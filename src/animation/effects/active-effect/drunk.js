@@ -86,6 +86,11 @@ async function play(token, config = {}) {
     if (seq) { await seq.play(); }
 
     if (overlay.applyPC || overlay.applyGM) {
+        const SEQUENCER_DEFAULT_OPACITY = 50;
+        if (!overlay.applyGM && game.settings.get('sequencer', 'user-effect-opacity') === SEQUENCER_DEFAULT_OPACITY) {
+            console.warn('EMP | Sequencer user-effect-opacity is set to default (50). This may cause the blurred vision effect to appear for GMs as well. Consider lowering this if this is not intended.');
+        }
+
         const owners = utils.owners(token, { applyPC: overlay.applyPC, applyGM: overlay.applyGM });
         blur.drunk.play(owners);
     }
