@@ -5,6 +5,7 @@ import { banishment } from "./active-effect/banishment.js";
 import { benignTransportation } from "./on-target/benign-transportation.js";
 import { bless } from "./active-effect/bless.js";
 import { blastLock } from "./template/blast-lock.js";
+import { blurredVision } from "./active-effect/blurred-vision.js";
 import { callLightning } from "./token/call-lightning.js";
 import { chainLightning } from "./token/chain-lightning.js";
 import { channelDivinityControlUndead } from "./target/channelDivinityControlUndead.js";
@@ -96,6 +97,7 @@ export const effect = {
     benignTransportation,
     bless,
     blastLock,
+    blurredVision,
     callLightning,
     chainLightning,
     channelDivinityControlUndead,

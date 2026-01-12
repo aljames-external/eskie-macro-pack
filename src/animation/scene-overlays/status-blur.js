@@ -11,11 +11,11 @@ const DEFAULT_CONFIG = {
 }
 
 function create(users = [], config = {}){
-    if (!canvas?.scene?.background?.src) return;
-
     // Catch the case where we pass in an array of users
     // Preference of this create function is single users
     const seq = new Sequence();
+    if (!canvas?.scene?.background?.src) return seq;
+
     if (Array.isArray(users)) {
         users.forEach( u => { seq.addSequence(create(u, config)); });
         return seq;
