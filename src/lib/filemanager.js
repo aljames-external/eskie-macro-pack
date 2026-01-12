@@ -54,8 +54,8 @@ export function snd(path) {
     switch (modulePrefix) {
         case 'psfx':
             dependency.someRequired([{ id: 'psfx-patreon' }, { id: 'psfx' }]);
-            isPatreonUser = dependency.isActivated({ id: 'psfx-patreon' });
-            isFreeUser = dependency.isActivated({ id: 'psfx' });
+            isPatreonUser = dependency.isActivated({ id: 'psfx-patreon', ref: 'PSFX-Patreon' });
+            isFreeUser = dependency.isActivated({ id: 'psfx', ref: "PSFX - Peri's Sound Effects" });
             if (isPatreonUser && isFreeUser) 
                 ui.notifications.warn('Both PSFX Patreon and Free are activated, both modules use the path `psfx.` to prefix files! This will cause conflicts! Recommend disabling / uninstalling the free version.');
             modulePrefix = 'psfx';
@@ -83,8 +83,8 @@ export function img(path) {
     switch (modulePrefix) {
         case 'eskie':
         case 'eskie-free':
-            dependency.someRequired([{ id: 'eskie-effects', ref: 'Eskie Effects Patreon'}, { id: 'eskie-effects-free', ref: 'Eskie Effects Free' }]);
-            isPatreonUser = dependency.isActivated({ id: 'eskie-effects' });
+            dependency.someRequired([{ id: 'eskie-effects', ref: 'Eskie Effects'}, { id: 'eskie-effects-free', ref: 'Eskie Effects Free' }]);
+            isPatreonUser = dependency.isActivated({ id: 'eskie-effects', ref: 'Eskie Effects' });
             modulePrefix = (isPatreonUser) ? `eskie` : `eskie-free`;
             break;
         case 'jb2a':

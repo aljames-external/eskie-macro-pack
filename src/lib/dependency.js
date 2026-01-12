@@ -119,7 +119,8 @@ function hasSomeRecommended(dependencyList) {
 
     let warnMsg = 'Recommend installing one of the following:';
     for (let dependency of dependencyList) {
-        warnMsg += `\nModule Id: ${dependency?.id}`;
+        warnMsg += `\nModule: ${dependency?.id}`;
+        if (dependency?.ref) warnMsg += ` (${dependency?.ref})`;
     }
     console.warn(warnMsg);
     return false;

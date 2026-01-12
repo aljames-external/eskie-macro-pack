@@ -9,9 +9,8 @@ const DEFAULT_CONFIG = {
 };
 
 async function create(token, config = {}) {
-    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, {inplace:false});
-    const { id } = mConfig;
-    dependency.required({ id: "fxmaster" });
+    const { id } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, {inplace:false});
+    dependency.required({ id: "fxmaster", ref: "Gambit's FXMaster" });
 
     const sequence = new Sequence();
     await FXMASTER.filters.switch("SandyfilterID", "color", {

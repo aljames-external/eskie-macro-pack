@@ -18,7 +18,7 @@ const defaultDetectionConfig = {
 };
 
 const defaultValidator = async function (target, tags) {
-    dependency.required({id: "tagger"});
+    dependency.required({id: "tagger", ref: "Tagger"});
     return Tagger.hasTags(target, tags);
 }
 
