@@ -33,10 +33,12 @@ console.log(eskie.showcase)  // Showcases from the Discord
 console.log(eskie.overlay)   // Canvas animations
 
 // Try some out!
-let target = Array.from(game.user.targets);
 let token = _token;
-await eskie.effect.banishment.play(target);
-await eskie.effect.banishment.stop(target);
+let targets = Array.from(game.user.targets);
+let target = targets[0];
+
+await eskie.effect.rage.play(token);
+await eskie.effect.rage.stop(token);
 
 // Configure!
 await eskie.effect.banishment.play(target, {color: 'purple'});
