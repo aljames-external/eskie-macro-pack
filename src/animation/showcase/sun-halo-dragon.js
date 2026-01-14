@@ -19,6 +19,10 @@ function adjustTeleport(coorinates) {
 const DEFAULT_CONFIG = {
     impact: false,
     screen: true,
+    sound: {
+        enabled: true,
+        volume: 0.5,
+    }
 };
 
 function xdelta(p1, p2) {
@@ -30,8 +34,7 @@ function ydelta(p1, p2) {
 }
 
 async function create(token, targets = [], config = {}) {
-    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, {inplace:false});
-    const { impact, screen } = mConfig;
+    const { impact, screen, sound } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, {inplace:false});
     const { pos1, pos2 } = await getPositions(token);
     const mirrorY = pos1.x > pos2.x;
 
@@ -57,15 +60,22 @@ async function create(token, targets = [], config = {}) {
             .duration(2000+150+500)
             .fadeIn(100,{delay: 2500+150})
             .fadeOut(250)
-            .filter("Blur", { blurX: 15, blurY: 0 })
+            .filter("Blur", { blurX: 15, blurY: 0 });
+        
+        if (sound.enabled) {
+            seq.sound()
+                .file("psfx.2nd-level-spells.misty-step.v1.intro.fire")
+                .volume(sound.volume);
+        }
 
-        .effect()
+        seq.effect()
             .file(img("eskie.screen_overlay.speed_lines.horizontal.02.redyellow"))
             .screenSpace()
             .screenSpaceScale({fitX:true,fitY:true})
             .mirrorX()
             .fadeOut(500)
             .duration(2500)
+            .delay(200)
             .playIf(screen)
 
         .effect()
@@ -80,6 +90,7 @@ async function create(token, targets = [], config = {}) {
             .private()
             //.mask()
             .duration(2000)
+            .delay(200)
             .fadeOut(250)
             .zIndex(5)
 
@@ -167,9 +178,15 @@ async function create(token, targets = [], config = {}) {
             .delay(2000)
             .shake({ duration: 250, strength: 1.5, rotation: false, fadeOut: 250 })
 
-        .wait(2000)
+        .wait(1000);
+        if (sound.enabled) {
+            seq.sound()
+                .file("psfx.casting.fire-side.001")
+                .volume(sound.volume);
+        }
+        seq.wait(1000);
 
-        .effect()
+        seq.effect()
             .file(img("eskie.fire.fire_dragon.01"))
             .atLocation(pos1)
             .stretchTo(pos2)
