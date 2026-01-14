@@ -44,8 +44,8 @@ async function create(token, config = {}) {
             .delay(500)
     }
 
-    sequence
-        .effect()
+    if (canvas.scene.background.src && tintMap){
+        sequence.effect()
             .name(`Casting ${token.document.name}`)
             .file(canvas.scene.background.src)
             .filter("ColorMatrix", {saturate: 1, brightness: 0.6})
@@ -57,9 +57,9 @@ async function create(token, config = {}) {
             .tint("#9eecff")
             .belowTokens()
             .spriteOffset({x:-canvas.scene.background.offsetX,y:-canvas.scene.background.offsetY})
-            .playIf(tintMap)
+    };
 
-        .effect()
+    sequence.effect()
             .file(img("jb2a.static_electricity.01.blue"))
             .atLocation(token)
             .fadeIn(500)
@@ -67,12 +67,11 @@ async function create(token, config = {}) {
             .scaleToObject(1.5)
             .duration(5000)
             .mask()
-            .zIndex(2);
+            .zIndex(2)
 
-    sequence
         .effect()
             .file(img("eskie.lightning.02.blue"))
-            .atLocation(position)
+            .atLocation(token)
             .rotateTowards(position)
             .size({width:2, height:1.8}, {gridUnits:true})
             .spriteOffset({x:-0.25}, {gridUnits:true})
@@ -83,7 +82,7 @@ async function create(token, config = {}) {
         
         .effect()
             .file(img("eskie.lightning.03.blue"))
-            .atLocation(position)
+            .atLocation(token)
             .rotateTowards(position)
             .size({width:2, height:1.8}, {gridUnits:true})
             .spriteOffset({x:-0.5}, {gridUnits:true})
@@ -109,7 +108,7 @@ async function create(token, config = {}) {
         
         .effect()
             .file(img("eskie.lightning.04.blue"))
-            .atLocation(position)
+            .atLocation(token)
             .rotateTowards(position)
             .size({width:1.2, height:1}, {gridUnits:true})
             .spriteScale({x:1.25})
