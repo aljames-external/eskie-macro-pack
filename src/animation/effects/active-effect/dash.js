@@ -1,7 +1,7 @@
 import { autoanimations } from '../../../integration/autoanimations.js';
 import { socket } from '../../../integration/socketlib.js';
 import { closest } from '../../../lib/filemanager.js'
-import { tiles } from '../../utils/tiles.js';
+import { matt } from '../../utils/matt-tiles.js';
 
 export const DEFAULT_CONFIG = {
     id: 'Cunning Action'
@@ -49,17 +49,17 @@ async function play(token, config = {}) {
     const mergedConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, {inplace:false});
     const effectFunction = `eskie.effect.dash.macro.movement`;
     const code = `${effectFunction}(token.object, tile)`;
-    await tiles.initialize(token, code, mergedConfig);    
+    await matt.movement.initialize(token, code, mergedConfig);    
     const sequence = create(token, config);
     return sequence?.play();
 }
 
 async function stop(token, config = {}) {
     const { id } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, {inplace:false});
-    const label = tiles.getLabel(id, token);
-    const taggerTiles = Tagger.getByTag(label);
+    const label = matt.getLabel(id, token);
+    const tiles = Tagger.getByTag(label);
 
-    taggerTiles.forEach(async (tile) => { await socket.tile.destroy(tile.id); });
+    tiles.forEach(async (tile) => { await socket.tile.destroy(tile.id); });
     Sequencer.EffectManager.endEffects({ name: label, object: token });
 }
 
@@ -110,7 +110,7 @@ async function movement(token, tile, config = {}) {
     }
 
     const mergedConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, {inplace:false});
-    const {rotation, travelTime, label} = await tiles.configuration(token, tile, mergedConfig);
+    const {rotation, travelTime, label} = await matt.movement.configuration(token, tile, mergedConfig);
     return travelSequence({tile, rotation, travelTime, label}).play();
 }
 

@@ -23,7 +23,7 @@ async function initialize(token, code, config = {}) {
 
     const mergedConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, {inplace:false});
     const { id } = mergedConfig;
-    const label = tiles.getLabel(id, token);
+    const label = getLabel(id, token);
 
     const initialData = {
         "texture.src": "icons/svg/d6-grey.svg", 
@@ -86,9 +86,10 @@ async function configuration(token, tile, config = {}) {
     return { rotation, travelTime, label };
 }
 
-export const tiles = {
-    initialize,
-    configuration,
-    getLabel,
-    getCenter,
-}
+export const matt = {
+    movement: {
+        initialize,
+        configuration,
+    },
+    getLabel
+};
