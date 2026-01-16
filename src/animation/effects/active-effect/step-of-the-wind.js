@@ -1,6 +1,7 @@
 // Author: .eskie
 // Modular Conversion: bakanabaka
 
+import { utils } from '../../utils/utils.js';
 import { img, snd } from '../../../lib/filemanager.js'
 import { dependency } from '../../../lib/dependency.js';
 import { socket } from '../../../integration/socketlib.js';
@@ -12,6 +13,11 @@ export const DEFAULT_CONFIG = {
 
 async function wait(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+//Determine movement direction
+function getCenter(tile) {
+    return {x: tile.x + tile.width/2, y: tile.y + tile.height/2};
 }
 
 function create(token, config = {}) {
@@ -76,13 +82,13 @@ async function play(token, config = {}) {
     const label = `${id} - ${token.id}`;
 
     const initialData = {
-        "texture.src":"icons/svg/d6-grey.svg", 
-        "alpha":0.1,
+        "texture.src": "icons/svg/d6-grey.svg", 
+        "alpha": 1,
         "hidden": true,
         "x": token.x,
         "y": token.y,
-        "width": canvas.grid.size*token.document.width,
-        "height": canvas.grid.size*token.document.width,
+        "width": canvas.grid.size * token.document.width,
+        "height": canvas.grid.size * token.document.width,
     };
     
     const [tile] = await socket.tile.create(initialData);
@@ -105,6 +111,7 @@ async function play(token, config = {}) {
     await Tagger.addTags(tile, label);
 
     await tokenAttacher.attachElementToToken(tile, token, true);
+    await tile.setFlag('world', 'step-of-the-wind', { tokenCenter: getCenter(tile) });
     const sequence = create(token, config);
     return sequence?.play();
 }
@@ -125,9 +132,17 @@ async function movement(token, config = {}) {
 
     if (!game.user.isGM || !tile) return;
 
-    //Determine movement direction
-    let tokenPosition = ({x: token.center.x, y: token.center.y}) 
-    let tilePosition =({x: tile.x+tile.width/2, y: tile.y+tile.height/2})
+    const savedData = await tile.getFlag('world', 'step-of-the-wind');
+    function tokenMoved() {
+        const currentCenter = {x: token.center.x, y: token.center.y};
+        const savedCenter = savedData.tokenCenter;
+        return (currentCenter.x !== savedCenter.x) || (currentCenter.y !== savedCenter.y);
+    }
+
+    const tokenPosition = {x: token.center.x, y: token.center.y};
+    await utils.waitUntil(tokenMoved, {timeout: 5000});
+    
+    let tilePosition = {x: tile.x+tile.width/2, y: tile.y+tile.height/2};
     let deltaX = tokenPosition.x - tilePosition.x;
     let deltaY = tokenPosition.y - tilePosition.y;
     let angleRadians = Math.atan2(deltaY, deltaX);
@@ -141,7 +156,6 @@ async function movement(token, config = {}) {
       
     //Play MATT Sequence
     const SequenceMATT = new Sequence()
-
       .effect()
         .file(img("eskie.nature.flower.particle.01.blue"))
         .atLocation(token)
@@ -163,7 +177,7 @@ async function movement(token, config = {}) {
         .name(`${label} - Trail`)
         .file(img("eskie.trail.token.generic.01.white"))
         .attachTo(token)
-        .rotateTowards(tile,{attachTo: false})
+        .rotateTowards(tile, {attachTo: false})
         .scaleToObject(1.5, {considerTokenScale: true})
         .spriteOffset({x:-0.75-0.75},{gridUnits:true})
         .opacity(1)
@@ -189,10 +203,12 @@ async function movement(token, config = {}) {
         .on(tile)
         .teleportTo(tilePosition, {relativeToCenter: true})
 
-      .wait(Math.max(travelTime-250,250))
+      .wait(Math.max(travelTime-250, 250))
       
       .thenDo(async () => {
-        Sequencer.EffectManager.endEffects({ name: `${label} - Trail` })
+        Sequencer.EffectManager.endEffects({ name: `${label} - Trail` });
+        // The tile "instantly" moves, but the token takes time to catch up -- so tile.{x,y} is correct for where the token will be
+        await tile.setFlag('world', 'step-of-the-wind', { tokenCenter: getCenter(tile) });
       });
     
    await SequenceMATT.play();
