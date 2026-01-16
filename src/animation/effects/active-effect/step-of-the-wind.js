@@ -142,20 +142,24 @@ async function movement(token, config = {}) {
     // Initial tokenPosition is where the tile was when the movement started
     const tokenPosition = {x: savedData.tileData.x, y: savedData.tileData.y};
     // Wait for the tile to actually move
-    await utils.waitUntil(tileMoved, {timeout: 5000});
-    const updatedTile = await fromUuid(tile.uuid);
-    await updatedTile.setFlag('world', 'step-of-the-wind', { tileData: getCenter(updatedTile) });
+    let latency = await utils.waitUntil(tileMoved, {timeout: 5000});
+    if (eskie.debug) console.error(latency);
+    await tile.setFlag('world', 'step-of-the-wind', { tileData: getCenter(tile) });
 
-    const tilePosition = {x: updatedTile.x+updatedTile.width/2, y: updatedTile.y+updatedTile.height/2};
+    const tilePosition = getCenter(tile);
     const deltaX = tokenPosition.x - tilePosition.x;
     const deltaY = tokenPosition.y - tilePosition.y;
     const angleRadians = Math.atan2(deltaY, deltaX);
     const distance = Math.hypot(tokenPosition.x - tilePosition.x, tokenPosition.y - tilePosition.y);
-    const speed = (6 * canvas.grid.size)/1000;
+    const tokenSpeed = token._getAnimationMovementSpeed();
+    const speed = (tokenSpeed * canvas.grid.size) / 1000;
     const rotation = angleRadians * (180 / Math.PI);
-    const travelTime = (distance / speed);
+    const travelTime = (distance / speed) - latency;
     const particleRepeats = travelTime / 250;
-      
+    
+    // Latency is too long to show the effect
+    if (travelTime < 0) { return; }
+
     //Play MATT Sequence
     const SequenceMATT = new Sequence()
       .effect()
@@ -179,7 +183,7 @@ async function movement(token, config = {}) {
         .name(`${label} - Trail`)
         .file(img("eskie.trail.token.generic.01.white"))
         .attachTo(token)
-        .rotateTowards(updatedTile, {attachTo: false})
+        .rotateTowards(tile, {attachTo: false})
         .scaleToObject(1.5, {considerTokenScale: true})
         .spriteOffset({x:-0.75-0.75},{gridUnits:true})
         .opacity(1)
@@ -201,11 +205,11 @@ async function movement(token, config = {}) {
         .playIf(travelTime < 500)   
 
       .animation()
-        .delay(travelTime+1000)
+        .delay(travelTime + 1000)
         .on(tile)
         .teleportTo(tilePosition, {relativeToCenter: true})
 
-      .wait(Math.max(travelTime-250, 250))
+      .wait(Math.max(travelTime - latency - 250, 250))
       
       .thenDo(async () => {
         Sequencer.EffectManager.endEffects({ name: `${label} - Trail` });

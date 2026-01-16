@@ -7,7 +7,7 @@ async function waitUntil(condition, {timeout=2000, interval=100}={}) {
         const startTime = game.time.serverTime;
         const check = () => {
             if (condition()) {
-                resolve();
+                resolve(game.time.serverTime - startTime);
             } else if (game.time.serverTime - startTime > timeout) {
                 reject(new Error("Timeout waiting for condition."));
             } else {
