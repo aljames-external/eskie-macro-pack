@@ -1,8 +1,9 @@
+import { MODULE_ID } from '../lib/constants.js';
 import { tile, tileSockets } from './socketlib/tile.js';
 import { door, doorSockets } from './socketlib/door.js';
 
 async function register() {
-    const socket = socketlib.registerModule('eskie-macros');
+    const socket = socketlib.registerModule(MODULE_ID);
     const socketAPI = {
         tileSockets,
         doorSockets,
@@ -13,7 +14,7 @@ async function register() {
             socket.register(key, value);
         });
     });
-    game.modules.get('eskie-macros').socketlib = socket;
+    game.modules.get(MODULE_ID).socketlib = socket;
 }
 
 export const socketlibapi = {

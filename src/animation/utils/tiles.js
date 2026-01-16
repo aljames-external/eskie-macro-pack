@@ -1,7 +1,7 @@
 import { utils } from './utils.js';
-import { SECONDS } from '../../lib/constants.js';
-import { socket } from '../../integration/socketlib.js';
 import { dependency } from '../../lib/dependency.js';
+import { socket } from '../../integration/socketlib.js';
+import { SECONDS, MODULE_ID } from '../../lib/constants.js';
 
 const DEFAULT_CONFIG = {
     id: 'generic-tile-movement',
@@ -52,7 +52,7 @@ async function initialize(token, code, config = {}) {
     await Tagger.addTags(tile, label);
 
     await tokenAttacher.attachElementToToken(tile, token, true);
-    await tile.setFlag('world', id, { tileData: getCenter(tile) });
+    await tile.setFlag(MODULE_ID, id, { tileData: getCenter(tile) });
 }
 
 async function configuration(token, tile, config = {}) {
@@ -63,7 +63,7 @@ async function configuration(token, tile, config = {}) {
 
     // Initial token position is where the tile was when the movement started
     // We wait until the tile has moved and calculate latency required for the animation
-    const savedData = await tile.getFlag('world', id);
+    const savedData = await tile.getFlag(MODULE_ID, id);
         const tileOrigin = {x: savedData.tileData.x, y: savedData.tileData.y};
         function tileMoved() {
             const currentCenter = getCenter(tile);
@@ -71,7 +71,7 @@ async function configuration(token, tile, config = {}) {
             return (currentCenter.x !== savedCenter.x) || (currentCenter.y !== savedCenter.y);
         }
         let latency = await utils.waitUntil(tileMoved, {timeout: 5000});
-    await tile.setFlag('world', id, { tileData: getCenter(tile) });
+    await tile.setFlag(MODULE_ID, id, { tileData: getCenter(tile) });
 
     const tilePosition = getCenter(tile);
     const deltaX = tileOrigin.x - tilePosition.x;

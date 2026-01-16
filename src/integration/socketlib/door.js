@@ -1,3 +1,5 @@
+import { MODULE_ID } from "../../lib/constants.js"
+
 /* To be registered in socketlib */
 async function editDoor(id, updates = {}) {
     const door = canvas.walls.get(id);
@@ -16,7 +18,7 @@ function initialized(socket) {
 
 async function edit(id, updates = {}) {
     if (game.user.isGM) return editDoor(id, updates);
-    const socket = game.modules.get('eskie-macros').socketlib;
+    const socket = game.modules.get(MODULE_ID).socketlib;
     if (!initialized(socket)) return;
     return socket.executeAsGM("editDoor", id, updates);
 }

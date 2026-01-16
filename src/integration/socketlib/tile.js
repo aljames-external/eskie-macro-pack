@@ -1,3 +1,5 @@
+import { MODULE_ID } from "../../lib/constants.js"
+
 /* To be registered in socketlib */
 async function editTile(id, updates = {}) {
     const tile = canvas.tiles.get(id);
@@ -32,21 +34,21 @@ function initialized(socket) {
 
 async function edit(id, updates = {}) {
     if (game.user.isGM) return editTile(id, updates);
-    const socket = game.modules.get('eskie-macros').socketlib;
+    const socket = game.modules.get(MODULE_ID).socketlib;
     if (!initialized(socket)) return;
     return socket.executeAsGM("editTile", id, updates);
 }
 
 async function create(updates = {}) {
     if (game.user.isGM) return createTile(updates);
-    const socket = game.modules.get('eskie-macros').socketlib;
+    const socket = game.modules.get(MODULE_ID).socketlib;
     if (!initialized(socket)) return;
     return socket.executeAsGM("createTile", updates);
 }
 
 async function destroy(id) {
     if (game.user.isGM) return destroyTile(id);
-    const socket = game.modules.get('eskie-macros').socketlib;
+    const socket = game.modules.get(MODULE_ID).socketlib;
     if (!initialized(socket)) return;
     return socket.executeAsGM("destroyTile", id);
 }

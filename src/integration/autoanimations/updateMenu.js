@@ -1,3 +1,5 @@
+import { MODULE_ID } from "../../lib/constants.js";
+
 export async function generateAutorecUpdate(autorec, quiet = true) {
     if (quiet) console.group("EMP | Autorecognition Menu Check");
     let settings = {};
@@ -153,7 +155,7 @@ export class autorecUpdateFormApplication extends FormApplication {
         return foundry.utils.mergeObject(super.defaultOptions, {
             classes: ["form"],
             popOut: true,
-            template: `modules/eskie-macros/src/integration/autoanimations/autorecUpdateMenu.html`,
+            template: `modules/${MODULE_ID}/src/integration/autoanimations/autorecUpdateMenu.html`,
             id: "empAutorecUpdateMenu",
             title: "Eskie Macro Pack AA Update",
         });

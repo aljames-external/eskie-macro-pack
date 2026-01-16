@@ -1,3 +1,4 @@
+import { MODULE_ID } from "../lib/constants.js";
 import { dependency } from "../lib/dependency.js";
 import { defaultMenuSettings } from "./autoanimations/defaultMenuSettings.js";
 import { autorecUpdateFormApplication, generateAutorecUpdate } from "./autoanimations/updateMenu.js";
@@ -45,11 +46,10 @@ function standardizeTrigger(trigger) {
  * @returns {object} The autorec entry.
  */
 function createAutorecEntry(label, trigger, animation, config, version = "0.0.0") {
-    const moduleId = "eskie-macros";
     trigger = standardizeTrigger(trigger);
     const defaultMenu = defaultMenuSettings[trigger];
     const defaultEntry = defaultMenu[0];
-    const compendium = `Compendium.${moduleId}.eskie-aa-integration`;
+    const compendium = `Compendium.${MODULE_ID}.eskie-aa-integration`;
 
     let name = "UNSPECIFIED MACRO";
     switch(trigger) {
