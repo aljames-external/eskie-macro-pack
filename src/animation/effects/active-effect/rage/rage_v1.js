@@ -12,6 +12,7 @@ export const DEFAULT_CONFIG = {
 function create(token, config = {}) {
     const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, {inplace:false});
     const { id, color } = mConfig;
+    const label = `${id} - ${token.id}`;
 
     let seq = new Sequence();
     seq = seq.effect()
@@ -36,7 +37,7 @@ function create(token, config = {}) {
         .filter("ColorMatrix", { hue: -15, saturate: 1 })
         .size(3.5, { gridUnits: true })
         .persist()
-        .name(`${id} - ground-crack - ${token.uuid}`)
+        .name(`${label} - ground-crack`)
         .zIndex(0);
 
     seq = seq.effect()
@@ -65,7 +66,7 @@ function create(token, config = {}) {
     seq = seq.effect()
         .file(closest("jb2a.wind_stream.white"))
         .atLocation(token)
-        .name(`${id} - ${token.uuid}`)
+        .name(label)
         .attachTo(token)
         .scaleToObject()
         .rotate(90)
@@ -78,7 +79,7 @@ function create(token, config = {}) {
     seq = seq.effect()
         .file(closest(`jb2a.token_border.circle.static.${color}.012`))
         .atLocation(token)
-        .name(`${id} - ${token.uuid}`)
+        .name(label)
         .attachTo(token)
         .opacity(0.6)
         .scaleToObject(1.9)

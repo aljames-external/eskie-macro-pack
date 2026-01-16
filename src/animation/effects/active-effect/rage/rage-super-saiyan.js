@@ -14,11 +14,12 @@ export const DEFAULT_CONFIG = {
 function create(token, config = {}) {
     const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, {inplace:false});
     const { id, color } = mConfig;
+    const label = `${id} - ${token.id}`;
 
     let seq = new Sequence();
     seq = seq
         .effect()
-        .name(`${id} - ${token.uuid}`)
+        .name(label)
         .file(closest("jb2a.extras.tmfx.outpulse.circle.02.normal"))
         .atLocation(token)
         .size(4, { gridUnits: true })
@@ -26,7 +27,7 @@ function create(token, config = {}) {
 
     seq = seq
         .effect()
-        .name(`${id} - ${token.uuid}`)
+        .name(label)
         .file(closest(`jb2a.impact.ground_crack.${color}.02`))
         .atLocation(token)
         .belowTokens()
@@ -36,7 +37,7 @@ function create(token, config = {}) {
 
     seq = seq
         .effect()
-        .name(`${id} - ground-crack - ${token.uuid}`)
+        .name(`${label} - ground-crack`)
         .file(closest("jb2a.impact.ground_crack.still_frame.02"))
         .atLocation(token)
         .belowTokens()
@@ -48,7 +49,7 @@ function create(token, config = {}) {
 
     seq = seq
         .effect()
-        .name(`${id} - ${token.uuid}`)
+        .name(label)
         .file(closest("jb2a.wind_stream.white"))
         .atLocation(token, { offset: { y: 75 } })
         .size(1.75, { gridUnits: true })
@@ -61,7 +62,7 @@ function create(token, config = {}) {
 
     seq = seq
         .effect()
-        .name(`${id} - ${token.uuid}`)
+        .name(label)
         .file(closest(`jb2a.particles.outward.${color}.01.03`))
         .atLocation(token)
         .scaleToObject(2.5)
@@ -74,7 +75,7 @@ function create(token, config = {}) {
 
     seq = seq
         .effect()
-        .name(`${id} - ${token.uuid}`)
+        .name(label)
         .file(closest("jb2a.wind_stream.white"))
         .atLocation(token)
         .attachTo(token)
@@ -88,7 +89,7 @@ function create(token, config = {}) {
 
     seq = seq
         .effect()
-        .name(`${id} - ${token.uuid}`)
+        .name(label)
         .file(closest(`jb2a.token_border.circle.static.${color}.012`))
         .atLocation(token)
         .attachTo(token)

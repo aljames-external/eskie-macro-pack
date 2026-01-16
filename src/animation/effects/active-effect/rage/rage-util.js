@@ -5,6 +5,7 @@ const DEFAULT_CONFIG = {
 async function stop(token, config) {
     const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, {inplace:false});
     const { id } = mConfig;
+    const label = `${id} - ${token.id}`;
 
     let opacity = new Sequence()
         .animation()
@@ -13,7 +14,7 @@ async function stop(token, config) {
     
     // End all effects associated with this rage
     return Promise.all([
-        Sequencer.EffectManager.endEffects({ name: `${id} - ${token.id}`, object: token }),
+        Sequencer.EffectManager.endEffects({ name: label, object: token }),
         opacity.play()
     ]);
 }
@@ -21,10 +22,11 @@ async function stop(token, config) {
 async function clean(token, config) {
     const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, {inplace:false});
     const { id } = mConfig;
+    const label = `${id} - ${token.id}`;
 
     return Promise.all([
         stop(token, config),
-        Sequencer.EffectManager.endEffects({ name: `${id} - ground-crack - ${token.id}` })
+        Sequencer.EffectManager.endEffects({ name: `${label} - ground-crack` })
     ]);
 }
 

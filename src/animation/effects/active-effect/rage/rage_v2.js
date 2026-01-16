@@ -3,6 +3,7 @@
  * Update Author: bakanabaka
  */
 
+import { MODULE_ID } from '../../../../lib/constants.js';
 import { closest } from '../../../../lib/filemanager.js';
 import { util } from './rage-util.js';
 
@@ -17,11 +18,12 @@ export const DEFAULT_CONFIG = {
 function create(token, config = {}) {
     const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, {inplace:false});
     const { id, color, effect } = mConfig;
+    const label = `${id} - ${token.id}`;
 
     let seq = new Sequence();
     seq = seq
         .effect()
-        .name(`${id} - ${token.uuid}`)
+        .name(label)
         .copySprite(token)
         .attachTo(token)
         .rotate(0)
@@ -42,7 +44,7 @@ function create(token, config = {}) {
     // Copy sprite effect for blur
     seq = seq
         .effect()
-        .name(`${id} - ${token.uuid}`)
+        .name(label)
         .delay(250)
         .copySprite(token)
         .attachTo(token)
@@ -58,7 +60,7 @@ function create(token, config = {}) {
     // Ground crack impact
     seq = seq
         .effect()
-        .name(`${id} - ${token.uuid}`)
+        .name(label)
         .delay(250)
         .file(closest(`jb2a.impact.ground_crack.${color}.02`))
         .atLocation(token)
@@ -70,7 +72,7 @@ function create(token, config = {}) {
     // Ground crack still frame (persistent based on groundCrack config)
     seq = seq
         .effect()
-        .name(`${id} - ground-crack - ${token.uuid}`)
+        .name(`${label} - ground-crack`)
         .delay(250)
         .file(closest("jb2a.impact.ground_crack.still_frame.02"))
         .atLocation(token)
@@ -85,7 +87,7 @@ function create(token, config = {}) {
     // Roar sound effect
     seq = seq
         .effect()
-        .name(`${id} - ${token.uuid}`)
+        .name(label)
         .delay(250)
         .file(closest("eskie.sound.roar.02"))
         .atLocation(token)
@@ -95,7 +97,7 @@ function create(token, config = {}) {
     // Buff loop simple red effect (initial burst)
     seq = seq
         .effect()
-        .name(`${id} - ${token.uuid}`)
+        .name(label)
         .delay(250)
         .file(closest(`eskie.buff.loop.simple.${color}`))
         .attachTo(token, { offset: { y: -0.05 }, gridUnits: true })
@@ -110,7 +112,7 @@ function create(token, config = {}) {
     // Buff loop simple red effect (persistent)
     seq = seq
         .effect()
-        .name(`${id} - ${token.uuid}`)
+        .name(label)
         .delay(250)
         .file(closest(`eskie.buff.loop.simple.${color}`))
         .attachTo(token, { offset: { y: -0.05 }, gridUnits: true })
@@ -125,7 +127,7 @@ function create(token, config = {}) {
     // Aura token generic red (persistent)
     seq = seq
         .effect()
-        .name(`${id} - ${token.uuid}`)
+        .name(label)
         .file(closest(`eskie.aura.token.generic.02.${color}`))
         .attachTo(token)
         .scaleToObject(2.1)
@@ -139,8 +141,8 @@ async function play(token, config) {
     const { rageImg } = mConfig;
 
     if ( rageImg ) {
-        let originalImg = token.document.getFlag('eskie', 'rage_v2');   // Make sure we don't have an original yet...
-        if (!originalImg) await token.document.setFlag('eskie', 'rage_v2', token.document.texture.src); // Store original
+        let originalImg = token.document.getFlag(MODULE_ID, 'rage_v2');   // Make sure we don't have an original yet...
+        if (!originalImg) await token.document.setFlag(MODULE_ID, 'rage_v2', token.document.texture.src); // Store original
         await token.document.update({ texture: { src: rageImg } }, { animate: true });
     }
 
@@ -153,11 +155,11 @@ async function stop(token, config) {
     const { rageImg } = mConfig;
 
     if ( rageImg ) {
-        let originalImg = token.document.getFlag('eskie', 'rage_v2');
+        let originalImg = token.document.getFlag(MODULE_ID, 'rage_v2');
         if (originalImg) {
             await Promise.all([
                 token.document.update({ texture: { src: originalImg } }, { animate: true }),
-                token.document.unsetFlag('eskie', 'rage_v2')    // Cleanup flag
+                token.document.unsetFlag(MODULE_ID, 'rage_v2')    // Cleanup flag
             ]);
         }
     }
