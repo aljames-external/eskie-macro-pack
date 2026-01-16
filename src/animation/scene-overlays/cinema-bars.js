@@ -1,5 +1,4 @@
 import { file } from "../../lib/filemanager.js";
-import { utils } from "../utils/utils.js"
 
 const DEFAULT_CONFIG = {
     id: 'cinema-bars',
@@ -7,7 +6,7 @@ const DEFAULT_CONFIG = {
 }
 
 function create(config = {}) {
-    const { id, dim } = utils.mergeObject(DEFAULT_CONFIG, config);
+    const { id, dim } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, {inplace:false});
 
     let sequence = new Sequence();
     sequence.effect()

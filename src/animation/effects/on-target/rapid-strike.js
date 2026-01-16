@@ -1,7 +1,7 @@
 //Last Updated: 12/22/2025
 //Author: .eskie
 
-import { utils } from '../../utils/utils.js';
+import { tokens } from '../../../lib/tokens.js';
 import { file } from '../../../lib/filemanager.js';
 import { settingsOverride } from "../../../lib/settings.js";
 import { autoanimations } from '../../../integration/autoanimations.js';
@@ -26,7 +26,7 @@ function create(token, target, config = {}) {
     const weightIndex = { light: 0, medium: 1, heavy: 2 }[weight];
     let effectSize = 2 + (0.25 * weightIndex);
     let effectOffset = -0.75 - (0.25 * weightIndex);
-    let targetSquare = utils.getNearestSquareCenter(token, target);
+    let targetSquare = tokens.getNearestSquareCenter(token, target);
 
     function attackAnimation(token, target, config) {
         const seq = new Sequence();

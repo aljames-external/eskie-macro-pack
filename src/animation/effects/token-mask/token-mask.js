@@ -1,7 +1,7 @@
 //Last Updated: 1/09/2026
 //Author: .eskie
 
-import { utils } from '../../utils/utils.js';
+import { time } from '../../../lib/time.js';
 import { file } from '../../../lib/filemanager.js'
 import { dependency } from '../../../lib/dependency.js';
 import { socket } from '../../../integration/socketlib.js';
@@ -59,7 +59,7 @@ async function createTiles(token, config) {
 
     // Ensure Foundry Tiles are generated are loaded
     function tilesRendered() { return tokenRevealMask?._object?.sourceElement && sceneRevealMask?._object?.sourceElement; }
-    await utils.waitUntil(tilesRendered, { timeout: 5000 });
+    await time.waitUntil(tilesRendered, { timeout: 5000 });
 
     // Reset videos to start
     tokenRevealMask._object.sourceElement.currentTime = 0;

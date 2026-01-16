@@ -1,8 +1,8 @@
 // Original Author: EskieMoh#2969
 // Modular Conversion: bakanabaka
 
-import { utils } from '../../utils/utils.js'
 import { file } from '../../../lib/filemanager.js';
+import { templates } from '../../../lib/templates.js'
 import { autoanimations } from '../../../integration/autoanimations.js';
 
 const DEFAULT_CONFIG = {
@@ -43,7 +43,7 @@ async function createCloud(token, config = {}) {
         icon: 'modules/jb2a_patreon/Library/Generic/Portals/Portal_Bright_Purple_V_400x250.webm', 
         label: 'Faerie Fire'
     };
-    let position = await utils.getPosition(template, cfg);
+    let position = await templates.getPosition(template, cfg);
     if (!position) { return; }
 
     const sequence = new Sequence();

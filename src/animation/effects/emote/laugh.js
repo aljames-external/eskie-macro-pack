@@ -1,5 +1,4 @@
 import { file } from "../../../lib/filemanager.js";
-import { utils } from "../../utils/utils.js"
 
 /* **
    Originally Published: 6/5/2023
@@ -39,7 +38,8 @@ async function create(token, config = {}) {
             {} // token shake
         ]
     };
-    let { id, duration, effect } = utils.mergeObject(defaultConfig, config);
+    // TODO(bakanabaka): Utilizes old [] -> {}
+    let { id, duration, effect } = foundry.utils.mergeObject(defaultConfig, config, {inplace:false});
     const facing = config.facing ?? defaultConfig.facing;
 
     const tokenWidth = token.document.width;

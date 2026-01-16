@@ -2,7 +2,7 @@
 //Author: .eskie
 //Update: bakanabaka
 
-import { utils } from '../../utils/utils.js';
+import { tokens } from '../../../lib/tokens.js';
 import { file } from '../../../lib/filemanager.js';
 import { autoanimations } from '../../../integration/autoanimations.js';
 
@@ -28,7 +28,7 @@ async function createMelee(token, target, config) {
     let effectOffset = -0.75 - (0.25 * weightIndex);
 
     //Determine nearest targetSquare
-    let targetSquare = utils.getNearestSquareCenter(token, target);
+    let targetSquare = tokens.getNearestSquareCenter(token, target);
 
     let seq = new Sequence()
 

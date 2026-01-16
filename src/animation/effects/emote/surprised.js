@@ -1,5 +1,4 @@
 import { file } from "../../../lib/filemanager.js";
-import { utils } from "../../utils/utils.js"
 
 /* **
    Originally Published: 4/14/2023
@@ -36,7 +35,8 @@ async function create(token, config = {}) {
             }
         ]
     };
-    let { id, duration, effect } = utils.mergeObject(defaultConfig, config);
+    // TODO(bakanabaka): Utilizes old mergeObject
+    let { id, duration, effect } = foundry.utils.mergeObject(defaultConfig, config, {inplace:false});
 
     const tokenWidth = token.document.width;
 

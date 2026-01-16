@@ -1,5 +1,4 @@
 import { file } from "../../../lib/filemanager.js";
-import { utils } from "../../utils/utils.js"
 
 /* **
    Originally Published: 5/1/2023
@@ -46,7 +45,8 @@ async function create(location, config = {}) {
             }
         ]
     };
-    let { id, duration, effect } = utils.mergeObject(defaultConfig, config);
+    // TODO(bakanabaka): Utilizes old mergeObject
+    let { id, duration, effect } = foundry.utils.mergeObject(defaultConfig, config, {inplace:false});
 
     let slapEffect = new Sequence()
         .effect()

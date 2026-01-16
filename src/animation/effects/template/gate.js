@@ -5,8 +5,8 @@
     Updated: bakanabaka
 ** */
 
-import { utils } from '../../utils/utils.js';
 import { file } from '../../../lib/filemanager.js';
+import { templates } from '../../../lib/templates.js';
 import { autoanimations, CONCENTRATING } from '../../../integration/autoanimations.js';
 
 const DEFAULT_CONFIG = {
@@ -106,7 +106,7 @@ async function create(token, config) {
         icon: 'modules/jb2a_patreon/Library/Generic/Portals/Portal_Bright_Purple_V_400x250.webm', 
         label: 'Gate'
     };
-    let position = await utils.getPosition(template, cfg);
+    let position = await templates.getPosition(template, cfg);
     if (!position) { return; }
 
     let destPlane = destination;

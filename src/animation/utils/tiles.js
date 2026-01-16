@@ -1,4 +1,4 @@
-import { utils } from './utils.js';
+import { time } from '../../lib/time.js';
 import { dependency } from '../../lib/dependency.js';
 import { socket } from '../../integration/socketlib.js';
 import { SECONDS, MODULE_ID } from '../../lib/constants.js';
@@ -70,7 +70,7 @@ async function configuration(token, tile, config = {}) {
             const savedCenter = savedData.tileData;
             return (currentCenter.x !== savedCenter.x) || (currentCenter.y !== savedCenter.y);
         }
-        let latency = await utils.waitUntil(tileMoved, {timeout: 5000});
+        let latency = await time.waitUntil(tileMoved, {timeout: 5000});
     await tile.setFlag(MODULE_ID, id, { tileData: getCenter(tile) });
 
     const tilePosition = getCenter(tile);
