@@ -136,16 +136,19 @@ function hasSomeRecommended(dependencyList) {
 function required(dependencyList) {
     if (!Array.isArray(dependencyList)) required([dependencyList]);
     let errorMsg = `Requires all of the following to be installed and activaged:\n`;
+    let dependencyMet = true;
 
     for (let dependency of dependencyList) {
         let [isActivated, isValidVersion] = _isActivated(dependency);
-        if (isActivated && isValidVersion) return;
+        if (isActivated && isValidVersion) continue;
+        dependencyMet = false;
 
         const depRef = dependency?.id + ((dependency?.ref) ? ` (${dependency?.ref})` : '');
         errorMsg += `\nModule: ${depRef}`;
         errorMsg += _versionMessageAppend(dependency, _getEntity(dependency)?.version);
     }
-    throw errorMsg;
+
+    if (!dependencyMet) throw errorMsg;
 }
 
 /**
