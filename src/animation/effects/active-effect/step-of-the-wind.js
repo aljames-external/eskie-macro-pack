@@ -1,25 +1,19 @@
 // Author: .eskie
 // Modular Conversion: bakanabaka
 
-import { utils } from '../../utils/utils.js';
 import { img, snd } from '../../../lib/filemanager.js'
 import { dependency } from '../../../lib/dependency.js';
 import { socket } from '../../../integration/socketlib.js';
 import { autoanimations } from '../../../integration/autoanimations.js';
-import { SECONDS } from '../../../lib/constants.js';
+import { tiles } from '../../utils/tiles.js';
 
 export const DEFAULT_CONFIG = {
     id: 'Step of the Wind'
 };
 
-//Determine movement direction
-function getCenter(tile) {
-    return {x: tile.x + tile.width/2, y: tile.y + tile.height/2};
-}
-
 function create(token, config = {}) {
     const { id } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, {inplace:false});
-    const label = `${id} - ${token.id}`;
+    const label = tiles.getLabel(id, token);
 
     const sequenceOn = new Sequence()
 
@@ -75,8 +69,9 @@ async function play(token, config = {}) {
     dependency.required({id: 'token-attacher', ref: "Token Attacher"});
     dependency.required({id: 'monks-active-tiles', ref: "Monk's Active Tile Triggers"});
 
-    const { id } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, {inplace:false});
-    const label = `${id} - ${token.id}`;
+    const mergedConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, {inplace:false});
+    const { id } = mergedConfig;
+    const label = tiles.getLabel(id, token);
 
     const initialData = {
         "texture.src": "icons/svg/d6-grey.svg", 
@@ -107,109 +102,84 @@ async function play(token, config = {}) {
     await Tagger.addTags(tile, label);
 
     await tokenAttacher.attachElementToToken(tile, token, true);
-    await tile.setFlag('world', 'step-of-the-wind', { tileData: getCenter(tile) });
+    await tiles.initialize(tile, mergedConfig);
     const sequence = create(token, config);
     return sequence?.play();
 }
 
 async function stop(token, config = {}) {
     const { id } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, {inplace:false});
-    const label = `${id} - ${token.id}`;
-    const tiles = Tagger.getByTag(label);
+    const label = tiles.getLabel(id, token);
+    const taggerTiles = Tagger.getByTag(label);
 
-    tiles.forEach(async (tile) => { await socket.tile.destroy(tile.id); });
+    taggerTiles.forEach(async (tile) => { await socket.tile.destroy(tile.id); });
     Sequencer.EffectManager.endEffects({ name: label, object: token });
 }
 
 async function movement(token, config = {}) {
-    const { id } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, {inplace:false});
-    const label = `${id} - ${token.id}`;
-    const tile = Tagger.getByTag(label)[0];
+    function travelSequence(config = {}) {
+        const { token, tile, tilePosition, rotation, travelTime, particleRepeats, label } = config;
+        
+        //Play MATT Sequence
+        const SequenceMATT = new Sequence()
+        .effect()
+            .file(img("eskie.nature.flower.particle.01.blue"))
+            .atLocation(token)
+            .spriteRotation(rotation+135)
+            .scaleToObject(1.5)
+            .playbackRate(2)
+            .duration(1500)
+            .fadeOut(500)
+            .repeats(particleRepeats, 250, 250)
 
-    if (!game.user.isGM || !tile) return;
+        .effect()
+            .file(img("eskie.smoke.01.white"))
+            .atLocation(token)
+            .spriteRotation(rotation)
+            .scaleToObject(1.75,{considerTokenScale: true})
+            .belowTokens()
 
-    // Initial tokenPosition is where the tile was when the movement started
-    // We wait until the tile has moved and calculate latency required for the animation
-    const savedData = await tile.getFlag('world', 'step-of-the-wind');
-        const tokenPosition = {x: savedData.tileData.x, y: savedData.tileData.y};
-        function tileMoved() {
-            const currentCenter = getCenter(tile);
-            const savedCenter = savedData.tileData;
-            return (currentCenter.x !== savedCenter.x) || (currentCenter.y !== savedCenter.y);
-        }
-        let latency = await utils.waitUntil(tileMoved, {timeout: 5000});
-    await tile.setFlag('world', 'step-of-the-wind', { tileData: getCenter(tile) });
+        .effect()
+            .name(`${label} - Trail`)
+            .file(img("eskie.trail.token.generic.01.white"))
+            .attachTo(token)
+            .rotateTowards(tile, {attachTo: false})
+            .scaleToObject(1.5, {considerTokenScale: true})
+            .spriteOffset({x:-0.75-0.75},{gridUnits:true})
+            .opacity(1)
+            .persist()
+            .timeRange(250, 750)
+            .fadeOut(500, {ease:"easeOutQuint"})
+            .filter("ColorMatrix", { saturate:3})
+            .playIf(travelTime >= 500)
 
-    const tilePosition = getCenter(tile);
-    const deltaX = tokenPosition.x - tilePosition.x;
-    const deltaY = tokenPosition.y - tilePosition.y;
-    const angleRadians = Math.atan2(deltaY, deltaX);
-    const distance = Math.hypot(tokenPosition.x - tilePosition.x, tokenPosition.y - tilePosition.y);
-    const tokenSpeed = token._getAnimationMovementSpeed();
-    const speed = (tokenSpeed * canvas.grid.size) / (1 * SECONDS);
-    const rotation = angleRadians * (180 / Math.PI);
-    const travelTime = (distance / speed) - latency;
-    const particleRepeats = travelTime / 250;
-    
-    // Latency is too long to show the effect
-    if (travelTime < 0) { return; }
+        .effect()
+            .file(img("eskie.trail.token.generic.01.white"))
+            .attachTo(token)
+            .rotateTowards(tilePosition)
+            .scaleToObject(1.5, {considerTokenScale: true})
+            .spriteOffset({x:-0.75-0.75},{gridUnits:true})
+            .opacity(1)
+            .filter("ColorMatrix", { saturate:3})
+            .startTime(750)
+            .playIf(travelTime < 500)   
 
-    //Play MATT Sequence
-    const SequenceMATT = new Sequence()
-      .effect()
-        .file(img("eskie.nature.flower.particle.01.blue"))
-        .atLocation(token)
-        .spriteRotation(rotation+135)
-        .scaleToObject(1.5)
-        .playbackRate(2)
-        .duration(1500)
-        .fadeOut(500)
-        .repeats(particleRepeats, 250, 250)
+        .animation()
+            .delay(travelTime + 1000)
+            .on(tile)
+            .teleportTo(tilePosition, {relativeToCenter: true})
 
-      .effect()
-        .file(img("eskie.smoke.01.white"))
-        .atLocation(token)
-        .spriteRotation(rotation)
-        .scaleToObject(1.75,{considerTokenScale: true})
-        .belowTokens()
+        .wait(Math.max(travelTime - latency - 250, 250))
+        
+        .thenDo(async () => {
+            Sequencer.EffectManager.endEffects({ name: `${label} - Trail` });
+        });
+        
+        return SequenceMATT;
+    }
 
-      .effect()
-        .name(`${label} - Trail`)
-        .file(img("eskie.trail.token.generic.01.white"))
-        .attachTo(token)
-        .rotateTowards(tile, {attachTo: false})
-        .scaleToObject(1.5, {considerTokenScale: true})
-        .spriteOffset({x:-0.75-0.75},{gridUnits:true})
-        .opacity(1)
-        .persist()
-        .timeRange(250, 750)
-        .fadeOut(500, {ease:"easeOutQuint"})
-        .filter("ColorMatrix", { saturate:3})
-        .playIf(travelTime >= 500)
-
-      .effect()
-        .file(img("eskie.trail.token.generic.01.white"))
-        .attachTo(token)
-        .rotateTowards(tilePosition)
-        .scaleToObject(1.5, {considerTokenScale: true})
-        .spriteOffset({x:-0.75-0.75},{gridUnits:true})
-        .opacity(1)
-        .filter("ColorMatrix", { saturate:3})
-        .startTime(750)
-        .playIf(travelTime < 500)   
-
-      .animation()
-        .delay(travelTime + 1000)
-        .on(tile)
-        .teleportTo(tilePosition, {relativeToCenter: true})
-
-      .wait(Math.max(travelTime - latency - 250, 250))
-      
-      .thenDo(async () => {
-        Sequencer.EffectManager.endEffects({ name: `${label} - Trail` });
-      });
-    
-   await SequenceMATT.play();
+    config.sequence = travelSequence;
+    return tiles.movement(token, config);
 }
 
 
