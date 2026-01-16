@@ -1,7 +1,7 @@
 // Original Author: EskieMoh#2969
 // Updater: @bakanabaka
 
-import { img } from "../../../../lib/filemanager.js";
+import { file } from "../../../../lib/filemanager.js";
 
 const DEFAULT_CONFIG = {
     id: 'elementalBlast.electricity',
@@ -67,7 +67,7 @@ async function create(token, target, config = {}) {
     let sequence = new Sequence()
 
     .effect()
-    .file(img("animated-spell-effects-cartoon.smoke.17"))
+    .file(file("animated-spell-effects-cartoon.smoke.17"))
     .atLocation(token,{offset:{x:-0, y: -0}, gridUnits:true, local:false})
     .rotateTowards(targetCenter, {local: true})
     .spriteOffset({x: -1.0+ranOffset, y:-1.2- (token.document.width-1)/2}, {gridUnits:true})
@@ -77,7 +77,7 @@ async function create(token, target, config = {}) {
 
     .effect()
     .delay(0)
-    .file(img("animated-spell-effects-cartoon.electricity.blast.03"))
+    .file(file("animated-spell-effects-cartoon.electricity.blast.03"))
     .atLocation(token,{offset:{x:0.5* token.document.width, y: ranOffset}, gridUnits:true, local:true})
     .stretchTo(target, {onlyX: projX})
     .playbackRate(1.5)
@@ -86,7 +86,7 @@ async function create(token, target, config = {}) {
     .waitUntilFinished(-600)
 
     .effect()
-    .file(img("jb2a.impact.011.blue"))
+    .file(file("jb2a.impact.011.blue"))
     .atLocation(target,{offset:{x:0, y:0}, gridUnits:true})
     .scale(impactSize/2)
     return sequence;

@@ -1,7 +1,7 @@
 // Original Author: EskieMoh#2969
 // Modular Conversion: bakanabaka
 
-import { img } from "../../../../lib/filemanager.js";
+import { file } from "../../../../lib/filemanager.js";
 import { util } from './rage-util.js';
 
 export const DEFAULT_CONFIG = {
@@ -15,13 +15,13 @@ function create(token, config = {}) {
 
     let seq = new Sequence();
     seq = seq.effect()
-        .file(img("jb2a.extras.tmfx.outpulse.circle.02.normal"))
+        .file(file("jb2a.extras.tmfx.outpulse.circle.02.normal"))
         .atLocation(token)
         .size(4, { gridUnits: true })
         .opacity(0.25);
 
     seq = seq.effect()
-        .file(img(`jb2a.impact.ground_crack.${color}.02`))
+        .file(file(`jb2a.impact.ground_crack.${color}.02`))
         .atLocation(token)
         .belowTokens()
         .filter("ColorMatrix", { hue: -15, saturate: 1 })
@@ -29,7 +29,7 @@ function create(token, config = {}) {
         .zIndex(1);
 
     seq = seq.effect()
-        .file(img("jb2a.impact.ground_crack.still_frame.02"))
+        .file(file("jb2a.impact.ground_crack.still_frame.02"))
         .atLocation(token)
         .belowTokens()
         .fadeIn(1000)
@@ -40,7 +40,7 @@ function create(token, config = {}) {
         .zIndex(0);
 
     seq = seq.effect()
-        .file(img("jb2a.wind_stream.white"))
+        .file(file("jb2a.wind_stream.white"))
         .atLocation(token, { offset: { y: -0.05 }, gridUnits: true })
         .size(1.75, { gridUnits: true })
         .rotate(90)
@@ -52,7 +52,7 @@ function create(token, config = {}) {
         .fadeOut(3000);
 
     seq = seq.effect()
-        .file(img(`jb2a.particles.outward.${color}.01.03`))
+        .file(file(`jb2a.particles.outward.${color}.01.03`))
         .atLocation(token)
         .scaleToObject(2.5)
         .opacity(1)
@@ -63,7 +63,7 @@ function create(token, config = {}) {
         .duration(8000);
 
     seq = seq.effect()
-        .file(img("jb2a.wind_stream.white"))
+        .file(file("jb2a.wind_stream.white"))
         .atLocation(token)
         .name(`${id} - ${token.uuid}`)
         .attachTo(token)
@@ -76,7 +76,7 @@ function create(token, config = {}) {
         .private();
 
     seq = seq.effect()
-        .file(img(`jb2a.token_border.circle.static.${color}.012`))
+        .file(file(`jb2a.token_border.circle.static.${color}.012`))
         .atLocation(token)
         .name(`${id} - ${token.uuid}`)
         .attachTo(token)

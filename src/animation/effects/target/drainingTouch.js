@@ -1,7 +1,7 @@
 // Original Author: EskieMoh#2969
 // Updater: @bakanabaka
 
-import { img } from "../../../lib/filemanager.js";
+import { file } from "../../../lib/filemanager.js";
 
 const DEFAULT_CONFIG = {
     color: "teal",
@@ -47,7 +47,7 @@ async function create(token, target, config = {}) {
 
         // Poltergeist attack
         .effect()
-        .file(img("jb2a.extras.tmfx.outflow.circle.01"))
+        .file(file("jb2a.extras.tmfx.outflow.circle.01"))
         .atLocation(token)
         .mirrorX(token.document.mirrorX)
         .animateProperty("spriteContainer", "position.x", { from: 0, to: middleposition.x, duration: 250, ease: "easeOutCubic" })
@@ -87,7 +87,7 @@ async function create(token, target, config = {}) {
         // Target hit point
         .effect()
         .delay(150)
-        .file(img("jb2a.impact.004.green"))
+        .file(file("jb2a.impact.004.green"))
         .atLocation(target)
         .rotateTowards(token)
         .scaleToObject(1.45)
@@ -98,7 +98,7 @@ async function create(token, target, config = {}) {
 
         // Drain Touch Cracks
         .effect()
-        .file(img("jb2a.impact.ground_crack.02.white"))
+        .file(file("jb2a.impact.ground_crack.02.white"))
         .atLocation(target)
         .rotateTowards(token)
         .spriteOffset({ x: -0.4 }, { gridUnits: true })
@@ -120,7 +120,7 @@ async function create(token, target, config = {}) {
 
         // Animate hit dust
         .effect()
-        .file(img("jb2a.extras.tmfx.outflow.circle.01"))
+        .file(file("jb2a.extras.tmfx.outflow.circle.01"))
         .attachTo(target)
         .filter("ColorMatrix", { brightness: 0, saturate: -1 })
         .scaleToObject(1.45, { considerTokenScale: true })
@@ -131,7 +131,7 @@ async function create(token, target, config = {}) {
 
         // Cracks on target
         .effect()
-        .file(img("jb2a.impact.ground_crack.still_frame.02"))
+        .file(file("jb2a.impact.ground_crack.still_frame.02"))
         .atLocation(target)
         .rotateTowards(token)
         .spriteOffset({ x: -0.4 }, { gridUnits: true })
@@ -178,7 +178,7 @@ async function play(token, target, config = {}) {
 
             .effect()
             .name(`Incorporeal ${token.document.name}`)
-            .file(img("jb2a.extras.tmfx.outflow.circle.01"))
+            .file(file("jb2a.extras.tmfx.outflow.circle.01"))
             .attachTo(token, { cacheLocation: true, offset: { y: 0 }, gridUnits: true, bindAlpha: false })
             .scaleToObject(1.45, { considerTokenScale: true })
             .randomRotation()
@@ -208,7 +208,7 @@ async function play(token, target, config = {}) {
             .waitUntilFinished()
 
             .effect()
-            .file(img("jb2a.smoke.puff.centered.grey"))
+            .file(file("jb2a.smoke.puff.centered.grey"))
             .atLocation(token)
             .scaleToObject(2, { considerTokenScale: true })
             .opacity(0.5)

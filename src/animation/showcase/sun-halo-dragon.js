@@ -1,4 +1,4 @@
-import { img } from '../../lib/filemanager.js';
+import { file } from '../../lib/filemanager.js';
 import { deathEffect } from './sun-halo-dragon/death-effect.js';
 
 async function getPositions(token) {
@@ -69,7 +69,7 @@ async function create(token, targets = [], config = {}) {
         }
 
         seq.effect()
-            .file(img("eskie.screen_overlay.speed_lines.horizontal.02.redyellow"))
+            .file(file("eskie.screen_overlay.speed_lines.horizontal.02.redyellow"))
             .screenSpace()
             .screenSpaceScale({fitX:true,fitY:true})
             .mirrorX()
@@ -79,7 +79,7 @@ async function create(token, targets = [], config = {}) {
             .playIf(screen)
 
         .effect()
-            .file(img("jb2a.wind_stream.white"))
+            .file(file("jb2a.wind_stream.white"))
             .name("Rage")
             .attachTo(token, {bindAlpha: false})
             .scaleToObject()
@@ -96,7 +96,7 @@ async function create(token, targets = [], config = {}) {
 
         // Fire Aura
         .effect()
-            .file(img("eskie.aura.token.generic.01.redorange"))
+            .file(file("eskie.aura.token.generic.01.redorange"))
             .atLocation(token)
             .scaleToObject(2.1)
             .zIndex(0.1)
@@ -108,14 +108,14 @@ async function create(token, targets = [], config = {}) {
 
         // Dragon Eyes
         .effect()
-            .file(img("eskie.fire.03.redorange"))
+            .file(file("eskie.fire.03.redorange"))
             .atLocation(token, {offset:{x:-0.3, y:-0.15}, gridUnits:true})
             .scaleToObject(0.5)
             .playbackRate(1.2)
             .mirrorX()
             .zIndex(1)
         .effect()
-            .file(img("eskie.fire.03.redorange"))
+            .file(file("eskie.fire.03.redorange"))
             .atLocation(token, {offset:{x:0.3, y:-0.2}, gridUnits:true})
             .scaleToObject(0.5)
             .playbackRate(1.2)
@@ -131,7 +131,7 @@ async function create(token, targets = [], config = {}) {
             seq.effect()
                 .delay(2100)
                 .name(`Casting ${token.name}`)
-                .file(img(canvas.scene.background.src))
+                .file(file(canvas.scene.background.src))
                 .filter("ColorMatrix", {saturate: 1, brightness: 0.6})
                 .atLocation({x:(canvas.dimensions.width)/2,y:(canvas.dimensions.height)/2})
                 .size({width:canvas.scene.width/canvas.grid.size, height:canvas.scene.height/canvas.grid.size}, {gridUnits: true})
@@ -147,7 +147,7 @@ async function create(token, targets = [], config = {}) {
 
         seq.effect()
             .delay(2100)
-            .file(img("eskie.environment.lighting.shine.01.rainbow"))
+            .file(file("eskie.environment.lighting.shine.01.rainbow"))
             .atLocation(token)
             .scaleToObject(4)
             .scaleIn(0, 250, {ease: "easeOutCubic"})
@@ -157,7 +157,7 @@ async function create(token, targets = [], config = {}) {
 
         .effect()
             .delay(2100)
-            .file(img("eskie.particle.04.orange"))
+            .file(file("eskie.particle.04.orange"))
             .atLocation(token)
             .scaleToObject(5)
             .animateProperty("spriteContainer", "position.x", { from: 0, to: -7.5, duration: 500, gridUnits: true, ease: "easeOutQuint" })
@@ -166,7 +166,7 @@ async function create(token, targets = [], config = {}) {
 
         .effect()
             .delay(2000)
-            .file(img("eskie.velocity.01.white"))
+            .file(file("eskie.velocity.01.white"))
             .atLocation(token)
             .mirrorX()
             .scaleToObject(7.5)
@@ -187,7 +187,7 @@ async function create(token, targets = [], config = {}) {
         seq.wait(1000);
 
         seq.effect()
-            .file(img("eskie.fire.fire_dragon.01"))
+            .file(file("eskie.fire.fire_dragon.01"))
             .atLocation(pos1)
             .stretchTo(pos2)
             .scale(0.75)
@@ -198,7 +198,7 @@ async function create(token, targets = [], config = {}) {
 
         seq.effect()
             .delay(150)
-            .file(img("eskie.slice.01_ranged.color.rainbow"))
+            .file(file("eskie.slice.01_ranged.color.rainbow"))
             .atLocation(pos1)
             .stretchTo(pos2)
             .scale(1.5)

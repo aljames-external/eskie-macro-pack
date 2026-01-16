@@ -4,7 +4,7 @@
 * Modular Update: Bakana
 **/
 
-import { img, snd } from "../../../lib/filemanager.js";
+import { file } from "../../../lib/filemanager.js";
 import { settingsOverride } from "../../../lib/settings.js";
 import { autoanimations } from "../../../integration/autoanimations.js";
 
@@ -40,16 +40,16 @@ async function create(token, targets, config = {}) {
         
         if (sound.enabled) {
             seq.sound()
-                .file(snd(sound.file))
+                .file(file(sound.file))
                 .volume(sound.volume)
         }
 
         seq.effect()
-            .file(img(animations.out.file))
+            .file(file(animations.out.file))
             .atLocation(A)
             .scaleToObject(2)
         .effect()
-            .file(img(animations.out.file))
+            .file(file(animations.out.file))
             .atLocation(B)
             .scaleToObject(2)
             .waitUntilFinished(animations.out.until)
@@ -73,11 +73,11 @@ async function create(token, targets, config = {}) {
         }
 
         seq.effect()
-            .file(img(animations.in.file))
+            .file(file(animations.in.file))
             .atLocation(A)
             .scaleToObject(2)
         .effect()
-            .file(img(animations.in.file))
+            .file(file(animations.in.file))
             .atLocation(B)
             .scaleToObject(2)
             .waitUntilFinished(animations.in.until)

@@ -2,7 +2,7 @@
 // Modular Conversion: bakanabaka
 
 import { utils } from '../../utils/utils.js'
-import { img } from '../../../lib/filemanager.js';
+import { file } from '../../../lib/filemanager.js';
 import { autoanimations } from '../../../integration/autoanimations.js';
 
 const DEFAULT_CONFIG = {
@@ -48,7 +48,7 @@ async function createCloud(token, config = {}) {
 
     const sequence = new Sequence();
     sequence.effect()
-        .file(img(`animated-spell-effects-cartoon.flash.25`))
+        .file(file(`animated-spell-effects-cartoon.flash.25`))
         .atLocation(position)
         .scale(0.05)
         .playbackRate(1)
@@ -62,7 +62,7 @@ async function createCloud(token, config = {}) {
         .belowTokens();
 
     sequence.effect()
-        .file(img(`jb2a.particles.outward.white.01.03`))
+        .file(file(`jb2a.particles.outward.white.01.03`))
         .atLocation(position)
         .scale(0.025)
         .playbackRate(1)
@@ -75,7 +75,7 @@ async function createCloud(token, config = {}) {
         .animateProperty("spriteContainer", "position.y", { from: 0, to: -0.45, duration: 2500, gridUnits:true});
 
     sequence.effect()
-        .file(img(`jb2a.sacred_flame.token.${color}`))
+        .file(file(`jb2a.sacred_flame.token.${color}`))
         .atLocation(position)
         .scale(0.05)
         .playbackRate(1)
@@ -87,14 +87,14 @@ async function createCloud(token, config = {}) {
         .waitUntilFinished(-200);
 
     sequence.effect()
-        .file(img(`jb2a.impact.010.${color}`))
+        .file(file(`jb2a.impact.010.${color}`))
         .atLocation(position, {offset: {y:-0.25}, gridUnits: true})
         .scale(0.45)
         .randomRotation()
         .zIndex(1);
 
     sequence.effect()
-        .file(img("jb2a.particles.outward.white.01.03"))
+        .file(file("jb2a.particles.outward.white.01.03"))
         .scaleIn(0, 500, {ease: "easeOutQuint"})
         .fadeOut(1000)
         .atLocation(position, {offset: {y:-0.25}, gridUnits: true})
@@ -105,7 +105,7 @@ async function createCloud(token, config = {}) {
         .zIndex(2);
 
     sequence.effect()
-        .file(img(`jb2a.fireflies.{{Pfew}}.02.${color}`))
+        .file(file(`jb2a.fireflies.{{Pfew}}.02.${color}`))
         .atLocation({x:position.x, y:position.y}, {randomOffset: 3.5})
         .scaleToObject(1.8)
         .randomRotation()
@@ -121,7 +121,7 @@ async function createCloud(token, config = {}) {
         .zIndex(1);
 
     sequence.effect()
-        .file(img(`animated-spell-effects-cartoon.energy.pulse.yellow`))
+        .file(file(`animated-spell-effects-cartoon.energy.pulse.yellow`))
         .atLocation(position, {offset: {y:-0.25}, gridUnits: true})
         .size(5, {gridUnits: true})
         .filter("ColorMatrix", { saturate: -1, brightness:2, hue: hue})
@@ -131,7 +131,7 @@ async function createCloud(token, config = {}) {
 
     sequence.effect()
         .delay(50)
-        .file(img(`animated-spell-effects-cartoon.energy.pulse.yellow`))
+        .file(file(`animated-spell-effects-cartoon.energy.pulse.yellow`))
         .atLocation(position, {offset: {y:-0.25}, gridUnits: true})
         .size(5, {gridUnits: true})
         .filter("ColorMatrix", { hue: hue})
@@ -149,7 +149,7 @@ function createEffect(token, config = {}) {
 
     sequence.effect()
         .name(`${id} - ${token.name}`)
-        .file(img(`jb2a.fireflies.many.01.${color}`))
+        .file(file(`jb2a.fireflies.many.01.${color}`))
         .attachTo(token)
         .scaleToObject(1.4)
         .randomRotation()

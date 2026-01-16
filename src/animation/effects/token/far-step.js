@@ -3,7 +3,7 @@
  * Update Author: bakanabaka
  */
 
-import { img } from '../../../lib/filemanager.js';
+import { file } from '../../../lib/filemanager.js';
 
 const DEFAULT_CONFIG = {
     id: 'farStep',
@@ -17,7 +17,7 @@ async function create(token, position, config = {}) {
     seq = seq
         .effect()
         .name(id)
-        .file(img("jb2a.explosion.07.bluewhite"))
+        .file(file("jb2a.explosion.07.bluewhite"))
         .atLocation(token)
         .scaleIn(0, 500, { ease: "easeOutCubic" })
         .fadeOut(1000)
@@ -31,7 +31,7 @@ async function create(token, position, config = {}) {
     seq = seq
         .effect()
         .name(id)
-        .file(img("jb2a.energy_strands.range.standard.blue.04"))
+        .file(file("jb2a.energy_strands.range.standard.blue.04"))
         .atLocation(token)
         .stretchTo(position)
         .waitUntilFinished(-2000)
@@ -40,7 +40,7 @@ async function create(token, position, config = {}) {
     seq = seq
         .effect()
         .name(id)
-        .file(img("jb2a.explosion.07.bluewhite"))
+        .file(file("jb2a.explosion.07.bluewhite"))
         .atLocation(position)
         .scale({ x: token.document.width / 4, y: token.document.height / 4 })
         .scaleIn(0, 500, { ease: "easeOutCubic" })
@@ -57,7 +57,7 @@ async function create(token, position, config = {}) {
     seq = seq
         .effect()
         .name(`${id}-con`) // Unique name for the persistent condition effect
-        .file(img("jb2a.token_border.circle.spinning.blue.001"))
+        .file(file("jb2a.token_border.circle.spinning.blue.001"))
         .scaleIn(0, 1000, { ease: "easeOutElastic" })
         .duration(1000)
         .scaleOut(0, 500, { ease: "easeOutElastic" }) // This scaleOut seems contradictory with persist() but it was in the original, might need review.

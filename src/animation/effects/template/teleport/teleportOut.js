@@ -1,7 +1,7 @@
 // Original Author: EskieMoh#2969
 // Modular Conversion: bakanabaka
 
-import { img } from "../../../../lib/filemanager.js";
+import { file } from "../../../../lib/filemanager.js";
 
 const DEFAULT_CONFIG = {
     id: 'TeleportOut',
@@ -14,7 +14,7 @@ function create(token, targets, config = {}) {
 
     let sequence = new Sequence();
     sequence = sequence.effect()
-        .file(img("jb2a.particles.outward.blue.01.05"))
+        .file(file("jb2a.particles.outward.blue.01.05"))
         .atLocation(token)
         .filter("ColorMatrix", { saturate: -1, brightness: 2 })
         .scaleToObject(1.7)
@@ -22,7 +22,7 @@ function create(token, targets, config = {}) {
         .duration(5500);
 
     sequence = sequence.effect()
-        .file(img("jb2a.particles.outward.blue.01.05"))
+        .file(file("jb2a.particles.outward.blue.01.05"))
         .atLocation(token)
         .filter("ColorMatrix", { saturate: -1, brightness: 2 })
         .scaleToObject(4)
@@ -31,7 +31,7 @@ function create(token, targets, config = {}) {
         .duration(5500);
 
     sequence = sequence.effect()
-        .file(img("jb2a.magic_signs.circle.02.conjuration.intro.blue"))
+        .file(file("jb2a.magic_signs.circle.02.conjuration.intro.blue"))
         .atLocation(token)
         .belowTokens()
         .scaleToObject(maxDistance)
@@ -40,7 +40,7 @@ function create(token, targets, config = {}) {
         .waitUntilFinished(-1000);
 
     sequence = sequence.effect()
-        .file(img("jb2a.magic_signs.circle.02.conjuration.loop.blue"))
+        .file(file("jb2a.magic_signs.circle.02.conjuration.loop.blue"))
         .atLocation(token)
         .filter("ColorMatrix", { saturate: -0.5, brightness: 1.5 })
         .opacity(0.65)

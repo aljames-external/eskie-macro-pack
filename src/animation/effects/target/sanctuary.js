@@ -1,7 +1,7 @@
 // Original Author: EskieMoh#2969
 // Modular Conversion: bakanabaka
 
-import { img } from '../../../lib/filemanager.js';
+import { file } from '../../../lib/filemanager.js';
 
 const DEFAULT_CONFIG = {
     id: 'Sanctuary',
@@ -12,7 +12,7 @@ async function create(token, target, config = {}) {
     let seq = new Sequence()
         .effect()
             .atLocation(token)
-            .file(img(`jb2a.markers.light.complete.blue`))
+            .file(file(`jb2a.markers.light.complete.blue`))
             .scaleToObject(2)
             .scaleIn(0, 600, {ease: "easeOutCubic"})
             .belowTokens()
@@ -25,7 +25,7 @@ async function create(token, target, config = {}) {
 
         .effect()
             .atLocation(token)
-            .file(img(`jb2a.magic_signs.circle.02.abjuration.loop.blue`))
+            .file(file(`jb2a.magic_signs.circle.02.abjuration.loop.blue`))
             .scaleToObject(1.25)
             .rotateIn(180, 600, {ease: "easeOutCubic"})
             .scaleIn(0, 600, {ease: "easeOutCubic"})
@@ -37,7 +37,7 @@ async function create(token, target, config = {}) {
 
         .effect()
             .atLocation(token)
-            .file(img(`jb2a.magic_signs.circle.02.abjuration.loop.blue`))
+            .file(file(`jb2a.magic_signs.circle.02.abjuration.loop.blue`))
             .scaleToObject(1.25)
             .rotateIn(180, 600, {ease: "easeOutCubic"})
             .scaleIn(0, 600, {ease: "easeOutCubic"})
@@ -64,13 +64,13 @@ async function create(token, target, config = {}) {
             .waitUntilFinished(-1500)
 
         .effect()
-            .file(img("jb2a.extras.tmfx.border.circle.outpulse.01.normal"))
+            .file(file("jb2a.extras.tmfx.border.circle.outpulse.01.normal"))
             .atLocation(target)
             .scaleToObject(3.25 * target.document.texture.scaleX)
             .delay(1200)
 
         .effect()
-            .file(img("jb2a.butterflies.single.blue"))
+            .file(file("jb2a.butterflies.single.blue"))
             .name(`${target.name} Sanctuary`)
             .scaleToObject(2 * target.document.texture.scaleX)
             .opacity(1)
@@ -84,7 +84,7 @@ async function create(token, target, config = {}) {
             .delay(1200)
 
         .effect()
-            .file(img("jb2a.extras.tmfx.inflow.circle.03"))
+            .file(file("jb2a.extras.tmfx.inflow.circle.03"))
             .name(`${target.name} Sanctuary`)
             .atLocation(target)
             .scaleToObject(target.document.texture.scaleX)
@@ -98,7 +98,7 @@ async function create(token, target, config = {}) {
             .delay(1200)
 
         .effect()
-            .file(img("jb2a.extras.tmfx.outflow.circle.02"))
+            .file(file("jb2a.extras.tmfx.outflow.circle.02"))
             .atLocation(target)
             .fadeIn(200)
             .opacity(0.25)
@@ -109,7 +109,7 @@ async function create(token, target, config = {}) {
             .delay(1200)
 
         .effect()
-            .file(img("jb2a.particles.outward.blue.01.03"))
+            .file(file("jb2a.particles.outward.blue.01.03"))
             .atLocation(target)
             .filter("ColorMatrix", {saturate:-1, brightness:2})
             .fadeIn(200, {ease: "easeInExpo"})
@@ -122,7 +122,7 @@ async function create(token, target, config = {}) {
 
         .effect()
             .name(`${target.name} Sanctuary`)
-            .file(img("jb2a.bless.200px.intro.blue"))
+            .file(file("jb2a.bless.200px.intro.blue"))
             .atLocation(target)
             .scaleToObject(1.5 * target.document.texture.scaleX)
             .fadeIn(2000)
@@ -132,7 +132,7 @@ async function create(token, target, config = {}) {
 
         .effect()
             .name(`${target.name} Sanctuary`)
-            .file(img("jb2a.bless.200px.loop.blue"))
+            .file(file("jb2a.bless.200px.loop.blue"))
             .scaleToObject(1.5 * target.document.texture.scaleX)
             .opacity(0.75)
             .fadeOut(500)

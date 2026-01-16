@@ -1,4 +1,4 @@
-import { img } from "../../../lib/filemanager.js";
+import { file } from "../../../lib/filemanager.js";
 import { utils } from "../../utils/utils.js"
 import { blur } from "../../scene-overlays/status-blur.js";
 import { autoanimations } from "../../../integration/autoanimations.js";
@@ -26,7 +26,7 @@ async function create(token, config = {}) {
     let drunkEffect = new Sequence()
         // Drunk bubbles effect
         .effect()
-        .file(img('eskie.emote.drunk_bubbles.01'))
+        .file(file('eskie.emote.drunk_bubbles.01'))
         .zIndex(0)
         .name(label)
         .delay(0, 500)
@@ -49,7 +49,7 @@ async function create(token, config = {}) {
 
         // Blush effect attached to token with bobbing motion
         .effect()
-        .file(img('eskie.emote.blush.01'))
+        .file(file('eskie.emote.blush.01'))
         .zIndex(0)
         .name(label)
         .opacity(0.85)

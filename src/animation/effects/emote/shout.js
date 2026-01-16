@@ -1,4 +1,4 @@
-import { img } from "../../../lib/filemanager.js";
+import { file } from "../../../lib/filemanager.js";
 import { utils } from "../../utils/utils.js"
 
 /* **
@@ -50,7 +50,7 @@ async function create(token, config = {}) {
     let shoutEffect = new Sequence()
         .effect()
         .name(id)
-        .file(img(effect[0].img))
+        .file(file(effect[0].img))
         .atLocation(token, { offset: { x: (effect[0].x * tokenWidth) * facingFactor, y: (effect[0].y * tokenWidth) }, gridUnits: true, local: true })
         .spriteRotation(effect[0].rotation * facingFactor)
         .loopProperty("sprite", "rotation", { from: 0, to: -10 * facingFactor, duration: 250, ease: "easeOutCubic" })

@@ -1,7 +1,7 @@
 // Original Author: EskieMoh#2969
 // Updater: @bakanabaka
 
-import { img } from "../../../../lib/filemanager.js";
+import { file } from "../../../../lib/filemanager.js";
 
 const DEFAULT_CONFIG = {
     id: 'elementalBlast.fire',
@@ -67,7 +67,7 @@ async function create(token, target, config = {}) {
     let sequence = new Sequence()
 
     .effect()
-    .file(img("animated-spell-effects-cartoon.fire.33"))
+    .file(file("animated-spell-effects-cartoon.fire.33"))
     .atLocation(token,{offset:{x:-0, y: -0}, gridUnits:true, local:false})
     .rotateTowards(targetCenter, {local: true})
     .spriteOffset({x: (-1.0+ranOffset)*token.document.width, y:-0.4*token.document.width}, {gridUnits:true})
@@ -77,7 +77,7 @@ async function create(token, target, config = {}) {
 
     .effect()
     .delay(0)
-    .file(img("animated-spell-effects-cartoon.fire.29"))
+    .file(file("animated-spell-effects-cartoon.fire.29"))
     .atLocation(token,{offset:{x:0* token.document.width, y: ranOffset}, gridUnits:true, local:true})
     .stretchTo(target, {onlyX: projX})
     .playbackRate(1)
@@ -85,7 +85,7 @@ async function create(token, target, config = {}) {
     .waitUntilFinished(-900)
 
     .effect()
-    .file(img("animated-spell-effects-cartoon.fire.14"))
+    .file(file("animated-spell-effects-cartoon.fire.14"))
     .atLocation(target,{offset:{x:0, y:0}, gridUnits:true})
     .size(impactSize, {gridUnits:true})
     .rotateTowards(token)

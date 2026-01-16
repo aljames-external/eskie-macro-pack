@@ -1,7 +1,7 @@
 // Original Author: EskieMoh#2969
 // Modular Conversion: bakanabaka
 
-import { img } from "../../../../lib/filemanager.js";
+import { file } from "../../../../lib/filemanager.js";
 
 const DEFAULT_CONFIG = {};
 
@@ -10,7 +10,7 @@ async function create(token, target, config = {}) {
     const sequence = new Sequence();
 
     sequence.effect()
-        .file(img(`jb2a.particles.outward.purple.01.03`))
+        .file(file(`jb2a.particles.outward.purple.01.03`))
         .attachTo(target)
         .scale(0.15)
         .playbackRate(1)
@@ -24,7 +24,7 @@ async function create(token, target, config = {}) {
         .zIndex(0.2);
 
     sequence.effect()
-        .file(img("animated-spell-effects-cartoon.misc.all seeing eye"))
+        .file(file("animated-spell-effects-cartoon.misc.all seeing eye"))
         .attachTo(target)
         .filter("ColorMatrix", { hue: 182 })
         .scaleToObject(0.75)
@@ -32,7 +32,7 @@ async function create(token, target, config = {}) {
         .zIndex(0.1);
 
     sequence.effect()
-        .file(img("animated-spell-effects-cartoon.simple.27"))
+        .file(file("animated-spell-effects-cartoon.simple.27"))
         .attachTo(target)
         .scaleToObject(4)
         .spriteOffset({ x: 0.1, y: -0.45 }, { gridUnits: true })

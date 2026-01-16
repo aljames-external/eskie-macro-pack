@@ -3,7 +3,7 @@
 //Modified by: Gornetron
 //Modular by: bakanabaka
 
-import { img } from "../../../lib/filemanager.js";
+import { file } from "../../../lib/filemanager.js";
 import { autoanimations } from "../../../integration/autoanimations.js";
 
 const DEFAULT_CONFIG = {
@@ -16,7 +16,7 @@ function createSpellCircle(token, mConfig) {
     const { position } = mConfig;
     const seq = new Sequence()
         .effect()
-            .file(img("jb2a.particles.outward.greenyellow.02.03"))
+            .file(file("jb2a.particles.outward.greenyellow.02.03"))
             .atLocation(token) 
             .delay(150)
             .anchor({ x: 0.1})
@@ -33,7 +33,7 @@ function createSpellCircle(token, mConfig) {
             .attachTo(token)
             .anchor({ x: -0.5 })
             .size({width:0.4,height:1},{gridUnits:true})
-            .file(img("jb2a.magic_signs.circle.02.illusion.loop.yellow"))
+            .file(file("jb2a.magic_signs.circle.02.illusion.loop.yellow"))
             .rotateTowards(position)
             .mirrorY()
             .scaleIn(0, 500, {ease: "easeOutCubic"})

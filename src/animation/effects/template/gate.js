@@ -6,7 +6,7 @@
 ** */
 
 import { utils } from '../../utils/utils.js';
-import { img } from '../../../lib/filemanager.js';
+import { file } from '../../../lib/filemanager.js';
 import { autoanimations, CONCENTRATING } from '../../../integration/autoanimations.js';
 
 const DEFAULT_CONFIG = {
@@ -140,7 +140,7 @@ async function create(token, config) {
     let seq = new Sequence()
         .effect()
         .name(id)
-        .file(img(`jb2a.magic_signs.circle.02.conjuration.loop.${circleColor}`))
+        .file(file(`jb2a.magic_signs.circle.02.conjuration.loop.${circleColor}`))
         .atLocation(position)
         .opacity(0.35)
         .size({ width: width, height: height }, { gridUnits: true })
@@ -151,7 +151,7 @@ async function create(token, config) {
         .persist()
 
         .effect()
-        .file(img(`jb2a.sacred_flame.source.${castColor}`))
+        .file(file(`jb2a.sacred_flame.source.${castColor}`))
         .atLocation(position)
         .anchor({ x: 0.5, y: 0.6 })
         .scale(1.2)
@@ -160,14 +160,14 @@ async function create(token, config) {
         .waitUntilFinished(-1500)
 
         .effect()
-        .file(img(`animated-spell-effects-cartoon.energy.pulse.${pulseColor}`))
+        .file(file(`animated-spell-effects-cartoon.energy.pulse.${pulseColor}`))
         .atLocation(position)
         .opacity(0.6)
         .scale(2)
 
         .effect()
         .name(id)
-        .file(img(`jb2a.portals.vertical.vortex_masked.${portalColor}`))
+        .file(file(`jb2a.portals.vertical.vortex_masked.${portalColor}`))
         .atLocation(position)
         .persist()
         .anchor({ x: 0.5, y: 0.57 })
@@ -181,7 +181,7 @@ async function create(token, config) {
 
         .effect()
         .name(id)
-        .file(img(`jb2a.wall_of_force.sphere.${portalColor}`))
+        .file(file(`jb2a.wall_of_force.sphere.${portalColor}`))
         .atLocation(position)
         .persist()
         .anchor({ x: 0.5, y: 0.6 })

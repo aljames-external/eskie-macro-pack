@@ -1,7 +1,7 @@
 // Original Author: EskieMoh#2969
 // Modular Conversion: bakanabaka
 
-import { img } from "../../../lib/filemanager.js";
+import { file } from "../../../lib/filemanager.js";
 import { autoanimations } from "../../../integration/autoanimations.js";
 
 const DEFAULT_CONFIG = {
@@ -15,7 +15,7 @@ async function create(token, target, config = {}) {
     let seq = new Sequence();
     seq = seq.effect()
         .delay(500)
-        .file(img(`jb2a.particles.outward.white.02.03`))
+        .file(file(`jb2a.particles.outward.white.02.03`))
         .attachTo(token, {offset:{y:-0.25}, gridUnits:true, bindRotation: false})
         .scaleToObject(1.2)
         .playbackRate(2)
@@ -29,14 +29,14 @@ async function create(token, target, config = {}) {
 
     seq = seq.effect()
         .delay(1050)
-        .file(img(`jb2a.divine_smite.caster.reversed.${color}`))
+        .file(file(`jb2a.divine_smite.caster.reversed.${color}`))
         .atLocation(token)
         .scaleToObject(2.2)
         .startTime(900)
         .fadeIn(200);
 
     seq = seq.effect()
-        .file(img(`jb2a.divine_smite.caster.${color}`))
+        .file(file(`jb2a.divine_smite.caster.${color}`))
         .atLocation(token)
         .scaleToObject(1.85)
         .belowTokens()
@@ -48,7 +48,7 @@ async function create(token, target, config = {}) {
 
     seq = seq.effect()
         .delay(300)
-        .file(img("jb2a.impact.ground_crack.01.blue"))
+        .file(file("jb2a.impact.ground_crack.01.blue"))
         .atLocation(target)
         .size(2.3*token.document.width, {gridUnits:true})
         .filter("ColorMatrix", { saturate:-0.5, hue: -160 })
@@ -57,7 +57,7 @@ async function create(token, target, config = {}) {
         .randomRotation();
 
     seq = seq.effect()
-        .file(img(`jb2a.divine_smite.target.${color}`))
+        .file(file(`jb2a.divine_smite.target.${color}`))
         .atLocation(target)
         .rotateTowards(token)
         .scaleToObject(3)

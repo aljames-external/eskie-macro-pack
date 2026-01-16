@@ -1,6 +1,6 @@
 // Original Author: EskieMoh#2969
 // Updater: bakanabaka
-import { img } from "../../../../lib/filemanager.js";
+import { file } from "../../../../lib/filemanager.js";
 
 const DEFAULT_CONFIG = {
     id: 'elementalBlast.cold',
@@ -66,7 +66,7 @@ async function create(token, target, config = {}) {
     let sequence = new Sequence()
 
     .effect()
-    .file(img("animated-spell-effects-cartoon.water.11"))
+    .file(file("animated-spell-effects-cartoon.water.11"))
     .atLocation(token,{offset:{x:-0, y: -0}, gridUnits:true, local:false})
     .rotateTowards(targetCenter, {local: true})
     .spriteOffset({x: -1.0 + ranOffset, y:-0.65- (token.document.width-1)/2}, {gridUnits:true})
@@ -75,7 +75,7 @@ async function create(token, target, config = {}) {
     .zIndex(1)
 
     .effect()
-    .file(img("animated-spell-effects-cartoon.water.11"))
+    .file(file("animated-spell-effects-cartoon.water.11"))
     .atLocation(token,{offset:{x:-0, y: -0}, gridUnits:true, local:false})
     .rotateTowards(targetCenter, {local: true})
     .spriteOffset({x: -0.1 + ranOffset, y:-0.65- (token.document.width-1)/2}, {gridUnits:true})
@@ -88,7 +88,7 @@ async function create(token, target, config = {}) {
 
     .effect()
     .delay(0)
-    .file(img("jb2a.spell_projectile.ice_shard.blue"))
+    .file(file("jb2a.spell_projectile.ice_shard.blue"))
     .atLocation(token,{offset:{x:0.5* token.document.width, y: ranOffset}, gridUnits:true, local:true})
     .stretchTo(target)
     .playbackRate(1.5)

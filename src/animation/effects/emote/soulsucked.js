@@ -1,4 +1,4 @@
-import { img } from "../../../lib/filemanager.js";
+import { file } from "../../../lib/filemanager.js";
 import { utils } from "../../utils/utils.js"
 
 /* **
@@ -48,7 +48,7 @@ async function create(token, config = {}) {
     let soulSuckedEffect = new Sequence()
         .effect()
         .name(id)
-        .file(img(effect[0].img))
+        .file(file(effect[0].img))
         .atLocation(token)
         .scaleIn(0, 1000, { ease: "easeOutElastic" })
         .scaleOut(0, 1000, { ease: "easeOutExpo" })

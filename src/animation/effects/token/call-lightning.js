@@ -1,7 +1,7 @@
 // Original Author: .eskie
 // Modular Conversion: bakanabaka
 
-import { img } from '../../../lib/filemanager.js';
+import { file } from '../../../lib/filemanager.js';
 
 const AVAILABLE_SIZES = [10, 20, 30, 60];
 
@@ -26,7 +26,7 @@ async function create(position, config = {}) {
     const sequence = new Sequence();
 
     sequence.effect()
-        .file(img("jb2a.lightning_strike.blue"))
+        .file(file("jb2a.lightning_strike.blue"))
         .atLocation(position)
         .scale(2.25)
         .opacity(1)
@@ -40,7 +40,7 @@ async function create(position, config = {}) {
 
     sequence.effect()
         .delay(250)
-        .file(img("jb2a.impact.ground_crack.blue.01")) // Use img() for paths
+        .file(file("jb2a.impact.ground_crack.blue.01")) // Use img() for paths
         .atLocation(position)
         .belowTokens()
         .randomRotation()

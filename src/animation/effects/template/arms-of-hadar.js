@@ -4,7 +4,7 @@
     Updated: bakanabaka
 ** */
 
-import { img } from "../../../lib/filemanager.js";
+import { file } from "../../../lib/filemanager.js";
 import { autoanimations } from "../../../integration/autoanimations.js";
 
 const DEFAULT_CONFIG = {
@@ -49,7 +49,7 @@ async function create(token, config = {}) {
     sequence
         .effect()
         .atLocation(token)
-        .file(img(`jb2a.ward.rune.dark_purple.01`))
+        .file(file(`jb2a.ward.rune.dark_purple.01`))
         .scaleToObject(1.85)
         .scaleIn(0, 600, { ease: "easeOutCubic" })
         .belowTokens()
@@ -67,7 +67,7 @@ async function create(token, config = {}) {
         .zIndex(1)
 
         .effect()
-        .file(img("jb2a.extras.tmfx.outflow.circle.01"))
+        .file(file("jb2a.extras.tmfx.outflow.circle.01"))
         .atLocation(token)
         .filter("ColorMatrix", { brightness: -1 })
         .randomRotation()
@@ -78,7 +78,7 @@ async function create(token, config = {}) {
         .zIndex(0.1)
 
         .effect()
-        .file(img("jb2a.particles.outward.purple.01.02"))
+        .file(file("jb2a.particles.outward.purple.01.02"))
         .scaleIn(0, 1000, { ease: "easeOutQuint" })
         .delay(500)
         .fadeOut(1000)
@@ -92,7 +92,7 @@ async function create(token, config = {}) {
         .wait(1000)
 
         .effect()
-        .file(img("jb2a.extras.tmfx.border.circle.inpulse.01.fast"))
+        .file(file("jb2a.extras.tmfx.border.circle.inpulse.01.fast"))
         .atLocation(token)
         .scaleToObject(1.5)
         .filter("ColorMatrix", { brightness: -1 })
@@ -101,14 +101,14 @@ async function create(token, config = {}) {
         .effect()
         .delay(150)
         .belowTokens()
-        .file(img("jb2a.impact.ground_crack.dark_red.02"))
+        .file(file("jb2a.impact.ground_crack.dark_red.02"))
         .atLocation(token)
         .size(3.5, { gridUnits: true })
         .filter("ColorMatrix", { hue: -100, brightness: -1 })
 
         .effect()
         .delay(150)
-        .file(img("jb2a.impact.004.dark_purple"))
+        .file(file("jb2a.impact.004.dark_purple"))
         .atLocation(token)
         .scaleToObject(4)
         .filter("ColorMatrix", { hue: -100, brightness: -1 })
@@ -116,7 +116,7 @@ async function create(token, config = {}) {
 
         .effect()
         .delay(150)
-        .file(img("jb2a.arms_of_hadar.dark_purple"))
+        .file(file("jb2a.arms_of_hadar.dark_purple"))
         .atLocation(token)
         .randomRotation()
         .scaleIn(0, 750, { ease: "easeOutCirc" })
@@ -135,7 +135,7 @@ async function create(token, config = {}) {
 
                 new Sequence()
                     .effect()
-                    .file(img("animated-spell-effects-cartoon.energy.tentacles"))
+                    .file(file("animated-spell-effects-cartoon.energy.tentacles"))
                     .atLocation(target)
                     .moveTowards({ x: newX, y: newY }, { rotate: true, ease: "easeOutBack" })
                     .scaleToObject(1)

@@ -1,4 +1,4 @@
-import { img } from "../../../lib/filemanager.js";
+import { file } from "../../../lib/filemanager.js";
 import { utils } from "../../utils/utils.js"
 
 /* **
@@ -52,7 +52,7 @@ async function create(location, config = {}) {
         .effect()
         .name(id)
         .atLocation(location, { offset: { x: effect[0].x, y: effect[0].y }, gridUnits: true })
-        .file(img(effect[0].img))
+        .file(file(effect[0].img))
         .size(effect[0].scale, { gridUnits: true })
 
         .effect()

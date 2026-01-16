@@ -1,7 +1,7 @@
 // Original Author: EskieMoh#2969
 // Modular Conversion: bakanabaka
 
-import { img } from "../../../../lib/filemanager.js";
+import { file } from "../../../../lib/filemanager.js";
 
 const DEFAULT_CONFIG = {
     id: 'ChannelElementsEarth',
@@ -11,7 +11,7 @@ const DEFAULT_CONFIG = {
 function _createRock(sequence, token, xOffset, rockFile, smokeFile) {
     sequence.effect()
         .name(effectName)
-        .file(img(rockFile))
+        .file(file(rockFile))
         .attachTo(token, { offset: { x: xOffset * token.document.width, y: 0.4 * token.document.width }, gridUnits: true, bindRotation: false })
         .scaleToObject(1, { considerTokenScale: true })
         .mirrorY()
@@ -20,7 +20,7 @@ function _createRock(sequence, token, xOffset, rockFile, smokeFile) {
 
     sequence.effect()
         .name(effectName)
-        .file(img(smokeFile))
+        .file(file(smokeFile))
         .attachTo(token, { offset: { x: xOffset * token.document.width, y: 0.6 * token.document.width }, gridUnits: true, bindRotation: false })
         .stretchTo(token, { offset: { x: xOffset * token.document.width, y: 0 }, gridUnits: true })
         .fadeOut(1600)
@@ -28,7 +28,7 @@ function _createRock(sequence, token, xOffset, rockFile, smokeFile) {
 
     sequence.effect()
         .name(effectName)
-        .file(img("jb2a.celestial_bodies.asteroid.single.iron.red.01"))
+        .file(file("jb2a.celestial_bodies.asteroid.single.iron.red.01"))
         .attachTo(token, { offset: { x: xOffset * token.document.width, y: 0.5 }, gridUnits: true, bindRotation: false })
         .scaleToObject(0.25, { considerTokenScale: true })
         .scaleIn(0, 500, { ease: "easeOutCubic" })
@@ -41,7 +41,7 @@ function _createRock(sequence, token, xOffset, rockFile, smokeFile) {
 
     sequence.effect()
         .name(effectName)
-        .file(img("jb2a.celestial_bodies.asteroid.single.iron.red.01"))
+        .file(file("jb2a.celestial_bodies.asteroid.single.iron.red.01"))
         .attachTo(token, { offset: { x: xOffset * token.document.width, y: 0.4 }, gridUnits: true, bindRotation: false })
         .scaleToObject(0.3, { considerTokenScale: true })
         .scaleIn(0, 500, { ease: "easeOutCubic" })
@@ -59,7 +59,7 @@ async function create(token, config = {}) {
 
     sequence.effect()
         .name(effectName)
-        .file(img("animated-spell-effects-cartoon.energy.pulse.yellow"))
+        .file(file("animated-spell-effects-cartoon.energy.pulse.yellow"))
         .attachTo(token, { offset: { x: 0, y: -0 }, gridUnits: true, bindRotation: false })
         .scaleToObject(3.5)
         .fadeIn(250)
@@ -71,7 +71,7 @@ async function create(token, config = {}) {
 
     sequence.effect()
         .name(effectName)
-        .file(img("jb2a.impact.ground_crack.orange.03"))
+        .file(file("jb2a.impact.ground_crack.orange.03"))
         .attachTo(token, { offset: { x: 0, y: 0 }, gridUnits: true, bindRotation: false })
         .scaleToObject(2.5)
         .fadeOut(500)
@@ -79,7 +79,7 @@ async function create(token, config = {}) {
 
     sequence.effect()
         .name(effectName)
-        .file(img("jb2a.wind_stream.200.white"))
+        .file(file("jb2a.wind_stream.200.white"))
         .attachTo(token, { offset: { x: 0, y: 0 }, gridUnits: true, bindRotation: false })
         .scaleToObject(2)
         .fadeIn(1000)

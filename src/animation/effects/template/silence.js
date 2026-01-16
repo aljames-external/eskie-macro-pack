@@ -4,7 +4,7 @@
 ** */
 
 import { utils } from '../../utils/utils.js';
-import { img } from "../../../lib/filemanager.js";
+import { file } from "../../../lib/filemanager.js";
 import { autoanimations, CONCENTRATING } from "../../../integration/autoanimations.js";
 
 const DEFAULT_CONFIG = {
@@ -36,7 +36,7 @@ async function createSilence(token, config = {}) {
     const sequence = new Sequence();
     sequence
         .effect()
-        .file(img("jb2a.moonbeam.01.outro.yellow"))
+        .file(file("jb2a.moonbeam.01.outro.yellow"))
         .atLocation(position)
         .size(0.75, { gridUnits: true })
         .startTime(500)
@@ -46,7 +46,7 @@ async function createSilence(token, config = {}) {
 
         .effect()
         .delay(750)
-        .file(img("jb2a.extras.tmfx.border.circle.outpulse.01.normal"))
+        .file(file("jb2a.extras.tmfx.border.circle.outpulse.01.normal"))
         .atLocation(position)
         .size(5, { gridUnits: true })
         .opacity(0.5)
@@ -55,7 +55,7 @@ async function createSilence(token, config = {}) {
 
         .effect()
         .delay(750)
-        .file(img("jb2a.extras.tmfx.border.circle.outpulse.01.normal"))
+        .file(file("jb2a.extras.tmfx.border.circle.outpulse.01.normal"))
         .atLocation(position)
         .size(size, { gridUnits: true })
         .opacity(0.75)
@@ -63,7 +63,7 @@ async function createSilence(token, config = {}) {
         .belowTokens()
 
         .effect()
-        .file(img("jb2a.cast_generic.earth.01.browngreen.1"))
+        .file(file("jb2a.cast_generic.earth.01.browngreen.1"))
         .atLocation(position)
         .size(2, { gridUnits: true })
         .scaleIn(0, 500, { ease: "easeOutCubic" })
@@ -73,7 +73,7 @@ async function createSilence(token, config = {}) {
 
         .effect()
         .name(`Silence ${token.document.name} ${id}`) // Unique name for stopping
-        .file(img("jb2a.markers.bubble.complete.blue"))
+        .file(file("jb2a.markers.bubble.complete.blue"))
         .atLocation(position)
         .size(size, { gridUnits: true })
         .opacity(0.2)
@@ -87,7 +87,7 @@ async function createSilence(token, config = {}) {
 
         .effect()
         .name(`Silence ${token.document.name} ${id}`) // Unique name for stopping
-        .file(img("jb2a.wall_of_force.sphere.grey"))
+        .file(file("jb2a.wall_of_force.sphere.grey"))
         .atLocation(position)
         .size(size, { gridUnits: true })
         .opacity(0.2)
@@ -102,7 +102,7 @@ async function createSilence(token, config = {}) {
 
         .effect()
         .name(`Silence ${token.document.name} ${id}`) // Unique name for stopping
-        .file(img("jb2a.extras.tmfx.runes.circle.simple.illusion"))
+        .file(file("jb2a.extras.tmfx.runes.circle.simple.illusion"))
         .atLocation(position)
         .size(2, { gridUnits: true })
         .scaleIn(0, 500, { ease: "easeOutElastic" })

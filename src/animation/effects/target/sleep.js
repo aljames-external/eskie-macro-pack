@@ -1,7 +1,7 @@
 // Original Author: Unknown (from discord)
 // Modular Conversion: bakanabaka
 
-import { img } from "../../../lib/filemanager.js";
+import { file } from "../../../lib/filemanager.js";
 
 const DEFAULT_CONFIG = {
     position: undefined,
@@ -13,7 +13,7 @@ async function create(targets, config = {}) {
 
     // AOE effects
     sequence.effect()
-        .file(img("jb2a.sleep.cloud.01.dark_orangepurple"))
+        .file(file("jb2a.sleep.cloud.01.dark_orangepurple"))
         .scaleIn(0, 500, { ease: "easeOutQuint" })
         .fadeOut(1000)
         .atLocation(config.position)
@@ -22,7 +22,7 @@ async function create(targets, config = {}) {
         .zIndex(3);
 
     sequence.effect()
-        .file(img("jb2a.extras.tmfx.border.circle.outpulse.02.normal"))
+        .file(file("jb2a.extras.tmfx.border.circle.outpulse.02.normal"))
         .atLocation(config.position)
         .size(5, { gridUnits: true })
         .duration(1000)
@@ -31,7 +31,7 @@ async function create(targets, config = {}) {
         .zIndex(1);
 
     sequence.effect()
-        .file(img("jb2a.particles.outward.orange.02.03"))
+        .file(file("jb2a.particles.outward.orange.02.03"))
         .scaleIn(0, 500, { ease: "easeOutQuint" })
         .fadeOut(2000)
         .atLocation(config.position)
@@ -45,7 +45,7 @@ async function create(targets, config = {}) {
         targets.forEach(target => {
             new Sequence()
                 .effect()
-                .file(img("jb2a.sleep.symbol.dark_orangepurple"))
+                .file(file("jb2a.sleep.symbol.dark_orangepurple"))
                 .scaleIn(0, 500, { ease: "easeOutQuint" })
                 .fadeOut(1000)
                 .atLocation(target)

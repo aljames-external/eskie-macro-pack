@@ -1,7 +1,7 @@
 // Original Author: EskieMoh#2969
 // Modular Conversion: bakanabaka
 
-import { img } from '../../../lib/filemanager.js';
+import { file } from '../../../lib/filemanager.js';
 
 const DEFAULT_CONFIG = {
     id: 'MistyStep',
@@ -40,7 +40,7 @@ async function create(token, config = {}) {
                 .fadeOut(200)
 
             .effect()
-                .file(img("jb2a.misty_step.01.blue"))
+                .file(file("jb2a.misty_step.01.blue"))
                 .atLocation(token)
                 .scaleToObject(2)
                 .waitUntilFinished(-2000)
@@ -53,7 +53,7 @@ async function create(token, config = {}) {
                 .waitUntilFinished(200)
 
             .effect()
-                .file(img("jb2a.misty_step.02.blue"))
+                .file(file("jb2a.misty_step.02.blue"))
                 .atLocation(token)
                 .scaleToObject(2)
 

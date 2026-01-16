@@ -1,6 +1,6 @@
 import { autoanimations } from '../../../integration/autoanimations.js';
 import { socket } from '../../../integration/socketlib.js';
-import { img, snd } from '../../../lib/filemanager.js'
+import { file } from '../../../lib/filemanager.js'
 import { tiles } from '../../utils/tiles.js';
 
 export const DEFAULT_CONFIG = {
@@ -14,7 +14,7 @@ function create(token, config = {}) {
     const sequenceOn = new Sequence()
         .effect()
             .name(label)
-            .file(img("eskie.smoke.03.black"))
+            .file(file("eskie.smoke.03.black"))
             .attachTo(token)
             .scaleToObject(2)
             .belowTokens()
@@ -22,7 +22,7 @@ function create(token, config = {}) {
             .tint("#696969")
         .effect()
             .name(label)
-            .file(img("eskie.buff.one_shot.simple.blue"))
+            .file(file("eskie.buff.one_shot.simple.blue"))
             .attachTo(token)
             .scaleToObject(1)
             .filter("ColorMatrix", { saturate: -1, brightness: 2 })
@@ -30,7 +30,7 @@ function create(token, config = {}) {
         .wait(200)
         .effect()
             .name(label)
-            .file(img("jb2a.wind_stream.200.white"))
+            .file(file("jb2a.wind_stream.200.white"))
             .attachTo(token)
             .scaleToObject(1.15, { considerTokenScale: true })
             .fadeIn(500)
@@ -69,7 +69,7 @@ async function movement(token, tile, config = {}) {
         
         const SequenceMATT = new Sequence()
         .effect()
-            .file(img("eskie.smoke.01.black"))
+            .file(file("eskie.smoke.01.black"))
             .atLocation(token)
             .spriteRotation(rotation)
             .scaleToObject(1.75, {considerTokenScale: true})
@@ -78,7 +78,7 @@ async function movement(token, tile, config = {}) {
             .tint("#696969")
 
         .effect()
-            .file(img("eskie.particle.04.white"))
+            .file(file("eskie.particle.04.white"))
             .atLocation(token)
             .spriteRotation(rotation)
             .scaleToObject(1.35, {considerTokenScale: true})
@@ -88,7 +88,7 @@ async function movement(token, tile, config = {}) {
 
         .effect()
             .name(`${label} - Trail`)
-            .file(img("eskie.trail.token.generic.02.black"))
+            .file(file("eskie.trail.token.generic.02.black"))
             .attachTo(token)
             .rotateTowards(tile, {attachTo: false})
             .scaleToObject(1.5, {considerTokenScale: true})

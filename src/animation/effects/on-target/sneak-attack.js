@@ -3,7 +3,7 @@
 //Update: bakanabaka
 
 import { utils } from '../../utils/utils.js';
-import { img } from '../../../lib/filemanager.js';
+import { file } from '../../../lib/filemanager.js';
 import { autoanimations } from '../../../integration/autoanimations.js';
 
 const DEFAULT_CONFIG_MELEE = {
@@ -33,7 +33,7 @@ async function createMelee(token, target, config) {
     let seq = new Sequence()
 
     .effect()
-        .file(img(`eskie.attack.melee.generic.01.${type}.${weight}.${color.attack}.slow`))
+        .file(file(`eskie.attack.melee.generic.01.${type}.${weight}.${color.attack}.slow`))
         .atLocation(token)
         .rotateTowards(targetSquare)
         .scaleToObject(effectSize)
@@ -43,7 +43,7 @@ async function createMelee(token, target, config) {
 
     .effect()
         .delay(150)
-        .file(img(`jb2a.impact.007.${color.impact}`))
+        .file(file(`jb2a.impact.007.${color.impact}`))
         .size(1.25 * token.document.width, { gridUnits: true })
         .atLocation(targetSquare)
         .randomRotation()
@@ -52,7 +52,7 @@ async function createMelee(token, target, config) {
 
     .effect()
         .delay(150)
-        .file(img(`jb2a.liquid.splash_side02.${color.damage}`))
+        .file(file(`jb2a.liquid.splash_side02.${color.damage}`))
         .atLocation(targetSquare)
         .size(1.5 * token.document.width, { gridUnits: true })
         .rotateTowards(token)
@@ -99,7 +99,7 @@ function createRanged(token, target, config) {
 
     let seq = new Sequence()
         .effect()
-            .file(img(`eskie.slice.01_ranged.black.${color.attack}`))
+            .file(file(`eskie.slice.01_ranged.black.${color.attack}`))
             .atLocation(token)
             .stretchTo(target)
             .spriteOffset({ x: token.document.width / 2 }, { gridUnits: true })
@@ -107,7 +107,7 @@ function createRanged(token, target, config) {
 
         .effect()
             .delay(150)
-            .file(img(`jb2a.impact.007.${color.impact}`))
+            .file(file(`jb2a.impact.007.${color.impact}`))
             .size(1.25 * token.document.width, { gridUnits: true })
             .atLocation(target)
             .randomRotation()
@@ -116,7 +116,7 @@ function createRanged(token, target, config) {
 
         .effect()
             .delay(150)
-            .file(img(`jb2a.liquid.splash_side02.${color.damage}`))
+            .file(file(`jb2a.liquid.splash_side02.${color.damage}`))
             .atLocation(target)
             .size(1.5 * token.document.width, { gridUnits: true })
             .rotateTowards(token)

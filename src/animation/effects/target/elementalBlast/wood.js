@@ -1,7 +1,7 @@
 // Original Author: EskieMoh#2969
 // Updater: @bakanabaka
 
-import { img } from "../../../../lib/filemanager.js";
+import { file } from "../../../../lib/filemanager.js";
 
 const DEFAULT_CONFIG = {
     id: 'elementalBlast.wood',
@@ -67,7 +67,7 @@ async function create(token, target, config = {}) {
     let sequence = new Sequence()
 
     .effect()
-    .file(img("jb2a.swirling_leaves.outburst.01.greenorange"))
+    .file(file("jb2a.swirling_leaves.outburst.01.greenorange"))
     .atLocation(token,{offset:{x:-0, y: -0}, gridUnits:true, local:false})
     .rotateTowards(targetCenter, {local: true})
     .spriteOffset({x: -1.0*token.document.width, y:-0.4- (token.document.width-1)/2}, {gridUnits:true})
@@ -75,7 +75,7 @@ async function create(token, target, config = {}) {
     .rotate(-90)
 
     .effect()
-    .file(img("jb2a.swirling_leaves.ranged.greenorange"))
+    .file(file("jb2a.swirling_leaves.ranged.greenorange"))
     .atLocation(token)
     .stretchTo(target)
     .playbackRate(2.1)
@@ -85,7 +85,7 @@ async function create(token, target, config = {}) {
 
     .effect()
     .delay(0)
-    .file(img("animated-spell-effects-cartoon.fire.04"))
+    .file(file("animated-spell-effects-cartoon.fire.04"))
     .atLocation(token)
     .moveTowards(target, {local: true, ease:"easeInCubic"})
     .spriteOffset({x:0.75* token.document.width, y: 0},{gridUnits:true})
@@ -102,7 +102,7 @@ async function create(token, target, config = {}) {
 
     .effect()
     .delay(0)
-    .file(img("animated-spell-effects-cartoon.fire.04"))
+    .file(file("animated-spell-effects-cartoon.fire.04"))
     .atLocation(token)
     .moveTowards(target, {local: true, ease:"easeInCubic"})
     .spriteOffset({x:0.5* token.document.width, y: 0},{gridUnits:true})
@@ -119,7 +119,7 @@ async function create(token, target, config = {}) {
     .waitUntilFinished(-250)
 
     .effect()
-    .file(img("jb2a.impact.boulder.02"))
+    .file(file("jb2a.impact.boulder.02"))
     .atLocation(target)
     .scale(0.3)
     return sequence;

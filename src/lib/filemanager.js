@@ -41,34 +41,7 @@ function closestPath(modulePrefix, ...categories) {
     return currentPath;
 }
 
-export function snd(path) {
-    // Support http:// and https:// addresses
-    if (path.includes('/')) return path;
-
-    // Support Sequencer Database paths (. seperated)
-    let categories = path.split('.');
-    if (categories.length === 0) return;
-    let isPatreonUser = false;
-    let isFreeUser = false;
-    let modulePrefix = categories.shift();
-    switch (modulePrefix) {
-        case 'psfx':
-            dependency.someRequired([{ id: 'psfx-patreon' }, { id: 'psfx' }]);
-            isPatreonUser = dependency.isActivated({ id: 'psfx-patreon', ref: 'PSFX-Patreon' });
-            isFreeUser = dependency.isActivated({ id: 'psfx', ref: "PSFX - Peri's Sound Effects" });
-            if (isPatreonUser && isFreeUser) 
-                ui.notifications.warn('Both PSFX Patreon and Free are activated, both modules use the path `psfx.` to prefix files! This will cause conflicts! Recommend disabling / uninstalling the free version.');
-            modulePrefix = 'psfx';
-            break;
-        case 'psfx-ambience':
-            // Only Patreon Version
-            break;
-    }
-
-    return closestPath(modulePrefix, ...categories);
-}
-
-export function img(path) {
+export function file(path) {
     // Support http:// and https:// addresses
     // Support direct filepaths
     if (path.includes('/')) return path;
@@ -81,6 +54,20 @@ export function img(path) {
     let modulePrefix = categories.shift();
 
     switch (modulePrefix) {
+        // Sounds
+        case 'psfx':
+            dependency.someRequired([{ id: 'psfx-patreon' }, { id: 'psfx' }]);
+            isPatreonUser = dependency.isActivated({ id: 'psfx-patreon', ref: 'PSFX-Patreon' });
+            isFreeUser = dependency.isActivated({ id: 'psfx', ref: "PSFX - Peri's Sound Effects" });
+            if (isPatreonUser && isFreeUser) 
+                ui.notifications.warn('Both PSFX Patreon and Free are activated, both modules use the path `psfx.` to prefix files! This will cause conflicts! Recommend disabling / uninstalling the free version.');
+            modulePrefix = 'psfx';
+            break;
+        case 'psfx-ambience':
+            // Only Patreon Version
+            break;
+
+        // Animations
         case 'eskie':
         case 'eskie-free':
             dependency.someRequired([{ id: 'eskie-effects', ref: 'Eskie Effects'}, { id: 'eskie-effects-free', ref: 'Eskie Effects Free' }]);
@@ -112,9 +99,4 @@ export function img(path) {
     }
 
     return closestPath(modulePrefix, ...categories);
-}
-
-export const filemanager = {
-    img,
-    snd,
 }

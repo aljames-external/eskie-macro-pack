@@ -1,7 +1,7 @@
 // Original Author: EskieMoh#2969
 // Updater: bakanabaka
 
-import { img } from "../../../../lib/filemanager.js";
+import { file } from "../../../../lib/filemanager.js";
 
 const DEFAULT_CONFIG = {
     id: 'elementalBlast.air',
@@ -62,7 +62,7 @@ async function create(token, target, config = {}) {
     let sequence = new Sequence()
 
     .effect()
-    .file(img("animated-spell-effects-cartoon.smoke.17"))
+    .file(file("animated-spell-effects-cartoon.smoke.17"))
     .atLocation(token,{offset:{x:-0, y: -0}, gridUnits:true, local:false})
     .rotateTowards(targetCenter, {local: true})
     .spriteOffset({x: -1.0+ranOffset, y:-1.2- (token.document.width-1)/2}, {gridUnits:true})
@@ -72,20 +72,20 @@ async function create(token, target, config = {}) {
 
     .effect()
     .delay(0)
-    .file(img("animated-spell-effects-cartoon.air.bolt.ray"))
+    .file(file("animated-spell-effects-cartoon.air.bolt.ray"))
     .atLocation(token,{offset:{x:0.5* token.document.width, y: ranOffset}, gridUnits:true, local:true})
     .stretchTo(target, {onlyX: projX})
     .scale(projHeight)
     .waitUntilFinished(-2000)
 
     .effect()
-    .file(img("jb2a.impact.007.white"))
+    .file(file("jb2a.impact.007.white"))
     .atLocation(target,{offset:{x:0, y:0}, gridUnits:true})
     .scale(0.6)
     .filter("ColorMatrix", { hue: 150 })
 
     .effect()
-    .file(img("animated-spell-effects-cartoon.smoke.43"))
+    .file(file("animated-spell-effects-cartoon.smoke.43"))
     .atLocation(target,{offset:{x:0, y:0}, gridUnits:true})
     .scale(0.3)
     .filter("ColorMatrix", { hue: 150 })

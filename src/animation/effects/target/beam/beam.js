@@ -1,7 +1,7 @@
 // Original Author: EskieMoh#2969
 // Modular Conversion: bakanabaka
 
-import { img } from "../../../../lib/filemanager.js";
+import { file } from "../../../../lib/filemanager.js";
 
 const DEFAULT_CONFIG = {
     id: 'beam',
@@ -21,7 +21,7 @@ function create(token, target, config = {}) {
         .effect()
         .name(id)
         .atLocation(token)
-        .file(img(effects[0].img))
+        .file(file(effects[0].img))
         .scaleToObject(1.25)
         .rotateIn(180, 600, {ease: "easeOutCubic"})
         .scaleIn(0, 600, {ease: "easeOutCubic"})
@@ -33,7 +33,7 @@ function create(token, target, config = {}) {
         .effect()
         .name(id)
         .atLocation(token)
-        .file(img(effects[0].img))
+        .file(file(effects[0].img))
         .scaleToObject(1.25)
         .rotateIn(180, 600, {ease: "easeOutCubic"})
         .scaleIn(0, 600, {ease: "easeOutCubic"})
@@ -49,7 +49,7 @@ function create(token, target, config = {}) {
 
         .effect()
         .name(id)
-        .file(img(effects[1].img))
+        .file(file(effects[1].img))
         .scaleIn(0, 1000, {ease: "easeOutQuint"})
         .delay(500)
         .fadeOut(1000)
@@ -61,7 +61,7 @@ function create(token, target, config = {}) {
 
         .effect()
         .name(id)
-        .file(img(effects[1].img))
+        .file(file(effects[1].img))
         .scaleIn(0, 1000, {ease: "easeOutQuint"})
         .delay(500)
         .fadeOut(1000)
@@ -76,7 +76,7 @@ function create(token, target, config = {}) {
 
         .effect()
         .name(id)
-        .file(img(effects[2].img))
+        .file(file(effects[2].img))
         .atLocation(token)
         .tint("#d9df53")
         .scaleToObject(1.5)
@@ -85,7 +85,7 @@ function create(token, target, config = {}) {
 
         .effect()
         .name(id)
-        .file(img(effects[3].img))
+        .file(file(effects[3].img))
         .atLocation(token)
         .stretchTo(target)
         .zIndex(1)

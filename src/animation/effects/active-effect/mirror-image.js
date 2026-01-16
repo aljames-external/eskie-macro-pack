@@ -3,7 +3,7 @@
    Update Author: bakanabaka
 ** */
 
-import { img } from "../../../lib/filemanager.js";
+import { file } from "../../../lib/filemanager.js";
 import { autoanimations } from "../../../integration/autoanimations.js";
 
 const DEFAULT_CONFIG = {
@@ -24,7 +24,7 @@ async function createMirrorImage(token, config = {}) {
 
     const sequence = new Sequence()
         .effect()
-            .file(img("jb2a.shimmer.01.purple"))
+            .file(file("jb2a.shimmer.01.purple"))
             .opacity(0.5)
             .rotate(-90)
             .scaleToObject(1.25)
@@ -35,7 +35,7 @@ async function createMirrorImage(token, config = {}) {
             .opacity(0)
 
         .effect()
-            .file(img("jb2a.particles.outward.orange.02.03"))
+            .file(file("jb2a.particles.outward.orange.02.03"))
             .scaleToObject(2.5)
             .atLocation(token)
             .fadeIn(1000)
@@ -123,7 +123,7 @@ async function createMirrorImage(token, config = {}) {
         .wait(200)
 
         .effect()
-            .file(img("jb2a.shimmer.01.purple"))
+            .file(file("jb2a.shimmer.01.purple"))
             .opacity(0.5)
             .rotate(90)
             .scaleToObject(1.25)

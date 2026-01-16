@@ -3,7 +3,7 @@
  * Update Author: bakanabaka
  */
 
-import { img } from '../../../lib/filemanager.js';
+import { file } from '../../../lib/filemanager.js';
 import { autoanimations } from '../../../integration/autoanimations.js';
 
 const DEFAULT_CONFIG = {
@@ -29,7 +29,7 @@ async function create(token, config = {}) {
         .effect()
         .name(id)
         .repeats(10, 50, 50)
-        .file(img("jb2a.impact.yellow.0"))
+        .file(file("jb2a.impact.yellow.0"))
         .atLocation(position, { randomOffset: 1 })
         .size(0.8, { gridUnits: true })
         .randomRotation()
@@ -39,7 +39,7 @@ async function create(token, config = {}) {
         .effect()
         .name(id)
         .repeats(5, 50, 50)
-        .file(img("jb2a.impact.yellow.0"))
+        .file(file("jb2a.impact.yellow.0"))
         .atLocation(position, { randomOffset: 1 })
         //.offset({ x: 100 })
         .size(0.8, { gridUnits: true })
@@ -50,7 +50,7 @@ async function create(token, config = {}) {
         .effect()
         .name(id)
         .repeats(5, 50, 50)
-        .file(img("jb2a.impact.yellow.0"))
+        .file(file("jb2a.impact.yellow.0"))
         .atLocation(position, { randomOffset: 1 })
         //.offset({ x: -100 })
         .size(0.8, { gridUnits: true })
@@ -60,7 +60,7 @@ async function create(token, config = {}) {
     seq = seq
         .effect()
         .name(id)
-        .file(img("jb2a.particles.outward.orange.02.03"))
+        .file(file("jb2a.particles.outward.orange.02.03"))
         .atLocation(position)
         .duration(5000)
         .fadeOut(1500)

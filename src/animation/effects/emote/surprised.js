@@ -1,4 +1,4 @@
-import { img } from "../../../lib/filemanager.js";
+import { file } from "../../../lib/filemanager.js";
 import { utils } from "../../utils/utils.js"
 
 /* **
@@ -43,7 +43,7 @@ async function create(token, config = {}) {
     let surprisedEffect = new Sequence()
         .effect()
         .name(id)
-        .file(img(effect[0].img))
+        .file(file(effect[0].img))
         .atLocation(token)
         .anchor(effect[0].anchor)
         .spriteOffset({ x: effect[0].x * tokenWidth, y: effect[0].y * tokenWidth }, { gridUnits: true, local: true })

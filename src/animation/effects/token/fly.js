@@ -1,7 +1,7 @@
 // Original Author: EskieMoh#2969
 // Modular Conversion: bakanabaka
 
-import { img } from "../../../lib/filemanager.js";
+import { file } from "../../../lib/filemanager.js";
 
 const DEFAULT_CONFIG = {
     id: "fly",
@@ -13,7 +13,7 @@ async function create(token, config = {}) {
 
     let seq = new Sequence();
     seq = seq.effect()
-        .file(img("jb2a.misty_step.01.blue"))
+        .file(file("jb2a.misty_step.01.blue"))
         .atLocation(token)
         .scaleToObject(1.75)
         .belowTokens();

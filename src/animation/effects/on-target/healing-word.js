@@ -3,7 +3,7 @@
  * Update Author: bakanabaka
  */
 
-import { img } from '../../../lib/filemanager.js';
+import { file } from '../../../lib/filemanager.js';
 import { autoanimations } from '../../../integration/autoanimations.js';
 
 const DEFAULT_CONFIG = {
@@ -46,7 +46,7 @@ async function create(token, targets, config = {}) {
         const target_seq = new Sequence()
             .effect()
                 .atLocation(target, { offset: { x: 0, y: -0.55 * target.document.width }, gridUnits: true })
-                .file(img(`animated-spell-effects-cartoon.level 01.healing word.${color}`))
+                .file(file(`animated-spell-effects-cartoon.level 01.healing word.${color}`))
                 .fadeOut(250)
                 .zIndex(1)
                 .scale(0.25 * target.document.width)
@@ -55,7 +55,7 @@ async function create(token, targets, config = {}) {
 
             .effect()
                 .atLocation(target, { offset: { x: 0, y: -0.55 * target.document.width }, gridUnits: true })
-                .file(img("jb2a.particles.outward.orange.02.04"))
+                .file(file("jb2a.particles.outward.orange.02.04"))
                 .fadeOut(250)
                 .zIndex(1)
                 .scale(0.25 * target.document.width)
@@ -65,7 +65,7 @@ async function create(token, targets, config = {}) {
 
             .effect()
                 .atLocation(target, { offset: { x: 0, y: -0.6 * target.document.width }, gridUnits: true })
-                .file(img("jb2a.particles.outward.orange.02.03"))
+                .file(file("jb2a.particles.outward.orange.02.03"))
                 .fadeOut(250)
                 .zIndex(1)
                 .scale(0.25 * target.document.width)
@@ -107,7 +107,7 @@ async function create(token, targets, config = {}) {
         const target_seq = new Sequence()
             .effect()
                 .atLocation(target)
-                .file(img(`jb2a.healing_generic.200px.${color}`))
+                .file(file(`jb2a.healing_generic.200px.${color}`))
                 .scaleToObject(1.25)
                 .filter("ColorMatrix", { hue: colorVal.hue })
                 .zIndex(2)

@@ -1,4 +1,4 @@
-import { img } from "../lib/filemanager.js";
+import { file } from "../lib/filemanager.js";
 
 async function create(token, {id = `Cone Crosshair`, angle = 53.13, coneSize = "thin", distance = 30} = {}) {
     let targets;

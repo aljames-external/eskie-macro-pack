@@ -1,6 +1,6 @@
 import { dependency } from './lib/dependency.js';
 import { animation } from './animation/_animation.js';
-import { filemanager } from './lib/filemanager.js';
+import { file } from './lib/filemanager.js';
 import { crosshair } from './crosshair/_crosshairs.js';
 import { autoanimations } from './integration/autoanimations.js';
 import { socketlibapi } from './integration/socketlib.js';
@@ -26,10 +26,12 @@ function setupApiCalls(exportedFunctions) {
 function setupModule() {
     // Setup dependency API
     setupApiCalls( animation );
-    setupApiCalls( filemanager );
-    setupApiCalls({ dependency });
-    setupApiCalls({ crosshair });
-    setupApiCalls({ tile });
+    setupApiCalls({ util:
+                        {
+                            file: file,
+                            tile: tile,
+                        }
+                    });
 }
 
 Hooks.once('init', async () => {

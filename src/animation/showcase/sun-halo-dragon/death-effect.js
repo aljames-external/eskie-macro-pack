@@ -1,4 +1,4 @@
-import { img } from '../../../lib/filemanager.js';
+import { file } from '../../../lib/filemanager.js';
 
 const DEFAULT_CONFIG = {
     delay: 2250
@@ -15,7 +15,7 @@ function create(token, config = {}) {
     const seq = new Sequence()
         .effect()
             .delay(delay-1000)
-            .file(img("eskie.particle.03.orange"))
+            .file(file("eskie.particle.03.orange"))
             .atLocation(token, {randomOffset:0.5, gridUnits:true})
             .scaleToObject(2)
             .randomRotation()
@@ -33,7 +33,7 @@ function create(token, config = {}) {
 
         .effect()
             .delay(delay)
-            .file(img("eskie.slice.01.white.rainbow"))
+            .file(file("eskie.slice.01.white.rainbow"))
             .atLocation(token)
             .scaleToObject(4)
             .rotate(-45)
@@ -41,7 +41,7 @@ function create(token, config = {}) {
 
             .effect()
             .delay(delay)
-            .file(img("eskie.particle.03.orange"))
+            .file(file("eskie.particle.03.orange"))
             .atLocation(token)
             .scaleToObject(2)
             .randomRotation()
@@ -100,7 +100,7 @@ function create(token, config = {}) {
         // Burn mask top (moves with top slice)
         .effect()
             .delay(delay + 250)
-            .file(img("eskie.burn.token_mask.orange.fast"))
+            .file(file("eskie.burn.token_mask.orange.fast"))
             .name(`${token.document.name}Top`)
             .scaleToObject(1.1)
             .atLocation({ x: cx + gs * 0.25, y: cy - gs * 0.25 })
@@ -122,7 +122,7 @@ function create(token, config = {}) {
         // Burn mask bottom
         .effect()
             .delay(delay + 250)
-            .file(img("eskie.burn.token_mask.orange.fast"))
+            .file(file("eskie.burn.token_mask.orange.fast"))
             .name(`${token.document.name}Bottom`)
             .scaleToObject(1.1)
             .atLocation(token)
@@ -141,7 +141,7 @@ function create(token, config = {}) {
         // Embers top
         .effect()
             .delay(delay + 250)
-            .file(img("eskie.burn.embers.orange"))
+            .file(file("eskie.burn.embers.orange"))
             .name(`${token.document.name}Top`)
             .scaleToObject(1.5)
             .atLocation({ x: cx + gs * 0.25, y: cy - gs * 0.25 })
@@ -152,7 +152,7 @@ function create(token, config = {}) {
         // Embers bottom
         .effect()
             .delay(delay + 250)
-            .file(img("eskie.burn.embers.orange"))
+            .file(file("eskie.burn.embers.orange"))
             .name(`${token.document.name}Bottom`)
             .scaleToObject(1.5)
             .atLocation(token)

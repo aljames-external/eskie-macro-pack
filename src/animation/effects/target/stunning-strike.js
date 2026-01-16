@@ -3,7 +3,7 @@
    Update Author: bakanabaka
 ** */
 
-import { img } from "../../../lib/filemanager.js";
+import { file } from "../../../lib/filemanager.js";
 
 const DEFAULT_CONFIG = {
     id: 'stunningStrike',
@@ -30,7 +30,7 @@ async function createStunningStrike(token, target, config = {}) {
 
     sequence
         .effect()
-        .file(img("jb2a.sacred_flame.target.blue"))
+        .file(file("jb2a.sacred_flame.target.blue"))
         .atLocation(token, { offset: { y: 0 }, gridUnits: true })
         .scaleToObject(0.5)
         .playbackRate(2)
@@ -38,7 +38,7 @@ async function createStunningStrike(token, target, config = {}) {
         .zIndex(2)
 
         .effect()
-        .file(img("jb2a.token_border.circle.static.blue.012"))
+        .file(file("jb2a.token_border.circle.static.blue.012"))
         .attachTo(token)
         .opacity(0.75)
         .scaleToObject(2)
@@ -49,7 +49,7 @@ async function createStunningStrike(token, target, config = {}) {
         .fadeOut(250)
 
         .effect()
-        .file(img("jb2a.particles.inward.blue.01.01"))
+        .file(file("jb2a.particles.inward.blue.01.01"))
         .attachTo(token)
         .opacity(0.35)
         .scaleToObject(1.5)
@@ -60,7 +60,7 @@ async function createStunningStrike(token, target, config = {}) {
         .fadeOut(250)
 
         .effect()
-        .file(img("animated-spell-effects-cartoon.cantrips.mending.yellow"))
+        .file(file("animated-spell-effects-cartoon.cantrips.mending.yellow"))
         .atLocation(token)
         .scaleToObject(3)
         .opacity(0.75)
@@ -75,7 +75,7 @@ async function createStunningStrike(token, target, config = {}) {
         .shake({ duration: 250, strength: 2, rotation: false })
 
         .effect()
-        .file(img("jb2a.swirling_leaves.outburst.01.pink"))
+        .file(file("jb2a.swirling_leaves.outburst.01.pink"))
         .scaleIn(0, 500, { ease: "easeOutCubic" })
         .filter("ColorMatrix", { saturate: 1, hue: -105 })
         .scaleToObject(0.75)
@@ -104,14 +104,14 @@ async function createStunningStrike(token, target, config = {}) {
         .delay(600)
 
         .effect()
-        .file(img("jb2a.impact.010.blue"))
+        .file(file("jb2a.impact.010.blue"))
         .scaleIn(0, 100, { ease: "easeOutCubic" })
         .scaleToObject(2.5)
         .atLocation(target)
         .randomRotation()
 
         .effect()
-        .file(img("jb2a.impact.ground_crack.blue.02"))
+        .file(file("jb2a.impact.ground_crack.blue.02"))
         .scaleIn(0, 100, { ease: "easeOutCubic" })
         .scaleToObject(2.5)
         .atLocation(target)
@@ -120,7 +120,7 @@ async function createStunningStrike(token, target, config = {}) {
 
         .effect()
         .delay(200)
-        .file(img("jb2a.extras.tmfx.border.circle.outpulse.01.fast"))
+        .file(file("jb2a.extras.tmfx.border.circle.outpulse.01.fast"))
         .scaleIn(0, 100, { ease: "easeOutCubic" })
         .scaleToObject(1.75)
         .opacity(0.5)
@@ -129,7 +129,7 @@ async function createStunningStrike(token, target, config = {}) {
 
         .effect()
         .delay(200)
-        .file(img("jb2a.extras.tmfx.border.circle.outpulse.01.fast"))
+        .file(file("jb2a.extras.tmfx.border.circle.outpulse.01.fast"))
         .scaleIn(0, 100, { ease: "easeOutCubic" })
         .scaleToObject(2.5)
         .opacity(0.5)
@@ -149,7 +149,7 @@ async function createStunningStrike(token, target, config = {}) {
         .effect()
         .name(`StunningStrike - DizzyStars - ${id} - ${target.uuid}`) // Unique name for stopping
         .delay(1000)
-        .file(img("jb2a.dizzy_stars.200px.yellow"))
+        .file(file("jb2a.dizzy_stars.200px.yellow"))
         .scaleIn(0, 100, { ease: "easeOutCubic" })
         .scaleToObject(1)
         .opacity(1)

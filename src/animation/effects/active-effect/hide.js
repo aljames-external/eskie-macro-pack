@@ -2,7 +2,7 @@
 //Author: .eskie
 //Integration: bakanabaka
 
-import { img } from "../../../lib/filemanager.js";
+import { file } from "../../../lib/filemanager.js";
 import { autoanimations } from "../../../integration/autoanimations.js";
 
 const DEFAULT_CONFIG = {
@@ -40,7 +40,7 @@ async function create(token, config) {
         .waitUntilFinished(-250)  
 
       .effect()
-        .file(img("eskie.smoke.03.black"))
+        .file(file("eskie.smoke.03.black"))
         .attachTo(token)
         .scaleToObject(1.75)
         .opacity(1)

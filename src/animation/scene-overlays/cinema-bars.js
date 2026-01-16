@@ -1,4 +1,4 @@
-import { img } from "../../lib/filemanager.js";
+import { file } from "../../lib/filemanager.js";
 import { utils } from "../utils/utils.js"
 
 const DEFAULT_CONFIG = {
@@ -14,7 +14,7 @@ function create(config = {}) {
         .name(id)
         .screenSpace()
         .screenSpaceScale({fitX:true,fitY:true})
-        .file(img("eskie.screen_overlay.cinema_bars.02"))
+        .file(file("eskie.screen_overlay.cinema_bars.02"))
         .persist()
 
     if (dim && canvas.scene.background.src) {

@@ -1,7 +1,7 @@
 // Original Author: EskieMoh#2969
 // Modular Conversion: bakanabaka
 
-import { img } from "../../../../lib/filemanager.js";
+import { file } from "../../../../lib/filemanager.js";
 
 const DEFAULT_CONFIG = {
     id: 'Armor of Agathys',
@@ -12,7 +12,7 @@ async function create(token, config = {}) {
     let sequence = new Sequence();
 
     sequence = sequence.effect()
-        .file(img("jb2a.ward.rune.dark_purple.01"))
+        .file(file("jb2a.ward.rune.dark_purple.01"))
         .atLocation(token)
         .scaleToObject(1.85)
         .belowTokens()
@@ -23,7 +23,7 @@ async function create(token, config = {}) {
     sequence = sequence.effect()
         .attachTo(token)
         .delay(250)
-        .file(img("jb2a.magic_signs.rune.02.complete.06.blue"))
+        .file(file("jb2a.magic_signs.rune.02.complete.06.blue"))
         .scaleToObject(0.75 * token.document.texture.scaleX)
         .scaleIn(0, 500, { ease: "easeOutCubic" })
         .playbackRate(2.5)
@@ -32,7 +32,7 @@ async function create(token, config = {}) {
 
     sequence = sequence.effect()
         .attachTo(token)
-        .file(img("jb2a.extras.tmfx.border.circle.inpulse.01.fast"))
+        .file(file("jb2a.extras.tmfx.border.circle.inpulse.01.fast"))
         .scaleToObject(1.5 * token.document.texture.scaleX)
         .opacity(1)
         .zIndex(3);
@@ -40,7 +40,7 @@ async function create(token, config = {}) {
     sequence = sequence.effect()
         .attachTo(token)
         .name(`${token.name} Armor of Agathys`)
-        .file(img("jb2a.extras.tmfx.inflow.circle.01"))
+        .file(file("jb2a.extras.tmfx.inflow.circle.01"))
         .scaleToObject(1 * token.document.texture.scaleX)
         .randomRotation()
         .fadeIn(1500)
@@ -54,7 +54,7 @@ async function create(token, config = {}) {
     sequence = sequence.effect()
         .attachTo(token)
         .name(`${token.name} Armor of Agathys`)
-        .file(img("jb2a.extras.tmfx.outflow.circle.01"))
+        .file(file("jb2a.extras.tmfx.outflow.circle.01"))
         .scaleToObject(1.35 * token.document.texture.scaleX)
         .randomRotation()
         .fadeIn(1500)
@@ -70,7 +70,7 @@ async function create(token, config = {}) {
     sequence = sequence.effect()
         .attachTo(token)
         .name(`${token.name} Armor of Agathys`)
-        .file(img("jb2a.template_circle.symbol.normal.snowflake.blue"))
+        .file(file("jb2a.template_circle.symbol.normal.snowflake.blue"))
         .scaleToObject(1.35 * token.document.texture.scaleX)
         .randomRotation()
         .fadeIn(1500)
@@ -86,7 +86,7 @@ async function create(token, config = {}) {
     sequence = sequence.effect()
         .attachTo(token)
         .name(`${token.name} Armor of Agathys`)
-        .file(img("jb2a.shield.01.loop.blue"))
+        .file(file("jb2a.shield.01.loop.blue"))
         .scaleToObject(1.5 * token.document.texture.scaleX)
         .opacity(0.75)
         .fadeIn(1500)
@@ -108,7 +108,7 @@ async function stop(token, config = {}) {
     let sequence = new Sequence()
         .effect()
         .attachTo(token)
-        .file(img("jb2a.shield.01.outro_explode.blue"))
+        .file(file("jb2a.shield.01.outro_explode.blue"))
         .scaleToObject(1.5 * token.document.texture.scaleX)
         .opacity(0.75)
         .fadeOut(500)

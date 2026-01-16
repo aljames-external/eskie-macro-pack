@@ -1,7 +1,7 @@
 // Original Author: Unknown
 // Modular Conversion: bakanabaka
 
-import { img } from "../../../lib/filemanager.js";
+import { file } from "../../../lib/filemanager.js";
 
 const DEFAULT_CONFIG = {
     id: "romanCandle",
@@ -30,7 +30,7 @@ async function create(token, config = {}) {
 
     let seq = new Sequence();
     seq = seq.effect()
-        .file(img("jb2a.impact.005.white"))
+        .file(file("jb2a.impact.005.white"))
         .scale(0.5)
         .atLocation(token)
         .anchor({ x: 0.42 })
@@ -43,7 +43,7 @@ async function create(token, config = {}) {
         .attachTo(token, { bindVisibility: false });
 
     seq = seq.effect()
-        .file(img("jb2a.impact.005.yellow"))
+        .file(file("jb2a.impact.005.yellow"))
         .scale(0.5)
         .atLocation(token)
         .anchor({ x: 0.42 })
@@ -59,7 +59,7 @@ async function create(token, config = {}) {
     for (let i = 0; i < shots; i++){
         let effectColor = items[Math.floor(Math.random() * items.length)];
         seq = seq.effect()
-            .file(img(`jb2a.impact.005.${effectColor}`))
+            .file(file(`jb2a.impact.005.${effectColor}`))
             .scale(0.5)
             .atLocation(token)
             .anchor({ x: 0.42 })
@@ -72,7 +72,7 @@ async function create(token, config = {}) {
             .attachTo(token, { bindVisibility: false });
 
         seq = seq.effect()
-            .file(img("jb2a.bolt.physical.white"))
+            .file(file("jb2a.bolt.physical.white"))
             .scale(2)
             .atLocation(token)
             .stretchTo(position)
@@ -84,7 +84,7 @@ async function create(token, config = {}) {
             .delay(1000);
 
         seq = seq.effect()
-            .file(img(`jb2a.bolt.fire.${effectColor}`))
+            .file(file(`jb2a.bolt.fire.${effectColor}`))
             .atLocation(token)
             .scale(2)
             .loopProperty("sprite", "position.y", { from: -25, to: 25, duration: 1000, pingPong: true })

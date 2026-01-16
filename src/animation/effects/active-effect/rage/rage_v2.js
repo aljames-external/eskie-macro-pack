@@ -3,7 +3,7 @@
  * Update Author: bakanabaka
  */
 
-import { img } from '../../../../lib/filemanager.js';
+import { file } from '../../../../lib/filemanager.js';
 import { util } from './rage-util.js';
 
 export const DEFAULT_CONFIG = {
@@ -60,7 +60,7 @@ function create(token, config = {}) {
         .effect()
         .name(`${id} - ${token.uuid}`)
         .delay(250)
-        .file(img(`jb2a.impact.ground_crack.${color}.02`))
+        .file(file(`jb2a.impact.ground_crack.${color}.02`))
         .atLocation(token)
         .belowTokens()
         .filter("ColorMatrix", { hue: -15, saturate: 1 })
@@ -72,7 +72,7 @@ function create(token, config = {}) {
         .effect()
         .name(`${id} - ground-crack - ${token.uuid}`)
         .delay(250)
-        .file(img("jb2a.impact.ground_crack.still_frame.02"))
+        .file(file("jb2a.impact.ground_crack.still_frame.02"))
         .atLocation(token)
         .belowTokens()
         .fadeIn(1000)
@@ -87,7 +87,7 @@ function create(token, config = {}) {
         .effect()
         .name(`${id} - ${token.uuid}`)
         .delay(250)
-        .file(img("eskie.sound.roar.02"))
+        .file(file("eskie.sound.roar.02"))
         .atLocation(token)
         .size(8, { gridUnits: true })
         .opacity(0.5);
@@ -97,7 +97,7 @@ function create(token, config = {}) {
         .effect()
         .name(`${id} - ${token.uuid}`)
         .delay(250)
-        .file(img(`eskie.buff.loop.simple.${color}`))
+        .file(file(`eskie.buff.loop.simple.${color}`))
         .attachTo(token, { offset: { y: -0.05 }, gridUnits: true })
         .scaleToObject(1.5)
         .opacity(0.9)
@@ -112,7 +112,7 @@ function create(token, config = {}) {
         .effect()
         .name(`${id} - ${token.uuid}`)
         .delay(250)
-        .file(img(`eskie.buff.loop.simple.${color}`))
+        .file(file(`eskie.buff.loop.simple.${color}`))
         .attachTo(token, { offset: { y: -0.05 }, gridUnits: true })
         .scaleToObject(1)
         .opacity(0.5)
@@ -126,7 +126,7 @@ function create(token, config = {}) {
     seq = seq
         .effect()
         .name(`${id} - ${token.uuid}`)
-        .file(img(`eskie.aura.token.generic.02.${color}`))
+        .file(file(`eskie.aura.token.generic.02.${color}`))
         .attachTo(token)
         .scaleToObject(2.1)
         .persist();

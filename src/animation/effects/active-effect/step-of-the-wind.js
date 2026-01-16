@@ -1,7 +1,7 @@
 // Author: .eskie
 // Modular Conversion: bakanabaka
 
-import { img, snd } from '../../../lib/filemanager.js'
+import { file } from '../../../lib/filemanager.js'
 import { socket } from '../../../integration/socketlib.js';
 import { autoanimations } from '../../../integration/autoanimations.js';
 import { tiles } from '../../utils/tiles.js';
@@ -18,7 +18,7 @@ function create(token, config = {}) {
 
     .effect()
         .name(label)
-        .file(img("eskie.smoke.03.white"))
+        .file(file("eskie.smoke.03.white"))
         .attachTo(token)
         .scaleToObject(2)
         .belowTokens()
@@ -26,7 +26,7 @@ function create(token, config = {}) {
 
     .effect()
         .name(label)
-        .file(img("eskie.buff.one_shot.simple.blue"))
+        .file(file("eskie.buff.one_shot.simple.blue"))
         .attachTo(token)
         .scaleToObject(1)
         .filter("ColorMatrix", { saturate:-1, brightness:2 })
@@ -36,7 +36,7 @@ function create(token, config = {}) {
 
     .effect()
         .name(label)
-        .file(img("jb2a.wind_stream.200.white"))
+        .file(file("jb2a.wind_stream.200.white"))
         .attachTo(token)
         .scaleToObject(1.15, {considerTokenScale:true})
         .fadeIn(500)
@@ -49,7 +49,7 @@ function create(token, config = {}) {
 
     .effect()
         .name(label)
-        .file(img("eskie.nature.flower.particle.01.blue"))
+        .file(file("eskie.nature.flower.particle.01.blue"))
         .attachTo(token)
         .scaleToObject(1.5)
         .playbackRate(2)
@@ -89,14 +89,14 @@ async function movement(token, tile, config = {}) {
         //Play MATT Sequence
         const SequenceMATT = new Sequence()
         .effect()
-            .file(img("eskie.smoke.01.white"))
+            .file(file("eskie.smoke.01.white"))
             .atLocation(token)
             .spriteRotation(rotation)
             .scaleToObject(1.75,{considerTokenScale: true})
             .belowTokens()
             
         .effect()
-            .file(img("eskie.nature.flower.particle.01.blue"))
+            .file(file("eskie.nature.flower.particle.01.blue"))
             .atLocation(token)
             .spriteRotation(rotation+135)
             .scaleToObject(1.5)
@@ -108,7 +108,7 @@ async function movement(token, tile, config = {}) {
 
         .effect()
             .name(`${label} - Trail`)
-            .file(img("eskie.trail.token.generic.01.white"))
+            .file(file("eskie.trail.token.generic.01.white"))
             .attachTo(token)
             .rotateTowards(tile, {attachTo: false})
             .scaleToObject(1.5, {considerTokenScale: true})

@@ -3,7 +3,7 @@
  * Update Author: bakanabaka
  */
 
-import { img } from '../../../../lib/filemanager.js';
+import { file } from '../../../../lib/filemanager.js';
 import { autoanimations } from '../../../../integration/autoanimations.js';
 
 const DEFAULT_CONFIG = {
@@ -18,7 +18,7 @@ async function create(target, config = {}) {
     let seq = new Sequence()
         .effect()
         .name(id)
-        .file(img(`jb2a.particles.outward.purple.01.03`))
+        .file(file(`jb2a.particles.outward.purple.01.03`))
         .attachTo(target)
         .scale(0.15)
         .playbackRate(1)
@@ -33,7 +33,7 @@ async function create(target, config = {}) {
 
         .effect()
         .name(id)
-        .file(img("animated-spell-effects-cartoon.misc.all seeing eye"))
+        .file(file("animated-spell-effects-cartoon.misc.all seeing eye"))
         .attachTo(target)
         .filter("ColorMatrix", { hue: 182 })
         .scaleToObject(0.75)
@@ -42,7 +42,7 @@ async function create(target, config = {}) {
 
         .effect()
         .name(id)
-        .file(img("animated-spell-effects-cartoon.simple.27"))
+        .file(file("animated-spell-effects-cartoon.simple.27"))
         .attachTo(target)
         .scaleToObject(4)
         .spriteOffset({ x: 0.1, y: -0.45 }, { gridUnits: true })
@@ -50,7 +50,7 @@ async function create(target, config = {}) {
 
         .effect()
         .name(id)
-        .file(img("jb2a.ward.rune.dark_purple.01"))
+        .file(file("jb2a.ward.rune.dark_purple.01"))
         .attachTo(target)
         .scaleToObject(1.85)
         .fadeOut(3000);
@@ -62,7 +62,7 @@ async function create(target, config = {}) {
 
         .effect()
         .name(id)
-        .file(img("jb2a.extras.tmfx.outflow.circle.04"))
+        .file(file("jb2a.extras.tmfx.outflow.circle.04"))
         .attachTo(target)
         .belowTokens()
         .filter("ColorMatrix", { brightness: -1 })

@@ -1,7 +1,7 @@
 // Original Author: EskieMoh#2969
 // Modular Conversion: bakanabaka
 
-import { img } from "../../../lib/filemanager.js";
+import { file } from "../../../lib/filemanager.js";
 
 const DEFAULT_CONFIG = {
     id: 'GuidingBolt',
@@ -13,7 +13,7 @@ async function create(token, target, config = {}) {
 
     sequence.effect()
         .atLocation(token)
-        .file(img(`jb2a.markers.light.complete.yellow`))
+        .file(file(`jb2a.markers.light.complete.yellow`))
         .scaleToObject(2)
         .scaleIn(0, 600, { ease: "easeOutCubic" })
         .belowTokens()
@@ -25,7 +25,7 @@ async function create(token, target, config = {}) {
 
     sequence.effect()
         .atLocation(token)
-        .file(img(`jb2a.magic_signs.circle.02.evocation.loop.yellow`))
+        .file(file(`jb2a.magic_signs.circle.02.evocation.loop.yellow`))
         .scaleToObject(1.25)
         .rotateIn(180, 600, { ease: "easeOutCubic" })
         .scaleIn(0, 600, { ease: "easeOutCubic" })
@@ -37,7 +37,7 @@ async function create(token, target, config = {}) {
 
     sequence.effect()
         .atLocation(token)
-        .file(img(`jb2a.magic_signs.circle.02.evocation.loop.yellow`))
+        .file(file(`jb2a.magic_signs.circle.02.evocation.loop.yellow`))
         .scaleToObject(1.25)
         .rotateIn(180, 600, { ease: "easeOutCubic" })
         .scaleIn(0, 600, { ease: "easeOutCubic" })
@@ -53,7 +53,7 @@ async function create(token, target, config = {}) {
     sequence.wait(250);
 
     sequence.effect()
-        .file(img("jb2a.guiding_bolt.01.yellow"))
+        .file(file("jb2a.guiding_bolt.01.yellow"))
         .attachTo(token)
         .stretchTo(target, { attachTo: true })
         .scaleIn(0, 500, { ease: "easeOutCubic" })
@@ -61,7 +61,7 @@ async function create(token, target, config = {}) {
         .waitUntilFinished(-2000);
 
     sequence.effect()
-        .file(img("jb2a.extras.tmfx.border.circle.outpulse.02.normal"))
+        .file(file("jb2a.extras.tmfx.border.circle.outpulse.02.normal"))
         .attachTo(target)
         .fadeIn(250)
         .fadeOut(500)
@@ -83,7 +83,7 @@ async function create(token, target, config = {}) {
         .opacity(0.5);
 
     sequence.effect()
-        .file(img("jb2a.extras.tmfx.border.circle.outpulse.02.normal"))
+        .file(file("jb2a.extras.tmfx.border.circle.outpulse.02.normal"))
         .attachTo(target)
         .fadeIn(250)
         .fadeOut(500)
@@ -95,7 +95,7 @@ async function create(token, target, config = {}) {
         .mask();
 
     sequence.effect()
-        .file(img("jb2a.particles.outward.orange.02.03"))
+        .file(file("jb2a.particles.outward.orange.02.03"))
         .attachTo(target)
         .fadeIn(1000)
         .scaleToObject(target.document.texture.scaleX * 1.5)

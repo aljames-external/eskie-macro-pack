@@ -1,7 +1,7 @@
 // Original Author: EskieMoh#2969
 // Modular Conversion: bakanabaka
 
-import { img } from '../../../lib/filemanager.js';
+import { file } from '../../../lib/filemanager.js';
 
 const DEFAULT_CONFIG = {};
 
@@ -9,12 +9,12 @@ async function create(token, target, config = {}) {
     const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, {inplace:false});
     let seq = new Sequence()
         .effect()
-            .file(img("jb2a.extras.tmfx.inpulse.circle.01.normal"))
+            .file(file("jb2a.extras.tmfx.inpulse.circle.01.normal"))
             .atLocation(target)
             .scaleToObject(1)
 
         .effect()
-            .file(img("jb2a.misty_step.02.yellow"))
+            .file(file("jb2a.misty_step.02.yellow"))
             .atLocation(target)
             .scaleToObject(1)
             .scaleOut(1, 3500, {ease: "easeOutCubic"})
@@ -22,7 +22,7 @@ async function create(token, target, config = {}) {
         .wait(1400)
 
         .effect()
-            .file(img("jb2a.healing_generic.burst.tealyellow"))
+            .file(file("jb2a.healing_generic.burst.tealyellow"))
             .atLocation(target)
             .scaleToObject(1.5)
             .filter("ColorMatrix", {hue:225})
@@ -44,7 +44,7 @@ async function create(token, target, config = {}) {
             .attachTo(target)
 
         .effect()
-            .file(img("jb2a.fireflies.few.02.yellow"))
+            .file(file("jb2a.fireflies.few.02.yellow"))
             .atLocation(target)
             .scaleToObject(2)
             .duration(10000)
@@ -53,7 +53,7 @@ async function create(token, target, config = {}) {
             .attachTo(target)
 
         .effect()
-            .file(img("jb2a.extras.tmfx.outflow.circle.02"))
+            .file(file("jb2a.extras.tmfx.outflow.circle.02"))
             .atLocation(target)
             .fadeIn(200)
             .opacity(0.25)
@@ -65,7 +65,7 @@ async function create(token, target, config = {}) {
             .attachTo(target)
 
         .effect()
-            .file(img("jb2a.particles.outward.blue.01.03"))
+            .file(file("jb2a.particles.outward.blue.01.03"))
             .atLocation(target)
             .filter("ColorMatrix", {saturate:-1, brightness:2})
             .fadeIn(200, {ease: "easeInExpo"})

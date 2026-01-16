@@ -1,7 +1,7 @@
 //Last Updated: 12/22/2025
 //Author: .eskie
 
-import { img } from '../../../lib/filemanager.js';
+import { file } from '../../../lib/filemanager.js';
 import { autoanimations } from '../../../integration/autoanimations.js';
 
 const DEFAULT_CONFIG = {
@@ -29,7 +29,7 @@ function create(token, config) {
             .persist()
         
         .effect()
-            .file(img("blfx.spell.cast.swirl1.fire1"))
+            .file(file("blfx.spell.cast.swirl1.fire1"))
             .attachTo(token)
             .scaleToObject()
             .filter("ColorMatrix", { hue: -25, saturate:1 })
@@ -38,7 +38,7 @@ function create(token, config) {
             .waitUntilFinished(-750)
 
         .effect()
-            .file(img("eskie.buff.loop.simple.red"))
+            .file(file("eskie.buff.loop.simple.red"))
             .attachTo(token, {offset:{y:-0.25},gridUnits:true})
             .scaleToObject(1.25)
             .spriteScale({x:1,y:1.25}, {gridUnits:true})
@@ -48,7 +48,7 @@ function create(token, config) {
             .zIndex(1)
 
         .effect()
-            .file(img("eskie.nature.flower.particle.01.red"))
+            .file(file("eskie.nature.flower.particle.01.red"))
             .attachTo(token, {offset:{y:-0},gridUnits:true})
             .scaleToObject(2)
             .fadeIn(250, {ease:"easeOutQuint"})
@@ -60,7 +60,7 @@ function create(token, config) {
 
         .effect()
             .name(label)
-            .file(img("eskie.nature.flower.particle.01.red"))
+            .file(file("eskie.nature.flower.particle.01.red"))
             .attachTo(token, {offset:{y:0.25},gridUnits:true})
             .scaleToObject(1.5)
             .fadeIn(250, {ease:"easeOutQuint"})
@@ -72,7 +72,7 @@ function create(token, config) {
 
         .effect()
             .name(label)
-            .file(img("eskie.nature.flower.particle.01.red"))
+            .file(file("eskie.nature.flower.particle.01.red"))
             .attachTo(token, {offset:{y:0.25},gridUnits:true})
             .scaleToObject(1.5)
             .fadeIn(250, {ease:"easeOutQuint"})
@@ -84,7 +84,7 @@ function create(token, config) {
 
         .effect()
             .name(label)
-            .file(img("eskie.fire.02.orange"))
+            .file(file("eskie.fire.02.orange"))
             .attachTo(token,{offset:{y:-0.05}, gridUnits:true})
             .scaleToObject(0.35)
             .scaleIn(0, 250, {ease: "easeOutQuint"})
@@ -97,7 +97,7 @@ function create(token, config) {
             .waitUntilFinished()
 
         .effect()
-            .file(img("jb2a.impact.010.red"))
+            .file(file("jb2a.impact.010.red"))
             .attachTo(token,{offset:{y:-0}, gridUnits:true})
             .scaleToObject(0.45)
             .filter("ColorMatrix", { hue: 0, saturate:1})

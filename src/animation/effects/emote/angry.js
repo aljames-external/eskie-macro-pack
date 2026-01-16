@@ -1,4 +1,4 @@
-import { img } from "../../../lib/filemanager.js";
+import { file } from "../../../lib/filemanager.js";
 import { autoanimations } from "../../../integration/autoanimations.js";
 
 /* **
@@ -22,7 +22,7 @@ async function create(token, config) {
     let angryEffect = new Sequence()
         .effect()
             .name(id)
-            .file(img(file))
+            .file(file(file))
             .atLocation(token)
             .scaleIn(0, 1000, {ease: "easeOutElastic"})
             .scaleOut(0, 1000, {ease: "easeOutExpo"})
@@ -36,7 +36,7 @@ async function create(token, config) {
 
         .effect()
             .name(id)
-            .file(img(file))
+            .file(file(file))
             .atLocation(token)
             .scaleIn(0, 1000, {ease: "easeOutElastic"})
             .scaleOut(0, 1000, {ease: "easeOutExpo"})

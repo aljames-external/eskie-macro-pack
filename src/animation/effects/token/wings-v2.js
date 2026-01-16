@@ -3,7 +3,7 @@
    Update Author: bakanabaka
 ** */
 
-import { img } from "../../../lib/filemanager.js";
+import { file } from "../../../lib/filemanager.js";
 
 const DEFAULT_CONFIG = {
     id: 'wingsV2',
@@ -61,7 +61,7 @@ async function createWingsV2(token, config = {}) {
 
         .effect()
         .name(`${id} - ${token.id}`) // Unique name for stopping
-        .file(img(image))
+        .file(file(image))
         .attachTo(token, { offset: { y: offset.y -0.5 - (0.1 * swayMulti), x: offset.x}, gridUnits: true, bindAlpha: false })
         .scaleToObject(3 * wingSize)
         .persist()

@@ -1,5 +1,5 @@
 import { utils } from '../../utils/utils.js';
-import { img } from '../../../lib/filemanager.js';
+import { file } from '../../../lib/filemanager.js';
 import { autoanimations } from '../../../integration/autoanimations.js';
 
 //Last Updated: 4/30/2024
@@ -30,7 +30,7 @@ async function create(token, config, options) {
 
         .effect()
             .delay(100)
-            .file(img("animated-spell-effects-cartoon.air.puff.01"))
+            .file(file("animated-spell-effects-cartoon.air.puff.01"))
             .atLocation(token)
             .scaleToObject(1.1)
             .belowTokens()
@@ -50,7 +50,7 @@ async function create(token, config, options) {
 
         .effect()
             .delay(900)
-            .file(img("animated-spell-effects-cartoon.smoke.99"))
+            .file(file("animated-spell-effects-cartoon.smoke.99"))
             .atLocation(position)
             .rotateTowards(token)
             .scaleToObject(1.5)
@@ -61,7 +61,7 @@ async function create(token, config, options) {
 
         .effect()
             .delay(900)
-            .file(img("animated-spell-effects-cartoon.earth.debris.04"))
+            .file(file("animated-spell-effects-cartoon.earth.debris.04"))
             .atLocation(position)
             .rotateTowards(token)
             .scaleToObject(1.5)
