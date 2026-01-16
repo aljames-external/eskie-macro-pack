@@ -1,7 +1,7 @@
 // Original Author: EskieMoh#2969
 // Updater: @bakanabaka
 
-import { file } from "../../../../lib/filemanager.js";
+import { closest } from "../../../../lib/filemanager.js";
 
 const DEFAULT_CONFIG = {
     id: 'elementalBlast.metal',
@@ -67,7 +67,7 @@ async function create(token, target, config = {}) {
     let sequence = new Sequence()
 
     .effect()
-    .file(file("animated-spell-effects-cartoon.electricity.35"))
+    .file(closest("animated-spell-effects-cartoon.electricity.35"))
     .atLocation(token,{offset:{x:-0, y: -0}, gridUnits:true, local:false})
     .rotateTowards(targetCenter, {local: true})
     .spriteOffset({x: -0.75*token.document.width, y:-0.5- (token.document.width-1)/2}, {gridUnits:true})
@@ -79,7 +79,7 @@ async function create(token, target, config = {}) {
     .effect()
     .delay(200)
     .opacity(0.1)
-    .file(file("jb2a.chakram.01.throw"))
+    .file(closest("jb2a.chakram.01.throw"))
     .atLocation(token,{offset:{x:0* token.document.width, y: 0.5}, gridUnits:true, local:true})
     .startTime(650)
     .stretchTo(target, {onlyX: false})
@@ -91,7 +91,7 @@ async function create(token, target, config = {}) {
     .effect()
     .delay(100)
     .opacity(0.25)
-    .file(file("jb2a.chakram.01.throw"))
+    .file(closest("jb2a.chakram.01.throw"))
     .atLocation(token,{offset:{x:0* token.document.width, y: 0.5}, gridUnits:true, local:true})
     .startTime(650)
     .stretchTo(target, {onlyX: false})
@@ -102,7 +102,7 @@ async function create(token, target, config = {}) {
 
     .effect()
     .delay(0)
-    .file(file("jb2a.chakram.01.throw"))
+    .file(closest("jb2a.chakram.01.throw"))
     .atLocation(token,{offset:{x:0* token.document.width, y: 0.5}, gridUnits:true, local:true})
     .startTime(650)
     .stretchTo(target, {onlyX: false})
@@ -113,7 +113,7 @@ async function create(token, target, config = {}) {
     .waitUntilFinished(-1750)
 
     .effect()
-    .file(file("jb2a.side_impact.part.fast.ice_shard.blue"))
+    .file(closest("jb2a.side_impact.part.fast.ice_shard.blue"))
     .atLocation(target,{offset:{x:0, y:0}, gridUnits:true})
     .size(impactSize, {gridUnits:true})
     .rotateTowards(token)

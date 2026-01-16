@@ -4,7 +4,7 @@
     Modularized by: bakanabaka
 ** */
 
-import { file } from '../../../lib/filemanager.js';
+import { closest } from '../../../lib/filemanager.js';
 import { templates } from '../../../lib/templates.js';
 import { socket } from '../../../integration/socketlib.js';
 import { settingsOverride } from '../../../lib/settings.js';
@@ -80,7 +80,7 @@ async function create(token, config = {}) {
     const seq = new Sequence()
         // Padlock Icon
         .effect()
-        .file(file("icons/svg/padlock.svg"))
+        .file(closest("icons/svg/padlock.svg"))
         .atLocation(position)
         .size(effectSize, { gridUnits: true })
         .opacity(1)
@@ -93,7 +93,7 @@ async function create(token, config = {}) {
 
         // Magic Chains
         .effect()
-        .file(file("jb2a.markers.chain.spectral_standard.complete.02.purple"))
+        .file(closest("jb2a.markers.chain.spectral_standard.complete.02.purple"))
         .atLocation(position)
         .size(effectSize + 0.8, { gridUnits: true })
         .spriteRotation(-90)
@@ -108,13 +108,13 @@ async function create(token, config = {}) {
         // Weapon Shot
         if (sound.enabled) {
             seq.sound()
-                .file(file(sound.file))
+                .file(closest(sound.file))
                 .volume(sound.volume)
         }
 
         seq.effect()
         .delay(225)
-        .file(file("jb2a.muzzle_flash.single.01.yellow"))
+        .file(closest("jb2a.muzzle_flash.single.01.yellow"))
         .atLocation(token)
         .rotateTowards(position)
         .scaleToObject(2.25 * token.document.width)
@@ -125,7 +125,7 @@ async function create(token, config = {}) {
 
         // Explosion on Padlock
         .effect()
-        .file(file("jb2a.explosion_side.01.orange"))
+        .file(closest("jb2a.explosion_side.01.orange"))
         .atLocation(position, { offset: { x: 0, y: -0 }, gridUnits: true })
         .size(1.05, { gridUnits: true })
         .rotateTowards(position)
@@ -139,7 +139,7 @@ async function create(token, config = {}) {
         // Padlock Shards
         .effect()
         .delay(100)
-        .file(file("jb2a.explosion.side_fracture.flask.02.0"))
+        .file(closest("jb2a.explosion.side_fracture.flask.02.0"))
         .atLocation(position, { offset: { x: 0, y: -0 }, gridUnits: true })
         .scale(0.25)
         .rotateTowards(token)

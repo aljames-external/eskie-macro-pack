@@ -1,7 +1,7 @@
 // Original Author: EskieMoh#2969
 // Modular Conversion: bakanabaka
 
-import { file } from "../../../lib/filemanager.js";
+import { closest } from "../../../lib/filemanager.js";
 
 const DEFAULT_CONFIG = {};
 
@@ -10,7 +10,7 @@ async function create(token, target, config = {}) {
     const sequence = new Sequence();
 
     sequence.effect()
-        .file(file("jb2a.melee_generic.piercing.two_handed"))
+        .file(closest("jb2a.melee_generic.piercing.two_handed"))
         .atLocation(target)
         .spriteOffset({ x: -5.6, y: 0.1 }, { gridUnits: true })
         .size(8, { gridUnits: true })

@@ -1,7 +1,7 @@
 // Original Author: EskieMoh#2969
 // Updater: bakanabaka
 
-import { file } from "../../../../lib/filemanager.js";
+import { closest } from "../../../../lib/filemanager.js";
 
 const DEFAULT_CONFIG = {
     id: 'elementalBlast.earth',
@@ -67,7 +67,7 @@ async function create(token, target, config = {}) {
     let sequence = new Sequence()
 
     .effect()
-    .file(file("animated-spell-effects-cartoon.energy.pulse.yellow"))
+    .file(closest("animated-spell-effects-cartoon.energy.pulse.yellow"))
     .atLocation(token,{offset:{x:-0, y: -0}, gridUnits:true, local:false})
     .rotateTowards(targetCenter, {local: true})
     .spriteOffset({x: -0.5+ranOffset, y:-0.7- (token.document.width-1)/2}, {gridUnits:true})
@@ -77,7 +77,7 @@ async function create(token, target, config = {}) {
     .rotate(-90)
 
     .effect()
-    .file(file("animated-spell-effects-cartoon.earth.debris.03"))
+    .file(closest("animated-spell-effects-cartoon.earth.debris.03"))
     .atLocation(token,{offset:{x:-0, y: -0}, gridUnits:true, local:false})
     .rotateTowards(targetCenter, {local: true})
     .spriteOffset({x: -1.5+ranOffset, y:-0.75- (token.document.width-1)/2}, {gridUnits:true})
@@ -86,7 +86,7 @@ async function create(token, target, config = {}) {
 
     .effect()
     .delay(0)
-    .file(file("jb2a.boulder.toss.02"))
+    .file(closest("jb2a.boulder.toss.02"))
     .atLocation(token,{offset:{x:0.5* token.document.width, y: ranOffset}, gridUnits:true, local:true})
     .stretchTo(target, {onlyX: false})
     .playbackRate(1)

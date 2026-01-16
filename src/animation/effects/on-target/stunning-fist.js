@@ -1,7 +1,7 @@
 // Author: .eskie
 // Modular Conversion: bakanabaka
 
-import { file } from "../../../lib/filemanager.js";
+import { closest } from "../../../lib/filemanager.js";
 import { autoanimations } from "../../../integration/autoanimations.js";
 
 const DEFAULT_CONFIG = {
@@ -71,7 +71,7 @@ async function create(token, target, config = {}) {
         .duration(2000)
 
     .effect()
-        .file(file("jb2a.sacred_flame.target.blue"))
+        .file(closest("jb2a.sacred_flame.target.blue"))
         .atLocation(token, {offset:{y:0}, gridUnits:true})
         .scaleToObject(0.5)
         .playbackRate(2)
@@ -79,7 +79,7 @@ async function create(token, target, config = {}) {
         .zIndex(2)
 
     .effect()
-        .file(file("eskie.aura.token.generic.02.blue"))
+        .file(closest("eskie.aura.token.generic.02.blue"))
         .attachTo(token, {bindAlpha: false})
         .scaleToObject(2.1, {considerTokenScale:true})
         .fadeIn(1000)
@@ -87,7 +87,7 @@ async function create(token, target, config = {}) {
         .startTime(1500)
 
     .effect()
-        .file(file("jb2a.particles.inward.blue.01.01"))
+        .file(closest("jb2a.particles.inward.blue.01.01"))
         .attachTo(token)
 .opacity(0.35)
         .scaleToObject(1.5)
@@ -98,7 +98,7 @@ async function create(token, target, config = {}) {
         .fadeOut(250)
 
     .effect()
-        .file(file("eskie.nature.flower.particle.01.blue"))
+        .file(closest("eskie.nature.flower.particle.01.blue"))
         .atLocation(token)
         .scaleToObject(0.75)
         .duration(1500)
@@ -111,7 +111,7 @@ async function create(token, target, config = {}) {
 
     .effect()
         .delay(100)
-        .file(file("eskie.slice.01.white.colorless"))
+        .file(closest("eskie.slice.01.white.colorless"))
         .atLocation(target)
         .scaleToObject(5)
         .rotateTowards(token)
@@ -121,7 +121,7 @@ async function create(token, target, config = {}) {
         .belowTokens()
 
     .effect()
-        .file(file("eskie.velocity.01.white"))
+        .file(closest("eskie.velocity.01.white"))
         .atLocation(target)
         .scaleToObject(3)
         .rotateTowards(token)
@@ -131,7 +131,7 @@ async function create(token, target, config = {}) {
         .zIndex(5)
 
     .effect()
-        .file(file("jb2a.melee_generic.creature_attack.fist.002.blue"))
+        .file(closest("jb2a.melee_generic.creature_attack.fist.002.blue"))
         .atLocation(token, {offset:{x:-0.75 , y:-0.2}, gridUnits:true, local:true})
         .rotateTowards(target,{randomOffset:0.15})
         .scaleToObject(3)
@@ -139,7 +139,7 @@ async function create(token, target, config = {}) {
         .zIndex(2)
 
     .effect()
-        .file(file("jb2a.swirling_leaves.outburst.01.pink"))
+        .file(closest("jb2a.swirling_leaves.outburst.01.pink"))
         .scaleIn(0, 500, {ease: "easeOutCubic"}) 
         .filter("ColorMatrix", { saturate: 1, hue: -105 })
         .scaleToObject(0.75)
@@ -162,14 +162,14 @@ async function create(token, target, config = {}) {
         .delay(600)
 
     .effect()
-        .file(file("jb2a.impact.010.blue"))
+        .file(closest("jb2a.impact.010.blue"))
         .scaleIn(0, 100, {ease: "easeOutCubic"}) 
         .scaleToObject(2.5)
         .atLocation(target)
         .randomRotation()
 
     .effect()
-        .file(file("jb2a.impact.ground_crack.blue.02"))
+        .file(closest("jb2a.impact.ground_crack.blue.02"))
         .scaleIn(0, 100, {ease: "easeOutCubic"}) 
         .scaleToObject(2.5)
         .atLocation(target)
@@ -178,7 +178,7 @@ async function create(token, target, config = {}) {
 
     .effect()
         .delay(1000)
-        .file(file("jb2a.dizzy_stars.200px.yellow"))
+        .file(closest("jb2a.dizzy_stars.200px.yellow"))
         .scaleIn(0, 100, {ease: "easeOutCubic"}) 
         .scaleToObject(1)
         .opacity(1)

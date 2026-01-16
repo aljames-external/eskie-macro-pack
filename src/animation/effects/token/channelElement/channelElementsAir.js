@@ -1,7 +1,7 @@
 // Original Author: EskieMoh#2969
 // Modular Conversion: bakanabaka
 
-import { file } from "../../../../lib/filemanager.js";
+import { closest } from "../../../../lib/filemanager.js";
 
 const DEFAULT_CONFIG = {
     id: 'ChannelElementsAir',
@@ -15,7 +15,7 @@ async function create(token, config = {}) {
 
     sequence.effect()
         .name(effectName)
-        .file(file("animated-spell-effects-cartoon.air.portal"))
+        .file(closest("animated-spell-effects-cartoon.air.portal"))
         .attachTo(token, { offset: { x: 0, y: -0.0 }, gridUnits: true, bindRotation: false })
         .scaleToObject(2.5)
         .fadeIn(250)
@@ -27,7 +27,7 @@ async function create(token, config = {}) {
 
     sequence.effect()
         .name(effectName)
-        .file(file("animated-spell-effects-cartoon.air.explosion.gray"))
+        .file(closest("animated-spell-effects-cartoon.air.explosion.gray"))
         .attachTo(token, { offset: { x: 0, y: -0.0 }, gridUnits: true, bindRotation: false })
         .scaleToObject(1.45)
         .fadeIn(250)
@@ -37,7 +37,7 @@ async function create(token, config = {}) {
 
     sequence.effect()
         .name(effectName)
-        .file(file("jb2a.wind_stream.200.white"))
+        .file(closest("jb2a.wind_stream.200.white"))
         .attachTo(token, { offset: { x: 0, y: 0 }, gridUnits: true, bindRotation: false })
         .scaleToObject(2)
         .fadeIn(1000)
@@ -50,7 +50,7 @@ async function create(token, config = {}) {
 
     sequence.effect()
         .name(effectName)
-        .file(file("animated-spell-effects-cartoon.smoke.19"))
+        .file(closest("animated-spell-effects-cartoon.smoke.19"))
         .attachTo(token, { offset: { x: 0.2 * token.document.width, y: 0.45 * token.document.width }, gridUnits: true, bindRotation: false })
         .scaleToObject(1.5, { considerTokenScale: true })
         .rotate(-30)
@@ -61,7 +61,7 @@ async function create(token, config = {}) {
 
     sequence.effect()
         .name(effectName)
-        .file(file("animated-spell-effects-cartoon.smoke.19"))
+        .file(closest("animated-spell-effects-cartoon.smoke.19"))
         .attachTo(token, { offset: { x: 0.2 * token.document.width, y: 0.35 * token.document.width }, gridUnits: true, bindRotation: false })
         .scaleToObject(1.5, { considerTokenScale: true })
         .rotate(-30)
@@ -71,7 +71,7 @@ async function create(token, config = {}) {
     sequence.effect()
         .name(effectName)
         .delay(700)
-        .file(file("animated-spell-effects-cartoon.smoke.19"))
+        .file(closest("animated-spell-effects-cartoon.smoke.19"))
         .attachTo(token, { offset: { x: -0.4 * token.document.width, y: -0.25 * token.document.width }, gridUnits: true, bindRotation: false })
         .scaleToObject(1.2, { considerTokenScale: true })
         .belowTokens(false)
@@ -85,7 +85,7 @@ async function create(token, config = {}) {
     sequence.effect()
         .name(effectName)
         .delay(700)
-        .file(file("animated-spell-effects-cartoon.smoke.19"))
+        .file(closest("animated-spell-effects-cartoon.smoke.19"))
         .attachTo(token, { offset: { x: -0.4 * token.document.width, y: -0.35 * token.document.width }, gridUnits: true, bindRotation: false })
         .scaleToObject(1.2, { considerTokenScale: true })
         .belowTokens(false)

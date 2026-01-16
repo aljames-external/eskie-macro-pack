@@ -4,7 +4,7 @@
     Updated: bakanabaka
 ** */
 
-import { file } from '../../../lib/filemanager.js';
+import { closest } from '../../../lib/filemanager.js';
 import { autoanimations } from '../../../integration/autoanimations.js';
 
 const DEFAULT_CONFIG = {
@@ -31,7 +31,7 @@ async function create(token, config = {}) {
             .persist()
 
         .effect()
-            .file(file("https://i.imgur.com/4P2tITB.png"))
+            .file(closest("https://i.imgur.com/4P2tITB.png"))
             .name(id)
             .atLocation(token)
             .mask(token)
@@ -56,7 +56,7 @@ async function stop(token, config = {}) {
     const { id } = mConfig;
     let sequence =  new Sequence()
         .effect()
-            .file(file("animated-spell-effects-cartoon.earth.explosion.02"))
+            .file(closest("animated-spell-effects-cartoon.earth.explosion.02"))
             .atLocation(token)
             .filter("ColorMatrix", { saturate: -1 })
             .scaleToObject(2)

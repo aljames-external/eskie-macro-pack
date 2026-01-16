@@ -1,7 +1,7 @@
 // Author: .eskie
 // Modular Conversion: bakanabaka
 
-import { file } from "../../../lib/filemanager.js";
+import { closest } from "../../../lib/filemanager.js";
 import { templates } from '../../../lib/templates.js';
 import { autoanimations } from "../../../integration/autoanimations.js";
 
@@ -69,7 +69,7 @@ async function create(token, config = {}) {
             .opacity(0)
 
         .effect()
-            .file(file("eskie.smoke.03.white"))
+            .file(closest("eskie.smoke.03.white"))
             .atLocation(token)
             .scaleToObject(1.75)
             .belowTokens()
@@ -79,7 +79,7 @@ async function create(token, config = {}) {
             .zIndex(1)
 
         .effect()
-            .file(file("eskie.nature.flower.particle.01.blue"))
+            .file(closest("eskie.nature.flower.particle.01.blue"))
             .atLocation(token)
             .scaleToObject(1.5)
             .playbackRate(2)
@@ -124,7 +124,7 @@ async function create(token, config = {}) {
 
         .effect()
             .name(`${token.document.name} Step of the Wind (Jump)`)
-            .file(file("eskie.trail.token.generic.01.white"))
+            .file(closest("eskie.trail.token.generic.01.white"))
             .scaleToObject(1.5, {considerTokenScale: true})
             .atLocation(token)   
             .opacity(1)
@@ -160,7 +160,7 @@ async function create(token, config = {}) {
             .snapToGrid()
 
         .effect()
-            .file(file("eskie.smoke.03.white"))
+            .file(closest("eskie.smoke.03.white"))
             .atLocation(token)
             .scaleToObject(1.75)
             .belowTokens()
@@ -169,7 +169,7 @@ async function create(token, config = {}) {
             .opacity(0.85)
 
         .effect()
-            .file(file("eskie.nature.flower.particle.01.blue"))
+            .file(closest("eskie.nature.flower.particle.01.blue"))
             .atLocation(token)
             .scaleToObject(1.5)
             .playbackRate(2)

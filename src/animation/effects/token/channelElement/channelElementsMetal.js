@@ -1,7 +1,7 @@
 // Original Author: EskieMoh#2969
 // Modular Conversion: bakanabaka
 
-import { file } from "../../../../lib/filemanager.js";
+import { closest } from "../../../../lib/filemanager.js";
 
 const DEFAULT_CONFIG = {
     id: 'ChannelElementsMetal',
@@ -11,7 +11,7 @@ const DEFAULT_CONFIG = {
 function _createMetal(sequence, token, xOffset) {
     sequence.effect()
         .name(effectName)
-        .file(file("animated-spell-effects-cartoon.electricity.04"))
+        .file(closest("animated-spell-effects-cartoon.electricity.04"))
         .attachTo(token, { offset: { x: xOffset * token.document.width, y: 0.6 * token.document.width }, gridUnits: true, bindRotation: false })
         .stretchTo(token, { offset: { x: xOffset * token.document.width, y: 0 }, gridUnits: true })
         .rotate(90)
@@ -23,7 +23,7 @@ function _createMetal(sequence, token, xOffset) {
 
     sequence.effect()
         .name(effectName)
-        .file(file("jb2a.celestial_bodies.planet.atmo.05.blue"))
+        .file(closest("jb2a.celestial_bodies.planet.atmo.05.blue"))
         .attachTo(token, { offset: { x: xOffset * token.document.width, y: 0.5 }, gridUnits: true, bindRotation: false })
         .scaleToObject(0.15, { considerTokenScale: true })
         .scaleIn(0, 500, { ease: "easeOutCubic" })
@@ -37,7 +37,7 @@ function _createMetal(sequence, token, xOffset) {
 
     sequence.effect()
         .name(effectName)
-        .file(file("jb2a.celestial_bodies.planet.atmo.05.blue"))
+        .file(closest("jb2a.celestial_bodies.planet.atmo.05.blue"))
         .attachTo(token, { offset: { x: xOffset * token.document.width, y: 0.4 }, gridUnits: true, bindRotation: false })
         .scaleToObject(0.2, { considerTokenScale: true })
         .scaleIn(0, 500, { ease: "easeOutCubic" })
@@ -58,7 +58,7 @@ async function create(token, config = {}) {
 
     sequence.effect()
         .name(effectName)
-        .file(file("animated-spell-effects-cartoon.electricity.35"))
+        .file(closest("animated-spell-effects-cartoon.electricity.35"))
         .attachTo(token, { offset: { x: 0.05, y: 0.1 }, gridUnits: true, bindRotation: false })
         .scaleToObject(3.5)
         .scaleIn(0, 500, { ease: "easeOutCubic" })
@@ -69,14 +69,14 @@ async function create(token, config = {}) {
 
     sequence.effect()
         .name(effectName)
-        .file(file("jb2a.shimmer.01.blue"))
+        .file(closest("jb2a.shimmer.01.blue"))
         .attachTo(token, { offset: { x: 0, y: 0 }, gridUnits: true, bindRotation: false })
         .scaleToObject(1.25, { considerTokenScale: true })
         .rotate(-90);
 
     sequence.effect()
         .name(effectName)
-        .file(file("jb2a.wind_stream.200.white"))
+        .file(closest("jb2a.wind_stream.200.white"))
         .attachTo(token, { offset: { x: 0, y: 0 }, gridUnits: true, bindRotation: false })
         .scaleToObject(2)
         .fadeIn(1000)

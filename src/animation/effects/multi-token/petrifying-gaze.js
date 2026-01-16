@@ -4,7 +4,7 @@
     Updated: bakanabaka
 ** */
 
-import { file } from '../../../lib/filemanager.js';
+import { closest } from '../../../lib/filemanager.js';
 
 const DEFAULT_CONFIG = {
     id: 'PetrifyingGaze',
@@ -26,7 +26,7 @@ async function create(token, targetTokens, config = {}) {
     let sequence = new Sequence();
     sequence
         .effect()
-        .file(file("animated-spell-effects-cartoon.misc.fiery eyes.04"))
+        .file(closest("animated-spell-effects-cartoon.misc.fiery eyes.04"))
         .atLocation(token)
         .size(0.9, { gridUnits: true })
         .anchor({ x: 0.5, y: 0.5 })
@@ -35,7 +35,7 @@ async function create(token, targetTokens, config = {}) {
         .fadeOut(500)
 
         .effect()
-        .file(file("animated-spell-effects-cartoon.misc.fiery eyes.04"))
+        .file(closest("animated-spell-effects-cartoon.misc.fiery eyes.04"))
         .atLocation(token)
         .size(0.9, { gridUnits: true })
         .anchor({ x: 0.5, y: 0.5 })
@@ -56,7 +56,7 @@ async function create(token, targetTokens, config = {}) {
         .fadeOut(500)
 
         .effect()
-        .file(file("jb2a.extras.tmfx.outflow.circle.02"))
+        .file(closest("jb2a.extras.tmfx.outflow.circle.02"))
         .atLocation(token)
         .belowTokens()
         .opacity(0.25)
@@ -69,7 +69,7 @@ async function create(token, targetTokens, config = {}) {
     for (const target of targetTokens) {
         sequence
             .effect()
-            .file(file("animated-spell-effects-cartoon.misc.fiery eyes.04"))
+            .file(closest("animated-spell-effects-cartoon.misc.fiery eyes.04"))
             .atLocation(token)
             .scale({ x: 0.1, y: 1.25 })
             .anchor({ x: 0.5, y: 0.35 })
@@ -82,7 +82,7 @@ async function create(token, targetTokens, config = {}) {
             .fadeOut(500)
 
             .effect()
-            .file(file("animated-spell-effects-cartoon.misc.fiery eyes.04"))
+            .file(closest("animated-spell-effects-cartoon.misc.fiery eyes.04"))
             .atLocation(token)
             .scale({ x: 0.1, y: 1.25 })
             .anchor({ x: 0.5, y: 0.35 })
@@ -95,7 +95,7 @@ async function create(token, targetTokens, config = {}) {
             .fadeOut(500)
 
             .effect()
-            .file(file("jb2a.wind_stream.white"))
+            .file(closest("jb2a.wind_stream.white"))
             .atLocation(token)
             .stretchTo(target, { onlyX: false })
             .filter("Blur", { blurX: 10, blurY: 20 })

@@ -1,4 +1,4 @@
-import { file } from '../../../lib/filemanager.js';
+import { closest } from '../../../lib/filemanager.js';
 import { templates } from '../../../lib/templates.js';
 import { autoanimations } from '../../../integration/autoanimations.js';
 
@@ -25,7 +25,7 @@ async function create(token, config = {}) {
 
         .effect()
             .name(id)
-            .file(file("jb2a.dagger.throw.01.white"))
+            .file(closest("jb2a.dagger.throw.01.white"))
             .atLocation(token)
             .stretchTo(position)
             .filter("ColorMatrix", {saturate:-1, brightness:5})
@@ -34,14 +34,14 @@ async function create(token, config = {}) {
             .duration(1000)
 
         .effect()
-            .file(file("jb2a.impact.010.blue"))
+            .file(closest("jb2a.impact.010.blue"))
             .atLocation(token)
             .scaleToObject(2)
             .scaleOut(0, 250)
             .randomRotation()
 
         .effect()
-            .file(file("jb2a.particles.outward.blue.01.03"))
+            .file(closest("jb2a.particles.outward.blue.01.03"))
             .filter("ColorMatrix", {saturate: 1, brightness:5})
             .filter("Glow", { color: 0x2EB8C1, distance: 3, innerStrength: 2 })
             .atLocation(token)
@@ -52,13 +52,13 @@ async function create(token, config = {}) {
             .duration(3000)
 
         .effect()
-            .file(file("jb2a.extras.tmfx.border.circle.outpulse.01.fast"))
+            .file(closest("jb2a.extras.tmfx.border.circle.outpulse.01.fast"))
             .atLocation(token)
             .scaleToObject(1.25)
             .opacity(0.25)
 
         .effect()
-            .file(file("jb2a.particles.outward.blue.01.03"))
+            .file(closest("jb2a.particles.outward.blue.01.03"))
             .atLocation(token)
             .scaleToObject(1.25)
             .filter("ColorMatrix", {saturate: -1, brightness:10})
@@ -89,14 +89,14 @@ async function create(token, config = {}) {
             })
 
         .effect()
-            .file(file("jb2a.impact.010.blue"))
+            .file(closest("jb2a.impact.010.blue"))
             .atLocation(token)
             .scaleToObject(2)
             .scaleIn(0, 250)
             .randomRotation()
 
         .effect()
-            .file(file("jb2a.particles.outward.blue.01.03"))
+            .file(closest("jb2a.particles.outward.blue.01.03"))
             .filter("ColorMatrix", {saturate: 1, brightness:5})
             .filter("Glow", { color: 0x2EB8C1, distance: 3, innerStrength: 2 })
             .atLocation(token)
@@ -107,13 +107,13 @@ async function create(token, config = {}) {
             .duration(3000)
 
         .effect()
-            .file(file("jb2a.extras.tmfx.border.circle.outpulse.01.fast"))
+            .file(closest("jb2a.extras.tmfx.border.circle.outpulse.01.fast"))
             .atLocation(token)
             .scaleToObject(1.25)
             .opacity(0.25)
 
         .effect()
-            .file(file("jb2a.particles.outward.blue.01.03"))
+            .file(closest("jb2a.particles.outward.blue.01.03"))
             .atLocation(token)
             .scaleToObject(1.25)
             .filter("ColorMatrix", {saturate: -1, brightness:10})

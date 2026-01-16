@@ -1,7 +1,7 @@
 // Original Author: EskieMoh#2969
 // Modular Conversion: bakanabaka
 
-import { file } from "../../../lib/filemanager.js";
+import { closest } from "../../../lib/filemanager.js";
 import { autoanimations } from "../../../integration/autoanimations.js";
 
 const DEFAULT_CONFIG = {
@@ -17,13 +17,13 @@ function createCaster(token, config = {}) {
     const sequence = new Sequence();
         // Effect on the caster
         sequence.effect()
-            .file(file(`jb2a.bless.200px.intro.${color}`))
+            .file(closest(`jb2a.bless.200px.intro.${color}`))
             .atLocation(token)
             .filter("ColorMatrix", { hue: hue });
 
         // Ground effects
         sequence.effect()
-            .file(file("jb2a.extras.tmfx.inflow.circle.03"))
+            .file(closest("jb2a.extras.tmfx.inflow.circle.03"))
             .atLocation(token)
             .size(12.65, { gridUnits: true })
             .spriteScale({ x: 1, y: 1 })
@@ -36,7 +36,7 @@ function createCaster(token, config = {}) {
             .zIndex(1);
 
         sequence.effect()
-            .file(file("jb2a.particles.inward.blue.01.03"))
+            .file(closest("jb2a.particles.inward.blue.01.03"))
             .atLocation(token)
             .size(12.65, { gridUnits: true })
             .spriteScale({ x: 1, y: 1 })
@@ -50,7 +50,7 @@ function createCaster(token, config = {}) {
             .zIndex(1);
 
         sequence.effect()
-            .file(file(`jb2a.markers.light.complete.${color}`))
+            .file(closest(`jb2a.markers.light.complete.${color}`))
             .atLocation(token)
             .size(20, { gridUnits: true })
             .spriteScale({ x: 0.5, y: 1.25 })
@@ -118,7 +118,7 @@ function createTarget(target, config = {}) {
                 .delay(1150);
 
             sequence.effect()
-                .file(file(`jb2a.bless.200px.loop.${color}`))
+                .file(closest(`jb2a.bless.200px.loop.${color}`))
                 .name(`${id} - ${target.name}`)
                 .attachTo(target)
                 .fadeIn(500, { delay: 250 })

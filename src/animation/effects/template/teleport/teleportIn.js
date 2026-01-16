@@ -1,7 +1,7 @@
 // Original Author: EskieMoh#2969
 // Modular Conversion: bakanabaka
 
-import { file } from "../../../../lib/filemanager.js";
+import { closest } from "../../../../lib/filemanager.js";
 
 const DEFAULT_CONFIG = {
     id: 'TeleportIn',
@@ -29,7 +29,7 @@ function create(token, targets, config = {}) {
     });
 
     sequence = sequence.effect()
-        .file(file("jb2a.magic_signs.circle.02.conjuration.intro.blue"))
+        .file(closest("jb2a.magic_signs.circle.02.conjuration.intro.blue"))
         .atLocation(token)
         .belowTokens()
         .scaleToObject(maxDistance)
@@ -37,7 +37,7 @@ function create(token, targets, config = {}) {
         .opacity(0.8)
         .waitUntilFinished(-500);
     sequence = sequence.effect()
-        .file(file("jb2a.magic_signs.circle.02.conjuration.loop.blue"))
+        .file(closest("jb2a.magic_signs.circle.02.conjuration.loop.blue"))
         .atLocation(token)
         .filter("ColorMatrix", { saturate: -0.5, brightness: 1.5 })
         .opacity(0.65)

@@ -1,7 +1,7 @@
 // Original Author: EskieMoh#2969
 // Modular Conversion: bakanabaka
 
-import { file } from "../../../../lib/filemanager.js";
+import { closest } from "../../../../lib/filemanager.js";
 
 const DEFAULT_CONFIG = {
     id: 'ChannelElementsWood',
@@ -15,7 +15,7 @@ async function create(token, config = {}) {
 
     sequence.effect()
         .name(effectName)
-        .file(file("jb2a.plant_growth.04.ring.4x4.pulse.greenwhite"))
+        .file(closest("jb2a.plant_growth.04.ring.4x4.pulse.greenwhite"))
         .attachTo(token, { offset: { x: 0, y: 0 }, gridUnits: true, bindRotation: false })
         .scaleToObject(3)
         .playbackRate(1.5)
@@ -28,7 +28,7 @@ async function create(token, config = {}) {
 
     sequence.effect()
         .name(effectName)
-        .file(file("jb2a.swirling_leaves.outburst.01.greenorange"))
+        .file(closest("jb2a.swirling_leaves.outburst.01.greenorange"))
         .attachTo(token, { offset: { x: 0, y: 0 }, gridUnits: true, bindRotation: false })
         .scaleToObject(2)
         .fadeOut(250)
@@ -36,7 +36,7 @@ async function create(token, config = {}) {
 
     sequence.effect()
         .name(effectName)
-        .file(file("jb2a.wind_stream.200.white"))
+        .file(closest("jb2a.wind_stream.200.white"))
         .attachTo(token, { offset: { x: 0, y: 0 }, gridUnits: true, bindRotation: false })
         .scaleToObject(2)
         .fadeIn(1000)
@@ -52,7 +52,7 @@ async function create(token, config = {}) {
     sequence.effect()
         .delay(700)
         .name(effectName)
-        .file(file("jb2a.swirling_leaves.loop.01.green.1"))
+        .file(closest("jb2a.swirling_leaves.loop.01.green.1"))
         .attachTo(token, { offset: { x: 0, y: 0 }, gridUnits: true, bindRotation: false })
         .scaleToObject(3.5, { considerTokenScale: true })
         .fadeIn(1000)

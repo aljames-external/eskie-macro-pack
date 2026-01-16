@@ -1,9 +1,7 @@
-import { dependency } from './lib/dependency.js';
 import { animation } from './animation/_animation.js';
-import { file } from './lib/filemanager.js';
-import { crosshair } from './crosshair/_crosshairs.js';
 import { autoanimations } from './integration/autoanimations.js';
 import { socketlibapi } from './integration/socketlib.js';
+import { file } from './lib/filemanager.js';
 import { tile } from './integration/socketlib/tile.js'
 // Import module settings to also run its initialization code
 import './settings.js';
@@ -28,8 +26,8 @@ function setupModule() {
     setupApiCalls( animation );
     setupApiCalls({ util:
                         {
-                            file: file,
-                            tile: tile,
+                            file,
+                            tile,
                         }
                     });
 }

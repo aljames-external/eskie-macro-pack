@@ -1,7 +1,7 @@
 // Original Author: EskieMoh#2969
 // Updater: @bakanabaka
 
-import { file } from "../../../../lib/filemanager.js";
+import { closest } from "../../../../lib/filemanager.js";
 
 const DEFAULT_CONFIG = {
     id: 'elementalBlast.vitality',
@@ -67,7 +67,7 @@ async function create(token, target, config = {}) {
     let sequence = new Sequence()
 
     .effect()
-    .file(file("jb2a.swirling_leaves.outburst.01.greenorange"))
+    .file(closest("jb2a.swirling_leaves.outburst.01.greenorange"))
     .atLocation(token,{offset:{x:-0, y: -0}, gridUnits:true, local:false})
     .rotateTowards(targetCenter, {local: true})
     .spriteOffset({x: (-1.0+ranOffset)*token.document.width, y:-0.4- (token.document.width-1)/2}, {gridUnits:true})
@@ -75,7 +75,7 @@ async function create(token, target, config = {}) {
     .rotate(-90)
 
     .effect()
-    .file(file("jb2a.swirling_leaves.ranged.greenorange"))
+    .file(closest("jb2a.swirling_leaves.ranged.greenorange"))
     .atLocation(token, {offset:{x:0 , y: 0+ranOffset},local: true, gridUnits:true})
     .stretchTo(target)
     .playbackRate(2.1)
@@ -84,7 +84,7 @@ async function create(token, target, config = {}) {
 
     .effect()
     .delay(0)
-    .file(file("jb2a.energy_strands.range.standard.dark_green.{{num}}"))
+    .file(closest("jb2a.energy_strands.range.standard.dark_green.{{num}}"))
     .atLocation(token, {offset:{x:0.15* token.document.width, y: 0+ranOffset},local: true, gridUnits:true})
     .stretchTo(target)
     .playbackRate(1)
@@ -103,7 +103,7 @@ async function create(token, target, config = {}) {
     .waitUntilFinished(-1500)
 
     .effect()
-    .file(file("jb2a.healing_generic.400px.green"))
+    .file(closest("jb2a.healing_generic.400px.green"))
     .atLocation(target)
     .scale(0.5)
     .filter("ColorMatrix", {saturate: 0, brightness:1.25, hue:-50 })

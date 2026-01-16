@@ -3,7 +3,7 @@
  * Update Author: bakanabaka
  */
 
-import { file } from '../../../lib/filemanager.js';
+import { closest } from '../../../lib/filemanager.js';
 import { autoanimations } from '../../../integration/autoanimations.js';
 
 const DEFAULT_CONFIG = {
@@ -17,7 +17,7 @@ function create(token, target, config = {}) {
 
     let seq = new Sequence()
         .effect()
-            .file(file("jb2a.icon.heart.pink"))
+            .file(closest("jb2a.icon.heart.pink"))
             .atLocation(token)
             .moveTowards(target, { ease: "easeOutCubic", rotate: false })
             .moveSpeed(1000)
@@ -31,7 +31,7 @@ function create(token, target, config = {}) {
             .zIndex(3)
 
         .effect()
-            .file(file("jb2a.particles.outward.purple.01.03"))
+            .file(closest("jb2a.particles.outward.purple.01.03"))
             .atLocation(target)
             .delay(200)
             .scaleToObject(2)
@@ -42,7 +42,7 @@ function create(token, target, config = {}) {
 
         seq = seq.effect()
             .name(label)
-            .file(file("jb2a.icon.heart.pink"))
+            .file(closest("jb2a.icon.heart.pink"))
             .atLocation(target)
             .attachTo(target)
             .scaleToObject(0.5)
@@ -53,7 +53,7 @@ function create(token, target, config = {}) {
         seq = (duration > 0) ? seq.duration(duration) : seq.persist();
 
         seq = seq.effect()
-            .file(file("jb2a.impact.004.dark_purple"))
+            .file(closest("jb2a.impact.004.dark_purple"))
             .atLocation(target)
             .delay(200)
             .scaleToObject(1.25)
@@ -78,7 +78,7 @@ function create(token, target, config = {}) {
 
         seq = seq.effect()
             .name(label)
-            .file(file("jb2a.energy_strands.range.multiple.purple.01"))
+            .file(closest("jb2a.energy_strands.range.multiple.purple.01"))
             .atLocation(target)
             .stretchTo(token, { attachTo: true })
             .playbackRate(1)
@@ -88,7 +88,7 @@ function create(token, target, config = {}) {
 
         seq = seq.effect()
             .name(label)
-            .file(file("jb2a.token_border.circle.static.purple.012"))
+            .file(closest("jb2a.token_border.circle.static.purple.012"))
             .atLocation(token)
             .attachTo(token)
             .opacity(0.6)
@@ -103,7 +103,7 @@ function create(token, target, config = {}) {
 
         seq = seq.effect()
             .name(label)
-            .file(file("jb2a.ground_cracks.purple.02"))
+            .file(closest("jb2a.ground_cracks.purple.02"))
             .atLocation(target)
             .scaleToObject(0.9)
             .delay(500)

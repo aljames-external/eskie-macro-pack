@@ -1,7 +1,7 @@
 // Original Author: EskieMoh#2969
 // Modular Conversion: bakanabaka
 
-import { file } from "../../../lib/filemanager.js";
+import { closest } from "../../../lib/filemanager.js";
 
 const DEFAULT_CONFIG = {
     id: 'dreadLord',
@@ -19,7 +19,7 @@ async function create(token, config = {}) {
 
     let seq = new Sequence();
     seq = seq.effect()
-        .file(file("jb2a.energy_strands.in.red.01"))
+        .file(closest("jb2a.energy_strands.in.red.01"))
         .attachTo(token)
         .scaleToObject(9, { considerTokenScale: true })
         .filter("ColorMatrix", { brightness: 0 })
@@ -28,7 +28,7 @@ async function create(token, config = {}) {
         .zIndex(0.1);
 
     seq = seq.effect()
-        .file(file("jb2a.token_border.circle.static.purple.004"))
+        .file(closest("jb2a.token_border.circle.static.purple.004"))
         .name(id)
         .attachTo(token)
         .opacity(0.6)
@@ -43,7 +43,7 @@ async function create(token, config = {}) {
 
     if (darkMap && canvas.scene.background?.src) {
         sequseq = seqence.effect()
-            .file(file(canvas.scene.background.src))
+            .file(closest(canvas.scene.background.src))
             .filter("ColorMatrix", { brightness: 0.3 })
             .atLocation({ x: (canvas.dimensions.width) / 2, y: (canvas.dimensions.height) / 2 })
             .size({ width: canvas.scene.width / canvas.grid.size, height: canvas.scene.height / canvas.grid.size }, { gridUnits: true })
@@ -55,7 +55,7 @@ async function create(token, config = {}) {
     }
 
     seq = seq.effect()
-        .file(file(`jb2a.particles.outward.red.01.03`))
+        .file(closest(`jb2a.particles.outward.red.01.03`))
         .attachTo(token, { offset: { y: 0.1 }, gridUnits: true, bindRotation: false })
         .size(0.5 * token.document.width, { gridUnits: true })
         .duration(1000)
@@ -68,7 +68,7 @@ async function create(token, config = {}) {
         .zIndex(0.3);
 
     seq = seq.effect()
-        .file(file("jb2a.flames.04.complete.purple"))
+        .file(closest("jb2a.flames.04.complete.purple"))
         .attachTo(token, { offset: { y: -0.35 }, gridUnits: true, bindRotation: true })
         .scaleToObject(1.5 * token.document.texture.scaleX)
         .tint("#e51e19")
@@ -79,7 +79,7 @@ async function create(token, config = {}) {
         .waitUntilFinished(-500);
 
     seq = seq.effect()
-        .file(file("jb2a.impact.ground_crack.dark_red.01"))
+        .file(closest("jb2a.impact.ground_crack.dark_red.01"))
         .atLocation(token)
         .belowTokens()
         .filter("ColorMatrix", { hue: -15, saturate: 1 })
@@ -91,7 +91,7 @@ async function create(token, config = {}) {
         .shake({ duration: 3000, strength: 2, rotation: false, fadeOut: 3000 });
 
     seq = seq.effect()
-        .file(file("jb2a.token_border.circle.static.purple.004"))
+        .file(closest("jb2a.token_border.circle.static.purple.004"))
         .name(id)
         .attachTo(token)
         .opacity(0.6)
@@ -106,7 +106,7 @@ async function create(token, config = {}) {
 
     seq = seq.effect()
         .name(id)
-        .file(file("jb2a.energy_strands.complete.dark_red.01"))
+        .file(closest("jb2a.energy_strands.complete.dark_red.01"))
         .attachTo(token)
         .scaleToObject(2, { considerTokenScale: true })
         .opacity(1)
@@ -118,7 +118,7 @@ async function create(token, config = {}) {
 
     seq = seq.effect()
         .name(id)
-        .file(file("jb2a.energy_strands.overlay.dark_red.01"))
+        .file(closest("jb2a.energy_strands.overlay.dark_red.01"))
         .attachTo(token)
         .scaleToObject(2, { considerTokenScale: true })
         .filter("ColorMatrix", { brightness: 0 })
@@ -129,7 +129,7 @@ async function create(token, config = {}) {
 
     seq = seq.effect()
         .name(id)
-        .file(file("jb2a.template_circle.aura.01.complete.small.bluepurple"))
+        .file(closest("jb2a.template_circle.aura.01.complete.small.bluepurple"))
         .attachTo(token, { offset: { y: 0 }, gridUnits: true, bindRotation: true })
         .size(7.5, { gridUnits: true })
         .opacity(0.7)
@@ -144,7 +144,7 @@ async function create(token, config = {}) {
 
     seq = seq.effect()
         .name(id)
-        .file(file("jb2a.extras.tmfx.outflow.circle.02"))
+        .file(closest("jb2a.extras.tmfx.outflow.circle.02"))
         .attachTo(token, { offset: { y: 0 }, gridUnits: true, bindRotation: true })
         .size(13, { gridUnits: true })
         .opacity(0.65)
@@ -157,7 +157,7 @@ async function create(token, config = {}) {
 
     seq = seq.effect()
         .name(id)
-        .file(file("jb2a.extras.tmfx.outflow.circle.01"))
+        .file(closest("jb2a.extras.tmfx.outflow.circle.01"))
         .attachTo(token, { offset: { y: 0 }, gridUnits: true, bindRotation: true })
         .size(13, { gridUnits: true })
         .opacity(0.7)
@@ -171,7 +171,7 @@ async function create(token, config = {}) {
         .zIndex(0.3);
 
     seq = seq.effect()
-        .file(file("jb2a.impact.003.dark_red"))
+        .file(closest("jb2a.impact.003.dark_red"))
         .attachTo(token, { offset: { y: 0.1 }, gridUnits: true, bindRotation: true })
         .scaleToObject(1, { considerTokenScale: true })
         .zIndex(2);

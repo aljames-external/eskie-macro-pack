@@ -1,7 +1,7 @@
 // Original Author: EskieMoh#2969
 // Modular Conversion: bakanabaka
 
-import { file } from "../../../lib/filemanager.js";
+import { closest } from "../../../lib/filemanager.js";
 
 const DEFAULT_CONFIG = {
     id: 'Control Undead',
@@ -14,7 +14,7 @@ async function create(token, target, config = {}) {
 
     sequence.effect()
         .attachTo(token)
-        .file(file("jb2a.extras.tmfx.outflow.circle.01"))
+        .file(closest("jb2a.extras.tmfx.outflow.circle.01"))
         .scaleToObject(1.5 * token.document.texture.scaleX)
         .opacity(1)
         .belowTokens()
@@ -24,7 +24,7 @@ async function create(token, target, config = {}) {
         .fadeOut(500);
 
     sequence.effect()
-        .file(file("jb2a.magic_signs.rune.necromancy.intro.red"))
+        .file(closest("jb2a.magic_signs.rune.necromancy.intro.red"))
         .attachTo(target)
         .scaleToObject(0.5)
         .scaleOut(0, 1000, { ease: "easeInBack" })
@@ -32,7 +32,7 @@ async function create(token, target, config = {}) {
         .zIndex(1);
 
     sequence.effect()
-        .file(file("jb2a.markers.02.red"))
+        .file(closest("jb2a.markers.02.red"))
         .atLocation(token)
         .rotateTowards(target)
         .spriteOffset({ x: -0.2 }, { gridUnits: true })
@@ -49,7 +49,7 @@ async function create(token, target, config = {}) {
         .zIndex(1);
 
     sequence.effect()
-        .file(file("jb2a.particle_burst.01.circle.bluepurple"))
+        .file(closest("jb2a.particle_burst.01.circle.bluepurple"))
         .atLocation(token)
         .rotateTowards(target)
         .spriteOffset({ x: -0.2 }, { gridUnits: true })
@@ -63,7 +63,7 @@ async function create(token, target, config = {}) {
         .zIndex(0);
 
     sequence.effect()
-        .file(file("jb2a.particle_burst.01.circle.bluepurple"))
+        .file(closest("jb2a.particle_burst.01.circle.bluepurple"))
         .attachTo(target)
         .scaleToObject(1.5)
         .filter("ColorMatrix", { saturate: 0.5, hue: -2 })
@@ -73,7 +73,7 @@ async function create(token, target, config = {}) {
 
     sequence.effect()
         .delay(550)
-        .file(file("jb2a.smoke.puff.centered.dark_black"))
+        .file(closest("jb2a.smoke.puff.centered.dark_black"))
         .attachTo(target)
         .scaleToObject(1.8)
         .scaleOut(0, 1000, { ease: "easeInBack" })
@@ -82,7 +82,7 @@ async function create(token, target, config = {}) {
 
     sequence.effect()
         .delay(750)
-        .file(file("jb2a.particles.outward.red.01.03"))
+        .file(closest("jb2a.particles.outward.red.01.03"))
         .atLocation(token)
         .rotateTowards(target)
         .spriteOffset({ x: -0.5, y: -0.1 }, { gridUnits: true })
@@ -109,7 +109,7 @@ async function create(token, target, config = {}) {
 
     sequence.effect()
         .delay(100)
-        .file(file(`jb2a.particles.outward.white.01.03`))
+        .file(closest(`jb2a.particles.outward.white.01.03`))
         .attachTo(target, { offset: { y: 0.2 }, gridUnits: true, bindRotation: false })
         .scaleToObject()
         .duration(1000)
@@ -125,7 +125,7 @@ async function create(token, target, config = {}) {
 
     sequence.effect()
         .delay(750)
-        .file(file("jb2a.static_electricity.03.dark_red"))
+        .file(closest("jb2a.static_electricity.03.dark_red"))
         .atLocation(target)
         .size(1.25, { gridUnits: true })
         .opacity(1)
@@ -136,7 +136,7 @@ async function create(token, target, config = {}) {
     sequence.effect()
         .delay(500)
         .name(`${id} ${token.document.name}`)
-        .file(file("jb2a.extras.tmfx.outflow.circle.01"))
+        .file(closest("jb2a.extras.tmfx.outflow.circle.01"))
         .attachTo(target, { cacheLocation: true, offset: { y: 0 }, gridUnits: true, bindAlpha: false })
         .scaleToObject(1.45, { considerTokenScale: true })
         .randomRotation()

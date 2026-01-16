@@ -2,7 +2,7 @@
 // Modular Conversion: bakanabaka
 
 import { dependency } from "../../../lib/dependency.js";
-import { file } from "../../../lib/filemanager.js";
+import { closest } from "../../../lib/filemanager.js";
 
 const DEFAULT_CONFIG = {
     id: 'Sandevistan',
@@ -36,7 +36,7 @@ async function create(token, config = {}) {
 
     sequence.effect()
         .atLocation(token)
-        .file(file("jb2a.token_stage.round.green.02.02"))
+        .file(closest("jb2a.token_stage.round.green.02.02"))
         .scaleToObject(1.2)
         .filter("ColorMatrix", { hue: 50 })
         .playbackRate(2)
@@ -48,7 +48,7 @@ async function create(token, config = {}) {
     sequence.effect()
         .delay(250)
         .atLocation(token)
-        .file(file("jb2a.token_stage.round.green.02.02"))
+        .file(closest("jb2a.token_stage.round.green.02.02"))
         .scaleToObject(1.2)
         .filter("ColorMatrix", { hue: 25 })
         .filter("Blur", { blurX: 30, blurY: 0 })
@@ -93,7 +93,7 @@ async function stop(token, config = {}) {
     const endSequence = new Sequence();
     endSequence.effect()
         .atLocation(token)
-        .file(file("jb2a.token_stage.round.green.02.02"))
+        .file(closest("jb2a.token_stage.round.green.02.02"))
         .scaleToObject(1.2)
         .filter("ColorMatrix", { hue: 50 })
         .playbackRate(2)
@@ -105,7 +105,7 @@ async function stop(token, config = {}) {
     endSequence.effect()
         .delay(250)
         .atLocation(token)
-        .file(file("jb2a.token_stage.round.green.02.02"))
+        .file(closest("jb2a.token_stage.round.green.02.02"))
         .scaleToObject(1.2)
         .filter("ColorMatrix", { hue: 25 })
         .filter("Blur", { blurX: 30, blurY: 0 })

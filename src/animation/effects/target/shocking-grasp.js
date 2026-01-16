@@ -3,7 +3,7 @@
    Update Author: bakanabaka
 ** */
 
-import { file } from "../../../lib/filemanager.js";
+import { closest } from "../../../lib/filemanager.js";
 
 const DEFAULT_CONFIG = {
     id: 'shockingGrasp',
@@ -25,7 +25,7 @@ async function createShockingGrasp(token, target, config = {}) {
 
     sequence
         .effect()
-        .file(file("jb2a.breath_weapons.lightning.line.blue"))
+        .file(closest("jb2a.breath_weapons.lightning.line.blue"))
         .atLocation(token)
         .rotateTowards(target)
         .spriteOffset({ x: token.document.width * 0.4 }, { gridUnits: true })
@@ -37,14 +37,14 @@ async function createShockingGrasp(token, target, config = {}) {
 
         .effect()
         .delay(250)
-        .file(file("jb2a.impact.008.blue"))
+        .file(closest("jb2a.impact.008.blue"))
         .atLocation(token)
         .rotateTowards(target)
         .spriteOffset({ x: token.document.width - 1 }, { gridUnits: true })
         .scale(0.25)
 
         .effect()
-        .file(file("eskie.lightning.03.blue"))
+        .file(closest("eskie.lightning.03.blue"))
         .atLocation(token)
         .rotateTowards(target)
         .size(token.document.width * 1.2, { gridUnits: true })
@@ -55,7 +55,7 @@ async function createShockingGrasp(token, target, config = {}) {
 
         .effect()
         .delay(250)
-        .file(file("eskie.lightning.03.blue"))
+        .file(closest("eskie.lightning.03.blue"))
         .atLocation(token)
         .rotateTowards(target)
         .size(token.document.width * 1.2, { gridUnits: true })
@@ -68,7 +68,7 @@ async function createShockingGrasp(token, target, config = {}) {
         .wait(250)
 
         .effect()
-        .file(file("jb2a.static_electricity.03.blue"))
+        .file(closest("jb2a.static_electricity.03.blue"))
         .attachTo(target)
         .scaleToObject(1.25)
         .opacity(1)

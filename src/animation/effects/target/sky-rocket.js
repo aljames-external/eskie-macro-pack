@@ -1,7 +1,7 @@
 // Original Author: Unknown
 // Modular Conversion: bakanabaka
 
-import { file } from "../../../lib/filemanager.js";
+import { closest } from "../../../lib/filemanager.js";
 
 const DEFAULT_CONFIG = {};
 
@@ -9,7 +9,7 @@ async function create(position, config = {}) {
     const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, {inplace:false});
     let seq = new Sequence();
     seq = seq.effect()
-        .file(file(`jb2a.firework.02.{{color}}`))
+        .file(closest(`jb2a.firework.02.{{color}}`))
         .atLocation(position)
         .setMustache({
             "color": () => {
@@ -22,7 +22,7 @@ async function create(position, config = {}) {
         .zIndex(4);
 
     seq = seq.effect()
-        .file(file("jb2a.particles.outward.blue.02.03"))
+        .file(closest("jb2a.particles.outward.blue.02.03"))
         .atLocation(position)
         .filter("ColorMatrix", { saturate: -1, brightness: 2 })
         .duration(7000)

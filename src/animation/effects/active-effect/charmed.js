@@ -3,7 +3,7 @@
  * Update Author: bakanabaka
  */
 
-import { file } from '../../../lib/filemanager.js';
+import { closest } from '../../../lib/filemanager.js';
 import { autoanimations } from '../../../integration/autoanimations.js';
 
 const DEFAULT_CONFIG = {
@@ -17,7 +17,7 @@ function create(token, config = {}) {
 
     let seq = new Sequence();
     seq.effect()
-        .file(file("jb2a.template_circle.symbol.out_flow.heart.pink"))
+        .file(closest("jb2a.template_circle.symbol.out_flow.heart.pink"))
         .scaleIn(0, 1000, { ease: "easeOutQuint" })
         .fadeOut(2000)
         .atLocation(token)
@@ -26,7 +26,7 @@ function create(token, config = {}) {
         .scaleToObject(3);
 
     seq.effect()
-        .file(file("jb2a.icon.heart.pink"))
+        .file(closest("jb2a.icon.heart.pink"))
         .atLocation(token)
         .scaleIn(0, 500, { ease: "easeOutQuint" })
         .fadeOut(1000)
@@ -36,7 +36,7 @@ function create(token, config = {}) {
         .playbackRate(1);
 
     seq.effect()
-        .file(file("jb2a.icon.heart.pink"))
+        .file(closest("jb2a.icon.heart.pink"))
         .atLocation(token)
         .scaleToObject(3)
         .anchor({ y: 0.45 })
@@ -48,13 +48,13 @@ function create(token, config = {}) {
         .opacity(0.5);
 
     seq.effect()
-        .file(file("jb2a.extras.tmfx.border.circle.outpulse.01.fast"))
+        .file(closest("jb2a.extras.tmfx.border.circle.outpulse.01.fast"))
         .atLocation(token)
         .scaleToObject(2);
 
     seq.effect()
         .name(label)
-        .file(file("jb2a.markers.heart.pink.03"))
+        .file(closest("jb2a.markers.heart.pink.03"))
         .atLocation(token)
         .scaleToObject(2)
         .delay(500)

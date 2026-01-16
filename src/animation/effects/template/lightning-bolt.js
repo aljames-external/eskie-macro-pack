@@ -3,7 +3,7 @@
  * Modular Conversion: bakanabaka
  */
 
-import { file } from '../../../lib/filemanager.js';
+import { closest } from '../../../lib/filemanager.js';
 import { templates } from '../../../lib/templates.js';
 import { settingsOverride } from '../../../lib/settings.js';
 import { autoanimations } from '../../../integration/autoanimations.js';
@@ -36,10 +36,10 @@ async function create(token, config = {}) {
 
     if (sound.enabled) {
         sequence.sound()
-            .file(file(`psfx.3rd-level-spells.call-lightning.v1.secondary`))
+            .file(closest(`psfx.3rd-level-spells.call-lightning.v1.secondary`))
             .volume(sound.volume)
         sequence.sound()
-            .file(file(`psfx.3rd-level-spells.call-lightning.v1.primary`))
+            .file(closest(`psfx.3rd-level-spells.call-lightning.v1.primary`))
             .volume(sound.volume)
             .delay(500)
     }
@@ -60,7 +60,7 @@ async function create(token, config = {}) {
     };
 
     sequence.effect()
-            .file(file("jb2a.static_electricity.01.blue"))
+            .file(closest("jb2a.static_electricity.01.blue"))
             .atLocation(token)
             .fadeIn(500)
             .fadeOut(500)
@@ -70,7 +70,7 @@ async function create(token, config = {}) {
             .zIndex(2)
 
         .effect()
-            .file(file("eskie.lightning.02.blue"))
+            .file(closest("eskie.lightning.02.blue"))
             .atLocation(token)
             .rotateTowards(position)
             .size({width:2, height:1.8}, {gridUnits:true})
@@ -81,7 +81,7 @@ async function create(token, config = {}) {
             .waitUntilFinished()
         
         .effect()
-            .file(file("eskie.lightning.03.blue"))
+            .file(closest("eskie.lightning.03.blue"))
             .atLocation(token)
             .rotateTowards(position)
             .size({width:2, height:1.8}, {gridUnits:true})
@@ -95,7 +95,7 @@ async function create(token, config = {}) {
             .shake({ duration: 500, strength: 1.5, rotation: false, fadeOut: 250 })
         
         .effect()
-            .file(file("eskie.lightning.lightning_bolt.blue"))
+            .file(closest("eskie.lightning.lightning_bolt.blue"))
             .atLocation(token)
             .stretchTo(position, {tiling: false, onlyX: true})
             .filter("ColorMatrix", {hue:-12, saturate:2 })
@@ -107,7 +107,7 @@ async function create(token, config = {}) {
         })
         
         .effect()
-            .file(file("eskie.lightning.04.blue"))
+            .file(closest("eskie.lightning.04.blue"))
             .atLocation(token)
             .rotateTowards(position)
             .size({width:1.2, height:1}, {gridUnits:true})

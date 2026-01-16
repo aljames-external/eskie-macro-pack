@@ -1,7 +1,7 @@
 // Original Author: EskieMoh#2969
 // Modular Conversion: bakanabaka
 
-import { file } from '../../../lib/filemanager.js';
+import { closest } from '../../../lib/filemanager.js';
 
 /**
  * Creates the Grease animation sequence at a specified location.
@@ -15,7 +15,7 @@ async function create(token, position, config = {}) {
     sequence
         .effect()
         .atLocation(token)
-        .file(file(`jb2a.magic_signs.circle.02.conjuration.loop.yellow`))
+        .file(closest(`jb2a.magic_signs.circle.02.conjuration.loop.yellow`))
         .scaleToObject(1.25)
         .rotateIn(180, 600, { ease: "easeOutCubic" })
         .scaleIn(0, 600, { ease: "easeOutCubic" })
@@ -26,7 +26,7 @@ async function create(token, position, config = {}) {
 
         .effect()
         .atLocation(token)
-        .file(file(`jb2a.magic_signs.circle.02.conjuration.complete.dark_yellow`))
+        .file(closest(`jb2a.magic_signs.circle.02.conjuration.complete.dark_yellow`))
         .scaleToObject(1.25)
         .rotateIn(180, 600, { ease: "easeOutCubic" })
         .scaleIn(0, 600, { ease: "easeOutCubic" })
@@ -41,7 +41,7 @@ async function create(token, position, config = {}) {
 
         .effect()
         .atLocation(position)
-        .file(file(`jb2a.magic_signs.circle.02.conjuration.complete.dark_yellow`))
+        .file(closest(`jb2a.magic_signs.circle.02.conjuration.complete.dark_yellow`))
         .size(2.2, { gridUnits: true })
         .fadeIn(600)
         .opacity(1)
@@ -50,7 +50,7 @@ async function create(token, position, config = {}) {
         .belowTokens()
 
         .effect()
-        .file(file("jb2a.particles.outward.white.01.02"))
+        .file(closest("jb2a.particles.outward.white.01.02"))
         .scaleIn(0, 500, { ease: "easeOutQuint" })
         .delay(500)
         .fadeOut(1000)
@@ -62,7 +62,7 @@ async function create(token, position, config = {}) {
         .waitUntilFinished(500)
 
         .effect()
-        .file(file("jb2a.water_splash.circle.01.black"))
+        .file(closest("jb2a.water_splash.circle.01.black"))
         .atLocation(position)
         .scaleIn(0, 1500, { ease: "easeOutCubic" })
         .scaleOut(0, 1500, { ease: "linear" })
@@ -74,7 +74,7 @@ async function create(token, position, config = {}) {
 
         .effect()
         .delay(100)
-        .file(file('jb2a.grease.dark_brown'))
+        .file(closest('jb2a.grease.dark_brown'))
         .atLocation(position)
         .belowTokens()
         .fadeIn(5000)

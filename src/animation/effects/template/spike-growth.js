@@ -3,7 +3,7 @@
    Update Author: bakanabaka
 ** */
 
-import { file } from "../../../lib/filemanager.js";
+import { closest } from "../../../lib/filemanager.js";
 import { templates } from '../../../lib/templates.js';
 import { autoanimations, CONCENTRATING } from "../../../integration/autoanimations.js";
 
@@ -29,13 +29,13 @@ async function createInitialSpikeGrowth(position, config = {}) {
 
     sequence
         .effect()
-        .file(file("jb2a.cast_generic.earth.01.browngreen.1"))
+        .file(closest("jb2a.cast_generic.earth.01.browngreen.1"))
         .atLocation(position)
         .size(3, { gridUnits: true })
         .filter("ColorMatrix", { hue: -30, saturate: 0.25, brightness: 0.8 })
 
         .effect()
-        .file(file("jb2a.plant_growth.02.ring.4x4.pulse.greenred"))
+        .file(closest("jb2a.plant_growth.02.ring.4x4.pulse.greenred"))
         .atLocation(position)
         .size(size, { gridUnits: true })
         .belowTokens()
@@ -44,7 +44,7 @@ async function createInitialSpikeGrowth(position, config = {}) {
         .opacity(0.65)
 
         .effect()
-        .file(file("jb2a.plant_growth.02.ring.4x4.pulse.greenred"))
+        .file(closest("jb2a.plant_growth.02.ring.4x4.pulse.greenred"))
         .atLocation(position)
         .size(4, { gridUnits: true })
         .belowTokens()
@@ -89,7 +89,7 @@ async function createPersistentSpikes(token, centralPosition, config = {}) {
             .effect()
             .name(`Spike Growth ${token.document.name} ${id}`) // Unique name for stopping
             .delay(550)
-            .file(file("jb2a.plant_growth.02.round.4x4.loop.greenred"))
+            .file(closest("jb2a.plant_growth.02.round.4x4.loop.greenred"))
             .atLocation(locations[i])
             .belowTokens()
             .size(3.8, { gridUnits: true })
@@ -104,7 +104,7 @@ async function createPersistentSpikes(token, centralPosition, config = {}) {
             .effect()
             .name(`Spike Growth ${token.document.name} ${id}`) // Unique name for stopping
             .delay(30)
-            .file(file("jb2a.ice_spikes.radial.burst.grey"))
+            .file(closest("jb2a.ice_spikes.radial.burst.grey"))
             .size(7.5, { gridUnits: true })
             .playbackRate(4)
             .atLocation(locations[i], { randomOffset: 0.25 })

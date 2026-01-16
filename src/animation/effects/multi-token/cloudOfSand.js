@@ -1,7 +1,7 @@
 // Original Author: EskieMoh#2969
 // Updater: @bakanabaka
 
-import { file } from "../../../lib/filemanager.js";
+import { closest } from "../../../lib/filemanager.js";
 
 const DEFAULT_CONFIG = {
     persist: false,
@@ -25,7 +25,7 @@ function _createCloudEffect(position, file, { size, opacity, rotate, zIndex, rot
     return new Sequence()
         .effect()
         .name("Cloud of Sand")
-        .file(file(file))
+        .file(closest(file))
         .atLocation(position)
         .size(size, {gridUnits:true})
         .scaleIn(0, 1000, {ease: "easeInCubic"})
@@ -74,7 +74,7 @@ async function create(position, config = {}) {
     let sequence = new Sequence()
         .effect()
             .name("Cloud of Sand")
-            .file(file("jb2a.extras.tmfx.outflow.circle.04"))
+            .file(closest("jb2a.extras.tmfx.outflow.circle.04"))
             //.attachTo(token)
             //.scaleToObject(1.75)
             .atLocation(position)
@@ -89,7 +89,7 @@ async function create(position, config = {}) {
 
         .effect()
             .name("Cloud of Sand")
-            .file(file(`jb2a.sleep.cloud.01.${color}`))
+            .file(closest(`jb2a.sleep.cloud.01.${color}`))
             //.attachTo(token)
             //.scaleToObject(1.75)
             .atLocation(position)
@@ -105,7 +105,7 @@ async function create(position, config = {}) {
 
         .effect()
             .delay(750)
-            .file(file("animated-spell-effects-cartoon.air.portal"))
+            .file(closest("animated-spell-effects-cartoon.air.portal"))
             .atLocation(position,{offset: {y:-0.25}, gridUnits:true})
             .size(10, {gridUnits:true})
             .scaleIn(0, 250, {ease: "easeInCirc"})
@@ -120,7 +120,7 @@ async function create(position, config = {}) {
 
         .effect()
             .name("Cloud of Sand")
-            .file(file("jb2a.extras.tmfx.outflow.circle.04"))
+            .file(closest("jb2a.extras.tmfx.outflow.circle.04"))
             .atLocation(position)
             .size(12, {gridUnits:true})
             .fadeIn(1000, {ease: "easeInCubic"})

@@ -1,7 +1,7 @@
 // Original Author: EskieMoh#2969
 // Modular Conversion: bakanabaka
 
-import { file } from "../../../lib/filemanager.js";
+import { closest } from "../../../lib/filemanager.js";
 
 const DEFAULT_CONFIG = {};
 
@@ -10,7 +10,7 @@ async function create(token, target, config = {}) {
     const sequence = new Sequence();
 
     sequence.effect()
-        .file(file("jb2a.toll_the_dead.red.skull_smoke"))
+        .file(closest("jb2a.toll_the_dead.red.skull_smoke"))
         .attachTo(target)
         .scaleToObject(1.65, { considerTokenScale: true })
         .filter("ColorMatrix", { saturate: 0.25, hue: -5 })
@@ -30,7 +30,7 @@ async function create(token, target, config = {}) {
         .zIndex(0.1);
 
     sequence.effect()
-        .file(file(`jb2a.particles.outward.red.01.03`))
+        .file(closest(`jb2a.particles.outward.red.01.03`))
         .attachTo(target, { offset: { y: 0.1 }, gridUnits: true, bindRotation: false })
         .size(1 * target.document.width, { gridUnits: true })
         .duration(1000)

@@ -1,7 +1,7 @@
 // Original Author: EskieMoh#2969
 // Modular Conversion: bakanabaka
 
-import { file } from "../../../../lib/filemanager.js";
+import { closest } from "../../../../lib/filemanager.js";
 
 const DEFAULT_CONFIG = {
     id: 'eskie.effect.possession.main',
@@ -46,7 +46,7 @@ async function create(token, target, config) {
 
         .effect()
         .delay(100)
-        .file(file(`jb2a.particles.outward.white.01.03`))
+        .file(closest(`jb2a.particles.outward.white.01.03`))
         .attachTo(target, { offset: { y: 0.2 }, gridUnits: true, bindRotation: false })
         .scaleToObject()
         .duration(1000)
@@ -63,7 +63,7 @@ async function create(token, target, config) {
         .effect()
         .delay(500)
         .name(`${id} - ${target.uuid}`)
-        .file(file("jb2a.extras.tmfx.outflow.circle.01"))
+        .file(closest("jb2a.extras.tmfx.outflow.circle.01"))
         .attachTo(target, { cacheLocation: true, offset: { y: 0 }, gridUnits: true, bindAlpha: false })
         .scaleToObject(1.45, { considerTokenScale: true })
         .randomRotation()

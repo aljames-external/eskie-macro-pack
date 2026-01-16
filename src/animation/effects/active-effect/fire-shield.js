@@ -1,7 +1,7 @@
 // Original Author: EskieMoh#2969
 // Modular Conversion: bakanabaka
 
-import { file } from "../../../lib/filemanager.js";
+import { closest } from "../../../lib/filemanager.js";
 import { autoanimations } from "../../../integration/autoanimations.js";
 
 const DEFAULT_CONFIG = {
@@ -14,13 +14,13 @@ async function create(token, config = {}) {
 
     const sequence = new Sequence();
     sequence.effect()
-        .file(file("jb2a.impact.ground_crack.orange.01"))
+        .file(closest("jb2a.impact.ground_crack.orange.01"))
         .atLocation(token)
         .belowTokens()
         .scaleToObject(3);
 
     sequence.effect()
-        .file(file("jb2a.particles.outward.orange.01.03"))
+        .file(closest("jb2a.particles.outward.orange.01.03"))
         .atLocation(token)
         .delay(200)
         .scaleIn(0.5, 250)
@@ -32,7 +32,7 @@ async function create(token, config = {}) {
         .name(label);
 
     sequence.effect()
-        .file(file("jb2a.energy_strands.in.yellow.01.2"))
+        .file(closest("jb2a.energy_strands.in.yellow.01.2"))
         .atLocation(token)
         .delay(200)
         .scaleIn(0.5, 250)
@@ -44,7 +44,7 @@ async function create(token, config = {}) {
         .name(label);
 
     sequence.effect()
-        .file(file("jb2a.token_border.circle.spinning.orange.004"))
+        .file(closest("jb2a.token_border.circle.spinning.orange.004"))
         .atLocation(token)
         .scaleToObject(2.2)
         .playbackRate(1)
@@ -53,7 +53,7 @@ async function create(token, config = {}) {
         .name(label);
 
     sequence.effect()
-        .file(file("jb2a.shield_themed.below.fire.03.orange"))
+        .file(closest("jb2a.shield_themed.below.fire.03.orange"))
         .atLocation(token)
         .delay(1000)
         .persist()
@@ -66,7 +66,7 @@ async function create(token, config = {}) {
         .name(label);
 
     sequence.effect()
-        .file(file("jb2a.shield_themed.above.fire.03.orange"))
+        .file(closest("jb2a.shield_themed.above.fire.03.orange"))
         .atLocation(token)
         .persist()
         .fadeIn(3500)

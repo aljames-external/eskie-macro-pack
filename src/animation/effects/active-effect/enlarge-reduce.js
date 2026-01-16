@@ -3,7 +3,7 @@
    Update Author: bakanabaka
 ** */
 
-import { file } from "../../../lib/filemanager.js";
+import { closest } from "../../../lib/filemanager.js";
 import { autoanimations } from "../../../integration/autoanimations.js";
 
 const DEFAULT_CONFIG = {
@@ -26,7 +26,7 @@ async function createEnlarge(token, config = {}) {
 
     sequence
         .effect()
-        .file(file("jb2a.static_electricity.03.orange"))
+        .file(closest("jb2a.static_electricity.03.orange"))
         .atLocation(token)
         .duration(3000)
         .scaleToObject(1)
@@ -81,7 +81,7 @@ async function createEnlarge(token, config = {}) {
         .scaleIn(0.25, 700, { ease: "easeOutBounce" })
 
         .effect()
-        .file(file("jb2a.extras.tmfx.outpulse.circle.01.fast"))
+        .file(closest("jb2a.extras.tmfx.outpulse.circle.01.fast"))
         .atLocation(token)
         .belowTokens()
         .opacity(0.75)
@@ -89,14 +89,14 @@ async function createEnlarge(token, config = {}) {
         .zIndex(1)
 
         .effect()
-        .file(file("jb2a.impact.ground_crack.orange.02"))
+        .file(closest("jb2a.impact.ground_crack.orange.02"))
         .atLocation(token)
         .belowTokens()
         .scaleToObject(2)
         .zIndex(0)
 
         .effect()
-        .file(file("jb2a.particles.outward.orange.01.04"))
+        .file(closest("jb2a.particles.outward.orange.01.04"))
         .scaleIn(0.25, 500, { ease: "easeOutQuint" })
         .fadeIn(500)
         .fadeOut(1000)
@@ -107,7 +107,7 @@ async function createEnlarge(token, config = {}) {
         .zIndex(4)
 
         .effect()
-        .file(file("jb2a.static_electricity.03.orange"))
+        .file(closest("jb2a.static_electricity.03.orange"))
         .atLocation(token)
         .duration(5000)
         .scaleToObject(1)
@@ -150,7 +150,7 @@ async function createReduce(token, config = {}) {
 
     sequence
         .effect()
-        .file(file("jb2a.static_electricity.03.orange"))
+        .file(closest("jb2a.static_electricity.03.orange"))
         .atLocation(token)
         .duration(3000)
         .scaleToObject(1)
@@ -205,21 +205,21 @@ async function createReduce(token, config = {}) {
         .scaleIn(0.25, 700, { ease: "easeOutBounce" })
 
         .effect()
-        .file(file("jb2a.extras.tmfx.outpulse.circle.01.fast"))
+        .file(closest("jb2a.extras.tmfx.outpulse.circle.01.fast"))
         .atLocation(token)
         .opacity(0.75)
         .scaleToObject(2)
         .zIndex(1)
 
         .effect()
-        .file(file("jb2a.energy_strands.in.yellow.01.2"))
+        .file(closest("jb2a.energy_strands.in.yellow.01.2"))
         .atLocation(token)
         .belowTokens()
         .scaleToObject(2)
         .zIndex(0)
 
         .effect()
-        .file(file("jb2a.particles.outward.orange.01.04"))
+        .file(closest("jb2a.particles.outward.orange.01.04"))
         .scaleIn(0.25, 500, { ease: "easeOutQuint" })
         .fadeIn(500)
         .fadeOut(1000)
@@ -230,7 +230,7 @@ async function createReduce(token, config = {}) {
         .zIndex(4)
 
         .effect()
-        .file(file("jb2a.static_electricity.03.orange"))
+        .file(closest("jb2a.static_electricity.03.orange"))
         .atLocation(token)
         .duration(5000)
         .scaleToObject(1)

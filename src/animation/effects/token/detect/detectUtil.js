@@ -1,4 +1,4 @@
-import { file } from '../../../../lib/filemanager.js';
+import { closest } from '../../../../lib/filemanager.js';
 
 // Mapping of tag -> Sequencer file
 const defaultDetectionConfig = {};
@@ -63,7 +63,7 @@ async function _createDetectionEffects(target, config) {
             if (delay >= totalDuration) { continue; }
 
             sequence.effect()
-                .file(file(config.detection[tag]))
+                .file(closest(config.detection[tag]))
                 .attachTo(target, {bindRotation:false})
                 .scaleToObject(1, { considerTokenScale: true })
                 .delay(delay)
@@ -98,7 +98,7 @@ async function create(token, config) {
     let sequence = new Sequence();
     sequence
         .effect()
-        .file(file(mConfig.effect.pulse.img))
+        .file(closest(mConfig.effect.pulse.img))
         .atLocation(token)
         .size(mConfig.distance * 2, { gridUnits: true })
         .fadeOut(4000)

@@ -4,7 +4,7 @@
     Updated: bakanabaka
 ** */
 
-import { file } from '../../../lib/filemanager.js';
+import { closest } from '../../../lib/filemanager.js';
 import { beam as beamEffect } from './beam/beam.js';
 
 const DEFAULT_CONFIG = {
@@ -180,7 +180,7 @@ function death(target, config = {}) {
         // Add a smoke puff effect
         .effect()
         .name(id)
-        .file(file(smokeEffect.img))
+        .file(closest(smokeEffect.img))
         .atLocation(target, { offset: { y: -0.25 }, gridUnits: true })
         .fadeIn(1000)
         .scaleIn(0, 1000, { ease: "easeOutCubic" })
@@ -195,7 +195,7 @@ function death(target, config = {}) {
         // Add swirling spirit particle effects
         .effect()
         .name(id)
-        .file(file(spiritEffect.img))
+        .file(closest(spiritEffect.img))
         .atLocation(target)
         .duration(spiritEffect.duration)
         .fadeOut(3000)

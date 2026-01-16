@@ -3,7 +3,7 @@
    Update Author: bakanabaka
 ** */
 
-import { file } from "../../../lib/filemanager.js";
+import { closest } from "../../../lib/filemanager.js";
 
 const DEFAULT_CONFIG = {
     id: 'suggestion',
@@ -36,7 +36,7 @@ async function createSuggestion(token, target, config = {}) {
             new Sequence()
                 .effect()
                 .delay(250)
-                .file(file("jb2a.icon.runes.blue"))
+                .file(closest("jb2a.icon.runes.blue"))
                 .attachTo(target, { offset: offsets[i], gridUnits: true, bindRotation: false })
                 .scaleToObject(0.4)
                 .scaleIn(0, 250, { ease: "easeOutBack" })
@@ -46,7 +46,7 @@ async function createSuggestion(token, target, config = {}) {
                 .duration(1150)
 
                 .effect()
-                .file(file("jb2a.template_circle.out_pulse.02.burst.bluewhite"))
+                .file(closest("jb2a.template_circle.out_pulse.02.burst.bluewhite"))
                 .attachTo(target, { offset: offsets[i], gridUnits: true })
                 .scaleToObject(0.4)
                 .opacity(0.5)
@@ -57,7 +57,7 @@ async function createSuggestion(token, target, config = {}) {
         .wait(1250)
 
         .effect()
-        .file(file("jb2a.energy_attack.01.blue"))
+        .file(closest("jb2a.energy_attack.01.blue"))
         .attachTo(target, { bindRotation: false })
         .scaleToObject(2.25)
         .belowTokens()
@@ -67,14 +67,14 @@ async function createSuggestion(token, target, config = {}) {
         .randomRotation()
 
         .effect()
-        .file(file("jb2a.impact.010.blue"))
+        .file(closest("jb2a.impact.010.blue"))
         .attachTo(target)
         .scaleToObject(0.9)
         .zIndex(2)
         .waitUntilFinished(-1000)
 
         .effect()
-        .file(file("jb2a.template_circle.symbol.normal.runes.blue"))
+        .file(closest("jb2a.template_circle.symbol.normal.runes.blue"))
         .attachTo(target)
         .scaleToObject(1.25)
         .fadeIn(500)
@@ -84,7 +84,7 @@ async function createSuggestion(token, target, config = {}) {
         .mask(target)
 
         .effect()
-        .file(file("jb2a.extras.tmfx.outflow.circle.01"))
+        .file(closest("jb2a.extras.tmfx.outflow.circle.01"))
         .attachTo(target, { cacheLocation: true, offset: { y: 0 }, gridUnits: true, bindAlpha: false })
         .scaleToObject(1.45, { considerTokenScale: true })
         .randomRotation()

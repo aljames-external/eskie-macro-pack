@@ -1,7 +1,7 @@
 // Original Author: EskieMoh#2969
 // Updater: @bakanabaka
 
-import { file } from "../../../lib/filemanager.js";
+import { closest } from "../../../lib/filemanager.js";
 
 const DEFAULT_CONFIG = {
     darkMap: true,
@@ -28,7 +28,7 @@ async function create(token, targets, config = {}) {
 
     sequence.wait(250)
         .effect()
-        .file(file("jb2a.healing_generic.03.burst.bluepurple"))
+        .file(closest("jb2a.healing_generic.03.burst.bluepurple"))
         .attachTo(token)
         .scaleToObject(2.2, { considerTokenScale: true })
         .fadeIn(500)
@@ -40,7 +40,7 @@ async function create(token, targets, config = {}) {
         .zIndex(1)
         
         .effect()
-        .file(file("animated-spell-effects-cartoon.misc.all seeing eye"))
+        .file(closest("animated-spell-effects-cartoon.misc.all seeing eye"))
         .attachTo(token)
         .scaleToObject(0.6, { gridUnits: true })
         .filter("ColorMatrix", { saturate: -1, hue: 105 })
@@ -50,7 +50,7 @@ async function create(token, targets, config = {}) {
         .zIndex(0.1)
 
         .effect()
-        .file(file("jb2a.twinkling_stars.points08.white"))
+        .file(closest("jb2a.twinkling_stars.points08.white"))
         .attachTo(token)
         .scaleToObject(0.75, { gridUnits: true })
         .scaleIn(0, 500, { ease: "easeOutBack" })
@@ -59,7 +59,7 @@ async function create(token, targets, config = {}) {
         .zIndex(1)
 
         .effect()
-        .file(file("animated-spell-effects-cartoon.energy.pulse.yellow"))
+        .file(closest("animated-spell-effects-cartoon.energy.pulse.yellow"))
         .attachTo(token, { offset: { x: 0 }, gridUnits: true })
         .scaleToObject(0.7, { gridUnits: true })
         .filter("ColorMatrix", { saturate: -1 })
@@ -112,7 +112,7 @@ async function play(token, targets, config = {}) {
             new Sequence()
                 .wait(500 + 100 * u)
                 .effect()
-                .file(file("jb2a.energy_beam.normal.yellow.03"))
+                .file(closest("jb2a.energy_beam.normal.yellow.03"))
                 .atLocation(targetOrder[u], { offset: { x: targetOffsetX[u], y: targetOffsetY[u] }, gridUnits: true })
                 .stretchTo(targetOrder[u + 1], { offset: { x: targetOffsetX[u + 1], y: targetOffsetY[u + 1] }, gridUnits: true, onlyX: true })
                 .scale(0.1)
@@ -124,7 +124,7 @@ async function play(token, targets, config = {}) {
 
                 .effect()
                 .delay(10 + 100 * u)
-                .file(file(`jb2a.twinkling_stars.points04.white`))
+                .file(closest(`jb2a.twinkling_stars.points04.white`))
                 .attachTo(targetOrder[u + 1], { offset: { x: targetOffsetX[u + 1], y: targetOffsetY[u + 1] }, gridUnits: true })
                 .scaleToObject(0.65, { gridUnits: true })
                 .scaleIn(0, 500, { ease: "easeOutBack" })
@@ -134,7 +134,7 @@ async function play(token, targets, config = {}) {
 
                 .effect()
                 .delay(10 + 100 * u)
-                .file(file("animated-spell-effects-cartoon.energy.pulse.yellow"))
+                .file(closest("animated-spell-effects-cartoon.energy.pulse.yellow"))
                 .attachTo(targetOrder[u + 1], { offset: { x: targetOffsetX[u + 1], y: targetOffsetY[u + 1] }, gridUnits: true })
                 .scaleToObject(0.6, { gridUnits: true })
                 .filter("ColorMatrix", { saturate: -1 })
@@ -142,7 +142,7 @@ async function play(token, targets, config = {}) {
 
                 .effect()
                 .delay(10 + 100 * u)
-                .file(file("jb2a.healing_generic.03.burst.bluepurple"))
+                .file(closest("jb2a.healing_generic.03.burst.bluepurple"))
                 .attachTo(targetOrder[u + 1])
                 .scaleToObject(2.2, { considerTokenScale: true })
                 .fadeIn(500)

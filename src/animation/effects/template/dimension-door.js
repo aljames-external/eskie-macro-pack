@@ -1,7 +1,7 @@
 // Original Author: Unknown (from Discord animations)
 // Modular Conversion: bakanabaka
 
-import { file } from '../../../lib/filemanager.js';
+import { closest } from '../../../lib/filemanager.js';
 import { templates } from '../../../lib/templates.js';
 import { autoanimations } from '../../../integration/autoanimations.js';
 
@@ -23,7 +23,7 @@ async function create(token, config = {}) {
 
     let sequence = new Sequence()
         .effect()
-            .file(file("jb2a.fireball.beam.purple"))
+            .file(closest("jb2a.fireball.beam.purple"))
             .atLocation(token)
             .stretchTo(position)
             .belowTokens()
@@ -33,7 +33,7 @@ async function create(token, config = {}) {
             .zIndex(0)
 
         .effect()
-            .file(file("jb2a.portals.vertical.ring.purple"))
+            .file(closest("jb2a.portals.vertical.ring.purple"))
             .atLocation(token)
             .rotateTowards(position)
             .belowTokens()
@@ -45,7 +45,7 @@ async function create(token, config = {}) {
             .zIndex(1)
 
         .effect()
-            .file(file("jb2a.portals.vertical.ring.purple"))
+            .file(closest("jb2a.portals.vertical.ring.purple"))
             .atLocation(position)
             .rotateTowards(token)
             .rotate(90)
@@ -58,7 +58,7 @@ async function create(token, config = {}) {
             .zIndex(1)
 
         .effect()
-            .file(file("jb2a.side_impact.part.slow.spiral.pinkpurple"))
+            .file(closest("jb2a.side_impact.part.slow.spiral.pinkpurple"))
             .atLocation(position)
             .scale({x:0.125, y:0.15})
             .playbackRate(1.75)

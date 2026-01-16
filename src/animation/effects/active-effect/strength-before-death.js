@@ -1,7 +1,7 @@
 //Last Updated: 12/22/2025
 //Author: .eskie
 
-import { file } from '../../../lib/filemanager.js';
+import { closest } from '../../../lib/filemanager.js';
 import { autoanimations } from '../../../integration/autoanimations.js';
 
 const DEFAULT_CONFIG = {
@@ -59,7 +59,7 @@ function create(token, config) {
         .effect()
             .delay(1000)
             .name(`${id} ${token.name}`)
-            .file(file("eskie.screen_overlay.cinema_bars.01"))
+            .file(closest("eskie.screen_overlay.cinema_bars.01"))
             .screenSpace()
             .screenSpaceScale({fitX:true, fitY:true})
             .persist()
@@ -69,7 +69,7 @@ function create(token, config) {
 
         .effect()
             .delay(50)
-            .file(file("jb2a.impact.ground_crack.02.orange"))
+            .file(closest("jb2a.impact.ground_crack.02.orange"))
             .attachTo(token)
             .scaleToObject(2.5)
             .filter("ColorMatrix", {hue: -15,saturate: 1})
@@ -77,14 +77,14 @@ function create(token, config) {
 
         .effect()
             .delay(250)
-            .file(file("jb2a.extras.tmfx.border.circle.outpulse.01.fast"))
+            .file(closest("jb2a.extras.tmfx.border.circle.outpulse.01.fast"))
             .attachTo(token)
             .scaleToObject(5)
             .opacity(0.15)
             .belowTokens()
 
         .effect()
-            .file(file("eskie.aura.token.generic.01.red"))
+            .file(closest("eskie.aura.token.generic.01.red"))
             .attachTo(token)
             .scaleToObject(2.2)
             .animateProperty("sprite", "scale.y", { from: 0, to: 1.5, duration: 1500,  ease: "easeOutQuint" })
@@ -100,7 +100,7 @@ function create(token, config) {
 
         .effect()
             .name(`${id} ${token.name}`)
-            .file(file("eskie.nature.flower.particle.01.red"))
+            .file(closest("eskie.nature.flower.particle.01.red"))
             .attachTo(token, {offset:{y:0.25},gridUnits:true})
             .scaleToObject(1.5)
             .fadeIn(250, {ease:"easeOutQuint"})
@@ -113,7 +113,7 @@ function create(token, config) {
         .wait(100)
 
         .effect()
-            .file(file("eskie.nature.flower.particle.01.red"))
+            .file(closest("eskie.nature.flower.particle.01.red"))
             .attachTo(token, {offset:{x:-1,y:-1},gridUnits:true, randomOffset: 1})
             .scaleToObject(2)
             .fadeIn(250, {ease:"easeOutQuint"})
@@ -123,7 +123,7 @@ function create(token, config) {
             .opacity(0.8)
 
         .effect()
-            .file(file("eskie.nature.flower.particle.01.red"))
+            .file(closest("eskie.nature.flower.particle.01.red"))
             .attachTo(token, {offset:{x:1,y:-1},gridUnits:true, randomOffset: 1})
             .scaleToObject(2)
             .fadeIn(250, {ease:"easeOutQuint"})
@@ -133,7 +133,7 @@ function create(token, config) {
             .opacity(0.8)
 
         .effect()
-            .file(file("eskie.nature.flower.particle.01.red"))
+            .file(closest("eskie.nature.flower.particle.01.red"))
             .attachTo(token, {offset:{x:-1,y:1},gridUnits:true, randomOffset: 1})
             .scaleToObject(2)
             .fadeIn(250, {ease:"easeOutQuint"})
@@ -143,7 +143,7 @@ function create(token, config) {
             .opacity(0.8)
 
         .effect()
-            .file(file("eskie.nature.flower.particle.01.red"))
+            .file(closest("eskie.nature.flower.particle.01.red"))
             .attachTo(token, {offset:{x:1,y:1},gridUnits:true, randomOffset: 1})
             .scaleToObject(2)
             .fadeIn(250, {ease:"easeOutQuint"})
@@ -153,7 +153,7 @@ function create(token, config) {
             .opacity(0.8)
 
         .effect()
-            .file(file("eskie.nature.flower.particle.01.red"))
+            .file(closest("eskie.nature.flower.particle.01.red"))
             .attachTo(token, {offset:{x:2,y:0},gridUnits:true, randomOffset: 1})
             .scaleToObject(2)
             .fadeIn(250, {ease:"easeOutQuint"})
@@ -163,7 +163,7 @@ function create(token, config) {
             .opacity(0.8)
 
         .effect()
-            .file(file("eskie.nature.flower.particle.01.red"))
+            .file(closest("eskie.nature.flower.particle.01.red"))
             .attachTo(token, {offset:{x:0,y:1.5},gridUnits:true, randomOffset: 1})
             .scaleToObject(2)
             .fadeIn(250, {ease:"easeOutQuint"})
@@ -173,7 +173,7 @@ function create(token, config) {
             .opacity(0.8)
 
         .effect()
-            .file(file("eskie.nature.flower.particle.01.red"))
+            .file(closest("eskie.nature.flower.particle.01.red"))
             .attachTo(token, {offset:{x:-2,y:0},gridUnits:true, randomOffset: 1})
             .scaleToObject(2)
             .fadeIn(250, {ease:"easeOutQuint"})
@@ -183,7 +183,7 @@ function create(token, config) {
             .opacity(0.8)
 
         .effect()
-            .file(file("eskie.nature.flower.particle.01.red"))
+            .file(closest("eskie.nature.flower.particle.01.red"))
             .attachTo(token, {offset:{x:0,y:-1.5},gridUnits:true, randomOffset: 1})
             .scaleToObject(2)
             .fadeIn(250, {ease:"easeOutQuint"})
@@ -194,7 +194,7 @@ function create(token, config) {
 
         .effect()
             .delay(50,250)
-            .file(file("eskie.nature.flower.particle.01.red"))
+            .file(closest("eskie.nature.flower.particle.01.red"))
             .attachTo(token, {offset:{x:-1,y:-1},gridUnits:true, randomOffset: 1})
             .scaleToObject(1.5)
             .fadeIn(250, {ease:"easeOutQuint"})
@@ -203,7 +203,7 @@ function create(token, config) {
     
         .effect()
             .delay(50,250)
-            .file(file("eskie.nature.flower.particle.01.red"))
+            .file(closest("eskie.nature.flower.particle.01.red"))
             .attachTo(token, {offset:{x:1,y:-1},gridUnits:true, randomOffset: 1})
             .scaleToObject(1.5)
             .fadeIn(250, {ease:"easeOutQuint"})
@@ -212,7 +212,7 @@ function create(token, config) {
 
         .effect()
             .delay(50,250)
-            .file(file("eskie.nature.flower.particle.01.red"))
+            .file(closest("eskie.nature.flower.particle.01.red"))
             .attachTo(token, {offset:{x:-1,y:1},gridUnits:true, randomOffset: 1})
             .scaleToObject(1.5)
             .fadeIn(250, {ease:"easeOutQuint"})
@@ -221,7 +221,7 @@ function create(token, config) {
 
         .effect()
             .delay(50,250)
-            .file(file("eskie.nature.flower.particle.01.red"))
+            .file(closest("eskie.nature.flower.particle.01.red"))
             .attachTo(token, {offset:{x:1,y:1},gridUnits:true, randomOffset: 1})
             .scaleToObject(1.5)
             .fadeIn(250, {ease:"easeOutQuint"})
@@ -229,7 +229,7 @@ function create(token, config) {
             .animateProperty("sprite", "position.y", {from: 0, to:-0.5,  duration: 1000, gridUnits: true, ease:"easeOutSine"})
 
         .effect()
-            .file(file("eskie.nature.flower.particle.01.red"))
+            .file(closest("eskie.nature.flower.particle.01.red"))
             .attachTo(token, {offset:{x:2,y:0},gridUnits:true, randomOffset: 1})
             .scaleToObject(1.5)
             .fadeIn(250, {ease:"easeOutQuint"})
@@ -237,7 +237,7 @@ function create(token, config) {
             .animateProperty("sprite", "position.y", {from: 0, to:-0.5,  duration: 1000, gridUnits: true, ease:"easeOutSine"})
 
         .effect()
-            .file(file("eskie.nature.flower.particle.01.red"))
+            .file(closest("eskie.nature.flower.particle.01.red"))
             .attachTo(token, {offset:{x:0,y:1.5},gridUnits:true, randomOffset: 1})
             .scaleToObject(1.5)
             .fadeIn(250, {ease:"easeOutQuint"})
@@ -245,7 +245,7 @@ function create(token, config) {
             .animateProperty("sprite", "position.y", {from: 0, to:-0.5,  duration: 1000, gridUnits: true, ease:"easeOutSine"})
 
         .effect()
-            .file(file("eskie.nature.flower.particle.01.red"))
+            .file(closest("eskie.nature.flower.particle.01.red"))
             .attachTo(token, {offset:{x:-2,y:0},gridUnits:true, randomOffset: 1})
             .scaleToObject(1.5)
             .fadeIn(250, {ease:"easeOutQuint"})
@@ -253,7 +253,7 @@ function create(token, config) {
             .animateProperty("sprite", "position.y", {from: 0, to:-0.5,  duration: 1000, gridUnits: true, ease:"easeOutSine"})
 
         .effect()
-            .file(file("eskie.nature.flower.particle.01.red"))
+            .file(closest("eskie.nature.flower.particle.01.red"))
             .attachTo(token, {offset:{x:0,y:-1.5},gridUnits:true, randomOffset: 1})
             .scaleToObject(1.5)
             .fadeIn(250, {ease:"easeOutQuint"})

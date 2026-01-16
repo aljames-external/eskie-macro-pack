@@ -1,7 +1,7 @@
 // Original Author: EskieMoh#2969
 // Modular Conversion: bakanabaka
 
-import { file } from '../../../lib/filemanager.js';
+import { closest } from '../../../lib/filemanager.js';
 import { text as textUtil } from '../../utils/text.js';
 import { cinemaBars } from '../../scene-overlays/cinema-bars.js';
 
@@ -37,7 +37,7 @@ function dashEffect(source, target) {
 
     let sequence = new Sequence();
     sequence.effect()
-        .file(file("animated-spell-effects-cartoon.magic.mind sliver"))
+        .file(closest("animated-spell-effects-cartoon.magic.mind sliver"))
         .atLocation(target)
         .rotate(angleDeg)
         .filter("ColorMatrix", { saturate: -1,brightness:1 })
@@ -94,7 +94,7 @@ function deathAnimation(target) {
         .fadeOut(500)
 
     sequence.effect()
-        .file(file("jb2a.water_splash.cone.01.red"))
+        .file(closest("jb2a.water_splash.cone.01.red"))
         .atLocation(target, {offset: {x:0.1,y:-0.1}, gridUnits: true})
         .delay(250)
         .fadeIn(200)
@@ -136,7 +136,7 @@ async function create(source, target, config) {
     }    
 
     sequence.effect()
-        .file(file("animated-spell-effects-cartoon.level 01.bless.blue"))
+        .file(closest("animated-spell-effects-cartoon.level 01.bless.blue"))
         .scaleToObject(0.75)
         .atLocation(source, {offset: {x:0.25, y:0.25}, gridUnits: true})
         .scaleIn(0, 500, {ease: "easeOutCubic"})

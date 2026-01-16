@@ -3,7 +3,7 @@
    Update Author: bakanabaka
 ** */
 
-import { file } from "../../../lib/filemanager.js";
+import { closest } from "../../../lib/filemanager.js";
 
 const DEFAULT_CONFIG = {
     id: 'leap',
@@ -47,13 +47,13 @@ async function createLeap(token, config = {}) {
         .waitUntilFinished()
 
         .effect()
-        .file(file("animated-spell-effects-cartoon.air.puff.03"))
+        .file(closest("animated-spell-effects-cartoon.air.puff.03"))
         .atLocation(token)
         .scaleToObject(1.75)
         .belowTokens()
 
         .effect()
-        .file(file("jb2a.wind_stream.white"))
+        .file(closest("jb2a.wind_stream.white"))
         .anchor({ x: 0.5, y: 1 })
         .atLocation(token)
         .duration(1000)

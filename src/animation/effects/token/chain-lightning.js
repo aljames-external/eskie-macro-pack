@@ -1,7 +1,7 @@
 // Original Author: .eskie
 // Modular Conversion: bakanabaka
 
-import { file } from "../../../lib/filemanager.js";
+import { closest } from "../../../lib/filemanager.js";
 
 /**
  * Creates the Chain Lightning sequence effects.
@@ -22,7 +22,7 @@ async function create(token, targetTokens, config = {}) {
     sequence
         .effect()
         .delay(150)
-        .file(file("jb2a.electric_arc.blue02"))
+        .file(closest("jb2a.electric_arc.blue02"))
         .atLocation(token)
         .stretchTo(initialTarget, { onlyX: true })
         .duration(1000)
@@ -36,7 +36,7 @@ async function create(token, targetTokens, config = {}) {
                 new Sequence()
                     .effect()
                     .delay(150)
-                    .file(file("jb2a.electric_arc.blue02"))
+                    .file(closest("jb2a.electric_arc.blue02"))
                     .atLocation(initialTarget)
                     .stretchTo(targetTokens[e], { onlyX: true })
                     .duration(1000)
@@ -51,7 +51,7 @@ async function create(token, targetTokens, config = {}) {
         })
         .effect()
         .delay(150)
-        .file(file("jb2a.chain_lightning.primary.blue"))
+        .file(closest("jb2a.chain_lightning.primary.blue"))
         .atLocation(token, { offset: { x: token.document.width * 0.25 }, gridUnits: true, local: true })
         .stretchTo(initialTarget)
         .zIndex(2)
@@ -69,7 +69,7 @@ async function create(token, targetTokens, config = {}) {
             for (let i = 1; i <= targetTokens.length - 1; i++) {
                 new Sequence()
                     .effect()
-                    .file(file("jb2a.chain_lightning.secondary.blue"))
+                    .file(closest("jb2a.chain_lightning.secondary.blue"))
                     .atLocation(initialTarget, { offset: { x: -0.1 }, gridUnits: true, local: true })
                     .stretchTo(targetTokens[i])
                     .randomizeMirrorY()

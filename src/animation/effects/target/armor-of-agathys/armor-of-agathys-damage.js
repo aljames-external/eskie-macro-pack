@@ -1,7 +1,7 @@
 // Original Author: EskieMoh#2969
 // Modular Conversion: bakanabaka
 
-import { file } from "../../../../lib/filemanager.js";
+import { closest } from "../../../../lib/filemanager.js";
 
 const DEFAULT_CONFIG = {};
 
@@ -10,7 +10,7 @@ async function create(token, target, config = {}) {
     const sequence = new Sequence();
 
     sequence.effect()
-        .file(file("jb2a.impact.004.blue"))
+        .file(closest("jb2a.impact.004.blue"))
         .atLocation(token)
         .rotateTowards(target)
         .scaleToObject(1.45)
@@ -20,7 +20,7 @@ async function create(token, target, config = {}) {
 
     sequence.effect()
         .atLocation(token)
-        .file(file("jb2a.side_impact.part.fast.ice_shard.blue"))
+        .file(closest("jb2a.side_impact.part.fast.ice_shard.blue"))
         .rotateTowards(target)
         .scaleToObject(2)
         .randomizeMirrorY()

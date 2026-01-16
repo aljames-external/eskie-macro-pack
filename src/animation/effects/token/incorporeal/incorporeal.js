@@ -1,7 +1,7 @@
 // Original Author: EskieMoh#2969
 // Modular Conversion: bakanabaka
 
-import { file } from "../../../../lib/filemanager.js";
+import { closest } from "../../../../lib/filemanager.js";
 
 const DEFAULT_CONFIG = {
     id: 'eskie.effect.incorporeal.main',
@@ -39,7 +39,7 @@ async function create(token, config) {
 
     seq.effect()
         .name(`${id} - ${token.uuid}`)
-        .file(file("jb2a.extras.tmfx.outflow.circle.01"))
+        .file(closest("jb2a.extras.tmfx.outflow.circle.01"))
         .attachTo(token, { cacheLocation: true, offset: { y: 0 }, gridUnits: true, bindAlpha: false })
         .scaleToObject(1.45, { considerTokenScale: true })
         .randomRotation()
@@ -66,7 +66,7 @@ async function create(token, config) {
         .filter("Blur", { blurX: 0, blurY: 0.8 });
 
     seq.effect()
-        .file(file("jb2a.smoke.puff.centered.grey"))
+        .file(closest("jb2a.smoke.puff.centered.grey"))
         .atLocation(token)
         .scaleToObject(2, { considerTokenScale: true })
         .opacity(0.5)

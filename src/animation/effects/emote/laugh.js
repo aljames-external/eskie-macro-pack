@@ -1,4 +1,4 @@
-import { file } from "../../../lib/filemanager.js";
+import { closest } from "../../../lib/filemanager.js";
 
 /* **
    Originally Published: 6/5/2023
@@ -53,7 +53,7 @@ async function create(token, config = {}) {
 
         .effect()
         .name(id)
-        .file(file(effect[0].img))
+        .file(closest(effect[0].img))
         .atLocation(token, { offset: { x: (effect[0].x * tokenWidth * facingFactor), y: effect[0].y * tokenWidth }, gridUnits: true, local: true })
         .attachTo(token, { bindAlpha: false })
         .loopProperty("sprite", "rotation", { from: 0, to: -15 * facingFactor, duration: 250, ease: "easeOutCubic" })

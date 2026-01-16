@@ -1,6 +1,6 @@
 // Original Author: EskieMoh#2969
 // Updater: @bakanabaka
-import { file } from "../../../lib/filemanager.js";
+import { closest } from "../../../lib/filemanager.js";
 import { settingsOverride } from "../../../lib/settings.js";
 
 const DEFAULT_CONFIG = { 
@@ -28,7 +28,7 @@ async function create(target, config) {
 
     let sequence = new Sequence();
     // Initiate sound at start
-    if (config.sound.enabled) sequence.sound().name(uniqueId).volume(sound.volume).file(file(sound.file));
+    if (config.sound.enabled) sequence.sound().name(uniqueId).volume(sound.volume).file(closest(sound.file));
 
     // Animation effects
     sequence.addSequence(_addMagicCircleEffects(target, uniqueId));
@@ -55,7 +55,7 @@ function _addMagicCircleEffects(target, id) {
         .effect()
         .name(id)
         .atLocation(target)
-        .file(file(`jb2a.magic_signs.circle.02.necromancy.loop.blue`))
+        .file(closest(`jb2a.magic_signs.circle.02.necromancy.loop.blue`))
         .scaleToObject(1.25)
         .scaleIn(0, 600, {ease: "easeOutCubic"})
         .filter("ColorMatrix", {hue:-65})
@@ -68,7 +68,7 @@ function _addMagicCircleEffects(target, id) {
         .effect()
         .name(id)
         .atLocation(target)
-        .file(file(`jb2a.magic_signs.circle.02.necromancy.loop.green`))
+        .file(closest(`jb2a.magic_signs.circle.02.necromancy.loop.green`))
         .scaleToObject(1.25)
         .scaleIn(0, 600, {ease: "easeOutCubic"})
         .belowTokens(true)
@@ -95,7 +95,7 @@ function _addTokenVisualEffects(target, id) {
         .effect()
         .name(id)
         .delay(1000)
-        .file(file("animated-spell-effects-cartoon.magic.mind sliver"))
+        .file(closest("animated-spell-effects-cartoon.magic.mind sliver"))
         .atLocation(target, {offset:{y:-0.75*target.document.width}, gridUnits:true})
         .scaleToObject(2)
         .rotate(-90)
@@ -107,7 +107,7 @@ function _addTokenVisualEffects(target, id) {
         .effect()
         .name(id)
         .delay(100)
-        .file(file("jb2a.particles.outward.blue.01.03"))
+        .file(closest("jb2a.particles.outward.blue.01.03"))
         .atLocation(target)
         .scaleToObject(1.1)
         .filter("ColorMatrix", {saturate:-1, brightness:2})
@@ -121,7 +121,7 @@ function _addTokenVisualEffects(target, id) {
         .effect()
         .name(id)
         .delay(100)
-        .file(file("jb2a.detect_magic.circle.blue"))
+        .file(closest("jb2a.detect_magic.circle.blue"))
         .atLocation(target)
         .scaleToObject(1.25)
         .filter("ColorMatrix", {hue:-65})
@@ -135,7 +135,7 @@ function _addTokenVisualEffects(target, id) {
 
         .effect()
         .name(id)
-        .file(file("jb2a.token_border.circle.static.blue.012"))
+        .file(closest("jb2a.token_border.circle.static.blue.012"))
         .attachTo(target, {bindAlpha: false, bindRotation: false})
         .scaleToObject(1.85, {considerTokenScale: true})
         .fadeIn(4000)
@@ -162,7 +162,7 @@ function _addTokenVisualEffects(target, id) {
         .effect()
         .name(id)
         .delay(2000)
-        .file(file("jb2a.spirit_guardians.blue.spirits"))
+        .file(closest("jb2a.spirit_guardians.blue.spirits"))
         .attachTo(target, {offset: {y:0}, gridUnits:true, bindAlpha: false, bindRotation: false})
         .scaleToObject(1.35,{considerTokenScale:true})
         .persist()
@@ -174,7 +174,7 @@ function _addTokenVisualEffects(target, id) {
         .effect()
         .name(id)
         .delay(3000)
-        .file(file("jb2a.magic_signs.rune.necromancy.complete.blue"))
+        .file(closest("jb2a.magic_signs.rune.necromancy.complete.blue"))
         .attachTo(target, {offset: {y:-0.77*target.document.width}, gridUnits:true, bindAlpha: false, bindRotation: false})
         .scaleToObject(0.4,{considerTokenScale:true})
         .persist()
@@ -186,7 +186,7 @@ function _addTokenVisualEffects(target, id) {
         .effect()
         .name(id)
         .delay(3000)
-        .file(file("jb2a.magic_signs.rune.necromancy.complete.blue"))
+        .file(closest("jb2a.magic_signs.rune.necromancy.complete.blue"))
         .attachTo(target, {offset: {y:-0.55*target.document.width}, gridUnits:true, bindAlpha: false, bindRotation: false})
         .scaleToObject(0.4,{considerTokenScale:true})
         .persist()
@@ -227,7 +227,7 @@ function _addCornerFlameEffects(target, id, xOffset, yOffset, smokeZIndex) {
         .effect()
         .name(id)
         .atLocation(target, {offset: {x:xOffset, y:yOffset}, gridUnits:true})
-        .file(file("jb2a.impact.008.blue"))
+        .file(closest("jb2a.impact.008.blue"))
         .filter("ColorMatrix", {hue:-65})
         .scaleToObject(1)
         .zIndex(1)
@@ -235,7 +235,7 @@ function _addCornerFlameEffects(target, id, xOffset, yOffset, smokeZIndex) {
         .effect()
         .name(id)
         .atLocation(target, {offset: {x:xOffset, y:yOffset}, gridUnits:true})
-        .file(file("jb2a.flames.01.blue"))
+        .file(closest("jb2a.flames.01.blue"))
         .belowTokens()
         .filter("ColorMatrix", {hue:-65})
         .scaleToObject(0.5)
@@ -247,7 +247,7 @@ function _addCornerFlameEffects(target, id, xOffset, yOffset, smokeZIndex) {
         .name(id)
         .delay(250)
         .atLocation(target, {offset: {x:xOffset, y:yOffset-0.35}, gridUnits:true})
-        .file(file("animated-spell-effects-cartoon.smoke.97"))
+        .file(closest("animated-spell-effects-cartoon.smoke.97"))
         .scaleToObject(0.8)
         .opacity(0.4)
         .tint("#6ff087")

@@ -1,7 +1,7 @@
 // Original Author: EskieMoh#2969
 // Modular Conversion: bakanabaka
 
-import { file } from '../../../lib/filemanager.js';
+import { closest } from '../../../lib/filemanager.js';
 
 /**
  * Creates the Frightful Moan animation sequence.
@@ -14,7 +14,7 @@ async function create(token, config = {}) {
 
     sequence
         .effect()
-        .file(file("jb2a.extras.tmfx.inpulse.circle.01.normal"))
+        .file(closest("jb2a.extras.tmfx.inpulse.circle.01.normal"))
         .attachTo(token, { bindAlpha: false })
         .scaleToObject(1.75)
         .randomRotation()
@@ -23,7 +23,7 @@ async function create(token, config = {}) {
         .aboveLighting()
 
         .effect()
-        .file(file("jb2a.particles.inward.white.01.02"))
+        .file(closest("jb2a.particles.inward.white.01.02"))
         .atLocation(token)
         .scaleToObject(2)
         .duration(500)
@@ -37,7 +37,7 @@ async function create(token, config = {}) {
         .waitUntilFinished(500)
 
         .effect()
-        .file(file("jb2a.impact.004.blue"))
+        .file(closest("jb2a.impact.004.blue"))
         .atLocation(token)
         .scaleToObject(6)
         .randomRotation()
@@ -52,7 +52,7 @@ async function create(token, config = {}) {
         .zIndex(1)
 
         .effect()
-        .file(file("jb2a.extras.tmfx.outpulse.circle.01.fast"))
+        .file(closest("jb2a.extras.tmfx.outpulse.circle.01.fast"))
         .attachTo(token, { bindAlpha: false })
         .size(13, { gridUnits: true })
         .repeats(8, 450, 450)

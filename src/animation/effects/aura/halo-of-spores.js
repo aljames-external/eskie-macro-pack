@@ -1,7 +1,7 @@
 // Original Author: EskieMoh#2969
 // Modular Conversion: bakanabaka
 
-import { file } from '../../../lib/filemanager.js';
+import { closest } from '../../../lib/filemanager.js';
 import { autoanimations, CONCENTRATING } from '../../../integration/autoanimations.js';
 
 const DEFAULT_CONFIG = {
@@ -18,7 +18,7 @@ function createAura(token, config = {}, options = {}) {
     sequence
         .effect()
             .name(label)
-            .file(file("jb2a.spirit_guardians.green.particles"))
+            .file(closest("jb2a.spirit_guardians.green.particles"))
             .attachTo(token)
             .filter("ColorMatrix", { hue: 60 })
             .size(3.5 + token.document.width, { gridUnits: true })
@@ -31,7 +31,7 @@ function createAura(token, config = {}, options = {}) {
 
         .effect()
             .name(label)
-            .file(file("jb2a.sleep.cloud.01.green"))
+            .file(closest("jb2a.sleep.cloud.01.green"))
             .attachTo(token)
             .size(5.5 + token.document.width, { gridUnits: true })
             .belowTokens()
@@ -55,7 +55,7 @@ function createDamageEffect(token, target, config = {}) {
     const sequence = new Sequence();
     sequence
         .effect()
-        .file(file("jb2a.fireflies.many.02.red"))
+        .file(closest("jb2a.fireflies.many.02.red"))
         .atLocation(target, { randomOffset: 0 })
         .scaleToObject(1.5)
         .fadeIn(500)
@@ -68,7 +68,7 @@ function createDamageEffect(token, target, config = {}) {
 
         .effect()
         .delay(250)
-        .file(file("jb2a.cast_generic.ice.01.blue"))
+        .file(closest("jb2a.cast_generic.ice.01.blue"))
         .atLocation(target)
         .scaleToObject(1)
         .playbackRate(2)
@@ -76,14 +76,14 @@ function createDamageEffect(token, target, config = {}) {
         .waitUntilFinished(0)
 
         .effect()
-        .file(file("animated-spell-effects-cartoon.energy.pulse.green"))
+        .file(closest("animated-spell-effects-cartoon.energy.pulse.green"))
         .atLocation(target)
         .scaleToObject(1.25)
         .playbackRate(1)
         .filter("ColorMatrix", { hue: 60 })
 
         .effect()
-        .file(file("jb2a.impact.004.green"))
+        .file(closest("jb2a.impact.004.green"))
         .atLocation(target)
         .scaleToObject(2)
         .playbackRate(1)
@@ -101,7 +101,7 @@ function createDamageEffect(token, target, config = {}) {
         .opacity(0.25)
 
         .effect()
-        .file(file("jb2a.particles.outward.greenyellow.01.03"))
+        .file(closest("jb2a.particles.outward.greenyellow.01.03"))
         .scaleToObject(2)
         .scaleIn(0.15, 750, { ease: "easeOutQuint" })
         .fadeOut(1500)

@@ -1,7 +1,7 @@
 // Original Author: EskieMoh#2969
 // Updater: @bakanabaka
 
-import { file } from "../../../../lib/filemanager.js";
+import { closest } from "../../../../lib/filemanager.js";
 
 const DEFAULT_CONFIG = {
     id: 'elementalBlast.water',
@@ -67,7 +67,7 @@ async function create(token, target, config = {}) {
     let sequence = new Sequence()
 
     .effect()
-    .file(file("animated-spell-effects-cartoon.water.11"))
+    .file(closest("animated-spell-effects-cartoon.water.11"))
     .atLocation(token,{offset:{x:-0, y: -0}, gridUnits:true, local:false})
     .rotateTowards(targetCenter, {local: true})
     .spriteOffset({x: -1.0+ranOffset, y:-0.65- (token.document.width-1)/2}, {gridUnits:true})
@@ -76,7 +76,7 @@ async function create(token, target, config = {}) {
 
     .effect()
     .delay(0)
-    .file(file("animated-spell-effects-cartoon.water.71"))
+    .file(closest("animated-spell-effects-cartoon.water.71"))
     .atLocation(token,{offset:{x:0*token.document.width, y: ranOffset}, gridUnits:true, local:true})
     .rotateTowards(target)
     .spriteRotation(90)
@@ -86,13 +86,13 @@ async function create(token, target, config = {}) {
     .waitUntilFinished(-1000)
 
     .effect()
-    .file(file("jb2a.impact.007.yellow"))
+    .file(closest("jb2a.impact.007.yellow"))
     .atLocation(target,{offset:{x:0, y:0}, gridUnits:true})
     .size(impactSize/2, {gridUnits:true})
     .filter("ColorMatrix", {saturate: -1, hue: -20 })
 
     .effect()
-    .file(file("animated-spell-effects-cartoon.water.23"))
+    .file(closest("animated-spell-effects-cartoon.water.23"))
     .atLocation(target,{offset:{x:0, y:0}, gridUnits:true})
     .size(impactSize, {gridUnits:true})
     .rotateTowards(token)

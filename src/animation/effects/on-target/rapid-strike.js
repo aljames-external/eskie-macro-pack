@@ -2,7 +2,7 @@
 //Author: .eskie
 
 import { tokens } from '../../../lib/tokens.js';
-import { file } from '../../../lib/filemanager.js';
+import { closest } from '../../../lib/filemanager.js';
 import { settingsOverride } from "../../../lib/settings.js";
 import { autoanimations } from '../../../integration/autoanimations.js';
 
@@ -32,12 +32,12 @@ function create(token, target, config = {}) {
         const seq = new Sequence();
             if ( sound.enabled ) {
                 seq.sound()
-                    .file(file(`psfx.impacts.${type}`))
+                    .file(closest(`psfx.impacts.${type}`))
                     .volume(sound.volume);
             }
 
             seq.effect()
-                .file(file(`eskie.attack.melee.generic.01.${type}.${weight}.${color}.slow`))
+                .file(closest(`eskie.attack.melee.generic.01.${type}.${weight}.${color}.slow`))
                 .atLocation(token)
                 .rotateTowards(targetSquare,{randomOffset:0.25})
                 .scaleToObject(effectSize)
@@ -48,7 +48,7 @@ function create(token, target, config = {}) {
 
             .effect()
                 .delay(150)
-                .file(file("jb2a.impact.003.yellow"))
+                .file(closest("jb2a.impact.003.yellow"))
                 .size(1.75 * token.document.width, { gridUnits: true })
                 .atLocation(targetSquare)
                 .randomRotation()
@@ -58,7 +58,7 @@ function create(token, target, config = {}) {
 
             .effect()
                 .delay(150)
-                .file(file(`jb2a.impact.008.${color}`))
+                .file(closest(`jb2a.impact.008.${color}`))
                 .size(0.75 * token.document.width, { gridUnits: true })
                 .atLocation(targetSquare)
                 .randomRotation()
@@ -67,7 +67,7 @@ function create(token, target, config = {}) {
 
             .effect()
                 .delay(150)
-                .file(file(`eskie.slice.01.color.${color}`))
+                .file(closest(`eskie.slice.01.color.${color}`))
                 .size(1.25 * token.document.width, { gridUnits: true })
                 .atLocation(targetSquare)
                 .randomRotation()
@@ -77,7 +77,7 @@ function create(token, target, config = {}) {
 
             .effect()
                 .delay(150)
-                .file(file("eskie.slice.01.black.colorless"))
+                .file(closest("eskie.slice.01.black.colorless"))
                 .size(1.25 * token.document.width, { gridUnits: true })
                 .atLocation(targetSquare)
                 .randomRotation()

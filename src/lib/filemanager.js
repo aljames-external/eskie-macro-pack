@@ -1,6 +1,6 @@
 import { dependency } from './dependency.js'
 
-function closestPath(modulePrefix, ...categories) {
+function bestFit(modulePrefix, ...categories) {
     let diverged = false;
     let currentPath = modulePrefix;
     let originalPath = `${modulePrefix}.${categories.join('.')}`;
@@ -41,7 +41,7 @@ function closestPath(modulePrefix, ...categories) {
     return currentPath;
 }
 
-export function file(path) {
+export function closest(path) {
     // Support http:// and https:// addresses
     // Support direct filepaths
     if (path.includes('/')) return path;
@@ -98,5 +98,9 @@ export function file(path) {
             break;
     }
 
-    return closestPath(modulePrefix, ...categories);
+    return bestFit(modulePrefix, ...categories);
+}
+
+export const file = {
+    closest,
 }

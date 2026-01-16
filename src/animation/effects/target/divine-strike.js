@@ -1,7 +1,7 @@
 // Original Author: eskiemoh#2969
 // Modularized: bakanabaka
 
-import { file } from "../../../lib/filemanager.js";
+import { closest } from "../../../lib/filemanager.js";
 
 const DEFAULT_CONFIG = {
     darkMap: true,
@@ -23,7 +23,7 @@ async function createMelee(token, target, config = {}) {
         sequence.effect()
             .name(`DivineStrike`)
             .delay(10 + 50 * i)
-            .file(file("jb2a.twinkling_stars.points04.white"))
+            .file(closest("jb2a.twinkling_stars.points04.white"))
             .atLocation(target)
             .rotateTowards(token)
             .scaleToObject(0.4, { gridUnits: true })
@@ -36,7 +36,7 @@ async function createMelee(token, target, config = {}) {
         sequence.effect()
             .name(`point`)
             .delay(10 + 50 * i)
-            .file(file("animated-spell-effects-cartoon.energy.pulse.yellow"))
+            .file(closest("animated-spell-effects-cartoon.energy.pulse.yellow"))
             .atLocation(target)
             .rotateTowards(token)
             .scaleToObject(0.4, { gridUnits: true })
@@ -46,7 +46,7 @@ async function createMelee(token, target, config = {}) {
     }
     if (darkMap && canvas?.scene?.background?.src) {
         sequence.effect()
-            .file(file(canvas.scene.background.src))
+            .file(closest(canvas.scene.background.src))
             .filter("ColorMatrix", { brightness: 0.5 })
             .atLocation({ x: (canvas.dimensions.width) / 2, y: (canvas.dimensions.height) / 2 })
             .size({ width: canvas.scene.width / canvas.grid.size, height: canvas.scene.height / canvas.grid.size }, { gridUnits: true })
@@ -63,7 +63,7 @@ async function createMelee(token, target, config = {}) {
 
     sequence.effect()
         .delay(300)
-        .file(file("jb2a.impact.ground_crack.01.purple"))
+        .file(closest("jb2a.impact.ground_crack.01.purple"))
         .atLocation(target)
         .size(2.3 * token.document.width, { gridUnits: true })
         .filter("ColorMatrix", { saturate: -0, brightness: 0 })
@@ -73,7 +73,7 @@ async function createMelee(token, target, config = {}) {
 
     sequence.effect()
         .delay(300)
-        .file(file("jb2a.particles.outward.white.02.03"))
+        .file(closest("jb2a.particles.outward.white.02.03"))
         .scaleIn(0, 500, { ease: "easeOutQuint" })
         .fadeOut(1500)
         .atLocation(target)
@@ -83,14 +83,14 @@ async function createMelee(token, target, config = {}) {
 
     sequence.effect()
         .delay(300)
-        .file(file("animated-spell-effects-cartoon.energy.pulse.yellow"))
+        .file(closest("animated-spell-effects-cartoon.energy.pulse.yellow"))
         .atLocation(target)
         .scaleToObject(1.75)
         .filter("ColorMatrix", { saturate: -1 })
         .zIndex(1.1);
 
     sequence.effect()
-        .file(file("jb2a.divine_smite.target.yellowwhite"))
+        .file(closest("jb2a.divine_smite.target.yellowwhite"))
         .attachTo(target, { bindScale: false })
         .rotateTowards(token)
         .scaleToObject(2)
@@ -156,7 +156,7 @@ async function createRanged(token, target, config = {}) {
         sequence.effect()
             .name(`DivineStrike`)
             .delay(10 + 50 * i)
-            .file(file("jb2a.twinkling_stars.points04.white"))
+            .file(closest("jb2a.twinkling_stars.points04.white"))
             .atLocation(midpoint, { offset: randomOffset[i], gridUnits: true })
             .scaleToObject(0.5, { gridUnits: true })
             .scaleIn(0, 500, { ease: "easeOutBack" })
@@ -168,7 +168,7 @@ async function createRanged(token, target, config = {}) {
         sequence.effect()
             .name(`point`)
             .delay(10 + 50 * i)
-            .file(file("animated-spell-effects-cartoon.energy.pulse.yellow"))
+            .file(closest("animated-spell-effects-cartoon.energy.pulse.yellow"))
             .atLocation(midpoint, { offset: randomOffset[i], gridUnits: true })
             .scaleToObject(0.5, { gridUnits: true })
             .spriteOffset(offset[i], { gridUnits: false })
@@ -178,7 +178,7 @@ async function createRanged(token, target, config = {}) {
 
     if (darkMap && canvas?.scene?.background?.src) {
         sequence.effect()
-            .file(file(canvas.scene.background.src))
+            .file(closest(canvas.scene.background.src))
             .filter("ColorMatrix", { brightness: 0.5 })
             .atLocation({ x: (canvas.dimensions.width) / 2, y: (canvas.dimensions.height) / 2 })
             .size({ width: canvas.scene.width / canvas.grid.size, height: canvas.scene.height / canvas.grid.size }, { gridUnits: true })
@@ -191,7 +191,7 @@ async function createRanged(token, target, config = {}) {
     sequence.wait(500);
 
     sequence.effect()
-        .file(file("jb2a.ranged.02.projectile.01.yellow"))
+        .file(closest("jb2a.ranged.02.projectile.01.yellow"))
         .atLocation(token)
         .stretchTo(target)
         .opacity(1)
@@ -202,7 +202,7 @@ async function createRanged(token, target, config = {}) {
         .zIndex(0.2);
 
     sequence.effect()
-        .file(file("jb2a.ranged.03.projectile.01.pinkpurple"))
+        .file(closest("jb2a.ranged.03.projectile.01.pinkpurple"))
         .atLocation(token)
         .stretchTo(target)
         .opacity(1)

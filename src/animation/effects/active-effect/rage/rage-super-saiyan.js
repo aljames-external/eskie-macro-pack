@@ -3,7 +3,7 @@
  * Update Author: bakanabaka
  */
 
-import { file } from '../../../../lib/filemanager.js';
+import { closest } from '../../../../lib/filemanager.js';
 import { util } from './rage-util.js';
 
 export const DEFAULT_CONFIG = {
@@ -19,7 +19,7 @@ function create(token, config = {}) {
     seq = seq
         .effect()
         .name(`${id} - ${token.uuid}`)
-        .file(file("jb2a.extras.tmfx.outpulse.circle.02.normal"))
+        .file(closest("jb2a.extras.tmfx.outpulse.circle.02.normal"))
         .atLocation(token)
         .size(4, { gridUnits: true })
         .opacity(0.25);
@@ -27,7 +27,7 @@ function create(token, config = {}) {
     seq = seq
         .effect()
         .name(`${id} - ${token.uuid}`)
-        .file(file(`jb2a.impact.ground_crack.${color}.02`))
+        .file(closest(`jb2a.impact.ground_crack.${color}.02`))
         .atLocation(token)
         .belowTokens()
         .filter("ColorMatrix", { hue: 20, saturate: 1 })
@@ -37,7 +37,7 @@ function create(token, config = {}) {
     seq = seq
         .effect()
         .name(`${id} - ground-crack - ${token.uuid}`)
-        .file(file("jb2a.impact.ground_crack.still_frame.02"))
+        .file(closest("jb2a.impact.ground_crack.still_frame.02"))
         .atLocation(token)
         .belowTokens()
         .fadeIn(2000)
@@ -49,7 +49,7 @@ function create(token, config = {}) {
     seq = seq
         .effect()
         .name(`${id} - ${token.uuid}`)
-        .file(file("jb2a.wind_stream.white"))
+        .file(closest("jb2a.wind_stream.white"))
         .atLocation(token, { offset: { y: 75 } })
         .size(1.75, { gridUnits: true })
         .rotate(90)
@@ -62,7 +62,7 @@ function create(token, config = {}) {
     seq = seq
         .effect()
         .name(`${id} - ${token.uuid}`)
-        .file(file(`jb2a.particles.outward.${color}.01.03`))
+        .file(closest(`jb2a.particles.outward.${color}.01.03`))
         .atLocation(token)
         .scaleToObject(2.5)
         .opacity(1)
@@ -75,7 +75,7 @@ function create(token, config = {}) {
     seq = seq
         .effect()
         .name(`${id} - ${token.uuid}`)
-        .file(file("jb2a.wind_stream.white"))
+        .file(closest("jb2a.wind_stream.white"))
         .atLocation(token)
         .attachTo(token)
         .scaleToObject()
@@ -89,7 +89,7 @@ function create(token, config = {}) {
     seq = seq
         .effect()
         .name(`${id} - ${token.uuid}`)
-        .file(file(`jb2a.token_border.circle.static.${color}.012`))
+        .file(closest(`jb2a.token_border.circle.static.${color}.012`))
         .atLocation(token)
         .attachTo(token)
         .opacity(0.7)

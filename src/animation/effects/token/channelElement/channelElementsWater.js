@@ -1,7 +1,7 @@
 // Original Author: EskieMoh#2969
 // Modular Conversion: bakanabaka
 
-import { file } from "../../../../lib/filemanager.js";
+import { closest } from "../../../../lib/filemanager.js";
 
 const DEFAULT_CONFIG = {
     id: 'ChannelElementsWater',
@@ -12,7 +12,7 @@ function _createWaterPulse(token, x, y, rotation) {
     return new Sequence()
         .effect()
         .name(effectName)
-        .file(file("animated-spell-effects-cartoon.water.49"))
+        .file(closest("animated-spell-effects-cartoon.water.49"))
         .attachTo(token, { offset: { x, y }, gridUnits: true, bindRotation: false })
         .scaleToObject(2)
         .fadeIn(250)
@@ -27,7 +27,7 @@ function _createWaterSplash(token, xOffset, delay, mirrorX) {
     const effect = new Sequence()
         .effect()
         .name(effectName)
-        .file(file("animated-spell-effects-cartoon.water.69"))
+        .file(closest("animated-spell-effects-cartoon.water.69"))
         .attachTo(token, { offset: { x: xOffset * token.document.width, y: -0.05 }, gridUnits: true, bindRotation: false })
         .scaleToObject(1.35, { considerTokenScale: true })
         .fadeIn(1000)
@@ -41,7 +41,7 @@ function _createWaterSplash(token, xOffset, delay, mirrorX) {
     effect
         .effect()
         .name(effectName)
-        .file(file("animated-spell-effects-cartoon.water.69"))
+        .file(closest("animated-spell-effects-cartoon.water.69"))
         .attachTo(token, { offset: { x: (xOffset + 0.1) * token.document.width, y: -0.05 }, gridUnits: true, bindRotation: false })
         .scaleToObject(1.35, { considerTokenScale: true })
         .fadeIn(1000)
@@ -64,7 +64,7 @@ async function create(token, config = {}) {
 
     sequence.effect()
         .name(effectName)
-        .file(file("animated-spell-effects-cartoon.water.63"))
+        .file(closest("animated-spell-effects-cartoon.water.63"))
         .attachTo(token, { offset: { x: 0, y: 0 }, gridUnits: true, bindRotation: false })
         .scaleToObject(2)
         .fadeOut(250)
@@ -72,7 +72,7 @@ async function create(token, config = {}) {
 
     sequence.effect()
         .name(effectName)
-        .file(file("jb2a.wind_stream.200.white"))
+        .file(closest("jb2a.wind_stream.200.white"))
         .attachTo(token, { offset: { x: 0, y: 0 }, gridUnits: true, bindRotation: false })
         .scaleToObject(2)
         .fadeIn(1000)

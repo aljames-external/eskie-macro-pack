@@ -1,7 +1,7 @@
 // Original Author: EskieMoh#2969
 // Updater: @bakanabaka
 
-import { file } from "../../../lib/filemanager.js";
+import { closest } from "../../../lib/filemanager.js";
 
 const DEFAULT_CONFIG = {
     darkMap: true,
@@ -13,7 +13,7 @@ async function create(token, target, config = {}) {
 
     let sequence = new Sequence();
     sequence.effect()
-        .file(file("jb2a.extras.tmfx.border.circle.outpulse.01.fast"))
+        .file(closest("jb2a.extras.tmfx.border.circle.outpulse.01.fast"))
         .atLocation(token)
         .scaleToObject(3)
         .opacity(0.75)
@@ -22,7 +22,7 @@ async function create(token, target, config = {}) {
         .zIndex(1);
 
     sequence.effect()
-        .file(file("jb2a.extras.tmfx.outflow.circle.04"))
+        .file(closest("jb2a.extras.tmfx.outflow.circle.04"))
         .attachTo(token)
         .scaleToObject(1.75)
         .fadeIn(1000)
@@ -48,7 +48,7 @@ async function create(token, target, config = {}) {
     sequence.wait(750)
 
     .effect()
-        .file(file("jb2a.impact.010.green"))
+        .file(closest("jb2a.impact.010.green"))
         .atLocation(token)
         .rotateTowards(target)
         .spriteOffset({ x: -0.2 }, { gridUnits: true })
@@ -58,7 +58,7 @@ async function create(token, target, config = {}) {
         .wait(50)
 
     .effect()
-        .file(file("jb2a.twinkling_stars.points04.orange"))
+        .file(closest("jb2a.twinkling_stars.points04.orange"))
         .atLocation(token)
         .rotateTowards(target)
         .spriteOffset({ x: -0.2 }, { gridUnits: true })
@@ -73,7 +73,7 @@ async function create(token, target, config = {}) {
         .zIndex(1)
 
     .effect()
-        .file(file("jb2a.extras.tmfx.outpulse.circle.03.normal"))
+        .file(closest("jb2a.extras.tmfx.outpulse.circle.03.normal"))
         .atLocation(token)
         .rotateTowards(target)
         .spriteOffset({ x: -0.175 }, { gridUnits: true })
@@ -90,7 +90,7 @@ async function create(token, target, config = {}) {
         .wait(3000)
 
     .effect()
-        .file(file("jb2a.cast_generic.dark.side01.red"))
+        .file(closest("jb2a.cast_generic.dark.side01.red"))
         .size(1 * token.document.width, { gridUnits: true })
         .atLocation(token)
         .rotateTowards(target)
@@ -99,7 +99,7 @@ async function create(token, target, config = {}) {
         .zIndex(2)
 
     .effect()
-        .file(file("jb2a.fireball.beam.dark_red"))
+        .file(closest("jb2a.fireball.beam.dark_red"))
         .atLocation(token)
         .playbackRate(1.75)
         .scale(0.3)
@@ -109,7 +109,7 @@ async function create(token, target, config = {}) {
         .waitUntilFinished(-2100)
 
     .effect()
-        .file(file("jb2a.impact.004.dark_red"))
+        .file(closest("jb2a.impact.004.dark_red"))
         .atLocation(target)
         .scaleToObject(2.5)
         .filter("ColorMatrix", { hue: -285 })
@@ -120,7 +120,7 @@ async function create(token, target, config = {}) {
         .shake({ duration: 100, strength: 25, rotation: false })
 
     .effect()
-        .file(file("jb2a.static_electricity.03.blue"))
+        .file(closest("jb2a.static_electricity.03.blue"))
         .attachTo(target)
         .scaleToObject(1.25)
         .filter("ColorMatrix", { saturate: -1, brightness: 0 })
@@ -141,7 +141,7 @@ async function create(token, target, config = {}) {
         .duration(10000)
 
     .effect()
-        .file(file("jb2a.token_border.circle.static.blue.009"))
+        .file(closest("jb2a.token_border.circle.static.blue.009"))
         .attachTo(target)
         .fadeIn(1000)
         .fadeOut(6000)
@@ -164,7 +164,7 @@ async function create(token, target, config = {}) {
 
     .effect()
         .delay(2000)
-        .file(file("jb2a.static_electricity.03.blue"))
+        .file(closest("jb2a.static_electricity.03.blue"))
         .attachTo(target)
         .scaleToObject(1.25)
         .filter("ColorMatrix", { saturate: -1, brightness: 0 })

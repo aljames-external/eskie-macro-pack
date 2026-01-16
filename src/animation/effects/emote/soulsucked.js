@@ -1,4 +1,4 @@
-import { file } from "../../../lib/filemanager.js";
+import { closest } from "../../../lib/filemanager.js";
 
 /* **
    Originally Published: 4/14/2023
@@ -48,7 +48,7 @@ async function create(token, config = {}) {
     let soulSuckedEffect = new Sequence()
         .effect()
         .name(id)
-        .file(file(effect[0].img))
+        .file(closest(effect[0].img))
         .atLocation(token)
         .scaleIn(0, 1000, { ease: "easeOutElastic" })
         .scaleOut(0, 1000, { ease: "easeOutExpo" })

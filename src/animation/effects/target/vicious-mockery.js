@@ -3,7 +3,7 @@
    Update Author: bakanabaka
 ** */
 
-import { file } from "../../../lib/filemanager.js";
+import { closest } from "../../../lib/filemanager.js";
 
 const DEFAULT_CONFIG = {
     id: 'viciousMockery',
@@ -27,7 +27,7 @@ async function createViciousMockeryCast(token, config = {}) {
         .effect()
         .name("Casting") // Note: Original script used this name, but it's not made persistent so no stop needed.
         .atLocation(token)
-        .file(file(`jb2a.magic_signs.circle.02.enchantment.loop.purple`))
+        .file(closest(`jb2a.magic_signs.circle.02.enchantment.loop.purple`))
         .scaleToObject(1.25)
         .rotateIn(180, 600, { ease: "easeOutCubic" })
         .scaleIn(0, 600, { ease: "easeOutCubic" })
@@ -38,7 +38,7 @@ async function createViciousMockeryCast(token, config = {}) {
 
         .effect()
         .atLocation(token)
-        .file(file(`jb2a.magic_signs.circle.02.enchantment.loop.purple`))
+        .file(closest(`jb2a.magic_signs.circle.02.enchantment.loop.purple`))
         .scaleToObject(1.25)
         .rotateIn(180, 600, { ease: "easeOutCubic" })
         .scaleIn(0, 600, { ease: "easeOutCubic" })
@@ -52,7 +52,7 @@ async function createViciousMockeryCast(token, config = {}) {
         .fadeOut(300, { ease: "linear" })
 
         .effect()
-        .file(file("jb2a.music_notations.{{music}}.purple"))
+        .file(closest("jb2a.music_notations.{{music}}.purple"))
         .scaleIn(0, 500, { ease: "easeOutQuint" })
         .delay(500)
         .atLocation(token, { offset: { y: -0.2 }, gridUnits: true, randomOffset: 1.5 })
@@ -97,7 +97,7 @@ async function createViciousMockeryImpact(target, word, config = {}) {
     sequence
         .effect()
         .atLocation(target, { offset: { x: -0.25 * target.document.width, y: -0.3 * target.document.width }, randomOffset: 0.1, gridUnits: true })
-        .file(file(`animated-spell-effects-cartoon.level 01.healing word.purple`))
+        .file(closest(`animated-spell-effects-cartoon.level 01.healing word.purple`))
         .fadeOut(250)
         .zIndex(1)
         .scale(0.25 * target.document.width)
@@ -110,7 +110,7 @@ async function createViciousMockeryImpact(target, word, config = {}) {
         .filter("ColorMatrix", { hue: 50 })
 
         .effect()
-        .file(file("jb2a.particles.outward.orange.02.02"))
+        .file(closest("jb2a.particles.outward.orange.02.02"))
         .atLocation(target, { offset: { x: -0.25 * target.document.width, y: -0.3 * target.document.width }, randomOffset: 0.1, gridUnits: true })
         .scale(0.25 * target.document.width)
         .duration(800)
@@ -147,7 +147,7 @@ async function createViciousMockeryImpact(target, word, config = {}) {
 
         .effect()
         .delay(600)
-        .file(file("jb2a.impact.010.purple"))
+        .file(closest("jb2a.impact.010.purple"))
         .atLocation(target, { offset: { x: -0.25 * target.document.width, y: -0.3 * target.document.width }, gridUnits: true })
         .scaleToObject(1.25)
         .zIndex(1)
@@ -166,7 +166,7 @@ async function createViciousMockeryImpact(target, word, config = {}) {
 
         .effect()
         .delay(800)
-        .file(file("animated-spell-effects-cartoon.misc.demon"))
+        .file(closest("animated-spell-effects-cartoon.misc.demon"))
         .atLocation(target, { offset: { x: -0, y: -0.5 * target.document.width }, gridUnits: true })
         .scaleToObject(0.75)
         .playbackRate(1.5)
@@ -175,7 +175,7 @@ async function createViciousMockeryImpact(target, word, config = {}) {
 
         .effect()
         .delay(1100)
-        .file(file("animated-spell-effects-cartoon.misc.demon"))
+        .file(closest("animated-spell-effects-cartoon.misc.demon"))
         .atLocation(target, { offset: { x: -0.5 * target.document.width, y: -0 }, gridUnits: true })
         .scaleToObject(0.75)
         .playbackRate(1.5)

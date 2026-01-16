@@ -1,4 +1,4 @@
-import { file } from '../../../lib/filemanager.js';
+import { closest } from '../../../lib/filemanager.js';
 import { templates } from '../../../lib/templates.js';
 import { autoanimations } from '../../../integration/autoanimations.js';
 
@@ -30,7 +30,7 @@ async function create(token, config, options) {
 
         .effect()
             .delay(100)
-            .file(file("animated-spell-effects-cartoon.air.puff.01"))
+            .file(closest("animated-spell-effects-cartoon.air.puff.01"))
             .atLocation(token)
             .scaleToObject(1.1)
             .belowTokens()
@@ -50,7 +50,7 @@ async function create(token, config, options) {
 
         .effect()
             .delay(900)
-            .file(file("animated-spell-effects-cartoon.smoke.99"))
+            .file(closest("animated-spell-effects-cartoon.smoke.99"))
             .atLocation(position)
             .rotateTowards(token)
             .scaleToObject(1.5)
@@ -61,7 +61,7 @@ async function create(token, config, options) {
 
         .effect()
             .delay(900)
-            .file(file("animated-spell-effects-cartoon.earth.debris.04"))
+            .file(closest("animated-spell-effects-cartoon.earth.debris.04"))
             .atLocation(position)
             .rotateTowards(token)
             .scaleToObject(1.5)

@@ -2,7 +2,7 @@
 //Author: .eskie
 
 import { time } from '../../../lib/time.js';
-import { file } from '../../../lib/filemanager.js'
+import { closest } from '../../../lib/filemanager.js'
 import { dependency } from '../../../lib/dependency.js';
 import { socket } from '../../../integration/socketlib.js';
 
@@ -124,7 +124,7 @@ async function create(token, config = {}) {
       })
 
     .effect()
-      .file(file(tokenOverlay))
+      .file(closest(tokenOverlay))
       .attachTo(token, {bindAlpha: false, bindVisibility: false, bindRotation: false})
       .mask(tokenShapeMask)
       .rotate(-rotation)

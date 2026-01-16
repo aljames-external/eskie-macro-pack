@@ -1,7 +1,7 @@
 // Original Author: EskieMoh#2969
 // Modular Conversion: bakanabaka
 
-import { file } from "../../../lib/filemanager.js";
+import { closest } from "../../../lib/filemanager.js";
 
 const DEFAULT_CONFIG = {
     position: undefined,
@@ -13,7 +13,7 @@ async function create(target, config = {}) {
 
     // Vortex out
     sequence = sequence.effect()
-        .file(file("jb2a.portals.horizontal.vortex.purple"))
+        .file(closest("jb2a.portals.horizontal.vortex.purple"))
         .atLocation(target)
         .scaleToObject(2.5)
         .rotateIn(-360, 500, { ease: "easeOutCubic" })
@@ -42,7 +42,7 @@ async function create(target, config = {}) {
 
     // Vortex in
     sequence = sequence.effect()
-        .file(file("jb2a.portals.horizontal.vortex.purple"))
+        .file(closest("jb2a.portals.horizontal.vortex.purple"))
         .atLocation(config.position)
         .scaleToObject(2.5)
         .rotateIn(-360, 500, { ease: "easeOutCubic" })

@@ -3,7 +3,7 @@
    Update Author: bakanabaka
 ** */
 
-import { file } from "../../../lib/filemanager.js";
+import { closest } from "../../../lib/filemanager.js";
 
 const DEFAULT_CONFIG = {
     id: 'animateDead',
@@ -34,7 +34,7 @@ async function createAnimateDead(undeadToken, config = {}) {
         .wait(50)
         .effect()
         .atLocation(undeadToken)
-        .file(file(`jb2a.magic_signs.circle.02.necromancy.complete.green`))
+        .file(closest(`jb2a.magic_signs.circle.02.necromancy.complete.green`))
         .size(1.25, { gridUnits: true })
         .belowTokens()
         .fadeOut(2000)
@@ -43,7 +43,7 @@ async function createAnimateDead(undeadToken, config = {}) {
         .effect()
         .delay(2250)
         .atLocation(undeadToken)
-        .file(file(`jb2a.magic_signs.circle.02.necromancy.loop.green`))
+        .file(closest(`jb2a.magic_signs.circle.02.necromancy.loop.green`))
         .size(1.25, { gridUnits: true })
         .belowTokens(true)
         .filter("ColorMatrix", { saturate: -1, brightness: 2 })
@@ -55,7 +55,7 @@ async function createAnimateDead(undeadToken, config = {}) {
         .fadeOut(300, { ease: "linear" })
 
         .effect()
-        .file(file("animated-spell-effects-cartoon.electricity.ball.06"))
+        .file(closest("animated-spell-effects-cartoon.electricity.ball.06"))
         .delay(2250)
         .fadeOut(1500)
         .atLocation(undeadToken)
@@ -69,7 +69,7 @@ async function createAnimateDead(undeadToken, config = {}) {
         //Build Up
         .effect()
         .delay(2250)
-        .file(file("jb2a.cast_generic.ice.01.blue.0"))
+        .file(closest("jb2a.cast_generic.ice.01.blue.0"))
         .atLocation(undeadToken)
         .size(1.5, { gridUnits: true })
         .opacity(0.8)
@@ -81,7 +81,7 @@ async function createAnimateDead(undeadToken, config = {}) {
         //Explosion
         .effect()
         .delay(200)
-        .file(file("animated-spell-effects-cartoon.electricity.04"))
+        .file(closest("animated-spell-effects-cartoon.electricity.04"))
         .atLocation(undeadToken, { offset: { y: -0.4 }, gridUnits: true })
         .size(1.5, { gridUnits: true })
         .playbackRate(1.5)
@@ -90,7 +90,7 @@ async function createAnimateDead(undeadToken, config = {}) {
         .waitUntilFinished(-200)
 
         .effect()
-        .file(file("animated-spell-effects-cartoon.electricity.discharge.06"))
+        .file(closest("animated-spell-effects-cartoon.electricity.discharge.06"))
         .atLocation(undeadToken)
         .size(2.25, { gridUnits: true })
         .filter("ColorMatrix", { saturate: -1, brightness: 0 })
@@ -99,7 +99,7 @@ async function createAnimateDead(undeadToken, config = {}) {
         .zIndex(2)
 
         .effect()
-        .file(file("jb2a.impact.dark.01.red.0"))
+        .file(closest("jb2a.impact.dark.01.red.0"))
         .atLocation(undeadToken)
         .size(2.5, { gridUnits: true })
         .filter("ColorMatrix", { hue: 90 })
@@ -107,7 +107,7 @@ async function createAnimateDead(undeadToken, config = {}) {
         .randomizeMirrorY()
 
         .effect()
-        .file(file("jb2a.liquid.splash.red"))
+        .file(closest("jb2a.liquid.splash.red"))
         .atLocation(undeadToken)
         .size(1.65, { gridUnits: true })
         .belowTokens()
@@ -115,7 +115,7 @@ async function createAnimateDead(undeadToken, config = {}) {
 
         .effect()
         .delay(250)
-        .file(file("animated-spell-effects-cartoon.water.117"))
+        .file(closest("animated-spell-effects-cartoon.water.117"))
         .attachTo(undeadToken)
         .size(1.3, { gridUnits: true })
         .belowTokens()
@@ -131,7 +131,7 @@ async function createAnimateDead(undeadToken, config = {}) {
         .fadeIn(500)
 
         .effect()
-        .file(file("jb2a.fireflies.many.02.green"))
+        .file(closest("jb2a.fireflies.many.02.green"))
         .atLocation(undeadToken)
         .size(1.25, { gridUnits: true })
         .duration(3000)
@@ -143,7 +143,7 @@ async function createAnimateDead(undeadToken, config = {}) {
 
         .effect()
         .delay(250)
-        .file(file("jb2a.static_electricity.03.blue"))
+        .file(closest("jb2a.static_electricity.03.blue"))
         .atLocation(undeadToken)
         .size(1.25, { gridUnits: true })
         .belowTokens()

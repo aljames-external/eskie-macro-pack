@@ -3,7 +3,7 @@
    Update Author: bakanabaka
 ** */
 
-import { file } from "../../../lib/filemanager.js";
+import { closest } from "../../../lib/filemanager.js";
 
 const DEFAULT_CONFIG = {
     id: 'trueStrike',
@@ -25,7 +25,7 @@ async function createTrueStrikeCast(token, config = {}) {
 
     sequence
         .effect()
-        .file(file("jb2a.ward.star.yellow.02"))
+        .file(closest("jb2a.ward.star.yellow.02"))
         .atLocation(token)
         .scale(0.25)
         .duration(3000)
@@ -33,7 +33,7 @@ async function createTrueStrikeCast(token, config = {}) {
         .fadeOut(500)
 
         .effect()
-        .file(file("jb2a.ward.star.yellow.02"))
+        .file(closest("jb2a.ward.star.yellow.02"))
         .atLocation(token)
         .scale(0.25)
         .fadeIn(500)
@@ -42,7 +42,7 @@ async function createTrueStrikeCast(token, config = {}) {
         .duration(1000)
 
         .effect()
-        .file(file("jb2a.particles.outward.orange.01.03"))
+        .file(closest("jb2a.particles.outward.orange.01.03"))
         .scaleIn(0.25, 500, { ease: "easeOutQuint" })
         .size(2, { gridUnits: true })
         .fadeIn(500)
@@ -51,20 +51,20 @@ async function createTrueStrikeCast(token, config = {}) {
         .fadeOut(2500)
 
         .effect()
-        .file(file("jb2a.extras.tmfx.border.circle.outpulse.01.fast"))
+        .file(closest("jb2a.extras.tmfx.border.circle.outpulse.01.fast"))
         .atLocation(token)
         .size(1.5, { gridUnits: true })
 
         .effect()
         .name(`TrueStrike - Glint - ${id} - ${token.uuid}`) // Persistent glint effect
-        .file(file("jb2a.glint.blue.few.0"))
+        .file(closest("jb2a.glint.blue.few.0"))
         .atLocation(token)
         .scaleToObject(1.75)
         .attachTo(token)
         .persist()
 
         .effect()
-        .file(file("jb2a.token_border.circle.spinning.blue.001"))
+        .file(closest("jb2a.token_border.circle.spinning.blue.001"))
         .atLocation(token)
         .attachTo(token)
         .fadeIn(200)
@@ -76,7 +76,7 @@ async function createTrueStrikeCast(token, config = {}) {
 
         .effect()
         .name(`TrueStrike - Border - ${id} - ${token.uuid}`) // Persistent border effect
-        .file(file("jb2a.token_border.circle.spinning.orange.001"))
+        .file(closest("jb2a.token_border.circle.spinning.orange.001"))
         .atLocation(token)
         .attachTo(token)
         .fadeIn(700)
@@ -128,7 +128,7 @@ async function createTrueStrikeAttack(token, target, config = {}) {
 
     sequence
         .effect()
-        .file(file("jb2a.impact.002.yellow"))
+        .file(closest("jb2a.impact.002.yellow"))
         .atLocation(token)
         .scaleToObject(2)
         .delay(1250)
@@ -136,7 +136,7 @@ async function createTrueStrikeAttack(token, target, config = {}) {
         .wait(1000)
 
         .effect()
-        .file(file("jb2a.wind_stream.white"))
+        .file(closest("jb2a.wind_stream.white"))
         .atLocation(token)
         .rotateTowards(target)
         .rotate(-180)
@@ -149,7 +149,7 @@ async function createTrueStrikeAttack(token, target, config = {}) {
         .zIndex(1)
 
         .effect()
-        .file(file("jb2a.extras.tmfx.border.circle.outpulse.01.fast"))
+        .file(closest("jb2a.extras.tmfx.border.circle.outpulse.01.fast"))
         .atLocation(token)
         .anchor({ x: 0.25 })
         .rotateTowards(target)
@@ -158,7 +158,7 @@ async function createTrueStrikeAttack(token, target, config = {}) {
         .scaleToObject()
 
         .effect()
-        .file(file("jb2a.extras.tmfx.border.circle.outpulse.01.fast"))
+        .file(closest("jb2a.extras.tmfx.border.circle.outpulse.01.fast"))
         .atLocation(token)
         .rotateTowards(target)
         .anchor({ x: -0.25 })
@@ -168,7 +168,7 @@ async function createTrueStrikeAttack(token, target, config = {}) {
         .delay(25)
 
         .effect()
-        .file(file("jb2a.extras.tmfx.border.circle.outpulse.01.fast"))
+        .file(closest("jb2a.extras.tmfx.border.circle.outpulse.01.fast"))
         .atLocation(token)
         .anchor({ x: -1.25 })
         .rotateTowards(target)
@@ -178,7 +178,7 @@ async function createTrueStrikeAttack(token, target, config = {}) {
         .delay(40)
 
         .effect()
-        .file(file("modules/animated-spell-effects-cartoon/spell-effects/cartoon/magic/mind_sliver_LINE.webm"))
+        .file(closest("modules/animated-spell-effects-cartoon/spell-effects/cartoon/magic/mind_sliver_LINE.webm"))
         .atLocation(target)
         .anchor({ x: 0.75 })
         .scale(0.075)
@@ -188,7 +188,7 @@ async function createTrueStrikeAttack(token, target, config = {}) {
         .zIndex(2)
 
         .effect()
-        .file(file("jb2a.impact.ground_crack.orange.02"))
+        .file(closest("jb2a.impact.ground_crack.orange.02"))
         .atLocation(target)
         .filter("ColorMatrix", { hue: 20, saturate: 1 })
         .scaleToObject(0.7)
@@ -197,7 +197,7 @@ async function createTrueStrikeAttack(token, target, config = {}) {
         .zIndex(1)
 
         .effect()
-        .file(file("jb2a.impact.yellow.2"))
+        .file(closest("jb2a.impact.yellow.2"))
         .atLocation(target)
         .scaleToObject(3)
         .delay(0)
@@ -205,7 +205,7 @@ async function createTrueStrikeAttack(token, target, config = {}) {
         .waitUntilFinished(-2000)
 
         .effect()
-        .file(file("jb2a.ground_cracks.orange.02"))
+        .file(closest("jb2a.ground_cracks.orange.02"))
         .atLocation(target)
         .filter("ColorMatrix", { hue: 20, saturate: 1 })
         .scaleToObject(0.7)
@@ -215,7 +215,7 @@ async function createTrueStrikeAttack(token, target, config = {}) {
         .zIndex(0)
 
         .effect()
-        .file(file("jb2a.particles.outward.orange.01.03"))
+        .file(closest("jb2a.particles.outward.orange.01.03"))
         .scaleIn(0.25, 500, { ease: "easeOutQuint" })
         .fadeIn(250)
         .rotateTowards(token)
@@ -227,7 +227,7 @@ async function createTrueStrikeAttack(token, target, config = {}) {
         .delay(0)
 
         .effect()
-        .file(file("jb2a.glint.blue.many.0"))
+        .file(closest("jb2a.glint.blue.many.0"))
         .atLocation(target)
         .randomRotation()
         .scaleToObject(0.75)

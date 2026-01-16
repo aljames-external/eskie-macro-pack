@@ -1,4 +1,4 @@
-import { file } from "../../../lib/filemanager.js";
+import { closest } from "../../../lib/filemanager.js";
 
 /* **
    Originally Published: 5/1/2023
@@ -52,7 +52,7 @@ async function create(location, config = {}) {
         .effect()
         .name(id)
         .atLocation(location, { offset: { x: effect[0].x, y: effect[0].y }, gridUnits: true })
-        .file(file(effect[0].img))
+        .file(closest(effect[0].img))
         .size(effect[0].scale, { gridUnits: true })
 
         .effect()

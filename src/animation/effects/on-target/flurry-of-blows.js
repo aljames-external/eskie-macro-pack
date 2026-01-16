@@ -1,7 +1,7 @@
 // Author: .eskie
 // Modular Conversion: bakanabaka
 
-import { file } from "../../../lib/filemanager.js";
+import { closest } from "../../../lib/filemanager.js";
 import { settingsOverride } from "../../../lib/settings.js";
 import { autoanimations } from "../../../integration/autoanimations.js";
 
@@ -21,14 +21,14 @@ async function create(token, target, config = {}) {
 
     if (sound.enabled) {
         seq = seq.sound()
-            .file(file(`psfx.impacts.bludgeoning`))
+            .file(closest(`psfx.impacts.bludgeoning`))
             .volume(sound.volume)
             .delay(125)
             .repeats(7,250,250)
     }
     seq = seq.effect()
         .delay(125)
-        .file(file(`jb2a.melee_generic.creature_attack.fist.001.${color}`))
+        .file(closest(`jb2a.melee_generic.creature_attack.fist.001.${color}`))
         .atLocation(token, {offset:{x:-0.75 , y:-0.2}, gridUnits:true, local:true})
         .rotateTowards(target,{randomOffset:0.15})
         .scaleToObject(2.5)
@@ -39,14 +39,14 @@ async function create(token, target, config = {}) {
 
     if (sound.enabled) {
         seq = seq.sound()
-            .file(file(`psfx.impacts.bludgeoning`))
+            .file(closest(`psfx.impacts.bludgeoning`))
             .volume(sound.volume)
             .delay(250)
             .repeats(7,250,250)
     }
     seq = seq.effect()
         .delay(250)
-        .file(file(`jb2a.melee_generic.creature_attack.fist.001.${color}`))
+        .file(closest(`jb2a.melee_generic.creature_attack.fist.001.${color}`))
         .atLocation(token, {offset:{x:-0.75 , y:0.2}, gridUnits:true, local:true})
         .rotateTowards(target,{randomOffset:0.15})
         .scaleToObject(2.5)
@@ -59,7 +59,7 @@ async function create(token, target, config = {}) {
     seq = seq.wait(250);
 
     seq = seq.effect()
-        .file(file("jb2a.impact.009.orange"))
+        .file(closest("jb2a.impact.009.orange"))
         .atLocation(target,{randomOffset:1})
         .size(token.document.width*1.25, {gridUnits:true})
         .repeats(14,125,125)
