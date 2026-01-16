@@ -6,14 +6,11 @@ import { img, snd } from '../../../lib/filemanager.js'
 import { dependency } from '../../../lib/dependency.js';
 import { socket } from '../../../integration/socketlib.js';
 import { autoanimations } from '../../../integration/autoanimations.js';
+import { SECONDS } from '../../../lib/constants.js';
 
 export const DEFAULT_CONFIG = {
     id: 'Step of the Wind'
 };
-
-async function wait(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
-}
 
 //Determine movement direction
 function getCenter(tile) {
@@ -92,7 +89,6 @@ async function play(token, config = {}) {
     };
     
     const [tile] = await socket.tile.create(initialData);
-    await wait(100);
 
     const MATTtriggers = ["exit", "manual"];
     const MATTactions = [{
@@ -132,18 +128,16 @@ async function movement(token, config = {}) {
 
     if (!game.user.isGM || !tile) return;
 
-    const savedData = await tile.getFlag('world', 'step-of-the-wind');
-    function tileMoved() {
-        const currentCenter = getCenter(tile);
-        const savedCenter = savedData.tileData;
-        return (currentCenter.x !== savedCenter.x) || (currentCenter.y !== savedCenter.y);
-    }
-
     // Initial tokenPosition is where the tile was when the movement started
-    const tokenPosition = {x: savedData.tileData.x, y: savedData.tileData.y};
-    // Wait for the tile to actually move
-    let latency = await utils.waitUntil(tileMoved, {timeout: 5000});
-    if (eskie.debug) console.error(latency);
+    // We wait until the tile has moved and calculate latency required for the animation
+    const savedData = await tile.getFlag('world', 'step-of-the-wind');
+        const tokenPosition = {x: savedData.tileData.x, y: savedData.tileData.y};
+        function tileMoved() {
+            const currentCenter = getCenter(tile);
+            const savedCenter = savedData.tileData;
+            return (currentCenter.x !== savedCenter.x) || (currentCenter.y !== savedCenter.y);
+        }
+        let latency = await utils.waitUntil(tileMoved, {timeout: 5000});
     await tile.setFlag('world', 'step-of-the-wind', { tileData: getCenter(tile) });
 
     const tilePosition = getCenter(tile);
@@ -152,7 +146,7 @@ async function movement(token, config = {}) {
     const angleRadians = Math.atan2(deltaY, deltaX);
     const distance = Math.hypot(tokenPosition.x - tilePosition.x, tokenPosition.y - tilePosition.y);
     const tokenSpeed = token._getAnimationMovementSpeed();
-    const speed = (tokenSpeed * canvas.grid.size) / 1000;
+    const speed = (tokenSpeed * canvas.grid.size) / (1 * SECONDS);
     const rotation = angleRadians * (180 / Math.PI);
     const travelTime = (distance / speed) - latency;
     const particleRepeats = travelTime / 250;
