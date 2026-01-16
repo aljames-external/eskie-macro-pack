@@ -1,5 +1,7 @@
 import { utils } from './utils.js';
 import { SECONDS } from '../../lib/constants.js';
+import { socket } from '../../integration/socketlib.js';
+import { dependency } from '../../lib/dependency.js';
 
 const DEFAULT_CONFIG = {
     id: 'generic-tile-movement',
@@ -14,18 +16,53 @@ function getLabel(id, token) {
     return `${id} - ${token.id}`;
 }
 
-async function initialize(tile, config = {}) {
-    const { id } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, {inplace:false});
+async function initialize(token, config = {}) {
+    dependency.required({id: 'tagger', ref: "Tagger"});
+    dependency.required({id: 'token-attacher', ref: "Token Attacher"});
+    dependency.required({id: 'monks-active-tiles', ref: "Monk's Active Tile Triggers"});
+
+    const mergedConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, {inplace:false});
+    const { id } = mergedConfig;
+    const label = tiles.getLabel(id, token);
+
+    const initialData = {
+        "texture.src": "icons/svg/d6-grey.svg", 
+        "alpha": 0,
+        "hidden": true,
+        "x": token.x,
+        "y": token.y,
+        "width": canvas.grid.size * token.document.width,
+        "height": canvas.grid.size * token.document.width,
+    };
+    
+    const [tile] = await socket.tile.create(initialData);
+
+    const MATTtriggers = ["exit", "manual"];
+    const MATTactions = [{
+        action: 'runcode',
+        data: {
+            code: `eskie.effect.stepOfTheWind.move.macro.movement(token.object, tile)`
+        },
+    }];
+    const updateData = {
+        "flags.monks-active-tiles.active": true,
+        "flags.monks-active-tiles.trigger": MATTtriggers,
+        "flags.monks-active-tiles.actions": MATTactions,
+        "flags.monks-active-tiles.controlled": "gm",
+    };
+    await socket.tile.edit(tile.id, updateData);
+    await Tagger.addTags(tile, label);
+
+    await tokenAttacher.attachElementToToken(tile, token, true);
     await tile.setFlag('world', id, { tileData: getCenter(tile) });
 }
 
-async function movement(token, config = {}) {
+async function movement(token, tile, sequence, config = {}) {
     const { id } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, {inplace:false});
     const label = getLabel(id, token);
-    const tile = Tagger.getByTag(label)[0];
 
     if (!game.user.isGM || !tile) return;
-    if (!config.sequence) return;
+    if (!sequence) return;
 
     // Initial tokenPosition is where the tile was when the movement started
     // We wait until the tile has moved and calculate latency required for the animation
@@ -48,16 +85,16 @@ async function movement(token, config = {}) {
     const speed = (tokenSpeed * canvas.grid.size) / (1 * SECONDS);
     const rotation = angleRadians * (180 / Math.PI);
     const travelTime = (distance / speed) - latency;
-    const particleRepeats = travelTime / 250;
     
     // Latency is too long to show the effect
     if (travelTime < 0) { return; }
 
-    return config.sequence({ token, tile, tilePosition, rotation, travelTime, particleRepeats, label }).play();
+    return sequence({ tile, rotation, travelTime, label }).play();
 }
 
 export const tiles = {
     initialize,
     movement,
     getLabel,
+    getCenter,
 }

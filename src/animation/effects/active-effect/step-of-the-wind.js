@@ -2,13 +2,12 @@
 // Modular Conversion: bakanabaka
 
 import { img, snd } from '../../../lib/filemanager.js'
-import { dependency } from '../../../lib/dependency.js';
 import { socket } from '../../../integration/socketlib.js';
 import { autoanimations } from '../../../integration/autoanimations.js';
 import { tiles } from '../../utils/tiles.js';
 
 export const DEFAULT_CONFIG = {
-    id: 'Step of the Wind'
+    id: 'step-of-the-wind'
 };
 
 function create(token, config = {}) {
@@ -65,44 +64,8 @@ function create(token, config = {}) {
 }
 
 async function play(token, config = {}) {
-    dependency.required({id: 'tagger', ref: "Tagger"});
-    dependency.required({id: 'token-attacher', ref: "Token Attacher"});
-    dependency.required({id: 'monks-active-tiles', ref: "Monk's Active Tile Triggers"});
-
     const mergedConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, {inplace:false});
-    const { id } = mergedConfig;
-    const label = tiles.getLabel(id, token);
-
-    const initialData = {
-        "texture.src": "icons/svg/d6-grey.svg", 
-        "alpha": 1,
-        "hidden": true,
-        "x": token.x,
-        "y": token.y,
-        "width": canvas.grid.size * token.document.width,
-        "height": canvas.grid.size * token.document.width,
-    };
-    
-    const [tile] = await socket.tile.create(initialData);
-
-    const MATTtriggers = ["exit", "manual"];
-    const MATTactions = [{
-        action: 'runcode',
-        data: {
-            code: `eskie.effect.stepOfTheWind.move.macro.movement(token.object)`
-        },
-    }];
-    const updateData = {
-        "flags.monks-active-tiles.active": true,
-        "flags.monks-active-tiles.trigger": MATTtriggers,
-        "flags.monks-active-tiles.actions": MATTactions,
-        "flags.monks-active-tiles.controlled": "gm",
-    };
-    await socket.tile.edit(tile.id, updateData);
-    await Tagger.addTags(tile, label);
-
-    await tokenAttacher.attachElementToToken(tile, token, true);
-    await tiles.initialize(tile, mergedConfig);
+    await tiles.initialize(token, mergedConfig);    
     const sequence = create(token, config);
     return sequence?.play();
 }
@@ -116,9 +79,12 @@ async function stop(token, config = {}) {
     Sequencer.EffectManager.endEffects({ name: label, object: token });
 }
 
-async function movement(token, config = {}) {
+async function movement(token, tile, config = {}) {
+    const { id } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
     function travelSequence(config = {}) {
-        const { token, tile, tilePosition, rotation, travelTime, particleRepeats, label } = config;
+        const { tile, rotation, travelTime, label } = config;
+        const particleRepeats = travelTime / 250;
+        const tilePosition = tiles.getCenter(tile);
         
         //Play MATT Sequence
         const SequenceMATT = new Sequence()
@@ -169,7 +135,7 @@ async function movement(token, config = {}) {
             .on(tile)
             .teleportTo(tilePosition, {relativeToCenter: true})
 
-        .wait(Math.max(travelTime - latency - 250, 250))
+        .wait(Math.max(travelTime - 250, 250))
         
         .thenDo(async () => {
             Sequencer.EffectManager.endEffects({ name: `${label} - Trail` });
@@ -178,8 +144,7 @@ async function movement(token, config = {}) {
         return SequenceMATT;
     }
 
-    config.sequence = travelSequence;
-    return tiles.movement(token, config);
+    return tiles.movement(token, tile, travelSequence, {id});
 }
 
 
