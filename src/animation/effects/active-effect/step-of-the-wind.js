@@ -111,7 +111,7 @@ async function play(token, config = {}) {
     await Tagger.addTags(tile, label);
 
     await tokenAttacher.attachElementToToken(tile, token, true);
-    await tile.setFlag('world', 'step-of-the-wind', { tokenCenter: getCenter(tile) });
+    await tile.setFlag('world', 'step-of-the-wind', { tileData: getCenter(tile) });
     const sequence = create(token, config);
     return sequence?.play();
 }
@@ -133,26 +133,30 @@ async function movement(token, config = {}) {
     if (!game.user.isGM || !tile) return;
 
     const savedData = await tile.getFlag('world', 'step-of-the-wind');
-    function tokenMoved() {
-        const currentCenter = {x: token.center.x, y: token.center.y};
-        const savedCenter = savedData.tokenCenter;
+    function tileMoved() {
+        const currentCenter = {x: tile.x+tile.width/2, y: tile.y+tile.height/2};
+        const savedCenter = savedData.tileData;
         return (currentCenter.x !== savedCenter.x) || (currentCenter.y !== savedCenter.y);
     }
 
-    const tokenPosition = {x: token.center.x, y: token.center.y};
-    await utils.waitUntil(tokenMoved, {timeout: 5000});
-    
-    let tilePosition = {x: tile.x+tile.width/2, y: tile.y+tile.height/2};
-    let deltaX = tokenPosition.x - tilePosition.x;
-    let deltaY = tokenPosition.y - tilePosition.y;
-    let angleRadians = Math.atan2(deltaY, deltaX);
-    let distance = Math.hypot(tokenPosition.x - tilePosition.x, tokenPosition.y - tilePosition.y);
-    let speed = (6 * canvas.grid.size)/1000;
-    
-    let rotation = angleRadians * (180 / Math.PI);
-    const travelTime = (distance / speed);
+    // Initial tokenPosition is where the tile was when the movement started
+    const tokenPosition = {x: savedData.tileData.x, y: savedData.tileData.y};
+    // Wait for the tile to actually move
+    await utils.waitUntil(tileMoved, {timeout: 5000});
+    const updatedTile = await fromUuid(tile.uuid);
+    const tilePosition = {x: updatedTile.x+updatedTile.width/2, y: updatedTile.y+updatedTile.height/2};
+    const deltaX = tokenPosition.x - tilePosition.x;
+    const deltaY = tokenPosition.y - tilePosition.y;
+    const angleRadians = Math.atan2(deltaY, deltaX);
+    const distance = Math.hypot(tokenPosition.x - tilePosition.x, tokenPosition.y - tilePosition.y);
+    const speed = (6 * canvas.grid.size)/1000;
 
-    let particleRepeats = travelTime/250;
+    console.error("All the variables:");
+    console.error({tokenPosition, tilePosition, deltaX, deltaY, angleRadians, distance, speed});
+    
+    const rotation = angleRadians * (180 / Math.PI);
+    const travelTime = (distance / speed);
+    const particleRepeats = travelTime / 250;
       
     //Play MATT Sequence
     const SequenceMATT = new Sequence()
@@ -177,7 +181,7 @@ async function movement(token, config = {}) {
         .name(`${label} - Trail`)
         .file(img("eskie.trail.token.generic.01.white"))
         .attachTo(token)
-        .rotateTowards(tile, {attachTo: false})
+        .rotateTowards(updatedTile, {attachTo: false})
         .scaleToObject(1.5, {considerTokenScale: true})
         .spriteOffset({x:-0.75-0.75},{gridUnits:true})
         .opacity(1)
@@ -208,7 +212,7 @@ async function movement(token, config = {}) {
       .thenDo(async () => {
         Sequencer.EffectManager.endEffects({ name: `${label} - Trail` });
         // The tile "instantly" moves, but the token takes time to catch up -- so tile.{x,y} is correct for where the token will be
-        await tile.setFlag('world', 'step-of-the-wind', { tokenCenter: getCenter(tile) });
+        await updatedTile.setFlag('world', 'step-of-the-wind', { tileData: getCenter(updatedTile) });
       });
     
    await SequenceMATT.play();
