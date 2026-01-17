@@ -61,7 +61,7 @@ import { rage } from "./active-effect/rage/_rage.js";
 import { rapidStrike } from "./on-target/rapid-strike.js";
 import { revivify } from "./target/revivify.js";
 import { romanCandle } from "./target/roman-candle.js";
-import { sandevistan } from "./token/sandevistan.js";
+import { sandevistan } from "./active-effect/sandevistan.js";
 import { sanctuary } from "./target/sanctuary.js";
 import { shockingGrasp } from "./target/shocking-grasp.js";
 import { shuffle } from "./multi-token/shuffle.js";
