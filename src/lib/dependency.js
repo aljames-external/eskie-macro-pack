@@ -134,7 +134,7 @@ function hasSomeRecommended(dependencyList) {
  * @returns {null | throw} 
  */
 function required(dependencyList) {
-    if (!Array.isArray(dependencyList)) required([dependencyList]);
+    if (!Array.isArray(dependencyList)) return required([dependencyList]);
     let errorMsg = `Requires all of the following to be installed and activaged:\n`;
     let dependencyMet = true;
 
