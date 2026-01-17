@@ -99,9 +99,12 @@ async function movement(token, tile) {
     const config = tile.getFlag(MODULE_ID, 'config') ?? {};
     function travelSequence(config = {}) {
         const { travelTime, label, msPerImage, imageDuration } = config;
+        const priorIterations = config.i ?? 0;
 
         let seq = new Sequence();
         const repeats = Math.floor(travelTime / msPerImage);
+        config.i = priorIterations + repeats;
+        /* await */ tile.setFlag(MODULE_ID, 'config', config);
 
         for (let i = 0; i < repeats; i++) {
             seq = seq.effect()
@@ -115,7 +118,7 @@ async function movement(token, tile) {
                 .opacity(1)
                 .tint("#30FF58")
                 .extraEndDuration(500)
-                .filter("ColorMatrix", { hue: 1.5 * i })
+                .filter("ColorMatrix", { hue: 1.5 * (i + priorIterations) })
                 .zIndex(0);
         }
         return seq;
