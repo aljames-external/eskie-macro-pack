@@ -69,7 +69,7 @@ import { silence } from "./template/silence.js";
 import { skyRocket } from "./target/sky-rocket.js";
 import { sleep } from "./target/sleep.js";
 import { sneakAttack } from "./on-target/sneak-attack.js";
-import { speakWithDead } from "./target/speakWithDead.js";
+import { speakWithDead } from "./active-effect/speakWithDead.js";
 import { spikeGrowth } from "./template/spike-growth.js";
 import { starwardSword } from "./template/starward-sword.js";
 import { strengthBeforeDeath } from "./active-effect/strength-before-death.js";
