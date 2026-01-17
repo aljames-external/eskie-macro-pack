@@ -3,6 +3,9 @@ import { autoanimations } from './integration/autoanimations.js';
 import { socketlibapi } from './integration/socketlib.js';
 import { file } from './lib/filemanager.js';
 import { tile } from './integration/socketlib/tile.js'
+import { time } from './lib/time.js';
+import { tokens as token } from './lib/tokens.js';
+
 // Import module settings to also run its initialization code
 import './settings.js';
 
@@ -28,6 +31,8 @@ function setupModule() {
                         {
                             file,
                             tile,
+                            time,
+                            token,
                         }
                     });
 }
