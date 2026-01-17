@@ -1,3 +1,10 @@
+/**
+ * Finds the center of the grid square on a target token that is nearest to a source token.
+ * @param {Token} token - The source token.
+ *
+ * @param {Token} target - The target token.
+ * @returns {{x: number, y: number}} The coordinates of the center of the nearest square.
+ */
 function getNearestSquareCenter(token, target) {
   const gs = canvas.grid.size;
   const srcCenter = token.center;
@@ -27,6 +34,14 @@ function getNearestSquareCenter(token, target) {
   return bestPoint;
 }
 
+/**
+ * Returns an array of users who are owners of a given token.
+ * @param {Token} token - The token to check for owners.
+ * @param {object} [config] - Optional configuration.
+ * @param {boolean} [config.applyPC=true] - Whether to include player characters.
+ * @param {boolean} [config.applyGM=true] - Whether to include Game Masters.
+ * @returns {User[]} An array of User objects who are owners of the token.
+ */
 function owners(token, config = {}) {
     if (!token) return [];
     const ownership = token.actor.ownership;

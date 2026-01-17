@@ -1,5 +1,12 @@
 import { dependency } from './dependency.js'
 
+/**
+ * Traverses the Sequencer database to find the best-fit path for a given set of categories.
+ * If a category is not found, it will try to find a similar path and log a warning.
+ * @param {string} modulePrefix - The prefix of the module to search within (e.g., 'jb2a').
+ * @param {...string} categories - The categories to traverse.
+ * @returns {string} The best-fit path in the Sequencer database.
+ */
 function bestFit(modulePrefix, ...categories) {
     let diverged = false;
     let currentPath = modulePrefix;
@@ -35,7 +42,7 @@ function bestFit(modulePrefix, ...categories) {
 
     if (diverged) { 
         let msg = `EMP  | Filemanager closest path diverged from requested path.`;
-        msg +=    `\n\tRequested: ${originalPath}`
+        msg +=    `\n\tRequested: ${originalPath}`;
         msg +=    `\n\tResolved as: ${currentPath}`;
         msg +=    `\n\tAvailable options at divergence: ${divergenceOptions}`;
         console.warn(msg);
@@ -43,6 +50,11 @@ function bestFit(modulePrefix, ...categories) {
     return currentPath;
 }
 
+/**
+ * Finds the closest matching file path in the Sequencer database, handling different module prefixes and versions (e.g., free vs. patreon).
+ * @param {string} path - The path to the file, using dot notation (e.g., 'jb2a.fireball.blue').
+ * @returns {string} The resolved file path.
+ */
 export function closest(path) {
     // Support http:// and https:// addresses
     // Support direct filepaths
