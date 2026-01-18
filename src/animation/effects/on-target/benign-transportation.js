@@ -37,12 +37,10 @@ async function create(token, targets, config = {}) {
     const B = (targets.length > 1) ? targets[1] : token;
 
     const seq = new Sequence();
-        
-        if (sound.enabled) {
-            seq.sound()
-                .file(closest(sound.file))
-                .volume(sound.volume)
-        }
+        seq.sound()
+            .file(closest(sound.file))
+            .volume(sound.volume)
+            .playIf(sound.enabled)
 
         seq.effect()
             .file(closest(animations.out.file))

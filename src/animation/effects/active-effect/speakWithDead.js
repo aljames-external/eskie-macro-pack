@@ -21,25 +21,24 @@ const DEFAULT_CONFIG = {
  * @returns {Sequence} The animation sequence.
  */
 function create(token, config = {}) {
-    if (!token) return new Sequence();
-
+    config = settingsOverride(config);
     const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, {inplace:false});
     const { id, sound } = mConfig;
     const label = `${id} - ${token.id}`;
 
-    let sequence = new Sequence();
-    // Initiate sound at start
-    if (config.sound.enabled) sequence.sound().name(label).volume(sound.volume).file(closest(sound.file));
+    let sequence = new Sequence()
+        // Initiate sound at start
+        .sound().name(label).volume(sound.volume).file(closest(sound.file)).playIf(sound.enabled)
 
-    // Animation effects
-    sequence.addSequence(_addMagicCircleEffects(token, label));
-    sequence.wait(500);
-    // Simplified corner flame effects
-    sequence.addSequence(_addCornerFlameEffects(token, label, 0.5, 0.5, 2)); // Bottom Right Flame
-    sequence.addSequence(_addCornerFlameEffects(token, label, -0.5, 0.5, 2)); // Bottom Left Flame
-    sequence.addSequence(_addCornerFlameEffects(token, label, -0.5, -0.5, 1)); // Top Left Flame
-    sequence.addSequence(_addCornerFlameEffects(token, label, 0.5, -0.5, 1)); // Top Right Flame
-    sequence.addSequence(_addTokenVisualEffects(token, label));
+        // Animation effects
+        .addSequence(_addMagicCircleEffects(token, label))
+        .wait(500)
+        // Simplified corner flame effects
+        .addSequence(_addCornerFlameEffects(token, label, 0.5, 0.5, 2)) // Bottom Right Flame
+        .addSequence(_addCornerFlameEffects(token, label, -0.5, 0.5, 2)) // Bottom Left Flame
+        .addSequence(_addCornerFlameEffects(token, label, -0.5, -0.5, 1)) // Top Left Flame
+        .addSequence(_addCornerFlameEffects(token, label, 0.5, -0.5, 1)) // Top Right Flame
+        .addSequence(_addTokenVisualEffects(token, label));
 
     return sequence;
 }
@@ -290,7 +289,7 @@ async function preload(config) {
         closest("jb2a.flames.01.blue"),
         closest("animated-spell-effects-cartoon.smoke.97")
     ]
-    if (sound.enabled) files.push(snd(sound.file));
+    if (sound.enabled) files.push(closest(sound.file));
 
     return Sequencer.Preloader.preloadForClients(files, false);
 }

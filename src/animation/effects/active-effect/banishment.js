@@ -34,11 +34,10 @@ async function createBanish(target, config = {}) {
     }
 
     const sequence = new Sequence();
-    if (sound.enabled) {
-        sequence.sound()
-            .file(closest('psfx.magic-signs.circle.v1.abjuration.complete'))
-            .volume(sound.volume)
-    }
+    sequence.sound()
+        .file(closest('psfx.magic-signs.circle.v1.abjuration.complete'))
+        .volume(sound.volume)
+        .playIf(sound.enabled);
     sequence.effect()
         .file(closest(`jb2a.magic_signs.circle.02.conjuration.intro.${color}`))
         .atLocation(target)
@@ -57,15 +56,14 @@ async function createBanish(target, config = {}) {
     sequence.wait(3750);
     let runeDelay = 0;
     let animationDelay = 4000;
-    const runeSoundFile = snd('psfx.casting.generic.001');
+    const runeSoundFile = closest('psfx.casting.generic.001');
     const runeImageFile = img(`jb2a.magic_signs.rune.conjuration.complete.${color}`);
     for (const rune of RUNE_DATA.runes) {
-        if (sound.enabled) {
-            sequence.sound()
-                .file(runeSoundFile)
-                .volume(sound.volume)
-                .delay(runeDelay + 750);
-        }
+        sequence.sound()
+            .file(runeSoundFile)
+            .volume(sound.volume)
+            .delay(runeDelay + 750)
+            .playIf(sound.enabled);
         sequence.effect()
             .file(runeImageFile)
             .atLocation(target, { offset: rune.offset })
@@ -83,11 +81,10 @@ async function createBanish(target, config = {}) {
     }
     
     sequence.wait(3000);
-    if (sound.enabled) {
-        sequence.sound()
-            .file(closest('psfx.2nd-level-spells.moonbeam.intro'))
-            .volume(sound.volume);
-    }
+    sequence.sound()
+        .file(closest('psfx.2nd-level-spells.moonbeam.intro'))
+        .volume(sound.volume)
+        .playIf(sound.enabled);
 
     sequence.wait(1500);
     sequence.effect()
@@ -230,11 +227,10 @@ async function createReturn(target, config = {}) {
     const { color, sound } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
 
     const sequence = new Sequence();
-    if (sound.enabled) {
-        sequence.sound()
-            .file(closest('psfx.2nd-level-spells.moonbeam.intro'))
-            .volume(sound.volume);
-    }
+    sequence.sound()
+        .file(closest('psfx.2nd-level-spells.moonbeam.intro'))
+        .volume(sound.volume)
+        .playIf(sound.enabled);
     sequence.effect()
         .file(closest(`jb2a.explosion.01.${color}`))
         .atLocation(target, { offset: { x: 5, y: -75 } })

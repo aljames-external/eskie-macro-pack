@@ -30,11 +30,10 @@ function create(token, target, config = {}) {
 
     function attackAnimation(token, target, config) {
         const seq = new Sequence();
-            if ( sound.enabled ) {
-                seq.sound()
-                    .file(closest(`psfx.impacts.${type}`))
-                    .volume(sound.volume);
-            }
+            seq.sound()
+                .file(closest(`psfx.impacts.${type}`))
+                .volume(sound.volume)
+                .playIf(sound.enabled);
 
             seq.effect()
                 .file(closest(`eskie.attack.melee.generic.01.${type}.${weight}.${color}.slow`))

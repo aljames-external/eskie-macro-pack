@@ -61,12 +61,11 @@ async function create(token, targets = [], config = {}) {
             .fadeIn(100,{delay: 2500+150})
             .fadeOut(250)
             .filter("Blur", { blurX: 15, blurY: 0 });
-        
-        if (sound.enabled) {
-            seq.sound()
-                .file("psfx.2nd-level-spells.misty-step.v1.intro.fire")
-                .volume(sound.volume);
-        }
+
+        seq.sound()
+            .file("psfx.2nd-level-spells.misty-step.v1.intro.fire")
+            .volume(sound.volume)
+            .playIf(sound.enabled);
 
         seq.effect()
             .file(closest("eskie.screen_overlay.speed_lines.horizontal.02.redyellow"))
@@ -179,11 +178,10 @@ async function create(token, targets = [], config = {}) {
             .shake({ duration: 250, strength: 1.5, rotation: false, fadeOut: 250 })
 
         .wait(1000);
-        if (sound.enabled) {
-            seq.sound()
-                .file("psfx.casting.fire-side.001")
-                .volume(sound.volume);
-        }
+        seq.sound()
+            .file("psfx.casting.fire-side.001")
+            .volume(sound.volume)
+            .playIf(sound.enabled);
         seq.wait(1000);
 
         seq.effect()
