@@ -1,4 +1,5 @@
 import { MODULE_ID } from "../../lib/constants.js";
+import { EMP_AA_Menu } from "../autoanimations.js";
 
 export async function generateAutorecUpdate(autorec, quiet = true) {
     if (quiet) console.group("EMP | Autorecognition Menu Check");
@@ -140,7 +141,7 @@ async function generateAutorecUpdateHTML(autorec) {
 export class autorecUpdateFormApplication extends FormApplication {
     constructor(autorec) {
         super();
-        this.autorec = autorec;
+        this.autorec = autorec ?? EMP_AA_Menu;
     }
 
     async html() {

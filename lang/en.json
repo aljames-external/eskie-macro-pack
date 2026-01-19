@@ -4,6 +4,11 @@
             "enableSounds": {
                 "name": "Enable Macro Sounds",
                 "hint": "If disabled, macros will not be able to play sounds."
+            },
+            "autorecUpdate": {
+                "name": "Update Automated Animation Autorecognition",
+                "label": "Update AA Autorec",
+                "hint": "Force an update of the Automated Animation Autorecognition."
             }
         },
         "updateMenu": {

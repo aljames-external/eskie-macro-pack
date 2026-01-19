@@ -3,7 +3,7 @@ import { dependency } from "../lib/dependency.js";
 import { defaultMenuSettings } from "./autoanimations/defaultMenuSettings.js";
 import { autorecUpdateFormApplication, generateAutorecUpdate } from "./autoanimations/updateMenu.js";
 
-const EMP_AA_Menu = {
+export const EMP_AA_Menu = {
     melee: [],
     range: [],
     ontoken: [],
@@ -149,6 +149,12 @@ async function register(name, trigger, animation, config, version) {
  */
 async function submit() {
     if (!game.user.isGM) return;
+    const developmentVersion = "#{VERSION}#";
+    const moduleVersion = game.modules.get(MODULE_ID).version;
+    const lastUpdate = game.settings.get(MODULE_ID, "autorecVersion");
+    const shouldUpdate = moduleVersion == developmentVersion || foundry.utils.isNewerVersion(moduleVersion, lastUpdate);
+    if (!shouldUpdate) return;
+
     if (!dependency.isActivated({ id: "autoanimations", min: "6.5.1" }, "EMP | Automated Animations integration skipped.")) { return; }
     const { missingEntriesList, updatedEntriesList, customEntriesList } = await generateAutorecUpdate(EMP_AA_Menu, true);
     if (missingEntriesList.length || updatedEntriesList.length || customEntriesList.length) {
@@ -156,6 +162,9 @@ async function submit() {
     } else {
         console.info("EMP | All Eskie Macro animations are up to date!");
     }
+
+    if (moduleVersion != developmentVersion)
+        game.modules.set(MODULE_ID, "autorecVersion", moduleVersion);
 }
 
 export const autoanimations = {

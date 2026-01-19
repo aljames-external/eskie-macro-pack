@@ -9,38 +9,37 @@ import { tokens as token } from './lib/tokens.js';
 // Import module settings to also run its initialization code
 import './settings.js';
 
-/**
- * Removes a previously exported function or variable and exports the specifed function or variable if the macro is active.
- *
- * @param {array} exportedIdentifierName the array of exported functions to be merged
- */
-function setupApiCalls(exportedFunctions) {
-    globalThis.eskie = foundry.utils.mergeObject(
-        globalThis.eskie ?? {},
-        exportedFunctions
-    );
-}
-
-/**
- * Initializes the environment with macroUtil for macros
- */
-function setupModule() {
-    // Setup dependency API
-    setupApiCalls( animation );
-    setupApiCalls({ util:
-                        {
-                            file,
-                            tile,
-                            time,
-                            token,
-                        }
-                    });
-}
-
 Hooks.once('init', async () => {
+    function setupModule() {
+        function setupApiCalls(exportedFunctions) {
+            globalThis.eskie = foundry.utils.mergeObject(
+                globalThis.eskie ?? {},
+                exportedFunctions
+            );
+        }
+
+        const util = {
+                        file,
+                        tile,
+                        time,
+                        token,
+                    };
+
+        // Setup dependency API
+        setupApiCalls( animation );
+        setupApiCalls({ util });
+    }
+
     setupModule();
     console.log('EMP | Eskie Macro Pack module ready');
 });
 
-Hooks.once('aa.ready', async () => { await autoanimations.submit(); });
+Hooks.once('ready', async () => {
+    Hooks.once('aa.ready', async () => { await autoanimations.submit(); });
+});
+
+Hooks.once('aa.ready', async () => {
+    Hooks.once('ready', async () => { await autoanimations.submit(); });
+});
+
 Hooks.once('socketlib.ready', async () => { await socketlibapi.register(); });
