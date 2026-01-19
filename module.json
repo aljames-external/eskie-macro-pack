@@ -79,11 +79,6 @@
         "id": "monks-active-tiles",
         "type": "module",
         "compatibility": {}
-      },
-      {
-        "id": "fxmaster",
-        "type": "module",
-        "compatibility": {}
       }
     ]
   },
