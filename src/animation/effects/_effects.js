@@ -50,6 +50,7 @@ import { hitTheDirt } from "./template/hit-the-dirt.js";
 import { iaijutsuStrike } from "./token/iaijutsu-strike.js";
 import { incorporeal } from "./token/incorporeal/incorporeal.js";
 import { leap } from "./token/leap.js";
+import { levitation } from "./active-effect/levitation.js";
 import { lightningBolt } from "./template/lightning-bolt.js";
 import { mirrorImage } from "./active-effect/mirror-image.js";
 import { mistyStep } from "./token/misty-step.js";
@@ -142,6 +143,7 @@ export const effect = {
     iaijutsuStrike,
     incorporeal,
     leap,
+    levitation,
     lightningBolt,
     mirrorImage,
     mistyStep,
