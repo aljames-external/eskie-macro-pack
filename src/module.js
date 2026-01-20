@@ -9,6 +9,11 @@ import { socket } from './integration/socketlib.js';
 // Import module settings to also run its initialization code
 import './settings.js';
 
+const status = {
+    aaReady: false,
+    ready: false,
+}
+
 Hooks.once('init', async () => {
     function setupModule() {
         function setupApiCalls(exportedFunctions) {
@@ -35,11 +40,15 @@ Hooks.once('init', async () => {
 });
 
 Hooks.once('ready', async () => {
-    Hooks.once('aa.ready', async () => { await autoanimations.submit(); });
+    status.ready = true;
+    if (status.ready && status.aaReady)
+        await autoanimations.submit();
 });
 
 Hooks.once('aa.ready', async () => {
-    Hooks.once('ready', async () => { await autoanimations.submit(); });
+    status.aaReady = true;
+    if (status.ready && status.aaReady)
+        await autoanimations.submit();
 });
 
 Hooks.once('socketlib.ready', async () => { await socketlibapi.register(); });
