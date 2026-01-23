@@ -46,7 +46,7 @@ function createAura(token, config = {}, options = {}) {
 }
 
 async function playAura(token, config = {}, options = {}) {
-    if (options.type == "aefx") return;
+    if (options?.type == "aefx") return;
     const sequence = createAura(token, config, options);
     if (sequence) return sequence.play();
 }

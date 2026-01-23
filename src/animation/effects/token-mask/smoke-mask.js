@@ -17,7 +17,7 @@ async function create(token, config = {}) {
 
 async function play(token, config = {}) {
     const seq = await create(token, config);
-    return seq?.play();
+    if (seq) return seq.play();
 }
 
 async function stop(token, config = {}) {

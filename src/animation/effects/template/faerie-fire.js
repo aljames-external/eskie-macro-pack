@@ -27,8 +27,11 @@ function getTintAndHue(color) {
 async function create(token, config = {}) {
     const seq = await createCloud(token, config);
     const { targets } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, {inplace:false})
-    for (const target of targets) {
-        seq.addSequence(await createEffect(token, config));
+    
+    if (targets) {
+        for (const target of targets) {
+            seq.addSequence(await createEffect(target, config));
+        }
     }
     return seq;
 }

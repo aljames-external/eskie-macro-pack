@@ -23,6 +23,10 @@ async function create(token, config) {
     };
     let [position, secondary] = await templates.getPosition(template, cfg);
     if (!position) { return; }
+    if (!secondary) {
+        secondary = position;
+        position = token.center;
+    }
 
     const seq = new Sequence();
     

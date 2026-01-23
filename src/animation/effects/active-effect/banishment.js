@@ -219,7 +219,7 @@ async function createBanish(target, config = {}) {
 
 async function playBanish(target, config = {}) {
     const sequence = await createBanish(target, config);
-    sequence?.play();
+    if (sequence) return sequence.play();
 }
 
 async function createReturn(target, config = {}) {
@@ -266,7 +266,7 @@ async function createReturn(target, config = {}) {
 
 async function playReturn(target, config = {}) {
     const sequence = await createReturn(target, config);
-    return sequence?.play();
+    if (sequence) return sequence.play();
 }
 
 async function clean(target, config = {}) {

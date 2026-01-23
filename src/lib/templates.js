@@ -7,8 +7,7 @@ async function getPosition(template, config) {
         const primary = { x: template.x, y: template.y };
         return [primary, secondary];
     } else {
-        const crosshair = getCrosshairCfg(config);
-        position = await Sequencer.Crosshair.show(crosshair);
+        position = await Sequencer.Crosshair.show();
         if (position.cancelled) { return []; }
         return [position, undefined];
     }

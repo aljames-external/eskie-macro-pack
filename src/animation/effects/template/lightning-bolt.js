@@ -30,7 +30,11 @@ async function create(token, config = {}) {
         label: id
     };
     let [primary, secondary] = await templates.getPosition(template, cfg);
-    if (!secondary || primary.cancelled) { return; }
+    if (primary.cancelled) { return; }
+    if (!secondary) {
+        secondary = primary;
+        primary = token.center;
+    }
 
     const sequence = new Sequence();
 
@@ -119,8 +123,8 @@ async function create(token, config = {}) {
 }
 
 async function play(token, config = {}) {
-    const sequence = create(token, config);    
-    return sequence?.play({preload:true});
+    const sequence = await create(token, config);    
+    if (sequence) return sequence.play({preload:true});
 }
 
 export const lightningBolt = {

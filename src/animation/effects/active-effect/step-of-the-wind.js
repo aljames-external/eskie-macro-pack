@@ -69,7 +69,7 @@ async function play(token, config = {}) {
     const code = `${effectFunction}(token.object, tile)`;
     await matt.movement.initialize(token, code, mergedConfig);    
     const sequence = create(token, config);
-    return sequence?.play();
+    if (sequence) return sequence.play();
 }
 
 async function stop(token, config = {}) {

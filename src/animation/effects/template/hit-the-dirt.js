@@ -11,7 +11,7 @@ const DEFAULT_CONFIG = {
 }
 
 async function create(token, config, options) {
-    if (options.type == 'aefx') return;
+    if (options?.type == 'aefx') return;
     const { id, template } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, {inplace:false});
 
     const cfg = { 

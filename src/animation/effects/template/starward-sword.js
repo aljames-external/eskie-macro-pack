@@ -10,7 +10,7 @@ const DEFAULT_CONFIG = {
 };
 
 async function createStarwardSword(token, config = {}, options = {}) {
-    if (options.type == "aefx") return;
+    if (options?.type == "aefx") return;
     const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
     const { size, darkMap, cameraZoom } = mConfig;
     let { targets } = mConfig;
@@ -512,7 +512,7 @@ async function createStarwardSword(token, config = {}, options = {}) {
 
 
 async function playStarwardSword(token, config = {}, options = {}) {
-    if (options.type == "aefx") return;
+    if (options?.type == "aefx") return;
     let seq = await createStarwardSword(token, config, options);
     if (seq) { return seq.play(); }
 }
