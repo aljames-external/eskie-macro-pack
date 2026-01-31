@@ -4,6 +4,7 @@ import { rageV1 as v1, DEFAULT_CONFIG as config_v1} from "./rage_v1.js";
 import { electric as v2, DEFAULT_CONFIG as config_v2} from "./rage-electric.js";
 import { superSaiyan as v3, DEFAULT_CONFIG as config_v3} from "./rage-super-saiyan.js";
 import { rageV2 as v4, DEFAULT_CONFIG as config_v4} from "./rage_v2.js";
+import { rageTotem as v5, DEFAULT_CONFIG as config_v5} from "./rage_totem.js";
 
 const DEFAULT_CONFIG = {
     version: 4,
@@ -11,6 +12,7 @@ const DEFAULT_CONFIG = {
     config_v2,
     config_v3,
     config_v4,
+    config_v5,
 };
 
 function getVersion(config = {}) {
@@ -22,6 +24,7 @@ function getVersion(config = {}) {
         {fn: v2, cfg: foundry.utils.mergeObject(config_v2, config.config_v2 ?? {}, {inplace:false})},
         {fn: v3, cfg: foundry.utils.mergeObject(config_v3, config.config_v3 ?? {}, {inplace:false})},
         {fn: v4, cfg: foundry.utils.mergeObject(config_v4, config.config_v4 ?? {}, {inplace:false})},
+        {fn: v5, cfg: foundry.utils.mergeObject(config_v5, config.config_v5 ?? {}, {inplace:false})},
     ];
     
     if ( version > map.length || version <= 0 ) return;
@@ -62,6 +65,7 @@ export const rage = {
     v2,
     v3,
     v4,
+    v5,
 };
 
-autoanimations.register("Rage", "effect", "eskie.effect.rage", DEFAULT_CONFIG);
+autoanimations.register("Rage", "effect", "eskie.effect.rage", DEFAULT_CONFIG, '1.0.0');

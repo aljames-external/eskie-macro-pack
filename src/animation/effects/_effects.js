@@ -87,6 +87,7 @@ import { suggestion } from "./target/suggestion.js";
 import { surprised } from "./token/surprised.js";
 import { tearMask } from "./token-mask/tear-mask.js";
 import { teleport } from "./template/teleport.js";
+import { totemicAttunement } from "./active-effect/rage/totemic-attunement/_attunement.js";
 import { trueStrike } from "./target/true-strike.js";
 import { viciousMockery } from "./target/vicious-mockery.js";
 import { vortexWarp } from "./target/vortex-warp.js";
@@ -180,6 +181,7 @@ export const effect = {
     suggestion,
     surprised,
     teleport,
+    totemicAttunement,
     tokenMask: {
         burn: burnMask,
         shatter: shatterMask,
