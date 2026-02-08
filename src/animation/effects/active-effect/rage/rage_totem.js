@@ -118,7 +118,7 @@ function create(token, config = {}) {
             .size(3.5, {gridUnits: true})
             .zIndex(0);
 
-        seq = (effect.ground.duration > 0) ? seq.duration(effect.ground.duration) : seq.persist();
+        seq = (effect.ground.duration >= 0) ? seq.duration(effect.ground.duration) : seq.persist();
       }
 
       seq = seq.effect()

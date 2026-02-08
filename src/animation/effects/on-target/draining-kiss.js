@@ -50,7 +50,7 @@ function create(token, target, config = {}) {
             .zIndex(3)
             .delay(1000)
             .private();
-        seq = (duration > 0) ? seq.duration(duration) : seq.persist();
+        seq = (duration >= 0) ? seq.duration(duration) : seq.persist();
 
         seq = seq.effect()
             .file(closest("jb2a.impact.004.dark_purple"))
@@ -84,7 +84,7 @@ function create(token, target, config = {}) {
             .playbackRate(1)
             .zIndex(2)
             .private();
-        seq = (duration > 0) ? seq.duration(duration) : seq.persist();
+        seq = (duration >= 0) ? seq.duration(duration) : seq.persist();
 
         seq = seq.effect()
             .name(label)
@@ -99,7 +99,7 @@ function create(token, target, config = {}) {
             .filter("ColorMatrix", { saturate: 0 })
             .belowTokens()
             .private();
-        seq = (duration > 0) ? seq.duration(duration) : seq.persist();
+        seq = (duration >= 0) ? seq.duration(duration) : seq.persist();
 
         seq = seq.effect()
             .name(label)
@@ -115,7 +115,7 @@ function create(token, target, config = {}) {
             .zIndex(1)
             .private()
             .mask(target);
-        seq = (duration > 0) ? seq.duration(duration) : seq.persist();
+        seq = (duration >= 0) ? seq.duration(duration) : seq.persist();
 
         seq = seq.effect()
             .name(label)
@@ -127,7 +127,7 @@ function create(token, target, config = {}) {
             .opacity(0.5)
             .filter("ColorMatrix", { saturate: -1, brightness: 0.5 })
             .zIndex(0);
-        seq = (duration > 0) ? seq.duration(duration) : seq.persist();
+        seq = (duration >= 0) ? seq.duration(duration) : seq.persist();
 
     return seq;
 }

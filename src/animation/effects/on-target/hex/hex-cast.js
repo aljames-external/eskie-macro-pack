@@ -54,7 +54,7 @@ async function create(target, config = {}) {
         .attachTo(target)
         .scaleToObject(1.85)
         .fadeOut(3000);
-    seq = (duration > 0) ? seq.duration(duration) : seq.persist();
+    seq = (duration >= 0) ? seq.duration(duration) : seq.persist();
     seq = seq
         .opacity(1)
         .belowTokens()

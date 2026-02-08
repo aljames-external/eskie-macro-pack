@@ -24,7 +24,7 @@ import { closest } from "../../../lib/filemanager.js";
 async function create(token, config = {}) {
     const defaultConfig = {
         id: 'surprised',
-        duration: 0,
+        duration: -1,
         effect: [
             {   // !! } surprised icon
                 img: 'eskie.emote.surprised.01',
@@ -79,7 +79,7 @@ async function exclaim(token, {id = 'surprised', duration = 0, anchor = { x: 0.5
         .loopProperty("sprite", "position.y", { from: 0, to: -15, duration: 750, pingPong: true})
         .scaleToObject(0.6)
         .attachTo(token, {bindAlpha: false});
-    seq = (duration > 0) ? seq.duration(duration) : seq.persist();
+    seq = (duration >= 0) ? seq.duration(duration) : seq.persist();
     return seq;
 }
 
