@@ -1,4 +1,4 @@
-async function getPosition(template, config) {
+async function getPosition(template, config = {}) {
     let position;
     if (template) {
         // Not sure if this works for everything... but let's try...

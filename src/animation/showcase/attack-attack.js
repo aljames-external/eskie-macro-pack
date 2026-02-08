@@ -60,7 +60,7 @@ async function play(token1, token2, config = {}) {
     if (seq) return seq.play({preload:true});
 }
 
-function create(red, blue, config) {
+function create(red, blue, config = {}) {
     const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, {inplace:false});
 
     let seq = new Sequence();
@@ -102,7 +102,7 @@ function midpoint(a, b) {
     return {x: (a.x + b.x)/2, y: (a.y + b.y)/2 };
 }
 
-function movement1create(red, blue, config) {
+function movement1create(red, blue, config = {}) {
     const {b1, b2, b3, b4, r1, r2, r3, r4} = config.positions;
 
     let seq = new Sequence();
@@ -303,7 +303,7 @@ function movement1create(red, blue, config) {
     return seq;
 }
 
-function movement2create(red, blue, config) {
+function movement2create(red, blue, config = {}) {
     const {b1, b2, b3, b4, r1, r2, r3, r4} = config.positions;
 
     let seq = new Sequence()
@@ -564,7 +564,7 @@ function movement2create(red, blue, config) {
     return seq;
 }
 
-function movement3create(red, blue, config) {
+function movement3create(red, blue, config = {}) {
     const {b1, b2, b3, b4, r1, r2, r3, r4} = config.positions;
 
     let seq = new Sequence()    

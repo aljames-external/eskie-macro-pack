@@ -107,7 +107,7 @@ function deathAnimation(target) {
     return sequence;
 }
 
-async function create(source, target, config) {
+async function create(source, target, config = {}) {
     const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, {inplace:false});
     const {targetDeath, teleport, cameraFocus, text} = mConfig;
 
@@ -174,12 +174,12 @@ async function create(source, target, config) {
     return sequence;
 }
 
-async function play(source, target, config) {
+async function play(source, target, config = {}) {
     const seq = await create(source, target, config);
     if (seq) { await seq.play(); }
 }
 
-async function clean(target, config) {
+async function clean(target, config = {}) {
     return Promise.all([
         Sequencer.EffectManager.endEffects({ name: `IaijutsuStrike` }),
         Sequencer.EffectManager.endEffects({ name: `IaijutsuText` }),

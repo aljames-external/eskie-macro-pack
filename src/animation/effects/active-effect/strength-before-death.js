@@ -10,7 +10,7 @@ const DEFAULT_CONFIG = {
     cinemaBars: true    //Set Cinema Bars
 }
 
-function create(token, config) {
+function create(token, config = {}) {
     const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, {inplace:false});
     const { id, tintMap, cinemaBars } = mConfig;
 
@@ -273,12 +273,12 @@ function create(token, config) {
     return seq;
 }
 
-async function play(token, config) {
+async function play(token, config = {}) {
     const seq = await create(token, config);
     if (seq) { return seq.play(); }
 }
 
-async function stop(token, config) {
+async function stop(token, config = {}) {
     const { id } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, {inplace:false});
     Sequencer.EffectManager.endEffects({ name: `${id} ${token.name}` }); 
 }

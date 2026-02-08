@@ -300,7 +300,7 @@ async function preload(config) {
  * @param {object} config - Configuration options.
  * @param {string} config.id - A unique ID for the effect to manage persistence.
  */
-async function stop(token, config) {
+async function stop(token, config = {}) {
     const { id } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, {inplace:false});
     const label = `${id} - ${token.id}`;
     let opacity = new Sequence().animation().on(token).opacity(1);

@@ -18,7 +18,7 @@ const DEFAULT_CONFIG = {
     validator: defaultValidator,
 }
 
-async function _createDetectionEffects(target, config) {
+async function _createDetectionEffects(target, config = {}) {
     const tags = Object.keys(config.detection);
     let sequence = new Sequence();
 
@@ -87,7 +87,7 @@ async function _createDetectionEffects(target, config) {
  * @param {object} [config.detectionConfig=defaultDetectionConfig] The detection configuration.
  * @returns {Promise<Sequence>} A promise that resolves with the sequence.
  */
-async function create(token, config) {
+async function create(token, config = {}) {
     const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, {inplace:false});
     const targets = canvas.tokens.placeables.filter((t) => {
         if (t.id === token.id) return false;
@@ -116,7 +116,7 @@ async function create(token, config) {
     return sequence;
 }
 
-async function play(token, config) {
+async function play(token, config = {}) {
     const seq = await create(token, config);
     if (seq) { return seq.play(); }
 }

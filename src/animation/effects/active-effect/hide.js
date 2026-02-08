@@ -9,7 +9,7 @@ const DEFAULT_CONFIG = {
     id: "hide"
 };
 
-async function create(token, config) {
+async function create(token, config = {}) {
     const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, {inplace:false});
     const { id } = mConfig;
 
@@ -57,12 +57,12 @@ async function create(token, config) {
     return seq;
 }
 
-async function play(token, config) {
+async function play(token, config = {}) {
     const seq = await create(token, config);
     if (seq) { return seq.play(); }
 }
 
-async function stop(token, config) {
+async function stop(token, config = {}) {
     new Sequence()
 
       .animation()

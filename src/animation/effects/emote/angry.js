@@ -14,7 +14,7 @@ const DEFAULT_CONFIG = {
     file: 'eskie.emote.angry.02'
 };
 
-async function create(token, config) {
+async function create(token, config = {}) {
     const { id, duration, scale, file } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, {inplace:false});
     const tokenHeight = token.document.height;
     const tokenWidth = token.document.width;

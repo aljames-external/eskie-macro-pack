@@ -2,7 +2,7 @@ const DEFAULT_CONFIG = {
     id : 'rage util',
 }
 
-async function stop(token, config) {
+async function stop(token, config = {}) {
     const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, {inplace:false});
     const { id } = mConfig;
     const label = `${id} - ${token.id}`;
@@ -19,7 +19,7 @@ async function stop(token, config) {
     ]);
 }
 
-async function clean(token, config) {
+async function clean(token, config = {}) {
     const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, {inplace:false});
     const { id } = mConfig;
     const label = `${id} - ${token.id}`;

@@ -19,7 +19,7 @@ function getTintColor(color) {
     }
 }
 
-async function create(token, config) {
+async function create(token, config = {}) {
     const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
     const { id, color, changeLight } = mConfig;
     const tintColor = getTintColor(color);
@@ -76,12 +76,12 @@ async function create(token, config) {
     return seq;
 }
 
-async function play(token, config) {
+async function play(token, config = {}) {
     let seq = await create(token, config);
     if (seq) { await seq.play(); }
 }
 
-async function stop(token, config) {
+async function stop(token, config = {}) {
     const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
     const { id } = mConfig;
     if (mConfig.changeLight) {
@@ -90,7 +90,7 @@ async function stop(token, config) {
     await Sequencer.EffectManager.endEffects({ name: `${id} - ${token.uuid}`, object: token });
 }
 
-async function clean(token, config) {
+async function clean(token, config = {}) {
     new Sequence()
         .animation()
             .on(token)

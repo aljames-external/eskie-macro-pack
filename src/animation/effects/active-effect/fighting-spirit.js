@@ -8,7 +8,7 @@ const DEFAULT_CONFIG = {
     id: "Fighting Spirit",
 }
 
-function create(token, config) {
+function create(token, config = {}) {
     const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, {inplace:false});
     const { id } = mConfig;
     const label = `${id} - ${token.name}`;
@@ -105,12 +105,12 @@ function create(token, config) {
     return seq;
 }
 
-async function play(token, config) {
+async function play(token, config = {}) {
     const seq = await create(token, config);
     if (seq) { return seq.play(); }
 }
 
-async function stop(token, config) {
+async function stop(token, config = {}) {
     const { id } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, {inplace:false});
     const label = `${id} ${token.name}`;
     Sequencer.EffectManager.endEffects({ name: label, object: token }); 

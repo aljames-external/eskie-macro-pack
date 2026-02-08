@@ -18,7 +18,7 @@ function getTintColor(color) {
     }
 }
 
-async function create(token, target, config) {
+async function create(token, target, config = {}) {
     const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
     const { id, color } = mConfig;
     const tintColor = getTintColor(color);
@@ -99,12 +99,12 @@ async function create(token, target, config) {
     return seq;
 }
 
-async function play(token, target, config) {
+async function play(token, target, config = {}) {
     let seq = await create(token, target, config);
     if (seq) { await seq.play(); }
 }
 
-async function stop(token, target, config) {
+async function stop(token, target, config = {}) {
     const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
     const { id } = mConfig;
     await Sequencer.EffectManager.endEffects({ name: `${id} - ${target.uuid}`, object: target });

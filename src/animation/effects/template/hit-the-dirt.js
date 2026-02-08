@@ -91,12 +91,12 @@ async function create(token, config, options) {
     return seq;
 }
 
-async function play(token, config) {
+async function play(token, config = {}) {
     const seq = await create(token, config);
     if (seq) return seq.play();
 }
 
-function destroy(token, config) {
+function destroy(token, config = {}) {
     let seq = new Sequence()
         .animation()
             .on(token)
@@ -104,7 +104,7 @@ function destroy(token, config) {
     return seq;
 }
 
-async function stop(token, config) {
+async function stop(token, config = {}) {
     const seq = destroy(token, config);
     if (seq) return seq.play();
 }

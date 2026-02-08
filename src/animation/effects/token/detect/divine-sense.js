@@ -22,12 +22,12 @@ const DEFAULT_CONFIG = {
     validator: defaultValidator,
 }
 
-async function create(token, config) {
+async function create(token, config = {}) {
     const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, {inplace:false});
     return detectUtil.create(token, mConfig);
 }
 
-async function play(token, config) {
+async function play(token, config = {}) {
     const seq = await create(token, config);
     if (seq) { return seq.play(); }
 }

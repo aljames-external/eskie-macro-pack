@@ -95,7 +95,7 @@ function _getPlaneConfig(destination) {
 }
 
 
-async function create(token, config) {
+async function create(token, config = {}) {
     const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, {inplace:false});
     mConfig.id = `${token.id} - ${mConfig.id}`;
     const { id, destination, destinationList, template } = mConfig;

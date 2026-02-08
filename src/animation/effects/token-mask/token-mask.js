@@ -15,7 +15,7 @@ const DEFAULT_CONFIG = {
     rotation: 0
 }
 
-async function createTiles(token, config) {
+async function createTiles(token, config = {}) {
     const { revealOverlay, padding, rotation } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, {inplace:false});
     const revealOverlayConfig = closest(revealOverlay);
     let revealOverlayPath = revealOverlayConfig;

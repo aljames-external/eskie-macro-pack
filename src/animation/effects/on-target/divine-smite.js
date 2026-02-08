@@ -69,7 +69,7 @@ async function create(token, target, config = {}) {
     return seq;
 }
 
-async function play(token, target, config) {
+async function play(token, target, config = {}) {
     const seq = await create(token, target, config);
     if (seq) { return seq.play(); }
 }

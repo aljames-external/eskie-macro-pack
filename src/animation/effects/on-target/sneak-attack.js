@@ -17,7 +17,7 @@ const DEFAULT_CONFIG_MELEE = {
     weight: "medium",
 }
 
-async function createMelee(token, target, config) {
+async function createMelee(token, target, config = {}) {
     const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG_MELEE, config, {inplace:false});
     const { id, color, type, weight } = mConfig;
 
@@ -74,7 +74,7 @@ async function createMelee(token, target, config) {
     return seq;
 }
 
-async function playMelee(token, target, config) {
+async function playMelee(token, target, config = {}) {
     const seq = await createMelee(token, target, config);
     if (seq) { return seq.play(); }
 }
@@ -93,7 +93,7 @@ const DEFAULT_CONFIG_RANGED = {
     }
 };
 
-function createRanged(token, target, config) {
+function createRanged(token, target, config = {}) {
     const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG_RANGED, config, {inplace:false});
     const { id, color } = mConfig;
 
@@ -137,7 +137,7 @@ function createRanged(token, target, config) {
     return seq;
 }
 
-async function playRanged(token, target, config) {
+async function playRanged(token, target, config = {}) {
     const seq = await createRanged(token, target, config);
     if (seq) { return seq.play(); }
 }
