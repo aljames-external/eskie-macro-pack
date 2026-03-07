@@ -38,7 +38,7 @@ async function createTiles(token, config = {}) {
     };
 
     const tokenMaskUpdates = {
-        "texture.src": token.document.texture.src,
+        "texture": token.document.texture,
         "alpha": 1,
         "hidden": false,
         "x": token.x,
