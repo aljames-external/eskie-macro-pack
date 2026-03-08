@@ -9,31 +9,31 @@ import { socket } from '../../../integration/socketlib.js';
 const DEFAULT_CONFIG = {
     id: 'tokenMask',
     deleteToken: false,
-    tokenOverlay: undefined,
-    revealOverlay: undefined,
-    padding: 1,
+    tokenOverlay: undefined,    // Internal use only - these functions generally not called by the end user
+    revealOverlay: undefined,   // Internal use only - these functions generally not called by the end user
     rotation: 0
 }
 
 async function createTiles(token, config = {}) {
-    const { revealOverlay, padding, rotation } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, {inplace:false});
+    const { revealOverlay, rotation } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, {inplace:false});
     const revealOverlayConfig = closest(revealOverlay);
     let revealOverlayPath = revealOverlayConfig;
     try { revealOverlayPath = Sequencer.Database.getEntry(revealOverlayConfig).originalData; } catch(e) { revealOverlayPath = revealOverlayConfig; }
+    const scaleXY = token.document.texture.scaleX;
 
     const overlayMaskUpdates = {
         "texture.src": revealOverlayPath,
         "alpha": 0,
         "hidden": false,
-        "x": token.x - (canvas.grid.size * token.document.width * (padding - 1) / 2),
-        "y": token.y - (canvas.grid.size * token.document.width * (padding - 1) / 2),
+        "x": token.x - (canvas.grid.size * token.document.width * (scaleXY - 1) / 2),
+        "y": token.y - (canvas.grid.size * token.document.height * (scaleXY - 1) / 2),
         "video": {
             autoplay: false,
             loop: false,
             volume: 0
         },
-        "width": canvas.grid.size * (token.document.width * padding),
-        "height": canvas.grid.size * (token.document.width * padding),
+        "width": canvas.grid.size * (token.document.width * scaleXY),
+        "height": canvas.grid.size * (token.document.height * scaleXY),
         "rotation": rotation,
     };
 
@@ -69,14 +69,15 @@ async function create(token, config = {}) {
     dependency.required([{id: 'token-attacher', ref: "Token Attacher"},
                         {id: 'monks-active-tiles', ref: "Monk's Active Tile Triggers"}]);
 
-    const { id, deleteToken, revealOverlay, tokenOverlay, padding, rotation } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, {inplace:false});
+    const { id, deleteToken, revealOverlay, tokenOverlay, rotation } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, {inplace:false});
     if ( !tokenOverlay || !revealOverlay ) {
         throw new Error(`EMP | tokenMaskEffect: Missing required configuration 'tokenOverlay' or 'revealOverlay'. Effect aborted.`);
     }
 
     const label = `${id} - ${token.id}`;
-    const tiles = await createTiles(token, {revealOverlay, padding, rotation});
+    const tiles = await createTiles(token, {revealOverlay, rotation});
     const [tokenRevealMask, sceneRevealMask, tokenShapeMask] = tiles;
+    const paddingXY = token.document.texture.scaleX;
 
     //Attach tiles to token
     await tokenAttacher.attachElementsToToken([tokenRevealMask, sceneRevealMask, tokenShapeMask], token, true);
@@ -104,7 +105,7 @@ async function create(token, config = {}) {
         .name(label)
         .copySprite(token)
         .attachTo(token, {bindAlpha: false, bindVisibility: false, bindRotation: true})
-        .scaleToObject(padding, {considerTokenScale:true})
+        .scaleToObject(paddingXY)
         .spriteRotation(-token.document.rotation)
         .mask(tokenRevealMask)
         .persist()
@@ -126,7 +127,7 @@ async function create(token, config = {}) {
       .attachTo(token, {bindAlpha: false, bindVisibility: false, bindRotation: false})
       .mask(tokenShapeMask)
       .rotate(-rotation)
-      .scaleToObject(padding)
+      .scaleToObject(paddingXY)
       .zIndex(1)
       .waitUntilFinished()
 
