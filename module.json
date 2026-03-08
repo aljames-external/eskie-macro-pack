@@ -1,7 +1,7 @@
 {
   "id": "eskie-macros",
   "title": "Eskie Macro Pack",
-  "description": "<p>A collection of macros from the Eskiemoh Discord Server.</p>",
+  "description": "<p> A collection of macros from the <a href=\"https://discord.gg/zkKPp4Zm\" title=\"eskie\">Eskiemoh Discord Server</a>.</p><p> Come contribute and learn how to write better Sequencer macros!</p>",
   "version": "#{VERSION}#",
   "authors": [
     {
