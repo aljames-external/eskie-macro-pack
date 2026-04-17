@@ -76,16 +76,16 @@ async function configuration(token, tile, config = {}) {
     await tile.setFlag(MODULE_ID, id, { tileData: getCenter(tile) });
 
     const tilePosition = getCenter(tile);
-    const deltaX = tileOrigin.x - tilePosition.x;
-    const deltaY = tileOrigin.y - tilePosition.y;
-    const angleRadians = Math.atan2(deltaY, deltaX);
+    const dx = tileOrigin.x - tilePosition.x;
+    const dy = tileOrigin.y - tilePosition.y;
+    const angleRadians = Math.atan2(dy, dx);
     const distance = Math.hypot(tileOrigin.x - tilePosition.x, tileOrigin.y - tilePosition.y);
     const tokenSpeed = token._getAnimationMovementSpeed();
     const speed = (tokenSpeed * canvas.grid.size) / (1 * SECONDS);
     const rotation = angleRadians * (180 / Math.PI);
     const travelTime = (distance / speed) - latency;
 
-    return { rotation, travelTime, label };
+    return { rotation, travelTime, label, delta: {x: dx, y: dy} };
 }
 
 export const matt = {

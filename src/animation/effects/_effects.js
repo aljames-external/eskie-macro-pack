@@ -42,6 +42,7 @@ import { flurryOfBlows } from "./on-target/flurry-of-blows.js";
 import { fly } from "./token/fly.js";
 import { frightfulMoan } from "./token/frightful-moan.js";
 import { gate } from "./template/gate.js";
+import { grapple } from "./on-target/grapple.js";
 import { grease } from "./template/grease.js";
 import { guidingBolt } from "./target/guiding-bolt.js";
 import { haloOfSpores } from "./aura/halo-of-spores.js";
@@ -137,6 +138,7 @@ export const effect = {
     fly,
     frightfulMoan,
     gate,
+    grapple,
     grease,
     guidingBolt,
     haloOfSpores,
