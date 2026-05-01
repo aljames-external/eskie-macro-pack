@@ -32,3 +32,10 @@ Don't overcrowd the main `SKILL.md` (keep it under 500 lines).
 The `description` field in the YAML frontmatter is the primary trigger.
 - Ensure the description explicitly states exactly *when* the agent should trigger it, using imperative language (e.g., *"Make sure to use this skill whenever..."*).
 - Do not just describe what the skill does; describe the context in which it is useful.
+
+## 6. Context Archiving
+The user prompt or event that triggered the creation or modification of a skill should be saved in a `CONTEXT.md` file in the same directory as the `SKILL.md` file. This will allow for auditability, traceability, and a way to reproduce the skill's recreation or modification at a later date with high fidelity when the underlying model or context window changes.
+- Denote new events with a heading like `## [YYYY-MM-DD HH:MM:SS] - Skill Creation`
+- Add the content of the user's prompt or event to the `CONTEXT.md` file
+- Add any independent reasoning or internal logic that informed the final implementation to the `CONTEXT.md` file if not directly inferable from the user's prompt or event.
+- [IMPORTANT] Do not delete old context when adding new context.
