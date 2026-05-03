@@ -189,4 +189,5 @@ export const stunningStrike = {
     create: createStunningStrike,
     play: playStunningStrike,
     stop: stopStunningStrike,
+    default_config: DEFAULT_CONFIG,
 };

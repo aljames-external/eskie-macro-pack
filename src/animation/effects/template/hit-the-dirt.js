@@ -114,6 +114,7 @@ export const hitTheDirt = {
     play,
     destroy,
     stop,
+    default_config: DEFAULT_CONFIG,
 };
 
 autoanimations.register('Hit the Dirt', 'template', 'eskie.effect.hitTheDirt', DEFAULT_CONFIG);

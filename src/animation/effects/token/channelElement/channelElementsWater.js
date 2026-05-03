@@ -106,4 +106,5 @@ export const water = {
     create,
     play,
     stop,
+    default_config: DEFAULT_CONFIG,
 };

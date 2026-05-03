@@ -195,6 +195,7 @@ async function play(token, target, config = {}) {
 export const stunningFist = {
     create,
     play,
+    default_config: DEFAULT_CONFIG,
 };
 
 autoanimations.register("Stunning Fist", "melee-target", "eskie.effect.stunningFist", DEFAULT_CONFIG)

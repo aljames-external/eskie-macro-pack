@@ -140,8 +140,9 @@ export const stepOfTheWindMove = {
     play,
     stop,
     macro: {
-        movement
+        movement,
     },
+    default_config: DEFAULT_CONFIG,
 };
 
 autoanimations.register("Step of the Wind", "effect", "eskie.effect.stepOfTheWind.move", DEFAULT_CONFIG);

@@ -245,11 +245,13 @@ export const tashasCausticBrew = {
     cast: {
         create: createCast,
         play: playCast,
+        default_config: DEFAULT_CONFIG_CAST,
     },
     target: {
         create: createTarget,
         play: playTarget,
         stop: stopTarget,
+        default_config: DEFAULT_CONFIG_CAST,
     },
     create: async function (source, config = {}) {
         const sequence = new Sequence();
@@ -268,6 +270,7 @@ export const tashasCausticBrew = {
         if (sequence) return sequence.play();
     },
     stop: stopTarget,
+    default_config: DEFAULT_CONFIG_CAST,
 };
 
 autoanimations.register("Tasha's Caustic Brew", "template", "eskie.effect.tashasCausticBrew", DEFAULT_CONFIG_CAST, '0.1.0');

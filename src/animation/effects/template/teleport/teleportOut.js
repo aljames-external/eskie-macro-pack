@@ -71,4 +71,5 @@ async function play(token, targets, config = {}) {
 export const teleportOut = {
     create,
     play,
+    default_config: DEFAULT_CONFIG,
 };

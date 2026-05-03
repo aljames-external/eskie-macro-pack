@@ -128,6 +128,7 @@ export const grapple = {
     play,
     stop,
     macro: {
-        movement
+        movement,
     },
+    default_config: DEFAULT_CONFIG,
 };

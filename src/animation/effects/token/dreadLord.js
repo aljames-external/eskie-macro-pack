@@ -42,7 +42,7 @@ async function create(token, config = {}) {
         .zIndex(2);
 
     if (darkMap && canvas.scene.background?.src) {
-        sequseq = seqence.effect()
+        seq = seq.effect()
             .file(closest(canvas.scene.background.src))
             .filter("ColorMatrix", { brightness: 0.3 })
             .atLocation({ x: (canvas.dimensions.width) / 2, y: (canvas.dimensions.height) / 2 })
@@ -206,4 +206,5 @@ export const dreadLord = {
     create,
     play,
     stop,
+    default_config: DEFAULT_CONFIG,
 };

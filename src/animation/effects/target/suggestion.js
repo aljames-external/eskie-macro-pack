@@ -142,4 +142,5 @@ export const suggestion = {
     create: createSuggestion,
     play: playSuggestion,
     stop: stopSuggestion,
+    default_config: DEFAULT_CONFIG,
 };

@@ -133,4 +133,5 @@ async function play(token, targetTokens, config = {}) {
 export const petrifyingGaze = {
     create,
     play,
+    default_config: DEFAULT_CONFIG,
 };

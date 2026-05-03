@@ -317,15 +317,18 @@ export const disintegrate = {
     create,
     play,
     stop,
+    default_config: DEFAULT_CONFIG,
     // Subfunctions
     beam,
     death,
     dissolve : {
         create: dissolveCreate,
         play: dissolvePlay,
+        default_config: DEFAULT_CONFIG,
     },
     reform : {
         create: reformCreate,
         play: reformPlay,
+        default_config: DEFAULT_CONFIG,
     },
 };

@@ -11,7 +11,7 @@ const DEFAULT_CONFIG = {
 };
 
 function create(token, config = {}) {
-    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, {inplace:false});
+    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
     const { id, tint } = mConfig;
     const label = `${id} - ${token.id}`;
 
@@ -83,12 +83,12 @@ function create(token, config = {}) {
 
 async function play(token, config = {}) {
     const sequence = create(token, config);
-    if (sequence) { return sequence.play(); }
+    if (sequence) return sequence.play();
 }
 
 async function stop(token, config = {}) {
-    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, {inplace:false});
-    const {id} = mConfig;
+    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
+    const { id } = mConfig;
     const label = `${id} - ${token.id}`;
 
     new Sequence()
@@ -106,7 +106,8 @@ async function stop(token, config = {}) {
 export const levitation = {
     create,
     play,
-    stop
+    stop,
+    default_config: DEFAULT_CONFIG,
 };
 
 autoanimations.register("Levitating", "effect", "eskie.effect.levitation", DEFAULT_CONFIG);

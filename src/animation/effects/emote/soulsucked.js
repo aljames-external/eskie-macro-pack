@@ -6,6 +6,20 @@ import { closest } from "../../../lib/filemanager.js";
    Update Author: bakanabaka
 ** */
 
+const DEFAULT_CONFIG = {
+    id: 'soulsucked',
+    duration: 0,
+    facing: 'left',
+    effect: [
+        {
+            img: 'eskie.emote.soul_sucked.01',
+            x: -0.45,
+            y: -0.25,
+            scale: 0.7
+        }
+    ]
+};
+
 /**
  * Creates a soulsucked emote effect on a token.
  *
@@ -24,22 +38,8 @@ import { closest } from "../../../lib/filemanager.js";
  * @returns {Promise<void>} A promise that resolves when the effect is finished.
  */
 async function create(token, config = {}) {
-    const defaultConfig = {
-        id: 'soulsucked',
-        duration: 0,
-        facing: 'left',
-        effect: [
-            {
-                img: 'eskie.emote.soul_sucked.01',
-                x: -0.45,
-                y: -0.25,
-                scale: 0.7
-            }
-        ]
-    };
     // TODO(bakanabaka): Utilizes old mergeObject
-    let { id, duration, effect } = foundry.utils.mergeObject(defaultConfig, config, {inplace:false});
-    const facing = config.facing ?? defaultConfig.facing;
+    let { id, duration, effect, facing } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
 
     const tokenWidth = token.document.width;
     const mirrorFace = facing === 'right';
@@ -68,12 +68,14 @@ async function play(token, config = {}) {
     if (seq) { await seq.play(); }
 }
 
-async function stop(token, {id = 'soulsucked'} = {}) {
-    return Sequencer.EffectManager.endEffects({ name: id, object: token });
+async function stop(token, config = {}) {
+    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
+    return Sequencer.EffectManager.endEffects({ name: mConfig.id, object: token });
 }
 
 export const soulsucked = {
     create,
     play,
     stop,
+    default_config: DEFAULT_CONFIG,
 };

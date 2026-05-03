@@ -12,7 +12,7 @@ const DEFAULT_CONFIG = {
 };
 
 async function create(token, config = {}) {
-    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, {inplace:false});
+    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
     const { id } = mConfig;
 
     let sequence = new Sequence()
@@ -49,11 +49,11 @@ async function create(token, config = {}) {
 
 async function play(token, config = {}) {
     let seq = await create(token, config);
-    if (seq) { await seq.play(); }
+    if (seq) await seq.play();
 }
 
 async function stop(token, config = {}) {
-    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, {inplace:false});
+    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
     const { id } = mConfig;
     let sequence =  new Sequence()
         .effect()
@@ -73,6 +73,7 @@ export const petrified = {
     create,
     play,
     stop,
+    default_config: DEFAULT_CONFIG,
 };
 
 autoanimations.register("Petrified", "effect", "eskie.effect.petrified", DEFAULT_CONFIG);

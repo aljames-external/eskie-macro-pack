@@ -108,6 +108,7 @@ async function play(token, target, config = {}) {
 export const magicMissile = {
     create,
     play,
+    default_config: DEFAULT_CONFIG,
 };
 
 autoanimations.register("Magic Missile", "ranged-target", "eskie.effect.magicMissile", DEFAULT_CONFIG);

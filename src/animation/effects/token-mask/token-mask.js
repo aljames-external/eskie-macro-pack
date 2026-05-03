@@ -15,7 +15,7 @@ const DEFAULT_CONFIG = {
 }
 
 async function createTiles(token, config = {}) {
-    const { revealOverlay, rotation } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, {inplace:false});
+    const { revealOverlay, rotation } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
     const revealOverlayConfig = closest(revealOverlay);
     let revealOverlayPath = revealOverlayConfig;
     try { revealOverlayPath = Sequencer.Database.getEntry(revealOverlayConfig).originalData; } catch(e) { revealOverlayPath = revealOverlayConfig; }
@@ -69,10 +69,8 @@ async function create(token, config = {}) {
     dependency.required([{id: 'token-attacher', ref: "Token Attacher"},
                         {id: 'monks-active-tiles', ref: "Monk's Active Tile Triggers"}]);
 
-    const { id, deleteToken, revealOverlay, tokenOverlay, rotation } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, {inplace:false});
-    if ( !tokenOverlay || !revealOverlay ) {
-        throw new Error(`EMP | tokenMaskEffect: Missing required configuration 'tokenOverlay' or 'revealOverlay'. Effect aborted.`);
-    }
+    const { id, deleteToken, revealOverlay, tokenOverlay, rotation } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
+    if (!tokenOverlay || !revealOverlay) return console.warn(`EMP | tokenMaskEffect: Missing required configuration 'tokenOverlay' or 'revealOverlay'. Effect aborted.`);
 
     const label = `${id} - ${token.id}`;
     const tiles = await createTiles(token, {revealOverlay, rotation});
@@ -141,7 +139,7 @@ async function create(token, config = {}) {
                 socket.tile.destroy(sceneRevealMask.id),
             ]);
         }
-        await Sequencer.EffectManager.endEffects({name: label})
+        await Sequencer.EffectManager.endEffects({ name: label });
     });
 
     return seq;
@@ -153,12 +151,12 @@ async function play(token, config = {}) {
 }
 
 async function stop(token, config = {}) {
-    const { id } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, {inplace:false});
+    const { id } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
     const label = `${id} - ${token.id}`;
 
     return Promise.all([
         new Sequence().animation().on(token).opacity(1).show(true).play(),
-        Sequencer.EffectManager.endEffects({name: label})
+        Sequencer.EffectManager.endEffects({ name: label })
     ]);
 }
 
@@ -166,4 +164,5 @@ export const tokenMaskEffect = {
     create,
     play,
     stop,
+    default_config: DEFAULT_CONFIG,
 }

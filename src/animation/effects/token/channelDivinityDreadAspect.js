@@ -176,4 +176,5 @@ async function play(token, targets, config = {}) {
 export const channelDivinityDreadAspect = {
     create,
     play,
+    default_config: DEFAULT_CONFIG,
 };

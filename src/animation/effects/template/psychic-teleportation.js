@@ -155,7 +155,8 @@ async function stop(token, config = {}) {
 export const psychicTeleportation = {
     create,
     play,
-    stop
-}
+    stop,
+    default_config: DEFAULT_CONFIG,
+};
 
 autoanimations.register("Psychic Teleportation", "template", "eskie.effect.psychicTeleportation", DEFAULT_CONFIG);

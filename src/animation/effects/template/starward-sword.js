@@ -530,6 +530,7 @@ export const starwardSword = {
     create: createStarwardSword,
     play: playStarwardSword,
     stop: stopStarwardSword,
+    default_config: DEFAULT_CONFIG,
 };
 
 autoanimations.register("Starward Sword", "template", "eskie.effect.starwardSword", DEFAULT_CONFIG);

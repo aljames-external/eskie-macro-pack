@@ -45,4 +45,5 @@ async function play(token, target, config = {}) {
 export const dreadLordAttack = {
     create,
     play,
+    default_config: DEFAULT_CONFIG,
 };

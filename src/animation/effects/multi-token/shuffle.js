@@ -61,4 +61,5 @@ async function play(targets, config = {}) {
 export const shuffle = {
     create,
     play,
+    default_config: DEFAULT_CONFIG,
 };

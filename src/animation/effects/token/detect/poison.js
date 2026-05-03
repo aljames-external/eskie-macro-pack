@@ -36,4 +36,5 @@ async function play(token, config = {}) {
 export const poison = {
     create,
     play,
+    default_config: DEFAULT_CONFIG,
 };

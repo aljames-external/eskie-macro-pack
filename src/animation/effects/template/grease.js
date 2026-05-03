@@ -124,6 +124,7 @@ async function play(token, config = {}, options = {}) {
 export const grease = {
     create,
     play,
+    default_config: DEFAULT_CONFIG,
 };
 
 autoanimations.register("Grease", "template", "eskie.effect.grease", DEFAULT_CONFIG);

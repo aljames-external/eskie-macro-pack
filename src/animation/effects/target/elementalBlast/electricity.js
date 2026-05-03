@@ -111,5 +111,6 @@ function stop(token, config = {}) {
 export const electricityBlast = {
     create,
     play,
-    stop
+    stop,
+    default_config: DEFAULT_CONFIG,
 };

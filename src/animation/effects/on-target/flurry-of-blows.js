@@ -84,6 +84,7 @@ async function play(token, target, config = {}) {
 export const flurryOfBlows = {
     create,
     play,
+    default_config: DEFAULT_CONFIG,
 };
 
 autoanimations.register("Flurry Of Blows", "melee-target", "eskie.effect.flurryOfBlows", DEFAULT_CONFIG);

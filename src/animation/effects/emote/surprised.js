@@ -6,6 +6,20 @@ import { closest } from "../../../lib/filemanager.js";
    Update Author: bakanabaka
 ** */
 
+const DEFAULT_CONFIG = {
+    id: 'surprised',
+    duration: -1,
+    effect: [
+        {   // !! } surprised icon
+            img: 'eskie.emote.surprised.01',
+            scale: 1.2,
+            anchor: { x: -0.3, y: 1.25 },
+            x: -0.8,
+            y: 0.5
+        }
+    ]
+};
+
 /**
  * Creates a surprised emote effect on a token.
  *
@@ -22,21 +36,8 @@ import { closest } from "../../../lib/filemanager.js";
  * @returns {Promise<void>} A promise that resolves when the effect is finished.
  */
 async function create(token, config = {}) {
-    const defaultConfig = {
-        id: 'surprised',
-        duration: -1,
-        effect: [
-            {   // !! } surprised icon
-                img: 'eskie.emote.surprised.01',
-                scale: 1.2,
-                anchor: { x: -0.3, y: 1.25 },
-                x: -0.8,
-                y: 0.5
-            }
-        ]
-    };
     // TODO(bakanabaka): Utilizes old mergeObject
-    let { id, duration, effect } = foundry.utils.mergeObject(defaultConfig, config, {inplace:false});
+    let { id, duration, effect } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, {inplace:false});
 
     const tokenWidth = token.document.width;
 
@@ -63,8 +64,9 @@ async function play(token, config = {}) {
     if (seq) { await seq.play(); }
 }
 
-async function stop(token, {id = 'surprised'} = {}) {
-    return Sequencer.EffectManager.endEffects({ name: id, object: token });
+async function stop(token, config = {}) {
+    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, {inplace:false});
+    return Sequencer.EffectManager.endEffects({ name: mConfig.id, object: token });
 }
 
 async function exclaim(token, {id = 'surprised', duration = 0, anchor = { x: 0.5, y: 1.55 }} = {}) {
@@ -88,4 +90,5 @@ export const surprised = {
     play,
     stop,
     exclaim,
+    default_config: DEFAULT_CONFIG,
 };

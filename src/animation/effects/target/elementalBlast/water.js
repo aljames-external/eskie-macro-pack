@@ -121,5 +121,6 @@ function stop(token, config = {}) {
 export const waterBlast = {
     create,
     play,
-    stop
+    stop,
+    default_config: DEFAULT_CONFIG,
 };

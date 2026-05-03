@@ -113,5 +113,6 @@ function stop(token, config = {}) {
 export const fireBlast = {
     create,
     play,
-    stop
+    stop,
+    default_config: DEFAULT_CONFIG,
 };

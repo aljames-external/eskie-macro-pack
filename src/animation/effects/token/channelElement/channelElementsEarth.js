@@ -115,4 +115,5 @@ export const earth = {
     create,
     play,
     stop,
+    default_config: DEFAULT_CONFIG,
 };

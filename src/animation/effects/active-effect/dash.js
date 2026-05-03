@@ -8,7 +8,7 @@ export const DEFAULT_CONFIG = {
 };
 
 function create(token, config = {}) {
-    const { id } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, {inplace:false});
+    const { id } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
     const label = `${id} - ${token.id}`;
 
     const sequenceOn = new Sequence()
@@ -46,7 +46,7 @@ function create(token, config = {}) {
 }
 
 async function play(token, config = {}) {
-    const mergedConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, {inplace:false});
+    const mergedConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
     const effectFunction = `eskie.effect.dash.macro.movement`;
     const code = `${effectFunction}(token.object, tile)`;
     await matt.movement.initialize(token, code, mergedConfig);    
@@ -55,11 +55,11 @@ async function play(token, config = {}) {
 }
 
 async function stop(token, config = {}) {
-    const { id } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, {inplace:false});
+    const { id } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
     const label = matt.getLabel(id, token);
     const tiles = Tagger.getByTag(label);
 
-    tiles.forEach(async (tile) => { await socket.tile.destroy(tile.id); });
+    tiles.forEach(async (tile) => socket.tile.destroy(tile.id));
     Sequencer.EffectManager.endEffects({ name: label, object: token });
 }
 
@@ -109,7 +109,7 @@ async function movement(token, tile, config = {}) {
         return SequenceMATT;
     }
 
-    const mergedConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, {inplace:false});
+    const mergedConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
     const {rotation, travelTime, label} = await matt.movement.configuration(token, tile, mergedConfig);
     return travelSequence({tile, rotation, travelTime, label}).play();
 }
@@ -120,8 +120,9 @@ export const dash = {
     play,
     stop,
     macro: {
-        movement
+        movement,
     },
+    default_config: DEFAULT_CONFIG,
 };
 
 autoanimations.register("Dash", "effect", "eskie.effect.dash", DEFAULT_CONFIG);

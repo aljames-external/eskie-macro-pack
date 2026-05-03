@@ -121,4 +121,5 @@ export const superSaiyan = {
     play,
     stop,
     clean,
+    default_config: DEFAULT_CONFIG,
 };

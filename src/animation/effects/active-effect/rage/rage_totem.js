@@ -34,6 +34,7 @@ export const rageTotem = {
     play,
     stop,
     clean,
+    default_config: DEFAULT_CONFIG,
 };
 
 function create(token, config = {}) {

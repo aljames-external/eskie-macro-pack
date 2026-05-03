@@ -113,4 +113,5 @@ export const fire = {
     create,
     play,
     stop,
+    default_config: DEFAULT_CONFIG,
 };

@@ -289,9 +289,12 @@ export const trueStrike = {
         create: createTrueStrikeCast,
         play: playTrueStrikeCast,
         stop: stopTrueStrike,
+        default_config: DEFAULT_CONFIG,
     },
     attack: {
         create: createTrueStrikeAttack,
         play: playTrueStrikeAttack,
+        default_config: DEFAULT_CONFIG,
     },
+    default_config: DEFAULT_CONFIG,
 };

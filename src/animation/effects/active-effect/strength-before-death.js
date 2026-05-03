@@ -284,10 +284,11 @@ async function stop(token, config = {}) {
     Sequencer.EffectManager.endEffects({ name: `${id} ${token.name}` }); 
 }
 
-export const strengthBeforeDeath = { 
+export const strengthBeforeDeath = {
     create,
     play,
     stop,
+    default_config: DEFAULT_CONFIG,
 };
 
 autoanimations.register("Strength Before Death", "effect", "eskie.effect.strengthBeforeDeath", DEFAULT_CONFIG);

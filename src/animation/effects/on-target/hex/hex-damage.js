@@ -59,5 +59,6 @@ async function play(token, target, config = {}) {
 
 export const hexDamage = {
     create,
-    play
+    play,
+    default_config: DEFAULT_CONFIG,
 };

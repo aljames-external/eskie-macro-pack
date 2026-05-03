@@ -79,6 +79,7 @@ async function play(position, config = {}) {
 export const firecracker = {
     create,
     play,
+    default_config: DEFAULT_CONFIG,
 };
 
 autoanimations.register("Firecracker", "template", "eskie.effect.firecracker", DEFAULT_CONFIG);

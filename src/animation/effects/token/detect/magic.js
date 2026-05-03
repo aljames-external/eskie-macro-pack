@@ -46,4 +46,5 @@ async function play(token, config = {}) {
 export const magic = {
     create,
     play,
+    default_config: DEFAULT_CONFIG,
 };

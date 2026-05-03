@@ -174,6 +174,7 @@ async function play(token, config = {}) {
 export const blastLock = {
     create,
     play,
+    default_config: DEFAULT_CONFIG,
 };
 
 autoanimations.register("Blast Lock", "template", "eskie.effect.blastLock", DEFAULT_CONFIG);

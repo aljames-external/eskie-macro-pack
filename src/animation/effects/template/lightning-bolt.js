@@ -130,6 +130,7 @@ async function play(token, config = {}) {
 export const lightningBolt = {
     play,
     create,
+    default_config: DEFAULT_CONFIG,
 };
 
 autoanimations.register("Lightning Bolt", "template", "eskie.effect.lightningBolt", DEFAULT_CONFIG);

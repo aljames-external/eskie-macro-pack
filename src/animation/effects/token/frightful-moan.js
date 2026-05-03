@@ -3,6 +3,8 @@
 
 import { closest } from '../../../lib/filemanager.js';
 
+const DEFAULT_CONFIG = {};
+
 /**
  * Creates the Frightful Moan animation sequence.
  * @param {Token} token - The token from which the moan originates.
@@ -10,6 +12,7 @@ import { closest } from '../../../lib/filemanager.js';
  * @returns {Sequence} The created Sequence object.
  */
 async function create(token, config = {}) {
+    config = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
     const sequence = new Sequence();
 
     sequence
@@ -82,5 +85,6 @@ async function play(token, config = {}) {
 export const frightfulMoan = {
     create,
     play,
+    default_config: DEFAULT_CONFIG,
     // No stop function needed as this is not a persistent effect
 };

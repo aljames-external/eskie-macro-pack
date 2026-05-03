@@ -9,7 +9,7 @@ const DEFAULT_CONFIG = {
 }
 
 function create(token, config = {}) {
-    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, {inplace:false});
+    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
     const { id } = mConfig;
     const label = `${id} - ${token.name}`;
 
@@ -107,19 +107,20 @@ function create(token, config = {}) {
 
 async function play(token, config = {}) {
     const seq = await create(token, config);
-    if (seq) { return seq.play(); }
+    if (seq) return seq.play();
 }
 
 async function stop(token, config = {}) {
-    const { id } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, {inplace:false});
+    const { id } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
     const label = `${id} ${token.name}`;
     Sequencer.EffectManager.endEffects({ name: label, object: token }); 
 }
 
-export const fightingSpirit = { 
+export const fightingSpirit = {
     create,
     play,
     stop,
+    default_config: DEFAULT_CONFIG,
 };
 
 autoanimations.register("Fighting Spirit", "effect", "eskie.effect.fightingSpirit", DEFAULT_CONFIG);

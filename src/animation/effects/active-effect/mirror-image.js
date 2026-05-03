@@ -205,6 +205,7 @@ export const mirrorImage = {
     create: createMirrorImage,
     play: playMirrorImage,
     stop: stopMirrorImage,
+    default_config: DEFAULT_CONFIG,
 };
 
 autoanimations.register("Mirror Image", "effect", "eskie.effect.mirrorImage", DEFAULT_CONFIG);

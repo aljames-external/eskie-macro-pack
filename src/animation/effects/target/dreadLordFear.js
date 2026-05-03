@@ -55,4 +55,5 @@ async function play(token, target, config = {}) {
 export const dreadLordFear = {
     create,
     play,
+    default_config: DEFAULT_CONFIG,
 };

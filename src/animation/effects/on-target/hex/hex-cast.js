@@ -89,6 +89,7 @@ export const hexCast = {
     create,
     play,
     stop,
+    default_config: DEFAULT_CONFIG,
 };
 
 autoanimations.register("Hexed", "effect", "eskie.effect.hex.cast", DEFAULT_CONFIG);

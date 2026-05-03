@@ -86,6 +86,7 @@ async function play(token, config = {}) {
 export const dimensionDoor = {
     create,
     play,
+    default_config: DEFAULT_CONFIG,
 };
 
 autoanimations.register("Dimension Door", "template", "eskie.effect.dimensionDoor", DEFAULT_CONFIG);

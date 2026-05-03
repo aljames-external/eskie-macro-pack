@@ -19,7 +19,7 @@ const DEFAULT_CONFIG = {
  * @returns {Sequence} The created Sequence object.
  */
 async function createAnimateDead(undeadToken, config = {}) {
-    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, {inplace:false});
+    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
     const { id, choice } = mConfig;
 
     const sequence = new Sequence();
@@ -187,4 +187,5 @@ export const animateDead = {
     create: createAnimateDead,
     play: playAnimateDead,
     stop: stopAnimateDead,
+    default_config: DEFAULT_CONFIG,
 };

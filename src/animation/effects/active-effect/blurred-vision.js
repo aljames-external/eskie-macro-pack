@@ -21,7 +21,7 @@ const DEFAULT_CONFIG = {
 }
 
 function create(token, config = {}) {
-    const { overlay, configs } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, {inplace: false});
+    const { overlay, configs } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
     const seq = new Sequence();
     const owners = tokens.owners(token, { applyPC: overlay.applyPC, applyGM: overlay.applyGM });
 
@@ -43,15 +43,16 @@ async function play(token, config = {}) {
 }
 
 async function stop(token, config = {}) {
-    const { id, overlay, configs } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, {inplace: false});
+    const { id, overlay, configs } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
     const owners = tokens.owners(token, { applyPC: overlay.applyPC, applyGM: overlay.applyGM });
-    return Promise.all(configs.map( c => blur.stop(owners, c) ));
+    return Promise.all(configs.map(c => blur.stop(owners, c)));
 }
 
 export const blurredVision = {
     create,
     play,
     stop,
+    default_config: DEFAULT_CONFIG,
 };
 
 autoanimations.register("Blurred Vision", "effect", "eskie.effect.blurredVision", DEFAULT_CONFIG);

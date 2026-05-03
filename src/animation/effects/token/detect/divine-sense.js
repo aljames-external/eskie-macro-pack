@@ -35,4 +35,5 @@ async function play(token, config = {}) {
 export const divineSense = {
     create,
     play,
+    default_config: DEFAULT_CONFIG,
 };

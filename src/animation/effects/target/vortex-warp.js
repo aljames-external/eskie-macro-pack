@@ -94,4 +94,5 @@ async function play(target, config = {}) {
 export const vortexWarp = {
     create,
     play,
+    default_config: DEFAULT_CONFIG,
 };

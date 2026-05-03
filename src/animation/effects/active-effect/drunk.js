@@ -19,7 +19,7 @@ const DEFAULT_CONFIG = {
 }
 
 async function create(token, config = {}) {
-    const { id, duration } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, {inplace: false});
+    const { id, duration } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
     const tokenWidth = token.document.width;
     const label = `${id} - ${token.id}`;
 
@@ -81,10 +81,10 @@ async function create(token, config = {}) {
 }
 
 async function play(token, config = {}) {
-    const { overlay } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, {inplace: false});
+    const { overlay } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
 
     const seq = await create(token, config);
-    if (seq) { await seq.play(); }
+    if (seq) await seq.play();
 
     if (overlay.applyPC || overlay.applyGM) {
         const SEQUENCER_DEFAULT_OPACITY = 50;
@@ -98,7 +98,7 @@ async function play(token, config = {}) {
 }
 
 async function stop(token, config = {}) {
-    const { id, overlay } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, {inplace: false})
+    const { id, overlay } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
     if (overlay.applyPC || overlay.applyGM) {
         const owners = tokens.owners(token, { applyPC: overlay.applyPC, applyGM: overlay.applyGM });
         blur.drunk.stop(owners)
@@ -118,6 +118,7 @@ export const drunk = {
     create,
     play,
     stop,
+    default_config: DEFAULT_CONFIG,
 };
 
 autoanimations.register("Drunk", "effect", "eskie.effect.emote.drunk", DEFAULT_CONFIG);

@@ -98,4 +98,5 @@ export const surprised = {
     create: createSurprised,
     play: playSurprised,
     stop: stopSurprised,
+    default_config: DEFAULT_CONFIG,
 };

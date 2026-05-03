@@ -4,6 +4,9 @@
 import { closest } from '../../../lib/filemanager.js';
 
 const AVAILABLE_SIZES = [10, 20, 30, 60];
+const DEFAULT_CONFIG = {
+    radius: 7.5,
+};
 
 /**
  * Creates the Call Lightning sequence effects.
@@ -12,10 +15,7 @@ const AVAILABLE_SIZES = [10, 20, 30, 60];
  * @returns {Sequence} The created Sequence object.
  */
 async function create(position, config = {}) {
-    config = {
-        radius: 7.5,
-        ...config,
-    };
+    config = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
 
     const pickEffectSize = (r) => AVAILABLE_SIZES.reduce(
         (acc, size) => (size <= r ? size : acc),
@@ -77,5 +77,6 @@ async function play(token, position, config = {}) {
 export const callLightning = {
     create,
     play,
+    default_config: DEFAULT_CONFIG,
     // No stop function needed as this is not a persistent effect
 };

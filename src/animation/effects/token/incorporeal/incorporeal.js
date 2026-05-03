@@ -104,4 +104,5 @@ export const incorporeal = {
     create,
     play,
     stop,
+    default_config: DEFAULT_CONFIG,
 };

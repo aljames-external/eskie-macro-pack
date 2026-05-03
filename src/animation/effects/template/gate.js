@@ -233,6 +233,7 @@ export const gate = {
     create,
     play,
     stop,
+    default_config: DEFAULT_CONFIG,
 };
 
 autoanimations.register("Gate", "template", "eskie.effect.gate", DEFAULT_CONFIG);

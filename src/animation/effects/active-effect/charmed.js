@@ -11,7 +11,7 @@ const DEFAULT_CONFIG = {
 };
 
 function create(token, config = {}) {
-    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, {inplace:false});
+    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
     const { id } = mConfig;
     const label = `${id}-${token.id}`;
 
@@ -69,11 +69,11 @@ function create(token, config = {}) {
 
 async function play(token, config = {}) {
     let seq = await create(token, config);
-    if (seq) { await seq.play(); }
+    if (seq) await seq.play();
 }
 
 async function stop(token, config = {}) {
-    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, {inplace:false});
+    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
     const { id } = mConfig;
     const label = `${id}-${token.id}`;
 
@@ -84,6 +84,7 @@ export const charmed = {
     create,
     play,
     stop,
+    default_config: DEFAULT_CONFIG,
 };
 
 autoanimations.register("Charmed", "effect", "eskie.effect.charmed", DEFAULT_CONFIG);

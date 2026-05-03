@@ -81,6 +81,7 @@ export const templateName = {
     create,
     play,
     stop,
+    default_config: DEFAULT_CONFIG,
 };
 
 // Register with "template" trigger

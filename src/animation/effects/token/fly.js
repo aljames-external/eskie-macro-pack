@@ -69,6 +69,8 @@ async function stop(token, config = {}) {
 }
 
 export const fly = {
+    create,
     play,
     stop,
+    default_config: DEFAULT_CONFIG,
 };

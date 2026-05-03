@@ -8,7 +8,7 @@ const DEFAULT_CONFIG = {
 };
 
 async function create(token, target, config = {}) {
-    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, {inplace:false});
+    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
     const { id } = mConfig;
     const sequence = new Sequence();
 
@@ -172,7 +172,7 @@ async function play(token, target, config = {}) {
 }
 
 function stop(token, config = {}) {
-    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, {inplace:false});
+    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
     const { id } = mConfig;
     Sequencer.EffectManager.endEffects({ name: `${id} ${token.document.name}` });
 }
@@ -181,4 +181,5 @@ export const channelDivinityControlUndead = {
     create,
     play,
     stop,
+    default_config: DEFAULT_CONFIG,
 };

@@ -112,4 +112,5 @@ export const metal = {
     create,
     play,
     stop,
+    default_config: DEFAULT_CONFIG,
 };

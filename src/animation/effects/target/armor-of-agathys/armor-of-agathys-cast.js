@@ -124,4 +124,5 @@ export const armorOfAgathysCast = {
     create,
     play,
     stop,
+    default_config: DEFAULT_CONFIG,
 };

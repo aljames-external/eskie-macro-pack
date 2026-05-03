@@ -10,7 +10,7 @@ const DEFAULT_CONFIG = {
 };
 
 function createCaster(token, config = {}) {
-    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, {inplace:false});
+    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
     const { color } = mConfig;
     let hue = -20;
 
@@ -96,11 +96,11 @@ function createCaster(token, config = {}) {
 
 async function playCaster(token, config = {}) {
     const sequence = createCaster(token, config);
-    if (sequence) { return sequence.play(); }
+    if (sequence) return sequence.play();
 }
 
 function createTarget(target, config = {}) {
-    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, {inplace:false});
+    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
     const { id, color } = mConfig;
     let hue = -20;
 
@@ -133,11 +133,11 @@ function createTarget(target, config = {}) {
 
 async function playTarget(target, config = {}) {
     const sequence = createTarget(target, config);
-    if (sequence) { return sequence.play(); }
+    if (sequence) return sequence.play();
 }
 async function stopTarget(target, config = {}) {
-    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, {inplace:false});
-    const {id} = mConfig;
+    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
+    const { id } = mConfig;
     return Sequencer.EffectManager.endEffects({ name: `${id} - ${target.name}`, object: target });
 }
 
@@ -159,13 +159,16 @@ export const bless = {
     play,
     cast: {
         create: createCaster,
-        play: playCaster
+        play: playCaster,
+        default_config: DEFAULT_CONFIG,
     },
     effect: {
         create: createTarget,
         play: playTarget,
-        stop: stopTarget
-    }
+        stop: stopTarget,
+        default_config: DEFAULT_CONFIG,
+    },
+    default_config: DEFAULT_CONFIG,
 };
 
 autoanimations.register("Bless", "token", "eskie.effect.bless.cast", DEFAULT_CONFIG);

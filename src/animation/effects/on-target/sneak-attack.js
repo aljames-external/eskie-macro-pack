@@ -18,7 +18,7 @@ const DEFAULT_CONFIG_MELEE = {
 }
 
 async function createMelee(token, target, config = {}) {
-    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG_MELEE, config, {inplace:false});
+    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG_MELEE, config, { inplace: false });
     const { id, color, type, weight } = mConfig;
 
     //Determine Attack Size
@@ -32,7 +32,7 @@ async function createMelee(token, target, config = {}) {
 
     let seq = new Sequence()
 
-    .effect()
+        .effect()
         .file(closest(`eskie.attack.melee.generic.01.${type}.${weight}.${color.attack}.slow`))
         .atLocation(token)
         .rotateTowards(targetSquare)
@@ -41,7 +41,7 @@ async function createMelee(token, target, config = {}) {
         .randomizeMirrorY()
         .zIndex(1)
 
-    .effect()
+        .effect()
         .delay(150)
         .file(closest(`jb2a.impact.007.${color.impact}`))
         .size(1.25 * token.document.width, { gridUnits: true })
@@ -50,7 +50,7 @@ async function createMelee(token, target, config = {}) {
         .playbackRate(0.9)
         .zIndex(0.1)
 
-    .effect()
+        .effect()
         .delay(150)
         .file(closest(`jb2a.liquid.splash_side02.${color.damage}`))
         .atLocation(targetSquare)
@@ -60,12 +60,12 @@ async function createMelee(token, target, config = {}) {
         .spriteRotation(180)
         .zIndex(0)
 
-    .effect()
+        .effect()
         .delay(150)
         .copySprite(target)
         .attachTo(target)
         .scaleToObject(1, { considerTokenScale: true })
-        .loopProperty("sprite", "position.x", { from: -0.05, to: 0.05, duration: 50, pingPong: true, gridUnits: true})
+        .loopProperty("sprite", "position.x", { from: -0.05, to: 0.05, duration: 50, pingPong: true, gridUnits: true })
         .opacity(0.25)
         .duration(1000)
         .fadeOut(750)
@@ -94,46 +94,46 @@ const DEFAULT_CONFIG_RANGED = {
 };
 
 function createRanged(token, target, config = {}) {
-    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG_RANGED, config, {inplace:false});
+    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG_RANGED, config, { inplace: false });
     const { id, color } = mConfig;
 
     let seq = new Sequence()
         .effect()
-            .file(closest(`eskie.slice.01_ranged.black.${color.attack}`))
-            .atLocation(token)
-            .stretchTo(target)
-            .spriteOffset({ x: token.document.width / 2 }, { gridUnits: true })
-            .zIndex(1)
+        .file(closest(`eskie.slice.01_ranged.black.${color.attack}`))
+        .atLocation(token)
+        .stretchTo(target)
+        .spriteOffset({ x: token.document.width / 2 }, { gridUnits: true })
+        .zIndex(1)
 
         .effect()
-            .delay(150)
-            .file(closest(`jb2a.impact.007.${color.impact}`))
-            .size(1.25 * token.document.width, { gridUnits: true })
-            .atLocation(target)
-            .randomRotation()
-            .playbackRate(0.9)
-            .zIndex(0.1)
+        .delay(150)
+        .file(closest(`jb2a.impact.007.${color.impact}`))
+        .size(1.25 * token.document.width, { gridUnits: true })
+        .atLocation(target)
+        .randomRotation()
+        .playbackRate(0.9)
+        .zIndex(0.1)
 
         .effect()
-            .delay(150)
-            .file(closest(`jb2a.liquid.splash_side02.${color.damage}`))
-            .atLocation(target)
-            .size(1.5 * token.document.width, { gridUnits: true })
-            .rotateTowards(token)
-            .spriteOffset({ x: -1.15 * token.document.width }, { gridUnits: true })
-            .spriteRotation(180)
-            .zIndex(0)
+        .delay(150)
+        .file(closest(`jb2a.liquid.splash_side02.${color.damage}`))
+        .atLocation(target)
+        .size(1.5 * token.document.width, { gridUnits: true })
+        .rotateTowards(token)
+        .spriteOffset({ x: -1.15 * token.document.width }, { gridUnits: true })
+        .spriteRotation(180)
+        .zIndex(0)
 
         .effect()
-            .delay(150)
-            .copySprite(target)
-            .attachTo(target)
-            .scaleToObject(1, { considerTokenScale: true })
-            .loopProperty("sprite", "position.x", { from: -0.05, to: 0.05, duration: 50, pingPong: true, gridUnits: true})
-            .opacity(0.25)
-            .duration(1000)
-            .fadeOut(750)
-            .tint("#FF0000");
+        .delay(150)
+        .copySprite(target)
+        .attachTo(target)
+        .scaleToObject(1, { considerTokenScale: true })
+        .loopProperty("sprite", "position.x", { from: -0.05, to: 0.05, duration: 50, pingPong: true, gridUnits: true })
+        .opacity(0.25)
+        .duration(1000)
+        .fadeOut(750)
+        .tint("#FF0000");
     return seq;
 }
 
@@ -155,7 +155,8 @@ const DEFAULT_CONFIG = {
 export const sneakAttack = {
     melee,
     ranged,
-}
+    default_config: DEFAULT_CONFIG,
+};
 
 autoanimations.register("Sneak Attack", "ranged-target", "eskie.effect.sneakAttack", DEFAULT_CONFIG);
 autoanimations.register("Sneak Attack", "melee-target", "eskie.effect.sneakAttack", DEFAULT_CONFIG);

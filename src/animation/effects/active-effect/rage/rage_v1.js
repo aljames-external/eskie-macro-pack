@@ -110,4 +110,5 @@ export const rageV1 = {
     play,
     stop,
     clean,
+    default_config: DEFAULT_CONFIG,
 };

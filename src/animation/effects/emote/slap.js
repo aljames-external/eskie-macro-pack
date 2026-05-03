@@ -6,6 +6,29 @@ import { closest } from "../../../lib/filemanager.js";
    Update Author: bakanabaka
 ** */
 
+const DEFAULT_CONFIG = {
+    id: 'slap',
+    duration: 5000,
+    effect: [
+        { // impact
+            img: 'eskie.sound.roar',
+            x: 0.1,
+            y: -0.1,
+            scale: 1.7
+        },
+        { // slap image
+            img: "https://i.imgur.com/9tLjNHH.png",
+            scale: 0.55,
+            rotation: -45
+        },
+        { // slap image shadow
+            img: "https://i.imgur.com/9tLjNHH.png",
+            scale: 0.55,
+            rotation: -45
+        }
+    ]
+};
+
 /**
  * Creates a slap emote effect at a specified location.
  *
@@ -23,30 +46,8 @@ import { closest } from "../../../lib/filemanager.js";
  * @returns {Promise<void>} A promise that resolves when the effect is finished.
  */
 async function create(location, config = {}) {
-    const defaultConfig = {
-        id: 'slap',
-        duration: 5000,
-        effect: [
-            { // impact
-                img: 'eskie.sound.roar',
-                x: 0.1,
-                y: -0.1,
-                scale: 1.7
-            },
-            { // slap image
-                img: "https://i.imgur.com/9tLjNHH.png",
-                scale: 0.55,
-                rotation: -45
-            },
-            { // slap image shadow
-                img: "https://i.imgur.com/9tLjNHH.png",
-                scale: 0.55,
-                rotation: -45
-            }
-        ]
-    };
     // TODO(bakanabaka): Utilizes old mergeObject
-    let { id, duration, effect } = foundry.utils.mergeObject(defaultConfig, config, {inplace:false});
+    let { id, duration, effect } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, {inplace:false});
 
     let slapEffect = new Sequence()
         .effect()
@@ -105,12 +106,14 @@ async function play(config = {}, crosshairOptions = undefined) {
     if (seq) { await seq.play(); }
 }
 
-async function stop({id = 'slap'} = {}) {
-    return Sequencer.EffectManager.endEffects({ name: id });
+async function stop(config = {}) {
+    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, {inplace:false});
+    return Sequencer.EffectManager.endEffects({ name: mConfig.id });
 }
 
 export const slap = {
     create,
     play,
     stop,
+    default_config: DEFAULT_CONFIG,
 };

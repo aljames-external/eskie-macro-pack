@@ -114,4 +114,5 @@ export const beam = {
     create,
     play,
     stop,
+    default_config: DEFAULT_CONFIG,
 };

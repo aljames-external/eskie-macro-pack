@@ -9,7 +9,7 @@ const DEFAULT_CONFIG = {
 };
 
 async function create(token, config = {}) {
-    const { id } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, {inplace:false});
+    const { id } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
     const label = `${id} - ${token.id}`;
 
     const sequence = new Sequence();
@@ -82,13 +82,11 @@ async function create(token, config = {}) {
 
 async function play(token, config = {}) {
     const sequence = await create(token, config);
-    if (sequence) {
-        sequence.play();
-    }
+    if (sequence) sequence.play();
 }
 
 function stop(token, config = {}) {
-    const { id } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, {inplace:false});
+    const { id } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
     const label = `${id} - ${token.id}`;
     Sequencer.EffectManager.endEffects({ name: label, object: token });
 }
@@ -97,6 +95,7 @@ export const fireShield = {
     create,
     play,
     stop,
+    default_config: DEFAULT_CONFIG,
 };
 
 autoanimations.register("Fire Shield", "effect", "eskie.effect.fireShield", DEFAULT_CONFIG);

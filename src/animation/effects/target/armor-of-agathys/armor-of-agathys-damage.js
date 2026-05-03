@@ -47,4 +47,5 @@ async function play(token, target, config = {}) {
 export const armorOfAgathysDamage = {
     create,
     play,
+    default_config: DEFAULT_CONFIG,
 };

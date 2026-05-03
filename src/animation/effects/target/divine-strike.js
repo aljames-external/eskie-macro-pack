@@ -223,9 +223,12 @@ export const divineStrike = {
     melee: {
         create: createMelee,
         play: playMelee,
+        default_config: DEFAULT_CONFIG,
     },
     ranged: {
         create: createRanged,
         play: playRanged,
-    }
+        default_config: DEFAULT_CONFIG,
+    },
+    default_config: DEFAULT_CONFIG,
 };

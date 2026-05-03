@@ -22,7 +22,7 @@ const DEFAULT_CONFIG = {
  */
 function create(token, config = {}) {
     config = settingsOverride(config);
-    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, {inplace:false});
+    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
     const { id, sound } = mConfig;
     const label = `${id} - ${token.id}`;
 
@@ -127,7 +127,6 @@ function _addTokenVisualEffects(token, label) {
         .filter("ColorMatrix", {hue:-65})
         .fadeOut(3500)
         .zIndex(1.5)
-
         .animation()
         .delay(200)
         .on(token)
@@ -142,8 +141,8 @@ function _addTokenVisualEffects(token, label) {
         .opacity(0.5)
         .filter("ColorMatrix", {hue:-65})
         .zIndex(1.1)
-        .animateProperty("spriteContainer", "position.y", { from: 0, to: -0.2, duration: 2000, delay:2000, gridUnits: true, ease: "easeInSine"})
-        .loopProperty("spriteContainer", "position.y", { from: 0, to: 0.05, duration: 2500, delay:4000, gridUnits: true, ease: "easeInOutQuad", pingPong: true})
+        .animateProperty("spriteContainer", "position.y", { from: 0, to: -0.2, duration: 2000, delay: 2000, gridUnits: true, ease: "easeInSine" })
+        .loopProperty("spriteContainer", "position.y", { from: 0, to: 0.05, duration: 2500, delay: 4000, gridUnits: true, ease: "easeInOutQuad", pingPong: true })
         .persist()
 
         .effect()
@@ -273,7 +272,7 @@ async function play(token, config = {}) {
 }
 
 async function preload(config) {
-    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, {inplace:false});
+    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
     const { sound } = mConfig;
 
     let files = [
@@ -301,7 +300,7 @@ async function preload(config) {
  * @param {string} config.id - A unique ID for the effect to manage persistence.
  */
 async function stop(token, config = {}) {
-    const { id } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, {inplace:false});
+    const { id } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
     const label = `${id} - ${token.id}`;
     let opacity = new Sequence().animation().on(token).opacity(1);
     return Promise.all([
@@ -314,7 +313,8 @@ async function stop(token, config = {}) {
 export const speakWithDead = {
     create,
     play,
-    stop
+    stop,
+    default_config: DEFAULT_CONFIG,
 };
 
 autoanimations.register("Speak with Dead", "effect", "eskie.effect.speakWithDead", DEFAULT_CONFIG);

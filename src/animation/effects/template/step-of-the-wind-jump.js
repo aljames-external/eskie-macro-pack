@@ -195,6 +195,7 @@ async function play(token, config = {}) {
 export const stepOfTheWindJump = {
     create,
     play,
+    default_config: DEFAULT_CONFIG,
 };
 
 autoanimations.register("Step of the Wind Jump", "template", "eskie.effect.stepOfTheWind.jump", DEFAULT_CONFIG);

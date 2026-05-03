@@ -3,6 +3,8 @@
 
 import { closest } from "../../../lib/filemanager.js";
 
+const DEFAULT_CONFIG = {};
+
 /**
  * Creates the Chain Lightning sequence effects.
  * @param {Token} token - The casting token.
@@ -11,6 +13,7 @@ import { closest } from "../../../lib/filemanager.js";
  * @returns {Sequence} The created Sequence object.
  */
 async function create(token, targetTokens, config = {}) {
+    config = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
     if (!targetTokens || targetTokens.length === 0) {
         console.warn("Chain Lightning: No targets provided.");
         return new Sequence();
@@ -104,5 +107,6 @@ async function play(token, targetTokens, config = {}) {
 export const chainLightning = {
     create,
     play,
+    default_config: DEFAULT_CONFIG,
     // No stop function needed as this is not a persistent effect
 };

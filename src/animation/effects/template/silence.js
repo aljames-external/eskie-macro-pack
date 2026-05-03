@@ -145,6 +145,7 @@ export const silence = {
     create: createSilence,
     play: playSilence,
     stop: stopSilence,
+    default_config: DEFAULT_CONFIG,
 };
 
 autoanimations.register("Silence", "template", "eskie.effect.silence", DEFAULT_CONFIG);

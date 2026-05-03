@@ -124,6 +124,7 @@ async function play(token, config) {
 export const colorSpray = {
     create,
     play,
-}
+    default_config: DEFAULT_CONFIG,
+};
 
 autoanimations.register('Color Spray', 'template', 'eskie.effect.colorSpray', DEFAULT_CONFIG, '1.0');

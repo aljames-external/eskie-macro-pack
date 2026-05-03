@@ -10,7 +10,7 @@ const DEFAULT_CONFIG = {
 };
 
 function createAura(token, config = {}, options = {}) {
-    const { id, opacity } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, {inplace:false});
+    const { id, opacity } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
     const label = `${id} - ${token.id}`;
 
     const sequence = new Sequence();
@@ -141,7 +141,7 @@ async function play(token, target, config = {}) {
 }
 
 async function stop(token, config = {}) {
-    const { id } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, {inplace:false});
+    const { id } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
     const label = `${id} - ${token.id}`;
     Sequencer.EffectManager.endEffects({ name: label, object: token });
 }
@@ -153,7 +153,9 @@ export const haloOfSpores = {
         create: createAura,
         play: playAura,
         stop,
-    }
+        default_config: DEFAULT_CONFIG,
+    },
+    default_config: DEFAULT_CONFIG,
 };
 
 autoanimations.register("Halo of Spores", "aura", "eskie.effect.haloOfSpores.aura", DEFAULT_CONFIG);

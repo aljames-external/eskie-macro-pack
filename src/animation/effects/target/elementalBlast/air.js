@@ -114,5 +114,6 @@ function stop(token, config = {}) {
 export const airBlast = {
     create,
     play,
-    stop
+    stop,
+    default_config: DEFAULT_CONFIG,
 };

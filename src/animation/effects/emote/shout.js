@@ -6,6 +6,21 @@ import { closest } from "../../../lib/filemanager.js";
    Update Author: bakanabaka
 ** */
 
+const DEFAULT_CONFIG = {
+    id: 'shout',
+    duration: 0,
+    facing: 'left',
+    effect: [
+        {
+            img: 'eskie.emote.shout.01',
+            x: 0.4,
+            y: -0.6,
+            scale: 0.9,
+            rotation: -15
+        }
+    ]
+};
+
 /**
  * Creates a shout emote effect on a token.
  *
@@ -25,23 +40,8 @@ import { closest } from "../../../lib/filemanager.js";
  * @returns {Promise<void>} A promise that resolves when the effect is finished.
  */
 async function create(token, config = {}) {
-    const defaultConfig = {
-        id: 'shout',
-        duration: 0,
-        facing: 'left',
-        effect: [
-            {
-                img: 'eskie.emote.shout.01',
-                x: 0.4,
-                y: -0.6,
-                scale: 0.9,
-                rotation: -15
-            }
-        ]
-    };
     // TODO(bakanabaka): Utilizes old mergeObject
-    let { id, duration, effect } = foundry.utils.mergeObject(defaultConfig, config, {inplace:false});
-    const facing = config.facing ?? defaultConfig.facing;
+    let { id, duration, effect, facing } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
 
     const tokenWidth = token.document.width;
     const mirrorFace = facing === 'right';
@@ -58,7 +58,7 @@ async function create(token, config = {}) {
         .loopProperty("sprite", "position.x", { from: 0, to: -0.025 * facingFactor, duration: 250, gridUnits: true, pingPong: false })
         .scaleToObject(effect[0].scale)
         .mirrorX(mirrorFace)
-        .attachTo(token, { bindAlpha: false } )
+        .attachTo(token, { bindAlpha: false })
 
         .waitUntilFinished(-200);
 
@@ -71,12 +71,14 @@ async function play(token, config = {}) {
     if (seq) { await seq.play(); }
 }
 
-async function stop(token, {id = 'shout'} = {}) {
-    return Sequencer.EffectManager.endEffects({ name: id, object: token });
+async function stop(token, config = {}) {
+    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
+    return Sequencer.EffectManager.endEffects({ name: mConfig.id, object: token });
 }
 
 export const shout = {
     create,
     play,
     stop,
+    default_config: DEFAULT_CONFIG,
 };

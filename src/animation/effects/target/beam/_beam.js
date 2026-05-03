@@ -1,4 +1,4 @@
-import { beam } from "./beam";
+import { beam } from "./beam.js";
 
 export const beams = {
     beam,

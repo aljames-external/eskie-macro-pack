@@ -144,5 +144,6 @@ function stop(token, config = {}) {
 export const metalBlast = {
     create,
     play,
-    stop
+    stop,
+    default_config: DEFAULT_CONFIG,
 };

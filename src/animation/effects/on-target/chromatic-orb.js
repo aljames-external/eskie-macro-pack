@@ -103,6 +103,7 @@ async function play(token, target, config = {}) {
 export const chromaticOrb = {
     create,
     play,
+    default_config: DEFAULT_CONFIG,
 };
 
 autoanimations.register("Chromatic Orb", "ranged-target", "eskie.effect.chromaticOrb", DEFAULT_CONFIG);

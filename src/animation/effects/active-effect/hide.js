@@ -10,7 +10,7 @@ const DEFAULT_CONFIG = {
 };
 
 async function create(token, config = {}) {
-    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, {inplace:false});
+    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
     const { id } = mConfig;
 
     let seq = new Sequence()
@@ -61,7 +61,7 @@ async function create(token, config = {}) {
 
 async function play(token, config = {}) {
     const seq = await create(token, config);
-    if (seq) { return seq.play(); }
+    if (seq) return seq.play();
 }
 
 async function stop(token, config = {}) {
@@ -79,6 +79,7 @@ export const hide = {
     create,
     play,
     stop,
+    default_config: DEFAULT_CONFIG,
 };
 
 autoanimations.register("Hide", "effect", "eskie.effect.hide", DEFAULT_CONFIG);

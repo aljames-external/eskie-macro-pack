@@ -77,6 +77,7 @@ async function play(token, target, config = {}) {
 export const divineSmite = {
     create,
     play,
+    default_config: DEFAULT_CONFIG,
 };
 
 autoanimations.register("Divine Smite", "melee-target", "eskie.effect.divineSmite", DEFAULT_CONFIG);

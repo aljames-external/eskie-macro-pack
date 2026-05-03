@@ -210,11 +210,14 @@ export const faerieFire = {
     template: {
         create: createCloud,
         play: playCloud,
+        default_config: DEFAULT_CONFIG,
     },
     effect: {
         create: createEffect,
         play: playEffect,
-    }
+        default_config: DEFAULT_CONFIG,
+    },
+    default_config: DEFAULT_CONFIG,
 };
 
 autoanimations.register("Faerie Fire", "template", "eskie.effect.faerieFire.template", DEFAULT_CONFIG);

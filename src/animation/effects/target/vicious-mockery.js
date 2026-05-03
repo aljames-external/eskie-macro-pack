@@ -221,9 +221,12 @@ export const viciousMockery = {
         create: createViciousMockeryCast,
         play: playViciousMockery, // The main play function for the spell
         stop: stopViciousMockery,
+        default_config: DEFAULT_CONFIG,
     },
     impact: {
         create: createViciousMockeryImpact,
+        default_config: DEFAULT_CONFIG,
         // play is integrated into playViciousMockery
     },
+    default_config: DEFAULT_CONFIG,
 };

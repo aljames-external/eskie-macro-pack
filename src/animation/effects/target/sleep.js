@@ -95,4 +95,5 @@ export const sleep = {
     create,
     play,
     stop,
+    default_config: DEFAULT_CONFIG,
 };

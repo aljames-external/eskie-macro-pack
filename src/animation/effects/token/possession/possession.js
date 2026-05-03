@@ -116,4 +116,5 @@ export const possession = {
     create,
     play,
     stop,
+    default_config: DEFAULT_CONFIG,
 };

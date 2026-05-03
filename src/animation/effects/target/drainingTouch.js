@@ -9,7 +9,7 @@ const DEFAULT_CONFIG = {
 };
 
 async function create(token, target, config = {}) {
-    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, {inplace:false});
+    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
     const { color, changeLight } = mConfig;
     let tintColor;
     let hue;
@@ -156,7 +156,7 @@ async function play(token, target, config = {}) {
     await Tagger.removeTags(token, "DrainingTouch");
 
     if (Tagger.hasTags(token, "Incorporeal")) {
-        const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, {inplace:false});
+        const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
         const { color, changeLight } = mConfig;
         let tintColor;
         if (color == "teal") { tintColor = '#6ff087' }
@@ -234,7 +234,7 @@ async function play(token, target, config = {}) {
 }
 
 async function stop(token, config = {}) {
-    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, {inplace:false});
+    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
     const { id } = mConfig;
     return Sequencer.EffectManager.endEffects({ name: id, object: token });
 }
@@ -242,5 +242,6 @@ async function stop(token, config = {}) {
 export const drainingTouch = {
     create,
     play,
-    stop
+    stop,
+    default_config: DEFAULT_CONFIG,
 };

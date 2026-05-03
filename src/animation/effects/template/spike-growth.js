@@ -178,6 +178,7 @@ export const spikeGrowth = {
     play: playSpikeGrowth,
     create: createSpikeGrowth,
     stop: stopSpikeGrowth,
+    default_config: DEFAULT_CONFIG,
 };
 
 autoanimations.register("Spike Growth", "template", "eskie.effect.spikeGrowth", DEFAULT_CONFIG);

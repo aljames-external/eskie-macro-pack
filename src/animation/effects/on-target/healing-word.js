@@ -145,6 +145,7 @@ export const healingWord = {
     create,
     play,
     stop,
+    default_config: DEFAULT_CONFIG,
 };
 
 autoanimations.register("Healing Word", "ranged-target", "eskie.effect.healingWord", DEFAULT_CONFIG);

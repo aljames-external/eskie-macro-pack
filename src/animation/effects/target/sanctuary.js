@@ -159,4 +159,5 @@ export const sanctuary = {
     create,
     play,
     stop,
+    default_config: DEFAULT_CONFIG,
 };

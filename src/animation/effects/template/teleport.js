@@ -42,6 +42,7 @@ export const teleport = {
     create,
     in: teleportIn,
     out: teleportOut,
+    default_config: DEFAULT_CONFIG,
 };
 
 autoanimations.register("Teleport", "template", "eskie.effect.teleport", DEFAULT_CONFIG);

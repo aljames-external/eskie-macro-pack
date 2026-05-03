@@ -121,4 +121,5 @@ export const shockingGrasp = {
     create: createShockingGrasp,
     play: playShockingGrasp,
     stop: stopShockingGrasp,
+    default_config: DEFAULT_CONFIG,
 };

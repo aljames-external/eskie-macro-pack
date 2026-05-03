@@ -134,7 +134,7 @@ async function createEnlarge(token, config = {}) {
  */
 async function playEnlarge(token, config = {}) {
     const sequence = await createEnlarge(token, config);
-    if (sequence) { return sequence.play(); }
+    if (sequence) return sequence.play();
 }
 
 /**
@@ -258,7 +258,7 @@ async function createReduce(token, config = {}) {
  */
 async function playReduce(token, config = {}) {
     const sequence = await createReduce(token, config);
-    if (sequence) { return sequence.play(); }
+    if (sequence) return sequence.play();
 }
 
 export const enlargeReduce = {
@@ -266,12 +266,15 @@ export const enlargeReduce = {
         create: createEnlarge,
         play: playEnlarge,
         stop: playReduce,
+        default_config: DEFAULT_CONFIG,
     },
     reduce: {
         create: createReduce,
         play: playReduce,
         stop: playEnlarge,
+        default_config: DEFAULT_CONFIG,
     },
+    default_config: DEFAULT_CONFIG,
 };
 
 autoanimations.register("Enlarged", "effect", "eskie.effect.enlargeReduce.enlarge", DEFAULT_CONFIG);

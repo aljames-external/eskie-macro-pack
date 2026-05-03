@@ -31,6 +31,14 @@ When asked to update scripts in the `new-submissions` folder or to convert Disco
 *   **Variable Renaming:** Rename global variables like `targets` to `targetTokens` to fit the modular function signature.
 *   **Image Path Conversion:** Convert any `.file("path/to/image.webp")` calls to `.file(img("path/to/image.webp"))`. Make sure to import `img` from `../../lib/filemanager.js` (adjusting the relative path as necessary).
 *   **Effect Comments:** Add descriptive comments explaining the visual or functional purpose of each effect or sequence chunk.
+*   **Standard Configuration Pattern:**
+    *   Every animation MUST have a global `const DEFAULT_CONFIG` object defined at the top level of the file.
+    *   If a legacy script has a local `default_config` (inside `create` or `play`), you MUST move it to the global namespace as `DEFAULT_CONFIG`.
+    *   This `DEFAULT_CONFIG` MUST be exported as `default_config` in the root export object of every animation module.
+    *   **Exclusion**: Index or collection files (typically named `_*.js` or `index.js`) that only group and re-export other animations do NOT need to define or export a `default_config` of their own.
+    *   If the export object contains nested API objects (e.g., `cast`, `target`), ensure `default_config` is present in those as well if they utilize it.
+    *   Inside `create`, `play`, and `stop`, use `foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false })` for safe configuration management.
+    *   Example: `const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });`
 *   **Helper Functions:** Extract complex sequences of effects into smaller, logically grouped helper functions (e.g., `_castSpellEffects(sequence, token)`).
 
 ## API Updates

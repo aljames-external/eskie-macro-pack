@@ -290,13 +290,16 @@ export const banishment = {
         play: playBanish,
         stop: playReturn,
         clean: clean,
+        default_config: DEFAULT_CONFIG,
     },
     return: {
         create: createReturn,
         play: playReturn,
+        default_config: DEFAULT_CONFIG,
     },
     play: playBanish,
     stop: playReturn,
+    default_config: DEFAULT_CONFIG,
 };
 
 autoanimations.register("Banishment", "effect", "eskie.effect.banishment", DEFAULT_CONFIG, '0.1.0');

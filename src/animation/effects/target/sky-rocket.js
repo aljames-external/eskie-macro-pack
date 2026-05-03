@@ -58,4 +58,5 @@ async function play(position, config = {}) {
 export const skyRocket = {
     create,
     play,
+    default_config: DEFAULT_CONFIG,
 };

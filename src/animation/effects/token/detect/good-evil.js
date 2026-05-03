@@ -40,4 +40,5 @@ async function play(token, config = {}) {
 export const goodevil = {
     create,
     play,
+    default_config: DEFAULT_CONFIG,
 };

@@ -165,4 +165,5 @@ export const cloudOfSand = {
     create,
     play,
     stop,
+    default_config: DEFAULT_CONFIG,
 };

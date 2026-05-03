@@ -119,5 +119,6 @@ export const electric = {
     create,
     play,
     stop,
-    clean
+    clean,
+    default_config: DEFAULT_CONFIG,
 };

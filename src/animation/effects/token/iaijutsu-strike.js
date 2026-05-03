@@ -197,5 +197,6 @@ async function clean(target, config = {}) {
 export const iaijutsuStrike = {
     create,
     play,
-    clean
+    clean,
+    default_config: DEFAULT_CONFIG,
 };

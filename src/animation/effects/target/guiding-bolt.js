@@ -10,6 +10,7 @@ const DEFAULT_CONFIG = {
 async function create(token, target, config = {}) {
     const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, {inplace:false});
     const { id } = mConfig;
+    const sequence = new Sequence();
 
     sequence.effect()
         .atLocation(token)
@@ -125,4 +126,5 @@ export const guidingBolt = {
     create,
     play,
     stop,
+    default_config: DEFAULT_CONFIG,
 };

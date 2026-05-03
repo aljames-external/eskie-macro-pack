@@ -109,4 +109,5 @@ export const wingsV2 = {
     create: createWingsV2,
     play: playWingsV2,
     stop: stopWingsV2,
+    default_config: DEFAULT_CONFIG,
 };

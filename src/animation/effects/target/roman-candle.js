@@ -105,4 +105,5 @@ async function play(token, config = {}) {
 export const romanCandle = {
     create,
     play,
+    default_config: DEFAULT_CONFIG,
 };

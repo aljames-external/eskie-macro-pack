@@ -115,5 +115,6 @@ function stop(token, config = {}) {
 export const earthBlast = {
     create,
     play,
-    stop
+    stop,
+    default_config: DEFAULT_CONFIG,
 };

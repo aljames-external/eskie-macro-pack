@@ -117,9 +117,10 @@ async function play(token, target, config = {}) {
     if (seq) { return seq.play(); }
 }
 
-export const rapidStrike = { 
+export const rapidStrike = {
     create,
     play,
+    default_config: DEFAULT_CONFIG,
 };
 
 autoanimations.register("Rapid Strike", "melee-target", "eskie.effect.rapidStrike", DEFAULT_CONFIG);

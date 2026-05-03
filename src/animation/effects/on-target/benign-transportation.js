@@ -98,6 +98,7 @@ async function play(token, targets, config = {}) {
 export const benignTransportation = {
     create,
     play,
+    default_config: DEFAULT_CONFIG,
 };
 
 autoanimations.register("Benign Transportation", "ranged-target", "eskie.effect.benignTransportation", DEFAULT_CONFIG);

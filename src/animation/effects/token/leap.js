@@ -126,4 +126,5 @@ export const leap = {
     create: createLeap,
     play: playLeap,
     stop: stopLeap,
+    default_config: DEFAULT_CONFIG,
 };
