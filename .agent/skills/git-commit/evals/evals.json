@@ -1,0 +1,23 @@
+{
+  "skill_name": "git-commit",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "I've finished adding the 'Fireball' animation in src/animation/effects/on-target/fireball.js. Please commit it.",
+      "expected_output": "Commit message starting with 'feat: '",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "Fixed a typo in the style guide in .agent/skills/style-guide/SKILL.md. Commit this change.",
+      "expected_output": "Commit message starting with 'cleanup: '",
+      "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "I've updated the git-commit skill instructions and applied it to some files. Commit everything.",
+      "expected_output": "Commit message starting with 'skill: '",
+      "files": []
+    }
+  ]
+}
