@@ -1,0 +1,23 @@
+{
+    "EMP": {
+        "settings": {
+            "enableSounds": {
+                "name": "Ativar Sons de Macros",
+                "hint": "Se desativado, as macros não poderão reproduzir sons."
+            },
+            "autorecUpdate": {
+                "name": "Atualizar Auto-Reconhecimento do Automated Animation",
+                "label": "Atualizar AutoRec do AA",
+                "hint": "Força uma atualização do Auto-Reconhecimento do Automated Animations."
+            }
+        },
+        "updateMenu": {
+            "added": "Os seguintes novos efeitos serão adicionados às configurações de Auto-Reconhecimento do Automated Animations.",
+            "custom": "Os seguintes efeitos não serão adicionados por já existirem a partir de outra fonte.",
+            "customHint": "Esses efeitos serão ignorados. Para que o Eskie Macro Pack possa gerenciá-los, remova-os do Automated Animations e envie novamente.",
+            "updated": "Os seguintes efeitos serão atualizados a partir de uma versão anterior do Eskie Macro Pack.",
+            "warning": "Isso substituirá quaisquer animações existentes do Eskie Macro Pack com o mesmo nome. Não afetará nenhuma outra animação.",
+            "nothing": "Todas as animações do Eskie Macro Pack já estão atualizadas!"
+        }
+    }
+}
