@@ -30,12 +30,13 @@ function create(token, target, config = {}) {
 
     function attackAnimation(token, target, config) {
         const seq = new Sequence();
+        if (sound.enabled) {
             seq.sound()
                 .file(closest(`psfx.impacts.${type}`))
-                .volume(sound.volume)
-                .playIf(sound.enabled);
+                .volume(sound.volume);
+        }
 
-            seq.effect()
+        seq.effect()
                 .file(closest(`eskie.attack.melee.generic.01.${type}.${weight}.${color}.slow`))
                 .atLocation(token)
                 .rotateTowards(targetSquare,{randomOffset:0.25})

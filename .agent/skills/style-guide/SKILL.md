@@ -51,6 +51,22 @@ When writing or modifying code in the `eskie-macro-pack` repository, adhere stri
 *   **Hooks:** Use `Hooks.once` or `Hooks.on` for all Foundry VTT lifecycle events.
 *   **Settings and Localization:** Use `game.settings.register` and `game.i18n.localize` for module settings and text definitions.
 
+## Sequencer Specifics
+
+*   **Optional Asset Libraries:** Optional asset libraries (like `psfx` or similar config parameters) that use `closest()` MUST be protected inside an `if` statement rather than using `.playIf(...)`. If `closest()` is called on an asset that doesn't exist, it throws an error immediately, breaking the script before the `playIf` check even occurs.
+    ```javascript
+    // Incorrect: closest() throws if asset is missing, before playIf evaluates
+    sequence.sound()
+        .file(closest(sound.file))
+        .playIf(sound.enabled);
+
+    // Correct: closest() is never evaluated if sound is disabled
+    if (sound.enabled) {
+        sequence.sound()
+            .file(closest(sound.file));
+    }
+    ```
+
 ## Automated Linting
 
 *   **Linter Script:** Before finalizing your code changes, you MUST run the provided linter script on any JavaScript files you modified to automatically check for tabs and logging prefix violations.

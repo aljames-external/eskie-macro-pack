@@ -106,10 +106,11 @@ async function create(token, config = {}) {
         .zIndex(11)
 
         // Weapon Shot
-        seq.sound()
-            .file(closest(sound.file))
-            .volume(sound.volume)
-            .playIf(sound.enabled);
+        if (sound.enabled) {
+            seq.sound()
+                .file(closest(sound.file))
+                .volume(sound.volume);
+        }
 
         seq.effect()
         .delay(225)

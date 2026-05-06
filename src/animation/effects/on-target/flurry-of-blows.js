@@ -19,12 +19,13 @@ async function create(token, target, config = {}) {
     const { color, sound } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, {inplace:false});
     let seq = new Sequence();
 
-    seq = seq.sound()
-        .file(closest(`psfx.impacts.bludgeoning`))
-        .volume(sound.volume)
-        .delay(125)
-        .repeats(7,250,250)
-        .playIf(sound.enabled);
+    if (sound.enabled) {
+        seq = seq.sound()
+            .file(closest(`psfx.impacts.bludgeoning`))
+            .volume(sound.volume)
+            .delay(125)
+            .repeats(7,250,250);
+    }
     seq = seq.effect()
         .delay(125)
         .file(closest(`jb2a.melee_generic.creature_attack.fist.001.${color}`))
@@ -36,12 +37,13 @@ async function create(token, target, config = {}) {
         .repeats(7,250,250)
         .zIndex(1);
 
-    seq = seq.sound()
-        .file(closest(`psfx.impacts.bludgeoning`))
-        .volume(sound.volume)
-        .delay(250)
-        .repeats(7,250,250)
-        .playIf(sound.enabled);
+    if (sound.enabled) {
+        seq = seq.sound()
+            .file(closest(`psfx.impacts.bludgeoning`))
+            .volume(sound.volume)
+            .delay(250)
+            .repeats(7,250,250);
+    }
     seq = seq.effect()
         .delay(250)
         .file(closest(`jb2a.melee_generic.creature_attack.fist.001.${color}`))
