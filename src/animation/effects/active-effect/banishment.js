@@ -26,24 +26,25 @@ async function createBanish(target, config = {}) {
         merge: { x: 0, y: -75 },
         runes: [
             { offset: { x: -45, y: -61 }, rotation: 3 * 360 / 5 },
-            { offset: { x: 0,   y:  75 }, rotation: 5 * 360 / 5 },
-            { offset: { x: 45,  y: -61 }, rotation: 2 * 360 / 5 },
-            { offset: { x: -70, y:  22 }, rotation: 4 * 360 / 5 },
-            { offset: { x: 70,  y:  22 }, rotation: 1 * 360 / 5 },
+            { offset: { x: 0, y: 75 }, rotation: 5 * 360 / 5 },
+            { offset: { x: 45, y: -61 }, rotation: 2 * 360 / 5 },
+            { offset: { x: -70, y: 22 }, rotation: 4 * 360 / 5 },
+            { offset: { x: 70, y: 22 }, rotation: 1 * 360 / 5 },
         ]
     }
 
     const sequence = new Sequence();
-    sequence.sound()
-        .file(closest('psfx.magic-signs.circle.v1.abjuration.complete'))
-        .volume(sound.volume)
-        .playIf(sound.enabled);
+    if (sound.enabled) {
+        sequence.sound()
+            .file(closest('psfx.magic-signs.circle.v1.abjuration.complete'))
+            .volume(sound.volume)
+    }
     sequence.effect()
         .file(closest(`jb2a.magic_signs.circle.02.conjuration.intro.${color}`))
         .atLocation(target)
         .scaleToObject(2)
         .belowTokens();
-    
+
     sequence.wait(3000);
     sequence.effect()
         .file(closest(`jb2a.magic_signs.circle.02.conjuration.loop.${color}`))
@@ -56,16 +57,15 @@ async function createBanish(target, config = {}) {
     sequence.wait(3750);
     let runeDelay = 0;
     let animationDelay = 4000;
-    const runeSoundFile = closest('psfx.casting.generic.001');
-    const runeImageFile = closest(`jb2a.magic_signs.rune.conjuration.complete.${color}`);
     for (const rune of RUNE_DATA.runes) {
-        sequence.sound()
-            .file(runeSoundFile)
-            .volume(sound.volume)
-            .delay(runeDelay + 750)
-            .playIf(sound.enabled);
+        if (sound.enabled) {
+            sequence.sound()
+                .file(closest('psfx.casting.generic.001'))
+                .volume(sound.volume)
+                .delay(runeDelay + 750)
+        }
         sequence.effect()
-            .file(runeImageFile)
+            .file(closest(`jb2a.magic_signs.rune.conjuration.complete.${color}`))
             .atLocation(target, { offset: rune.offset })
             .scaleToObject(0.5)
             .delay(runeDelay)
@@ -79,12 +79,13 @@ async function createBanish(target, config = {}) {
         runeDelay += RUNE_DATA.animDuration;
         animationDelay -= RUNE_DATA.animDuration;
     }
-    
+
     sequence.wait(3000);
-    sequence.sound()
-        .file(closest('psfx.2nd-level-spells.moonbeam.intro'))
-        .volume(sound.volume)
-        .playIf(sound.enabled);
+    if (sound.enabled) {
+        sequence.sound()
+            .file(closest('psfx.2nd-level-spells.moonbeam.intro'))
+            .volume(sound.volume)
+    }
 
     sequence.wait(1500);
     sequence.effect()
@@ -232,10 +233,11 @@ async function createReturn(target, config = {}) {
     const { color, sound } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
 
     const sequence = new Sequence();
-    sequence.sound()
-        .file(closest('psfx.2nd-level-spells.moonbeam.intro'))
-        .volume(sound.volume)
-        .playIf(sound.enabled);
+    if (sound.enabled) {
+        sequence.sound()
+            .file(closest('psfx.2nd-level-spells.moonbeam.intro'))
+            .volume(sound.volume)
+    }
     sequence.effect()
         .file(closest(`jb2a.explosion.01.${color}`))
         .atLocation(target, { offset: { x: 5, y: -75 } })

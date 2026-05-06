@@ -38,15 +38,15 @@ async function create(token, config = {}) {
 
     const sequence = new Sequence();
 
-    sequence.sound()
-        .file(closest(`psfx.3rd-level-spells.call-lightning.v1.secondary`))
-        .volume(sound.volume)
-        .playIf(sound.enabled);
-    sequence.sound()
-        .file(closest(`psfx.3rd-level-spells.call-lightning.v1.primary`))
-        .volume(sound.volume)
-        .delay(500)
-        .playIf(sound.enabled);
+    if (sound.enabled) {
+        sequence.sound()
+            .file(closest(`psfx.3rd-level-spells.call-lightning.v1.secondary`))
+            .volume(sound.volume);
+        sequence.sound()
+            .file(closest(`psfx.3rd-level-spells.call-lightning.v1.primary`))
+            .volume(sound.volume)
+            .delay(500);
+    }
 
     if (canvas.scene.background.src && tintMap){
         sequence.effect()

@@ -26,10 +26,11 @@ function create(token, config = {}) {
     const { id, sound } = mConfig;
     const label = `${id} - ${token.id}`;
 
-    let sequence = new Sequence()
-        // Initiate sound at start
-        .sound().name(label).volume(sound.volume).file(closest(sound.file)).playIf(sound.enabled)
-
+    let sequence = new Sequence();
+    if (sound.enabled) {
+        sequence.sound().name(label).volume(sound.volume).file(closest(sound.file));
+    }
+    sequence
         // Animation effects
         .addSequence(_addMagicCircleEffects(token, label))
         .wait(500)
