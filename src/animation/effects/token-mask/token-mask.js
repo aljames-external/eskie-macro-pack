@@ -144,15 +144,8 @@ async function create(token, config = {}) {
     seq = seq.waitUntilFinished()
 
         .thenDo(async () => {
-            if (deleteToken) {
-                await token.document.delete();
-            } else {
-                await Promise.all([
-                    socket.tile.destroy(tokenRevealMask.id),
-                    socket.tile.destroy(tokenShapeMask.id),
-                    socket.tile.destroy(sceneRevealMask.id),
-                ]);
-            }
+            await socket.tile.destroy([tokenRevealMask.id, tokenShapeMask.id, sceneRevealMask.id]);
+            if (deleteToken) await token.document.delete();
             await Sequencer.EffectManager.endEffects({ name: label });
         });
 
