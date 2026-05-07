@@ -12,7 +12,8 @@ const DEFAULT_CONFIG = {
     tokenOverlay: undefined,    // Internal use only - these functions generally not called by the end user
     revealOverlay: undefined,   // Internal use only - these functions generally not called by the end user
     rotation: 0,
-    tint: 'none'
+    tint: 'none',
+    callback: {} // Optional callback functions for customisation
 }
 
 async function createTiles(token, config = {}) {
@@ -67,26 +68,33 @@ async function createTiles(token, config = {}) {
 }
 
 async function create(token, config = {}) {
-    dependency.required([{ id: 'token-attacher', ref: "Token Attacher" },
-    { id: 'monks-active-tiles', ref: "Monk's Active Tile Triggers" }]);
+    dependency.required([
+        { id: 'token-attacher', ref: "Token Attacher" },
+        { id: 'monks-active-tiles', ref: "Monk's Active Tile Triggers" }
+    ]);
 
-    const { id, deleteToken, revealOverlay, tokenOverlay, rotation, tint } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
-    if (!tokenOverlay || !revealOverlay) return console.warn(`EMP | tokenMaskEffect: Missing required configuration 'tokenOverlay' or 'revealOverlay'. Effect aborted.`);
+    const { id, deleteToken, revealOverlay, tokenOverlay, rotation, tint, callback } =
+        foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
+
+    if (!tokenOverlay || !revealOverlay)
+        return console.warn(`EMP | tokenMaskEffect: Missing required configuration.`);
 
     const label = `${id} - ${token.id}`;
     const tiles = await createTiles(token, { revealOverlay, rotation });
     const [tokenRevealMask, sceneRevealMask, tokenShapeMask] = tiles;
     const paddingXY = token.document.texture.scaleX;
 
-    //Attach tiles to token
+    // Attach tiles to token
     await tokenAttacher.attachElementsToToken([tokenRevealMask, sceneRevealMask, tokenShapeMask], token, true);
 
     let seq = new Sequence();
+
+    // Background mask
     if (canvas.scene.background.src) {
         seq = seq.effect()
             .name(label)
             .file(canvas.scene.background.src)
-            .atLocation({ x: (canvas.dimensions.width) / 2, y: (canvas.dimensions.height) / 2 })
+            .atLocation({ x: canvas.dimensions.width / 2, y: canvas.dimensions.height / 2 })
             .size({ width: canvas.scene.width / canvas.grid.size, height: canvas.scene.height / canvas.grid.size }, { gridUnits: true })
             .persist()
             .belowTokens()
@@ -94,6 +102,7 @@ async function create(token, config = {}) {
             .spriteOffset({ x: -canvas.scene.background.offsetX, y: -canvas.scene.background.offsetY })
     }
 
+    // Token clone
     seq = seq.animation()
         .delay(250)
         .on(token)
@@ -115,10 +124,10 @@ async function create(token, config = {}) {
 
         .thenDo(async () => {
             return Promise.all([
-                sceneRevealMask.update({ alpha: 1, }),
+                sceneRevealMask.update({ alpha: 1 }),
                 tokenRevealMask.update({
                     alpha: 1,
-                    video: { autoplay: true, }
+                    video: { autoplay: true }
                 })
             ]);
         })
@@ -129,8 +138,10 @@ async function create(token, config = {}) {
         .mask(tokenShapeMask)
         .rotate(-rotation)
         .scaleToObject(paddingXY)
-        .zIndex(1)
-        .waitUntilFinished()
+        .zIndex(1);
+    // Additional customization of the token overlay
+    if (callback.tokenOverlay) seq = callback.tokenOverlay(seq)
+    seq = seq.waitUntilFinished()
 
         .thenDo(async () => {
             if (deleteToken) {
@@ -168,4 +179,4 @@ export const tokenMaskEffect = {
     play,
     stop,
     default_config: DEFAULT_CONFIG,
-}
+};
