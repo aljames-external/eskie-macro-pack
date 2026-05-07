@@ -1,26 +1,111 @@
 import { shatterMask } from '../token-mask/shatter-mask.js';
+import { settingsOverride } from "../../../lib/settings.js";
+import { closest } from "../../../lib/filemanager.js";
 
 const DEFAULT_CONFIG = {
     id: 'swordArtOnlineShatter',
-    tintColor: '#00FFFF',
-    duration: 1000,
+    tintColor: '#00BFFF',
+    duration: 600,
     shatterColor: 'blue',
-    deleteToken: false
+    deleteToken: false,
+    sound: {
+        enabled: false,
+        volume: 0.3,
+        file: "SAO/sfx/saoexplo.mp3",   // Replace this with a file in some asset library (PSFX, etc)
+    }
 };
 
 async function create(source, config = {}) {
-    const { id, tintColor, duration, shatterColor, deleteToken } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
+    config = settingsOverride(config);
+    const { id, tintColor, duration, shatterColor, deleteToken, sound } =
+        foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
 
-    let sequence = new Sequence()
+    let sequence = new Sequence();
+    if (sound.enabled) {
+        sequence = sequence.sound()
+            .file(sound.file)
+            .volume(sound.volume)
+            .fadeInAudio(50)
+            .fadeOutAudio(500);
+    }
+
+    sequence = sequence
+        // 🔵 Aura AVANT shatter
+        .effect()
+        .file(closest("jaamod.spells_effects.antilife_shell"))
+        .attachTo(source)
+        .scaleToObject(1.1)
+        .opacity(0.15)
+        .filter("ColorMatrix", {
+            hue: 510,
+            saturate: 1.2,
+            brightness: 15
+        })
+        .fadeIn(duration)
+        .belowTokens(true)
+        .name(`${id}-${source.id}`)
+        .persist()
+
+        // 🎨 Tint token
         .animation()
         .on(source)
         .tint(tintColor)
         .fadeIn(duration)
         .duration(duration)
+
         .waitUntilFinished()
+
+        // 💥 SHATTER + PARTICULES
         .thenDo(async () => {
-            const shatterSeq = await shatterMask.create(source, { color: shatterColor, tint: tintColor, deleteToken });
-            if (shatterSeq) return shatterSeq.play();
+            // 💥 particules synchronisées
+            let particleSeq = new Sequence()
+                .effect()
+                .file(closest("eskie.particle.05.blue"))
+                .delay(950)
+                .atLocation(source.center)        // 🔥 important
+                .size({
+                    width: source.document.width * 2.5,
+                    height: source.document.height * 2.5
+                }, { gridUnits: true })
+                .playbackRate(0.5)
+                .filter("Glow", {
+                    distance: 1,      // Number, distance of the glow in pixels
+                    outerStrength: 2,  // Number, strength of the glow outward from the edge of the sprite
+                    innerStrength: 0,  // Number, strength of the glow inward from the edge of the sprite
+                    color: 0x1FFFA3,   // Hexadecimal, color of the glow
+                    quality: 0.1,      // Number, describes the quality of the glow (0 to 1) - the higher the number the less performant
+                    knockout: false    // Boolean, toggle to hide the contents and only show glow (effectively hides the sprite)
+                })
+                .belowTokens(true);
+
+            // Token Overlay colorMatrix for shatter mask
+            function colorMatrix(seq) {
+                return seq.tint('#03e8fc')
+                    .filter("ColorMatrix", { brightness: 1.5 })
+                    .filter("Glow", {
+                        distance: 8,
+                        outerStrength: 4,
+                        innerStrength: 0,
+                        color: 0x1FFFA3,
+                        quality: 0.1,
+                        knockout: false
+                    });
+            }
+            // Shatter Mask sequence
+            const shatterSeq = await shatterMask.create(source, {
+                color: shatterColor,
+                tint: tintColor,
+                deleteToken,
+                callback: {
+                    tokenOverlay: colorMatrix
+                },
+                overlay: {
+                    token: "eskie.texture_mask.tile_base.shatter.center.01",
+                    reveal: "eskie.texture_mask.tile_base.shatter.center.01",
+                }
+            });
+
+            if (particleSeq && shatterSeq) return particleSeq.addSequence(shatterSeq).play();
         });
 
     return sequence;
@@ -32,7 +117,10 @@ async function play(source, config = {}) {
 }
 
 async function stop(source, config = {}) {
-    const { shatterColor, deleteToken } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
+    const { shatterColor, deleteToken } =
+        foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
+
+    Sequencer.EffectManager.endEffects({ name: `${id}-${source.id}` });
     return shatterMask.stop(source, { color: shatterColor, deleteToken });
 }
 
