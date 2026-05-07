@@ -19,6 +19,7 @@ async function create(source, config = {}) {
     config = settingsOverride(config);
     const { id, tintColor, duration, shatterColor, deleteToken, sound } =
         foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
+    const label = `${id}-${source.id}`;
 
     let sequence = new Sequence();
     if (sound.enabled) {
@@ -43,7 +44,7 @@ async function create(source, config = {}) {
         })
         .fadeIn(duration)
         .belowTokens(true)
-        .name(`${id}-${source.id}`)
+        .name(label)
         .persist()
 
         // 🎨 Tint token
@@ -93,6 +94,7 @@ async function create(source, config = {}) {
             }
             // Shatter Mask sequence
             const shatterSeq = await shatterMask.create(source, {
+                id,
                 color: shatterColor,
                 tint: tintColor,
                 deleteToken,
@@ -117,11 +119,14 @@ async function play(source, config = {}) {
 }
 
 async function stop(source, config = {}) {
-    const { shatterColor, deleteToken } =
+    const { id, shatterColor, deleteToken } =
         foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
+    const label = `${id}-${source.id}`;
 
-    Sequencer.EffectManager.endEffects({ name: `${id}-${source.id}` });
-    return shatterMask.stop(source, { color: shatterColor, deleteToken });
+    return Promise.all([
+        Sequencer.EffectManager.endEffects({ name: label }),
+        shatterMask.stop(source, { id, color: shatterColor, deleteToken })
+    ]);
 }
 
 export const swordArtOnlineDeath = {
