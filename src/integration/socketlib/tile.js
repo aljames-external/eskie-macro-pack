@@ -23,23 +23,22 @@ async function createTile(updates = {}) {
         height: 1
     };
     updates = foundry.utils.mergeObject(DEFAULT_TILE_UPDATES, updates, { inplace: false });
-    
     return canvas.scene.createEmbeddedDocuments("Tile", [updates]);
 }
 
 /**
- * Deletes a tile document. To be registered in socketlib.
- * @param {string} id - The ID of the tile to delete.
- * @returns {Promise<TileDocument[]>} An array containing the deleted tile document.
+ * Deletes multiple tile documents. To be registered in socketlib.
+ * @param {string[]} ids - An array of IDs of the tiles to delete.
+ * @returns {Promise<TileDocument[]>} An array containing the deleted tile documents.
  */
-async function destroyTile(id) {
-    return canvas.scene.deleteEmbeddedDocuments("Tile", [id]);
+async function destroyTiles(ids) {
+    return canvas.scene.deleteEmbeddedDocuments("Tile", ids);
 }
 
 export const tileSockets = {
     editTile,
     createTile,
-    destroyTile,
+    destroyTiles,
 };
 
 /**
@@ -78,19 +77,20 @@ async function create(updates = {}) {
 }
 
 /**
- * Deletes a tile, executing as GM if the user is not a GM.
- * @param {string} id - The ID of the tile to delete.
+ * Deletes tiles, executing as GM if the user is not a GM.
+ * @param {string|string[]} id - The ID of the tile to delete, or an array of IDs.
  * @returns {Promise<TileDocument[]>} An array containing the deleted tile document.
  */
 async function destroy(id) {
-    if (game.user.isGM) return destroyTile(id);
+    const ids = Array.isArray(id) ? id : [id];
+    if (game.user.isGM) return destroyTiles(ids);
     const socket = game.modules.get(MODULE_ID).socketlib;
     if (!initialized(socket)) return;
-    return socket.executeAsGM("destroyTile", id);
+    return socket.executeAsGM("destroyTiles", ids);
 }
 
 export const tile = {
     edit,
     create,
-    destroy,
+    destroy
 }
