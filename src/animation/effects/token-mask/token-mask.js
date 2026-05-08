@@ -143,10 +143,15 @@ async function create(token, config = {}) {
     if (callback.tokenOverlay) seq = callback.tokenOverlay(seq)
     seq = seq.waitUntilFinished()
 
-        .thenDo(async () => {
-            await socket.tile.destroy([tokenRevealMask.id, tokenShapeMask.id, sceneRevealMask.id]);
-            if (deleteToken) await token.document.delete();
+        .thenDo(async () => { // Reveal Shape Scene seems to work
+            await socket.tile.destroy([tokenShapeMask.id]);
+            await Promise.all([
+                socket.tile.edit(tokenRevealMask.id, { alpha: 0 }),
+                socket.tile.edit(sceneRevealMask.id, { alpha: 0 })
+            ]);
             await Sequencer.EffectManager.endEffects({ name: label });
+            await socket.tile.destroy([tokenRevealMask.id, sceneRevealMask.id]);
+            if (deleteToken) await token.document.delete();
         });
 
     return seq;
