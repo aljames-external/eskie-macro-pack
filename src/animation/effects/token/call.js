@@ -39,23 +39,6 @@ async function create(token, config = {}) {
     const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
     const { id } = mConfig;
 
-    if (Tagger.hasTags(token, CALL_TAG)) {
-        // Toggle off: remove tag, end effects, restore token opacity
-        await Tagger.removeTags(token, CALL_TAG);
-        await Sequencer.EffectManager.endEffects({ name: EFFECT_NAME, object: token });
-        await Sequencer.EffectManager.endEffects({ name: EFFECT_NAME_TEXT, object: token });
-
-        const seq = new Sequence();
-        seq.animation()
-            .on(token)
-            .opacity(1)
-            .tint();
-        return seq;
-    }
-
-    // Toggle on: add tag and play persistent effects
-    await Tagger.addTags(token, CALL_TAG);
-
     const seq = new Sequence();
 
     // Phone icon badge attached to the top-right corner of the token
