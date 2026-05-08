@@ -21,6 +21,7 @@ When asked to update scripts in the `new-submissions` folder or to convert Disco
 
 *   **Modular Structure:** Encapsulate the animation logic within an `export async function create(...)` function. This function MUST return a `Sequence` object.
 *   **Root Exports:** The final module MUST export an object containing `create`, `play`, and `stop` at its root level. The `create` method is absolutely mandatory because the Automated Animations system directly calls `animation.create(token, config)`!
+*   **Toggle Logic (Tagger):** Do NOT use `Tagger` to manage toggling features on/off inside the module's `create` function. The `create` function should solely generate the Sequence to turn the effect on. Use the `stop` function to end the effect.
 *   **Parameter Handling:**
     *   **Token & Active Effects:** Pass the casting token as `source`. Pass target tokens as an array `targetTokens` or as a singular `target`. Pass configurations as `config`. Signature: `(source, targetTokens, config = {})`
     *   **Template Effects:** Template effects only receive two arguments: `(source, config = {})`. Target tokens MUST be extracted via `config.targets?.length ? config.targets : Array.from(game.user.targets)`.
