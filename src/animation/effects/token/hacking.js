@@ -18,22 +18,6 @@ async function create(token, config = {}) {
     const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
     const { id } = mConfig;
 
-    if (Tagger.hasTags(token, HACK_TAG)) {
-        // Toggle off: remove tag, end effects, restore token opacity
-        await Tagger.removeTags(token, HACK_TAG);
-        await Sequencer.EffectManager.endEffects({ name: EFFECT_NAME, object: token });
-
-        const seq = new Sequence();
-        seq.animation()
-            .on(token)
-            .opacity(1)
-            .tint();
-        return seq;
-    }
-
-    // Toggle on: add tag and play persistent effects
-    await Tagger.addTags(token, HACK_TAG);
-
     const seq = new Sequence();
 
     // Left eye red glow (adjust offset to match token's eye position)
