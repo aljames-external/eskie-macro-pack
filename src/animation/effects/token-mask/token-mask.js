@@ -145,6 +145,7 @@ async function create(token, config = {}) {
 
         .thenDo(async () => { // Reveal Shape Scene seems to work
             await socket.tile.destroy([tokenShapeMask.id]);
+            await time.wait(1000)   // Lag safety buffer
             await Promise.all([
                 socket.tile.edit(tokenRevealMask.id, { alpha: 0 }),
                 socket.tile.edit(sceneRevealMask.id, { alpha: 0 })
