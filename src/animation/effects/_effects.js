@@ -1,3 +1,4 @@
+import { aerodyneVehicle } from "./token/aerodyne-vehicle.js";
 import { animateDead } from "./target/animate-dead.js";
 import { armorOfAgathys } from "./target/armor-of-agathys/_armor-of-agathys.js";
 import { armsOfHadar } from "./template/arms-of-hadar.js";
@@ -52,6 +53,7 @@ import { healingWord } from "./on-target/healing-word.js";
 import { hex } from "./on-target/hex/_hex.js";
 import { hide } from "./active-effect/hide.js";
 import { hitTheDirt } from "./template/hit-the-dirt.js";
+import { hologram } from "./token/hologram.js";
 import { iaijutsuStrike } from "./token/iaijutsu-strike.js";
 import { incorporeal } from "./token/incorporeal/incorporeal.js";
 import { leap } from "./token/leap.js";
@@ -110,6 +112,8 @@ export const effect = {
     call,
     callLightning,
     chainLightning,
+    hologram,
+    aerodyneVehicle,
     channelDivinityControlUndead,
     channelDivinityDreadAspect,
     channelElement,
