@@ -7,6 +7,7 @@ import { blastLock } from "./template/blast-lock.js";
 import { bless } from "./active-effect/bless.js";
 import { blurredVision } from "./active-effect/blurred-vision.js";
 import { burnMask } from "./token-mask/burn-mask.js";
+import { call } from "./token/call.js";
 import { callLightning } from "./token/call-lightning.js";
 import { chainLightning } from "./token/chain-lightning.js";
 import { channelDivinityControlUndead } from "./target/channelDivinityControlUndead.js";
@@ -45,6 +46,7 @@ import { gate } from "./template/gate.js";
 import { grapple } from "./on-target/grapple.js";
 import { grease } from "./template/grease.js";
 import { guidingBolt } from "./target/guiding-bolt.js";
+import { hacking } from "./token/hacking.js";
 import { haloOfSpores } from "./aura/halo-of-spores.js";
 import { healingWord } from "./on-target/healing-word.js";
 import { hex } from "./on-target/hex/_hex.js";
@@ -105,6 +107,7 @@ export const effect = {
     blastLock,
     bless,
     blurredVision,
+    call,
     callLightning,
     chainLightning,
     channelDivinityControlUndead,
@@ -143,6 +146,7 @@ export const effect = {
     grapple,
     grease,
     guidingBolt,
+    hacking,
     haloOfSpores,
     healingWord,
     hex,
