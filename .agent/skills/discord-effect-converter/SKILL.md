@@ -30,7 +30,7 @@ When asked to update scripts in the `new-submissions` folder or to convert Disco
 *   **File Relocation:** Move the newly converted file from its input folder (e.g., `new-submissions`) to `src/animation/effects/`.
 *   **Module Integration:** Update `src/animation/effects/_effects.js` to import and export the new modular animation.
 *   **Variable Renaming:** Rename global variables like `targets` to `targetTokens` to fit the modular function signature.
-*   **Image Path Conversion:** Convert any `.file("path/to/image.webp")` calls to `.file(img("path/to/image.webp"))`. Make sure to import `img` from `../../lib/filemanager.js` (adjusting the relative path as necessary).
+*   **Image Path Conversion:** You MUST wrap EVERY argument passed to `.file(...)` with the `closest(...)` function, regardless of whether it is an image, video, http link, or Sequencer database path. For example, `.file('https://i.imgur.com/image.png')` MUST become `.file(closest('https://i.imgur.com/image.png'))`. Make sure to import `closest` from `../../../lib/filemanager.js` (adjusting the relative path as necessary).
 *   **Effect Comments:** Add descriptive comments explaining the visual or functional purpose of each effect or sequence chunk.
 *   **Standard Configuration Pattern:**
     *   Every animation MUST have a global `const DEFAULT_CONFIG` object defined at the top level of the file.

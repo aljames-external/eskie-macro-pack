@@ -1,6 +1,8 @@
 // Original Author: EskieMoh#2969
 // Modular Conversion: bakanabaka
 
+import { closest } from '../../../lib/filemanager.js';
+
 const HACK_TAG = 'Hacking';
 const EFFECT_NAME = 'Hack';
 
@@ -22,7 +24,7 @@ async function create(token, config = {}) {
 
     // Left eye red glow (adjust offset to match token's eye position)
     seq.effect()
-        .file('jb2a.twinkling_stars.points04.orange')
+        .file(closest('jb2a.twinkling_stars.points04.orange'))
         .name(EFFECT_NAME)
         .atLocation(token, { offset: { x: -0.2, y: -0.16 }, gridUnits: true, local: true })
         .size({ width: 0.4, height: 0.1 }, { gridUnits: true })
@@ -37,7 +39,7 @@ async function create(token, config = {}) {
 
     // Right eye red glow (adjust offset to match token's eye position)
     seq.effect()
-        .file('jb2a.twinkling_stars.points04.orange')
+        .file(closest('jb2a.twinkling_stars.points04.orange'))
         .name(EFFECT_NAME)
         .atLocation(token, { offset: { x: 0.12, y: -0.225 }, gridUnits: true, local: true })
         .size({ width: 0.4, height: 0.1 }, { gridUnits: true })
@@ -52,7 +54,7 @@ async function create(token, config = {}) {
 
     // Main hacker terminal/laptop icon attached to the lower-left of the token
     seq.effect()
-        .file('https://i.imgur.com/xLJ9SPY.png')
+        .file(closest('https://i.imgur.com/xLJ9SPY.png'))
         .name(EFFECT_NAME)
         .atLocation(token)
         .scaleIn({ x: 0.75, y: 0 }, 50)
@@ -65,7 +67,7 @@ async function create(token, config = {}) {
 
     // Scrolling code lines on the terminal screen (vertical scroll)
     seq.effect()
-        .file('https://i.imgur.com/oOqrAsc.png')
+        .file(closest('https://i.imgur.com/oOqrAsc.png'))
         .name(EFFECT_NAME)
         .atLocation(token)
         .attachTo(token, { align: 'center', edge: 'outer', bindVisibility: false, offset: { x: -0.39, y: 0.24 }, gridUnits: true, followRotation: false })
@@ -77,7 +79,7 @@ async function create(token, config = {}) {
 
     // Rotated scrolling code lines (horizontal strip scrolled 90°)
     seq.effect()
-        .file('https://i.imgur.com/oOqrAsc.png')
+        .file(closest('https://i.imgur.com/oOqrAsc.png'))
         .name(EFFECT_NAME)
         .atLocation(token)
         .attachTo(token, { align: 'center', edge: 'outer', bindVisibility: false, offset: { x: -0.54, y: 0.385 }, gridUnits: true, followRotation: false })
@@ -99,7 +101,7 @@ async function create(token, config = {}) {
 
                 // Primary floating UI panel - randomized position with mirror
                 .effect()
-                .file(`https://i.imgur.com/${ui1}.png`)
+                .file(closest(`https://i.imgur.com/${ui1}.png`))
                 .name(EFFECT_NAME)
                 .scaleIn({ x: 0.75, y: 0 }, 50)
                 .scaleOut({ x: 0.75, y: 0 }, 50)
@@ -112,7 +114,7 @@ async function create(token, config = {}) {
 
                 // Secondary floating UI panel - offset to the left of the token
                 .effect()
-                .file(`https://i.imgur.com/${ui2}.png`)
+                .file(closest(`https://i.imgur.com/${ui2}.png`))
                 .delay(200)
                 .name(EFFECT_NAME)
                 .scaleIn({ x: 0.75, y: 0 }, 50)
