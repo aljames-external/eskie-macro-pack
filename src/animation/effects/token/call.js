@@ -1,6 +1,8 @@
 // Original Author: EskieMoh#2969
 // Modular Conversion: bakanabaka
 
+import { closest } from '../../../lib/filemanager.js';
+
 const CALL_TAG = 'Calling';
 const EFFECT_NAME = 'Call';
 const EFFECT_NAME_TEXT = 'CallText';
@@ -43,7 +45,7 @@ async function create(token, config = {}) {
 
     // Phone icon badge attached to the top-right corner of the token
     seq.effect()
-        .file('https://i.imgur.com/Vif3lSd.png')
+        .file(closest('https://i.imgur.com/Vif3lSd.png'))
         .name(EFFECT_NAME)
         .atLocation(token)
         .scaleIn({ x: 0.75, y: 0 }, 50)
@@ -56,7 +58,7 @@ async function create(token, config = {}) {
 
     // JB2A red token stage ring behind the icon
     seq.effect()
-        .file('jb2a.token_stage.round.red.01.05')
+        .file(closest('jb2a.token_stage.round.red.01.05'))
         .name(EFFECT_NAME)
         .atLocation(token)
         .attachTo(token, { align: 'top-right', edge: 'outer', bindVisibility: false, offset: { x: -0.2, y: 0.2 }, gridUnits: true, followRotation: false })
@@ -78,7 +80,7 @@ async function create(token, config = {}) {
 
     // Left eye glow sparkle effect
     seq.effect()
-        .file('jb2a.twinkling_stars.points04.orange')
+        .file(closest('jb2a.twinkling_stars.points04.orange'))
         .name(EFFECT_NAME)
         .atLocation(token, { offset: { x: -0.2, y: -0.16 }, gridUnits: true, local: true })
         .size({ width: 0.4, height: 0.1 }, { gridUnits: true })
@@ -92,7 +94,7 @@ async function create(token, config = {}) {
 
     // Right eye glow sparkle effect
     seq.effect()
-        .file('jb2a.twinkling_stars.points04.orange')
+        .file(closest('jb2a.twinkling_stars.points04.orange'))
         .name(EFFECT_NAME)
         .atLocation(token, { offset: { x: 0.12, y: -0.225 }, gridUnits: true, local: true })
         .size({ width: 0.4, height: 0.1 }, { gridUnits: true })

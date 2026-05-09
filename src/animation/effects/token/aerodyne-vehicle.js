@@ -1,6 +1,8 @@
 // Original Author: EskieMoh#2969
 // Modular Conversion: bakanabaka
 
+import { closest } from '../../../lib/filemanager.js';
+
 const FLYING_TAG = 'Flying';
 const EFFECT_NAME = 'Fly';
 
@@ -18,7 +20,7 @@ async function create(token, config = {}) {
 
     const seq = new Sequence()
         .effect()
-        .file('modules/animated-spell-effects-cartoon/spell-effects/cartoon/air/air_portal_CIRCLE_01.webm')
+        .file(closest('animated-spell-effects-cartoon.air.portal'))
         .atLocation(token)
         .randomRotation()
         .scale(1.2)
@@ -61,7 +63,7 @@ async function create(token, config = {}) {
 
         // Thrusters, adjust thruster offset to match the token image
         .effect()
-        .file('jb2a.dancing_light.blueteal')
+        .file(closest('jb2a.dancing_light.blueteal'))
         .scaleToObject(0.25)
         .name(EFFECT_NAME)
         .atLocation(token, { offset: { x: 1.2, y: 1.2 }, gridUnits: true, local: true })
@@ -75,7 +77,7 @@ async function create(token, config = {}) {
         .zIndex(0)
 
         .effect()
-        .file('jb2a.dancing_light.blueteal')
+        .file(closest('jb2a.dancing_light.blueteal'))
         .scaleToObject(0.25)
         .name(EFFECT_NAME)
         .atLocation(token, { offset: { x: -1.2, y: 1.2 }, gridUnits: true, local: true })
@@ -89,7 +91,7 @@ async function create(token, config = {}) {
         .zIndex(0)
 
         .effect()
-        .file('jb2a.dancing_light.blueteal')
+        .file(closest('jb2a.dancing_light.blueteal'))
         .scaleToObject(0.25)
         .name(EFFECT_NAME)
         .atLocation(token, { offset: { x: 1.2, y: -1.2 }, gridUnits: true, local: true })
@@ -103,7 +105,7 @@ async function create(token, config = {}) {
         .zIndex(0)
 
         .effect()
-        .file('jb2a.dancing_light.blueteal')
+        .file(closest('jb2a.dancing_light.blueteal'))
         .scaleToObject(0.25)
         .name(EFFECT_NAME)
         .atLocation(token, { offset: { x: -1.2, y: -1.2 }, gridUnits: true, local: true })
@@ -133,7 +135,7 @@ async function stop(token, config = {}) {
         .opacity(1)
 
         .effect()
-        .file('modules/animated-spell-effects-cartoon/spell-effects/cartoon/air/air_portal_CIRCLE_01.webm')
+        .file(closest('animated-spell-effects-cartoon.air.portal'))
         .atLocation(token)
         .randomRotation()
         .scale(1.2)

@@ -1,6 +1,8 @@
 // Original Author: EskieMoh#2969
 // Modular Conversion: bakanabaka
 
+import { closest } from '../../../lib/filemanager.js';
+
 const HOLOGRAM_TAG = 'Hologram';
 const EFFECT_NAME = 'Holo';
 
@@ -33,7 +35,7 @@ async function create(token, config = {}) {
 
         .effect()
         .name(EFFECT_NAME)
-        .file('https://i.imgur.com/DBMEF5B.png')
+        .file(closest('https://i.imgur.com/DBMEF5B.png'))
         .atLocation(token)
         .attachTo(token, { followRotation: false, bindVisibility: false })
         .scaleToObject()
