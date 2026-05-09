@@ -150,6 +150,7 @@ async function create(token, config = {}) {
 }
 
 async function play(token, config = {}) {
+    await Tagger.setTags(token, CALL_TAG);
     const seq = await create(token, config);
     if (seq) return seq.play();
 }
