@@ -72,6 +72,7 @@ import { revivify } from "./target/revivify.js";
 import { romanCandle } from "./target/roman-candle.js";
 import { sandevistan } from "./active-effect/sandevistan.js";
 import { sanctuary } from "./target/sanctuary.js";
+import { shapechange } from "./active-effect/shapechange.js";
 import { shatterMask } from "./token-mask/shatter-mask.js";
 import { shockingGrasp } from "./target/shocking-grasp.js";
 import { shuffle } from "./multi-token/shuffle.js";
@@ -174,6 +175,7 @@ export const effect = {
     romanCandle,
     sandevistan,
     sanctuary,
+    shapechange,
     shockingGrasp,
     shuffle,
     silence,
