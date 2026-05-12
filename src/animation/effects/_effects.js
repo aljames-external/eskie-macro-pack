@@ -9,6 +9,7 @@ import { bless } from "./active-effect/bless.js";
 import { blurredVision } from "./active-effect/blurred-vision.js";
 import { burnMask } from "./token-mask/burn-mask.js";
 import { call } from "./token/call.js";
+import { curseOfTheWerewolf } from "./token/curse-of-the-werewolf.js";
 import { callLightning } from "./token/call-lightning.js";
 import { chainLightning } from "./token/chain-lightning.js";
 import { channelDivinityControlUndead } from "./target/channelDivinityControlUndead.js";
@@ -112,6 +113,7 @@ export const effect = {
     blurredVision,
     call,
     callLightning,
+    curseOfTheWerewolf,
     chainLightning,
     hologram,
     aerodyneVehicle,
