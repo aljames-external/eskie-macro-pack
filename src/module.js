@@ -1,6 +1,7 @@
 import { animation } from './animation/_animation.js';
 import { autoanimations } from './integration/autoanimations.js';
 import { socketlibapi } from './integration/socketlib.js';
+import { dialog } from './lib/dialog.js';
 import { file } from './lib/filemanager.js';
 import { time } from './lib/time.js';
 import { tokens as token } from './lib/tokens.js';
@@ -24,6 +25,7 @@ Hooks.once('init', async () => {
         }
 
         const util = {
+                        dialog,
                         file,
                         time,
                         token,
