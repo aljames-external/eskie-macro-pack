@@ -50,6 +50,7 @@ import { grease } from "./template/grease.js";
 import { guidingBolt } from "./target/guiding-bolt.js";
 import { hacking } from "./token/hacking.js";
 import { haloOfSpores } from "./aura/halo-of-spores.js";
+import { hookAndPull } from "./token/hook-and-pull.js";
 import { healingWord } from "./on-target/healing-word.js";
 import { hex } from "./on-target/hex/_hex.js";
 import { hide } from "./active-effect/hide.js";
@@ -159,6 +160,7 @@ export const effect = {
     hex,
     hide,
     hitTheDirt,
+    hookAndPull,
     iaijutsuStrike,
     incorporeal,
     leap,

@@ -23,13 +23,16 @@ When asked to update scripts in the `new-submissions` folder or to convert Disco
 *   **Root Exports:** The final module MUST export an object containing `create`, `play`, and `stop` at its root level. The `create` method is absolutely mandatory because the Automated Animations system directly calls `animation.create(token, config)`!
 *   **Toggle Logic (Tagger):** Do NOT use `Tagger` to manage toggling features on/off inside the module's `create` function. The `create` function should solely generate the Sequence to turn the effect on. Use the `stop` function to end the effect.
 *   **Parameter Handling:**
-    *   **Token & Active Effects:** Pass the casting token as `source`. Pass target tokens as an array `targetTokens` or as a singular `target`. Pass configurations as `config`. Signature: `(source, targetTokens, config = {})`
+    *   **Token & Active Effects:** Pass the casting token as `source`. 
+        *   If the animation only affects a single target, pass it as `target`. Signature: `(source, target, config = {})`.
+        *   If the animation affects multiple targets, pass them as an array `targetTokens`. Signature: `(source, targetTokens, config = {})`.
+        *   Pass configurations as `config`.
     *   **Template Effects:** Template effects only receive two arguments: `(source, config = {})`. Target tokens MUST be extracted via `config.targets?.length ? config.targets : Array.from(game.user.targets)`.
 *   **Template Positioning:** If `config.template` exists, you MUST prioritize extracting the position from it (e.g., `config.template._object?.ray?.B`) instead of spawning a `Sequencer.Crosshair`. Refer to `template_template.js`.
 *   **Multi-Target Timing:** When iterating over multiple targets with a delay (e.g., waiting 2 seconds before striking each), do NOT chain `.wait()` sequentially on the main sequence. You MUST create a new isolated Sequence for each target (`let targetSeq = new Sequence().wait(1000)`) and add it to the main sequence using `sequence.addSequence(targetSeq)`. This prevents cumulative, compounding delays.
 *   **File Relocation:** Move the newly converted file from its input folder (e.g., `new-submissions`) to `src/animation/effects/`.
 *   **Module Integration:** Update `src/animation/effects/_effects.js` to import and export the new modular animation.
-*   **Variable Renaming:** Rename global variables like `targets` to `targetTokens` to fit the modular function signature.
+*   **Variable Renaming:** Rename global variables like `targets` to `target` (for single-target) or `targetTokens` (for multi-target) to fit the modular function signature.
 *   **Image Path Conversion:** You MUST wrap EVERY argument passed to `.file(...)` with the `closest(...)` function, regardless of whether it is an image, video, http link, or Sequencer database path. For example, `.file('https://i.imgur.com/image.png')` MUST become `.file(closest('https://i.imgur.com/image.png'))`. Make sure to import `closest` from `../../../lib/filemanager.js` (adjusting the relative path as necessary).
 *   **Effect Comments:** Add descriptive comments explaining the visual or functional purpose of each effect or sequence chunk.
 *   **Standard Configuration Pattern:**
