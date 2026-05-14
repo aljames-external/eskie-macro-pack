@@ -17,6 +17,7 @@ Join the Discord channel! Learn Sequencer and share your own creations!
 * Gornetron
 * Doomrule
 * Mia Del'Mori
+* yamiakane
 
 ## Features
 

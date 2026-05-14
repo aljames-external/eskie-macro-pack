@@ -44,6 +44,17 @@ When asked to update scripts in the `new-submissions` folder or to convert Disco
     *   Inside `create`, `play`, and `stop`, use `foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false })` for safe configuration management.
     *   Example: `const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });`
 *   **Helper Functions:** Extract complex sequences of effects into smaller, logically grouped helper functions (e.g., `_castSpellEffects(sequence, token)`).
+*   **Sound Configuration Pattern:**
+    *   If an animation includes sound effects, you MUST include a `sound` object in the `DEFAULT_CONFIG`:
+        ```javascript
+        sound: {
+            enabled: true,
+            volume: 0.5,
+        }
+        ```
+    *   All `.sound()` calls MUST be wrapped in an `if (sound.enabled)` block.
+    *   The `.volume()` of every sound effect MUST be multiplied by `sound.volume` (e.g., `.volume(sound.volume)` or `.volume(sound.volume * 0.8)` if it needs a relative adjustment).
+    *   You MUST import `{ settingsOverride }` from `'../../../lib/settings.js'` (adjusting the relative path as necessary) and call `config = settingsOverride(config);` at the very beginning of the `create` (and `play`, if it merges config) function to ensure global sound settings are respected.
 
 ## API Updates
 
@@ -65,3 +76,4 @@ Ensure the script uses the latest Foundry VTT API patterns:
 
 *   **Original Author:** Include a comment at the top of the file crediting the original author of the animation.
 *   **Updater:** Add a comment at the top of the file crediting `bakanabaka` as the author of the modular conversion.
+*   **README Credits:** Check if the original author is already listed in the `README.md` under "Animation Contributors". If they are a new contributor, you MUST add their name to the list in alphabetical order (if possible, or at the bottom if not).
