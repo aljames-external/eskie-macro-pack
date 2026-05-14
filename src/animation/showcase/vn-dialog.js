@@ -11,7 +11,7 @@ import { text as textUtil } from '../utils/text.js';
 const DEFAULT_CONFIG = {
     duration: 10000,
     side: 'left',
-    text: 'poo poo pee pee ass, me mad!',
+    text: undefined,
     style: {
         fill: 'white',
         fontFamily: 'Arial Black',
@@ -38,7 +38,10 @@ async function create(token, config = {}) {
         emote
     } = mConfig;
 
-    if (portrait === undefined) portrait = token.actor.img;
+    if (token === undefined && portrait === undefined) {
+        ui.notifications.error("Please provide either a token or a portrait to this animation.");
+        return;
+    } else if (portrait === undefined) portrait = token.actor.img;
 
     const sequence = new Sequence();
 
@@ -79,16 +82,18 @@ async function create(token, config = {}) {
     }
 
     // --- Typing Text ---
-    textUtil.typing.create(sequence, text, {
-        duration,
-        delay: 500,
-        charSpacing,
-        lineSpacing,
-        anchor: textAnchor,
-        style,
-        letterShift: 5 * charSpacing,
-        screenSpace: true
-    });
+    if (text) {
+        textUtil.typing.create(sequence, text, {
+            duration,
+            delay: 500,
+            charSpacing,
+            lineSpacing,
+            anchor: textAnchor,
+            style,
+            letterShift: 5 * charSpacing,
+            screenSpace: true
+        });
+    }
 
     return sequence;
 }
