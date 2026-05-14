@@ -11,13 +11,13 @@ Join the Discord channel! Learn Sequencer and share your own creations!
 
 ## Animation Contributors
 
-* Eskiemoh / eskie
-* Bakana
-* DerKriegs
-* Gornetron
-* Doomrule
-* Mia Del'Mori
-* yamiakane
+* Eskiemoh / eskie (@.eskie)
+* Bakana (@bakanabaka)
+* DerKriegs (@derkriegs)
+* Gornetron (@nefin)
+* Doomrule (@doomrule)
+* Mia Del'Mori (@.tranquilite)
+* Akane (@yamiakane)
 
 ## Features
 
