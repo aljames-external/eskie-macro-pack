@@ -6,6 +6,7 @@
 
 import { closest } from '../../lib/filemanager.js';
 import { settingsOverride } from '../../lib/settings.js';
+import { text as textUtil } from '../utils/text.js';
 
 const DEFAULT_CONFIG = {
     duration: 10000,
@@ -18,6 +19,7 @@ const DEFAULT_CONFIG = {
         strokeThickness: 10
     },
     charSpacing: 50,
+    lineSpacing: 120,
     portrait: undefined,
     emote: 'eskie.emote.angry.02',
 };
@@ -31,6 +33,7 @@ async function create(token, config = {}) {
         text,
         style,
         charSpacing,
+        lineSpacing,
         portrait,
         emote
     } = mConfig;
@@ -76,27 +79,16 @@ async function create(token, config = {}) {
     }
 
     // --- Typing Text ---
-    if (text) {
-        const typeDuration = duration / 10;
-        const letterDelay = typeDuration / text.length;
-        const totalWidth = text.length * charSpacing;
-        const startX = -(totalWidth / 2);
-
-        for (let i = 0; i < text.length; i++) {
-            sequence.effect()
-                .delay(500 + i * letterDelay)
-                .screenSpace()
-                .screenSpaceScale({ x: 1.0, y: 1.0 })
-                .screenSpaceAnchor(textAnchor)
-                .screenSpacePosition({
-                    x: startX + (i * charSpacing),
-                    y: 0
-                })
-                .text(text[i], style)
-                .zIndex(1)
-                .duration(duration - (i * letterDelay));
-        }
-    }
+    textUtil.typing.create(sequence, text, {
+        duration,
+        delay: 500,
+        charSpacing,
+        lineSpacing,
+        anchor: textAnchor,
+        style,
+        letterShift: 5 * charSpacing,
+        screenSpace: true
+    });
 
     return sequence;
 }
