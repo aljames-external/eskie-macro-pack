@@ -30,7 +30,7 @@ async function create(source, target, config = {}) {
     const dx = target.center.x - source.center.x;
     const dy = target.center.y - source.center.y;
     const dist = Math.hypot(dx, dy);
-    
+
     if (dist === 0) return sequence;
 
     const nx = dx / dist;
@@ -286,8 +286,7 @@ async function play(source, target, config = {}) {
 }
 
 function stop(target, config = {}) {
-    // This animation is one-shot, but we provide stop for consistency
-    Sequencer.EffectManager.endEffects({ object: target });
+    // This animation is one-shot
 }
 
 export const fireBlast = {
