@@ -63,6 +63,7 @@ import { leap } from "./token/leap.js";
 import { levitation } from "./active-effect/levitation.js";
 import { lightningBolt } from "./template/lightning-bolt.js";
 import { magicMissile } from "./on-target/magic-missile.js";
+import { meteorStrike } from "./template/meteor-strike.js";
 import { mirrorImage } from "./active-effect/mirror-image.js";
 import { mistyStep } from "./token/misty-step.js";
 import { petrified } from "./active-effect/petrified.js";
@@ -169,6 +170,7 @@ export const effect = {
     levitation,
     lightningBolt,
     magicMissile,
+    meteorStrike,
     mirrorImage,
     mistyStep,
     petrified,
