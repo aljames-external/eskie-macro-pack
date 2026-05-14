@@ -2,6 +2,7 @@
 // Modular Conversion: bakanabaka
 
 import { closest } from '../../../lib/filemanager.js';
+import { utils } from '../../utils/_utils.js';
 
 const DEFAULT_CONFIG = {
     missed: false,
@@ -23,17 +24,8 @@ async function create(token, target, config = {}) {
     const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
     const { missed, timingAdjust, effect } = mConfig;
 
-    // Determine pull location (closest square to the target that is adjacent to the token)
-    const dx = target.center.x - token.center.x;
-    const dy = target.center.y - token.center.y;
-
-    const stepX = Math.sign(dx);
-    const stepY = Math.sign(dy);
-
-    const location = {
-        x: token.center.x + (stepX * canvas.grid.size),
-        y: token.center.y + (stepY * canvas.grid.size)
-    };
+    // Determine pull location (best adjacent square to the token along the line to the target)
+    const location = utils.grid.getBestAdjacentLocation(token, target);
 
     // Determine travel distance
     const offsetX = (location.x - target.center.x) / canvas.grid.size;
