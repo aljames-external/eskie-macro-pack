@@ -30,7 +30,7 @@ import { drainingTouch } from "./target/drainingTouch.js";
 import { dreadLord } from "./token/dreadLord.js";
 import { dreadLordAttack } from "./target/dreadLordAttack.js";
 import { dreadLordFear } from "./target/dreadLordFear.js";
-import { drunk } from "./active-effect/drunk.js"
+import { drunk } from "./active-effect/drunk.js";
 import { elementalBlast } from "./target/elementalBlast/_elementalBlast.js";
 import { emote } from "./emote/_emotes.js";
 import { enlargeReduce } from "./active-effect/enlarge-reduce.js";
@@ -39,6 +39,7 @@ import { faerieFire } from "./template/faerie-fire.js";
 import { farStep } from "./token/far-step.js";
 import { fightingSpirit } from "./active-effect/fighting-spirit.js";
 import { fingerOfDeath } from "./target/fingerOfDeath.js";
+import { fireBlast } from "./target/fire-blast.js";
 import { firecracker } from "./template/firecracker.js";
 import { fireShield } from "./active-effect/fire-shield.js";
 import { flurryOfBlows } from "./on-target/flurry-of-blows.js";
@@ -145,6 +146,7 @@ export const effect = {
     farStep,
     fightingSpirit,
     fingerOfDeath,
+    fireBlast,
     firecracker,
     fireShield,
     flurryOfBlows,
