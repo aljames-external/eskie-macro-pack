@@ -17,6 +17,24 @@ async function create(tile, targets, config = {}) {
     config = settingsOverride(config);
     const { reveal, smokeSize, fallenScale } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
 
+    // Target all tokens currently standing on the trap tile, falling back to triggering targets
+    const tileX = tile.document?.x ?? tile.x;
+    const tileY = tile.document?.y ?? tile.y;
+    const tileWidth = tile.document?.width ?? tile.width;
+    const tileHeight = tile.document?.height ?? tile.height;
+
+    const minX = tileX;
+    const maxX = tileX + tileWidth;
+    const minY = tileY;
+    const maxY = tileY + tileHeight;
+
+    const tokensOnTile = canvas.tokens.placeables.filter(t => {
+        const center = t.center;
+        return center.x >= minX && center.x <= maxX && center.y >= minY && center.y <= maxY;
+    });
+
+    const finalTargets = tokensOnTile.length ? tokensOnTile : targets;
+
     let seq = new Sequence()
         // Dust puff when trap opens
         .effect()
@@ -34,8 +52,8 @@ async function create(tile, targets, config = {}) {
             .opacity(1);
     }
 
-    if (targets.length > 0) {
-        targets.forEach(target => {
+    if (finalTargets.length > 0) {
+        finalTargets.forEach(target => {
             const targetName = target.name || target.document?.name || 'Token';
             const targetWidth = target.document?.width ?? target.width ?? 1;
             const targetHeight = target.document?.height ?? target.height ?? 1;
