@@ -31,3 +31,17 @@
 .emp-animations-muted {
     color: #777 !important;
 }
+
+/* Vertical layout for dialog buttons */
+.emp-vertical-dialog footer,
+.emp-vertical-dialog .window-buttons,
+.emp-vertical-dialog .dialog-buttons {
+    flex-direction: column !important;
+    align-items: stretch !important;
+}
+
+.emp-vertical-dialog button {
+    display: block !important;
+    width: 100% !important;
+    margin: 4px 0 !important;
+}

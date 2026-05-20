@@ -35,6 +35,7 @@ export const traps = {
             title: 'Trap Setup: Choose Trap',
             buttons: buttons,
         }, {
+            classes: ['emp-vertical-dialog'],
             content: '<p>Choose a trap to configure and set up on the canvas.</p>'
         });
 
