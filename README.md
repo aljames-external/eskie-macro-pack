@@ -8,6 +8,7 @@ A collection of community-generated macros utilizing both free and premium asset
 * [Eskie Youtube Channel](https://www.youtube.com/channel/UCnES1fzHV-xSu58rEL7NcDg)
 
 Join the Discord channel! Learn Sequencer and share your own creations!
+
 ---
 
 ## Want to Contribute?
@@ -37,6 +38,8 @@ Downloading Visual Studio Code and/or an agentic IDE such as Google's Antigravit
 * Mia Del'Mori (@.tranquilite)
 * Akane (@yamiakane)
 
+---
+
 ## Features
 
 * A wide variety of animations!
@@ -44,8 +47,6 @@ Downloading Visual Studio Code and/or an agentic IDE such as Google's Antigravit
 * User-facing API for macro support!
 * Highly customizable variants!
 * Automated tile-based trap system!
-
----
 
 ## Requirements
 
