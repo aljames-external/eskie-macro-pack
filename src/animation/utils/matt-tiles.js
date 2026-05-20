@@ -138,6 +138,27 @@ async function setup(playPath, config = {}) {
         }
     }
 
+    const extraTileResults = {};
+    if (config.extraTiles) {
+        for (const extra of config.extraTiles) {
+            const extraResult = await dialog.buttonDialog({
+                title: `Trap Setup - ${extra.label}`,
+                buttons: [
+                    { label: 'Continue', value: 'continue' },
+                    { label: 'Cancel', value: 'cancel' },
+                ],
+            }, {
+                content: `<p>${extra.prompt}</p><p>Click <strong>Continue</strong> once selected.</p>`
+            });
+
+            if (extraResult !== 'continue') return;
+
+            const selected = canvas.tiles.controlled.map(t => t.document);
+            if (selected.length === 0) return ui.notifications.warn(`EMP | No ${extra.label} selected. Trap setup cancelled.`);
+            extraTileResults[extra.key] = selected.map(t => t.id);
+        }
+    }
+
     const code = `const playPath = tile.getFlag('${MODULE_ID}', 'trap.playPath');
 const trapTileIds = tile.getFlag('${MODULE_ID}', 'trap.trapTileIds') || [];
 if (playPath && typeof token !== 'undefined') {
@@ -173,6 +194,11 @@ if (playPath && typeof token !== 'undefined') {
         const updateData = {
             [`flags.${MODULE_ID}.trap.isTrapTile`]: true,
         };
+        if (config.extraTiles) {
+            for (const extra of config.extraTiles) {
+                updateData[`flags.${MODULE_ID}.trap.${extra.key}`] = extraTileResults[extra.key];
+            }
+        }
         await socket.tile.edit(trapTile.id, updateData);
     }
 
