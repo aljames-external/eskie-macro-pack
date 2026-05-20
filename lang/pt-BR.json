@@ -18,6 +18,51 @@
             "updated": "Os seguintes efeitos serão atualizados a partir de uma versão anterior do Eskie Macro Pack.",
             "warning": "Isso substituirá quaisquer animações existentes do Eskie Macro Pack com o mesmo nome. Não afetará nenhuma outra animação.",
             "nothing": "Todas as animações do Eskie Macro Pack já estão atualizadas!"
+        },
+        "traps": {
+            "fire": {
+                "title": "Fogo"
+            },
+            "pitfall": {
+                "title": "Fosso"
+            },
+            "spike": {
+                "title": "Espinhos"
+            },
+            "common": {
+                "continue": "Continuar",
+                "cancel": "Cancelar"
+            },
+            "setup": {
+                "chooseTrapTitle": "Configuração de Armadilha: Escolha a Armadilha",
+                "chooseTrapContent": "<p>Escolha uma armadilha para configurar e instalar na tela.</p>",
+                "noTrapChosen": "EMP | Nenhuma armadilha selecionada. Configuração de armadilha cancelada.",
+                "noSetupMethod": "EMP | A armadilha \"{name}\" não possui um método de configuração.",
+                "onlyGm": "EMP | Apenas um Mestre pode configurar armadilhas.",
+                "step1Title": "Configuração de Armadilha - {name}: Etapa 1 (Peças de Gatilho)",
+                "step1Content": "<p>Selecione a(s) **Peça(s) de Gatilho** na tela (onde os tokens pisam para acionar a armadilha).</p><p>Clique em <strong>Continuar</strong> após selecionar.</p>",
+                "noTriggerTiles": "EMP | Nenhuma peça de gatilho selecionada. Configuração da armadilha cancelada.",
+                "step2OriginTitle": "Configuração de Armadilha - {name}: Etapa 2 (Origem da Armadilha/Peças de Disparo)",
+                "step2OriginContent": "<p>Selecione a(s) **Peça(s) de Origem de Armadilha** na tela (de onde a armadilha começa ou dispara).</p><p>Clique em <strong>Continuar</strong> após selecionar.</p>",
+                "noOriginTiles": "EMP | Nenhuma peça de origem de armadilha selecionada. Configuração da armadilha cancelada.",
+                "step3TargetTitle": "Configuração de Armadilha - {name}: Etapa 3 (Alvo da Armadilha/Peças de Destino)",
+                "step3TargetContent": "<p>Selecione a(s) **Peça(s) de Alvo de Armadilha** na tela (para onde a armadilha dispara ou onde ela atinge).</p><p>Clique em <strong>Continuar</strong> após selecionar.</p>",
+                "noTargetTiles": "EMP | Nenhuma peça de alvo de armadilha selecionada. Usando as Peças de Gatilho por padrão.",
+                "step2AnimTitle": "Configuração de Armadilha - {name}: Etapa 2 (Peças de Animação)",
+                "step2AnimContent": "<p>Selecione a(s) **Peça(s) de Animação de Armadilha** onde o efeito visual será reproduzido.</p><p>Clique em <strong>Continue</strong> após selecionar.</p>",
+                "noAnimTiles": "EMP | Nenhuma peça de animação de armadilha selecionada. Usando as Peças de Gatilho por padrão.",
+                "extraTitle": "Configuração de Armadilha - {name}",
+                "noExtraTiles": "EMP | Nenhuma {name} selecionada. Configuração da armadilha cancelada."
+            },
+            "projectile": {
+                "title": "Projétil",
+                "chooseTypeTitle": "Configuração da Armadilha de Projéteis: Escolha o Tipo",
+                "chooseTypeContent": "<p>Escolha o tipo de projétil para esta armadilha.</p>",
+                "noTypeChosen": "EMP | Nenhum tipo de projétil selecionado. Configuração cancelada.",
+                "arrow": "Flech",
+                "dart": "Dardo",
+                "javelin": "Azagaia"
+            }
         }
     }
 }
