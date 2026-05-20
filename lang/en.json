@@ -26,9 +26,6 @@
             "pitfall": {
                 "title": "Pitfall"
             },
-            "projectile": {
-                "title": "Projectile"
-            },
             "spike": {
                 "title": "Spike"
             },
@@ -60,6 +57,7 @@
                 "noExtraTiles": "EMP | No {name} selected. Trap setup cancelled."
             },
             "projectile": {
+                "title": "Projectile",
                 "chooseTypeTitle": "Projectile Trap Setup: Choose Type",
                 "chooseTypeContent": "<p>Choose the projectile type for this trap.</p>",
                 "noTypeChosen": "EMP | No projectile type chosen. Setup cancelled.",
