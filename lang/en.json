@@ -31,8 +31,7 @@
             },
             "common": {
                 "continue": "Continue",
-                "cancel": "Cancel",
-                "finish": "Finish"
+                "cancel": "Cancel"
             },
             "setup": {
                 "chooseTrapTitle": "Trap Setup: Choose Trap",
@@ -50,7 +49,7 @@
                 "step3TargetContent": "<p>Select the **Trap Target Tile(s)** on the canvas (where the trap shoots towards or lands).</p><p>Click <strong>Continue</strong> once selected.</p>",
                 "noTargetTiles": "EMP | No trap target tiles selected. Defaulting to use Trigger Tiles.",
                 "step2AnimTitle": "Trap Setup - {name}: Step 2 (Animation Tiles)",
-                "step2AnimContent": "<p>Select the **Trap Animation Tile(s)** where the visual effect will play.</p><p>Click <strong>Finish</strong> once selected.</p>",
+                "step2AnimContent": "<p>Select the **Trap Animation Tile(s)** where the visual effect will play.</p><p>Click <strong>Continue</strong> once selected.</p>",
                 "noAnimTiles": "EMP | No trap animation tiles selected. Defaulting to use Trigger Tiles.",
                 "extraTitle": "Trap Setup - {name}",
                 "noExtraTiles": "EMP | No {name} selected. Trap setup cancelled."
