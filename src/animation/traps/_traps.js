@@ -7,6 +7,7 @@ import { fire } from './fire.js';
 import { floodingRoom } from './flooding-room.js';
 import { javelin } from './javelin.js';
 import { pitfall } from './pitfall.js';
+import { projectile } from './projectile.js';
 import { rollingBoulder } from './rolling-boulder.js';
 import { spike } from './spike.js';
 import { tileDodge } from './tile-dodge.js';
@@ -21,6 +22,7 @@ export const traps = {
     floodingRoom,
     javelin,
     pitfall,
+    projectile,
     rollingBoulder,
     spike,
     tileDodge,

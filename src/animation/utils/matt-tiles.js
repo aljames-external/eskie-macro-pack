@@ -244,6 +244,11 @@ if (playPath && typeof token !== 'undefined') {
         if (tileCount === 3) {
             updateData[`flags.${MODULE_ID}.trap.trapTargetTileIds`] = targetTiles.map(t => t.id);
         }
+        if (config.extraFlags) {
+            for (const [k, v] of Object.entries(config.extraFlags)) {
+                updateData[`flags.${MODULE_ID}.trap.${k}`] = v;
+            }
+        }
         if (config.extraTiles) {
             for (const extra of config.extraTiles) {
                 updateData[`flags.${MODULE_ID}.trap.${extra.key}`] = extraTileResults[extra.key];
