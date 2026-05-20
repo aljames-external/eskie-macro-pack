@@ -36,8 +36,10 @@ async function create(tile, targets, config = {}) {
         return new Sequence();
     }
 
-    const startLoc = tile.center || tile;
-    const endLoc = endTile.center || endTile;
+    const tilePlaceable = tile.object || tile;
+    const endTilePlaceable = endTile.object || endTile;
+    const startLoc = tilePlaceable.center || tilePlaceable;
+    const endLoc = endTilePlaceable.center || endTilePlaceable;
 
     return new Sequence()
         .canvasPan()

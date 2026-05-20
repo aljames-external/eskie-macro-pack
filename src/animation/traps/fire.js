@@ -24,7 +24,8 @@ async function create(tile, targets, config = {}) {
         if (triggerTile) targetTile = triggerTile;
     }
 
-    const targetLoc = targetTile?.center || (targets.length ? (targets[0].object?.center || targets[0]) : null);
+    const targetTilePlaceable = targetTile?.object || targetTile;
+    const targetLoc = targetTilePlaceable?.center || (targets.length ? (targets[0].object?.center || targets[0]) : null);
 
     let seq = new Sequence();
 

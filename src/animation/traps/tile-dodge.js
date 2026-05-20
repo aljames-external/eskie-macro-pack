@@ -17,7 +17,8 @@ async function create(tile, targets, config = {}) {
         targets.forEach(target => {
             const targetObject = target.object || target;
             const targetCenter = targetObject.center || target;
-            const pt = tile.center || tile;
+            const tilePlaceable = tile.object || tile;
+            const pt = tilePlaceable.center || tilePlaceable;
 
             const distance = {
                 x: pt.x - targetCenter.x,

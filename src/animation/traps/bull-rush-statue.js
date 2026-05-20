@@ -25,14 +25,16 @@ async function create(tile, targets, config = {}) {
         if (triggerTile) targetTile = triggerTile;
     }
 
-    const targetLoc = targetTile?.center || (target ? (target.object?.center || target) : null);
+    const tilePlaceable = tile.object || tile;
+    const targetTilePlaceable = targetTile?.object || targetTile;
+    const targetLoc = targetTilePlaceable?.center || (target ? (target.object?.center || target) : null);
 
     let seq = new Sequence();
 
     if (targetLoc) {
         const distance = {
-            x: targetLoc.x - tile.center.x,
-            y: targetLoc.y - tile.center.y
+            x: targetLoc.x - tilePlaceable.center.x,
+            y: targetLoc.y - tilePlaceable.center.y
         };
 
         const getDirection = (value) => {
@@ -56,8 +58,8 @@ async function create(tile, targets, config = {}) {
 
             // Animate statue sliding out and back
             .effect()
-            .copySprite(tile)
-            .atLocation(tile)
+            .copySprite(tilePlaceable)
+            .atLocation(tilePlaceable)
             .size({ width: tile.width * (tile.texture?.scaleX ?? 1), height: tile.height * (tile.texture?.scaleY ?? 1) })
             .animateProperty('sprite', 'position.x', { from: 0, to: distance.x * 0.5, duration: 500, ease: 'easeOutQuint', delay: 200 })
             .animateProperty('sprite', 'position.y', { from: 0, to: distance.y * 0.5, duration: 500, ease: 'easeOutQuint', delay: 200 })
