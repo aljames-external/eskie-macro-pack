@@ -157,14 +157,14 @@ async function setup(playPath, config = {}) {
         const trapResult = await dialog.buttonDialog({
             title: game.i18n.format('EMP.traps.setup.step2AnimTitle', { name: trapKey }),
             buttons: [
-                { label: game.i18n.localize('EMP.traps.common.finish'), value: 'finish' },
+                { label: game.i18n.localize('EMP.traps.common.continue'), value: 'continue' },
                 { label: game.i18n.localize('EMP.traps.common.cancel'), value: 'cancel' },
             ],
         }, {
             content: game.i18n.localize('EMP.traps.setup.step2AnimContent')
         });
 
-        if (trapResult === 'cancel' || trapResult === false) return;
+        if (trapResult !== 'continue') return;
 
         originTiles = canvas.tiles.controlled.map(t => t.document);
         if (originTiles.length === 0) {
