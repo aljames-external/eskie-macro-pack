@@ -15,6 +15,29 @@ async function create(tile, targets, config = {}) {
     config = settingsOverride(config);
     const { delay } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
 
+    // Target all tokens currently overlapping the trap tile bounds
+    const tileX = tile.document?.x ?? tile.x;
+    const tileY = tile.document?.y ?? tile.y;
+    const tileWidth = tile.document?.width ?? tile.width;
+    const tileHeight = tile.document?.height ?? tile.height;
+
+    const tileMinX = tileX;
+    const tileMaxX = tileX + tileWidth;
+    const tileMinY = tileY;
+    const tileMaxY = tileY + tileHeight;
+
+    const finalTargets = canvas.tokens.placeables.filter(t => {
+        const tWidth = (t.document?.width ?? t.width ?? 1) * canvas.grid.size;
+        const tHeight = (t.document?.height ?? t.height ?? 1) * canvas.grid.size;
+        const tMinX = t.document?.x ?? t.x;
+        const tMaxX = tMinX + tWidth;
+        const tMinY = t.document?.y ?? t.y;
+        const tMaxY = tMinY + tHeight;
+
+        // Bounding-box intersection check
+        return !(tMaxX <= tileMinX || tMinX >= tileMaxX || tMaxY <= tileMinY || tMinY >= tileMaxY);
+    });
+
     let seq = new Sequence()
         // Hidden/still frame base of the spike trap below tokens
         .effect()
@@ -35,8 +58,8 @@ async function create(tile, targets, config = {}) {
 
         .wait(delay);
 
-    if (targets.length > 0) {
-        targets.forEach(target => {
+    if (finalTargets.length > 0) {
+        finalTargets.forEach(target => {
             seq = seq
                 // Blood splash effect on target
                 .effect()
