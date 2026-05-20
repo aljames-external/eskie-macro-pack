@@ -159,18 +159,18 @@ async function setup(config = {}) {
     let projectileType = config.projectileType;
     if (!projectileType) {
         projectileType = await dialog.buttonDialog({
-            title: 'Projectile Trap Setup: Choose Type',
+            title: game.i18n.localize('EMP.traps.projectile.chooseTypeTitle'),
             buttons: [
-                { label: 'Arrow', value: 'arrow' },
-                { label: 'Dart', value: 'dart' },
-                { label: 'Javelin', value: 'javelin' },
+                { label: game.i18n.localize('EMP.traps.projectile.arrow'), value: 'arrow' },
+                { label: game.i18n.localize('EMP.traps.projectile.dart'), value: 'dart' },
+                { label: game.i18n.localize('EMP.traps.projectile.javelin'), value: 'javelin' },
             ],
         }, {
-            content: '<p>Choose the projectile type for this trap.</p>'
+            content: game.i18n.localize('EMP.traps.projectile.chooseTypeContent')
         });
     }
 
-    if (!projectileType) return ui.notifications.warn('EMP | No projectile type chosen. Setup cancelled.');
+    if (!projectileType) return ui.notifications.warn(game.i18n.localize('EMP.traps.projectile.noTypeChosen'));
 
     const setupConfig = {
         tileCount: 3,

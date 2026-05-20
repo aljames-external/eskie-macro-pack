@@ -18,6 +18,55 @@
             "updated": "The following effects will be updated from a previous version of Eskie Macro Pack.",
             "warning": "This will overwrite any existing animations from Eskie Macro Pack with the same name. It will not touch any other animations.",
             "nothing": "All Eskie Macro animations are up to date!"
+        },
+        "traps": {
+            "fire": {
+                "title": "Fire"
+            },
+            "pitfall": {
+                "title": "Pitfall"
+            },
+            "projectile": {
+                "title": "Projectile"
+            },
+            "spike": {
+                "title": "Spike"
+            },
+            "common": {
+                "continue": "Continue",
+                "cancel": "Cancel",
+                "finish": "Finish",
+                "useTrigger": "Use Trigger Tiles"
+            },
+            "setup": {
+                "chooseTrapTitle": "Trap Setup: Choose Trap",
+                "chooseTrapContent": "<p>Choose a trap to configure and set up on the canvas.</p>",
+                "noTrapChosen": "EMP | No trap chosen. Trap setup cancelled.",
+                "noSetupMethod": "EMP | Trap \"{name}\" has no setup configuration method.",
+                "onlyGm": "EMP | Only a GM can setup traps.",
+                "step1Title": "Trap Setup - {name}: Step 1 (Trigger Tiles)",
+                "step1Content": "<p>Select the **Trigger Tile(s)** on the canvas (which tokens step on to trigger the trap).</p><p>Click <strong>Continue</strong> once selected.</p>",
+                "noTriggerTiles": "EMP | No trigger tiles selected. Trap setup cancelled.",
+                "step2OriginTitle": "Trap Setup - {name}: Step 2 (Trap Origin/Launcher Tiles)",
+                "step2OriginContent": "<p>Select the **Trap Origin Tile(s)** on the canvas (where the trap starts or shoots from).</p><p>Click <strong>Continue</strong> once selected.</p>",
+                "noOriginTiles": "EMP | No trap origin tiles selected. Trap setup cancelled.",
+                "step3TargetTitle": "Trap Setup - {name}: Step 3 (Trap Target/Landing Tiles)",
+                "step3TargetContent": "<p>Select the **Trap Target Tile(s)** on the canvas (where the trap shoots towards or lands).</p><p>If the target/landing area is the trigger tile, click <strong>Use Trigger Tiles</strong>.</p>",
+                "noTargetTiles": "EMP | No trap target tiles selected. Defaulting to use Trigger Tiles.",
+                "step2AnimTitle": "Trap Setup - {name}: Step 2 (Animation Tiles)",
+                "step2AnimContent": "<p>Select the **Trap Animation Tile(s)** where the visual effect will play.</p><p>If the trigger tile and trap tile are the same, click <strong>Use Trigger Tiles</strong> or select the same tile and click <strong>Finish</strong>.</p>",
+                "noAnimTiles": "EMP | No trap animation tiles selected. Defaulting to use Trigger Tiles.",
+                "extraTitle": "Trap Setup - {name}",
+                "noExtraTiles": "EMP | No {name} selected. Trap setup cancelled."
+            },
+            "projectile": {
+                "chooseTypeTitle": "Projectile Trap Setup: Choose Type",
+                "chooseTypeContent": "<p>Choose the projectile type for this trap.</p>",
+                "noTypeChosen": "EMP | No projectile type chosen. Setup cancelled.",
+                "arrow": "Arrow",
+                "dart": "Dart",
+                "javelin": "Javelin"
+            }
         }
     }
 }

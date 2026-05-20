@@ -24,7 +24,9 @@ export const traps = {
     setup: async function (config = {}) {
         const activeTrapKeys = Object.keys(traps).filter(key => key !== 'setup');
         const buttons = activeTrapKeys.map(key => {
-            const label = key
+            const locKey = `EMP.traps.${key}.title`;
+            const hasLoc = game.i18n.has(locKey);
+            const label = hasLoc ? game.i18n.localize(locKey) : key
                 .replace(/([A-Z])/g, ' $1')
                 .replace(/^./, str => str.toUpperCase())
                 .trim();
@@ -32,15 +34,15 @@ export const traps = {
         });
 
         const chosenTrapKey = await dialog.buttonDialog({
-            title: 'Trap Setup: Choose Trap',
+            title: game.i18n.localize('EMP.traps.setup.chooseTrapTitle'),
             buttons: buttons,
         }, {
             classes: ['emp-vertical-dialog'],
-            content: '<p>Choose a trap to configure and set up on the canvas.</p>'
+            content: game.i18n.localize('EMP.traps.setup.chooseTrapContent')
         });
 
         if (!chosenTrapKey) {
-            ui.notifications.warn('EMP | No trap chosen. Setup cancelled.');
+            ui.notifications.warn(game.i18n.localize('EMP.traps.setup.noTrapChosen'));
             return;
         }
 
@@ -48,7 +50,7 @@ export const traps = {
         if (trap && typeof trap.setup === 'function') {
             return trap.setup(config);
         } else {
-            ui.notifications.error(`EMP | Trap "${chosenTrapKey}" has no setup configuration method.`);
+            ui.notifications.error(game.i18n.format('EMP.traps.setup.noSetupMethod', { name: chosenTrapKey }));
         }
     }
 };
