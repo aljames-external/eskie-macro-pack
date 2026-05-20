@@ -139,7 +139,6 @@ async function setup(playPath, config = {}) {
             title: game.i18n.format('EMP.traps.setup.step3TargetTitle', { name: trapKey }),
             buttons: [
                 { label: game.i18n.localize('EMP.traps.common.continue'), value: 'continue' },
-                { label: game.i18n.localize('EMP.traps.common.useTrigger'), value: 'use-trigger' },
                 { label: game.i18n.localize('EMP.traps.common.cancel'), value: 'cancel' },
             ],
         }, {
@@ -148,14 +147,10 @@ async function setup(playPath, config = {}) {
 
         if (targetResult === 'cancel' || targetResult === false) return;
 
-        if (targetResult === 'use-trigger') {
+        targetTiles = canvas.tiles.controlled.map(t => t.document);
+        if (targetTiles.length === 0) {
+            ui.notifications.warn(game.i18n.localize('EMP.traps.setup.noTargetTiles'));
             targetTiles = triggerTiles;
-        } else {
-            targetTiles = canvas.tiles.controlled.map(t => t.document);
-            if (targetTiles.length === 0) {
-                ui.notifications.warn(game.i18n.localize('EMP.traps.setup.noTargetTiles'));
-                targetTiles = triggerTiles;
-            }
         }
     } else {
         // Step 2: Prompt user to select trap animation tiles
@@ -163,7 +158,6 @@ async function setup(playPath, config = {}) {
             title: game.i18n.format('EMP.traps.setup.step2AnimTitle', { name: trapKey }),
             buttons: [
                 { label: game.i18n.localize('EMP.traps.common.finish'), value: 'finish' },
-                { label: game.i18n.localize('EMP.traps.common.useTrigger'), value: 'use-trigger' },
                 { label: game.i18n.localize('EMP.traps.common.cancel'), value: 'cancel' },
             ],
         }, {
@@ -172,14 +166,10 @@ async function setup(playPath, config = {}) {
 
         if (trapResult === 'cancel' || trapResult === false) return;
 
-        if (trapResult === 'use-trigger') {
+        originTiles = canvas.tiles.controlled.map(t => t.document);
+        if (originTiles.length === 0) {
+            ui.notifications.warn(game.i18n.localize('EMP.traps.setup.noAnimTiles'));
             originTiles = triggerTiles;
-        } else {
-            originTiles = canvas.tiles.controlled.map(t => t.document);
-            if (originTiles.length === 0) {
-                ui.notifications.warn(game.i18n.localize('EMP.traps.setup.noAnimTiles'));
-                originTiles = triggerTiles;
-            }
         }
     }
 

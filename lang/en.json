@@ -32,8 +32,7 @@
             "common": {
                 "continue": "Continue",
                 "cancel": "Cancel",
-                "finish": "Finish",
-                "useTrigger": "Use Trigger Tiles"
+                "finish": "Finish"
             },
             "setup": {
                 "chooseTrapTitle": "Trap Setup: Choose Trap",
@@ -48,10 +47,10 @@
                 "step2OriginContent": "<p>Select the **Trap Origin Tile(s)** on the canvas (where the trap starts or shoots from).</p><p>Click <strong>Continue</strong> once selected.</p>",
                 "noOriginTiles": "EMP | No trap origin tiles selected. Trap setup cancelled.",
                 "step3TargetTitle": "Trap Setup - {name}: Step 3 (Trap Target/Landing Tiles)",
-                "step3TargetContent": "<p>Select the **Trap Target Tile(s)** on the canvas (where the trap shoots towards or lands).</p><p>If the target/landing area is the trigger tile, click <strong>Use Trigger Tiles</strong>.</p>",
+                "step3TargetContent": "<p>Select the **Trap Target Tile(s)** on the canvas (where the trap shoots towards or lands).</p><p>Click <strong>Continue</strong> once selected.</p>",
                 "noTargetTiles": "EMP | No trap target tiles selected. Defaulting to use Trigger Tiles.",
                 "step2AnimTitle": "Trap Setup - {name}: Step 2 (Animation Tiles)",
-                "step2AnimContent": "<p>Select the **Trap Animation Tile(s)** where the visual effect will play.</p><p>If the trigger tile and trap tile are the same, click <strong>Use Trigger Tiles</strong> or select the same tile and click <strong>Finish</strong>.</p>",
+                "step2AnimContent": "<p>Select the **Trap Animation Tile(s)** where the visual effect will play.</p><p>Click <strong>Finish</strong> once selected.</p>",
                 "noAnimTiles": "EMP | No trap animation tiles selected. Defaulting to use Trigger Tiles.",
                 "extraTitle": "Trap Setup - {name}",
                 "noExtraTiles": "EMP | No {name} selected. Trap setup cancelled."
