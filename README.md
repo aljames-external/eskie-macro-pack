@@ -343,3 +343,7 @@ We'd love to have you! There are (at least) two ways to contribute to this proje
     - `DEFAULT_CONFIG` used as the base configuration
     - Test the animation with token rotation
     - (If integrating with AA) standardized arguments for `create` / `play` functions
+
+Hate following coding guidelines? Me too! I'd recommend using an AI agent to help. The code here isn't life saving... you don't need to spend an entire day getting a PR in. Skills have been written to help enforce the coding guidelines, just ask the agent to clean up your code following the discord to module and style guide skills.
+
+Want this localized into your native language? I don't entrust that to AI - I need native speaker help! Submit a PR and I'll be happy to give a mild vetting process and approve it.
