@@ -226,7 +226,7 @@ if (playPath && typeof token !== 'undefined') {
             [`flags.${MODULE_ID}.trap.trapTileIds`]: originTiles.map(t => t.id),
             [`flags.${MODULE_ID}.trap.isTriggerTile`]: true,
             'flags.monks-active-tiles.active': true,
-            'flags.monks-active-tiles.trigger': ['enter'],
+            'flags.monks-active-tiles.trigger': config.trigger || ['enter'],
             'flags.monks-active-tiles.actions': [{
                 action: 'runcode',
                 data: { code },
