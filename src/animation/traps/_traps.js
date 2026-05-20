@@ -8,7 +8,6 @@ import { pitfall } from './pitfall.js';
 import { projectile } from './projectile.js';
 import { rollingBoulder } from './rolling-boulder.js';
 import { spike } from './spike.js';
-import { tileDodge } from './tile-dodge.js';
 
 export const traps = {
     bullRushStatue,
@@ -21,5 +20,4 @@ export const traps = {
     projectile,
     rollingBoulder,
     spike,
-    tileDodge,
 };
