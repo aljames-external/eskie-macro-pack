@@ -72,7 +72,11 @@ async function stop(tile, config = {}) {
 }
 
 async function setup(config = {}) {
-    return matt.trap.setup('eskie.traps.electric-door', config);
+    const setupConfig = {
+        trigger: ['door'],
+        ...config
+    };
+    return matt.trap.setup('eskie.traps.electric-door', setupConfig);
 }
 
 export const electricDoor = {
