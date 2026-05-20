@@ -46,10 +46,10 @@ The following modules are optional but unlock additional features when installed
 
 | Module | What It Enables |
 |--------|----------------|
-| [Eskie Effects](https://www.patreon.com/EskieEffects) | Additional premium effect assets designed specifically for EMP (or the free variant) |
-| [JB2A (Patreon)](https://www.patreon.com/JB2A) | Large library of high-quality animated assets used by many EMP effects |
+| [Eskie Effects (Patreon)](https://www.patreon.com/EskieEffects) | Additional premium effect assets designed specifically for EMP (or the free variant) |
+| [JB2A (Patreon)](https://www.patreon.com/JB2A) | Large library of high-quality animated assets used by many EMP effects (or the free variant) |
 | [Animated Spell Effects: Cartoon](https://foundryvtt.com/packages/animated-spell-effects-cartoon) | Free (being deprecated) animated asset library used by select effects |
-| [Boss Loot Assets](https://www.patreon.com/cw/BossLoot) | Premium asset pack used by select effects (or the free variant) |
+| [Boss Loot Assets (Patreon)](https://www.patreon.com/cw/BossLoot) | Premium asset pack used by select effects (or the free variant) |
 | [Tagger](https://foundryvtt.com/packages/tagger) | Tag-based tile and token lookup; used by some trap and movement effects |
 | [Token Attacher](https://foundryvtt.com/packages/token-attacher) | Attaches tokens to tiles for movement-based trap and tile effects |
 | [Monk's Active Tile Triggers (MATT)](https://foundryvtt.com/packages/monks-active-tiles) | **Required for the Traps API.** Automates trap playback when tokens enter tiles |
