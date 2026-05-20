@@ -29,6 +29,24 @@ When writing or modifying code in the `eskie-macro-pack` repository, adhere stri
 
 *   **Module System:** Use ES6 module syntax (`import` and `export`).
 *   **Exports:** Prefer named exports over default exports.
+*   **Function Declarations in Exports:** Do **not** declare functions inline inside an exported variable. Declare the function separately first, then export it.
+    ```javascript
+    // Incorrect: function declared inside the export variable
+    export const actions = {
+        doSomething: function() {
+            // ...
+        },
+    };
+
+    // Correct: function declared outside, then referenced
+    function doSomething() {
+        // ...
+    }
+
+    export const actions = {
+        doSomething,
+    };
+    ```
 
 ## Control Structures
 
