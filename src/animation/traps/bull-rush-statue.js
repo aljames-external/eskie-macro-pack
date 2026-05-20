@@ -17,8 +17,15 @@ async function create(tile, targets, config = {}) {
     const { pushDistance } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
 
     const target = targets.length ? targets[0] : null;
-    const triggerTile = canvas.tiles.placeables.find(t => t.document.getFlag(MODULE_ID, 'trap.trapTileIds')?.includes(tile.id));
-    const targetLoc = triggerTile?.center || (target ? (target.object?.center || target) : null);
+    const targetTileIds = tile.document?.getFlag(MODULE_ID, 'trap.trapTargetTileIds') || [];
+    let targetTile = targetTileIds.length ? canvas.tiles.get(targetTileIds[0]) : null;
+
+    if (!targetTile) {
+        const triggerTile = canvas.tiles.placeables.find(t => t.document.getFlag(MODULE_ID, 'trap.trapTileIds')?.includes(tile.id));
+        if (triggerTile) targetTile = triggerTile;
+    }
+
+    const targetLoc = targetTile?.center || (target ? (target.object?.center || target) : null);
 
     let seq = new Sequence();
 
@@ -107,7 +114,7 @@ async function stop(tile, config = {}) {
 }
 
 async function setup(config = {}) {
-    return matt.trap.setup('eskie.traps.bull-rush-statue', config);
+    return matt.trap.setup('eskie.traps.bull-rush-statue', { tileCount: 3, ...config });
 }
 
 export const bullRushStatue = {

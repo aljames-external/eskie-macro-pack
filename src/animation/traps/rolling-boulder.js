@@ -17,9 +17,14 @@ async function create(tile, targets, config = {}) {
     config = settingsOverride(config);
     const { boulderSpeed, boulderSize } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
 
-    // Retrieve end tile from flags, falling back to Tagger search for backward compatibility
-    const endTileIds = tile.document.getFlag(MODULE_ID, 'trap.boulderEndTileIds') || [];
-    let endTile = endTileIds.length ? canvas.tiles.get(endTileIds[0]) : null;
+    // Retrieve end tile from flags, falling back to legacy/Tagger search for backward compatibility
+    const targetTileIds = tile.document.getFlag(MODULE_ID, 'trap.trapTargetTileIds') || [];
+    let endTile = targetTileIds.length ? canvas.tiles.get(targetTileIds[0]) : null;
+
+    if (!endTile) {
+        const endTileIds = tile.document.getFlag(MODULE_ID, 'trap.boulderEndTileIds') || [];
+        endTile = endTileIds.length ? canvas.tiles.get(endTileIds[0]) : null;
+    }
 
     if (!endTile && typeof Tagger !== 'undefined') {
         const tagged = await Tagger.getByTag('Rolling Boulder End');
@@ -114,17 +119,7 @@ async function stop(tile, config = {}) {
 }
 
 async function setup(config = {}) {
-    const setupConfig = {
-        extraTiles: [
-            {
-                key: 'boulderEndTileIds',
-                label: 'Boulder End Tile',
-                prompt: 'Select the **Boulder End Tile(s)** on the canvas (where the boulder will crash).'
-            }
-        ],
-        ...config
-    };
-    return matt.trap.setup('eskie.traps.rolling-boulder', setupConfig);
+    return matt.trap.setup('eskie.traps.rolling-boulder', { tileCount: 3, ...config });
 }
 
 export const rollingBoulder = {

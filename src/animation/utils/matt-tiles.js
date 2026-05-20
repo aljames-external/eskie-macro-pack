@@ -96,10 +96,11 @@ async function setup(playPath, config = {}) {
 
     const pathParts = playPath.split('.');
     const trapKey = pathParts[pathParts.length - 1];
+    const tileCount = config.tileCount ?? 2;
 
     // Step 1: Prompt user to select trigger tiles
     const triggerResult = await dialog.buttonDialog({
-        title: 'Trap Setup - Step 1: Trigger Tiles',
+        title: `Trap Setup - ${trapKey}: Step 1 (Trigger Tiles)`,
         buttons: [
             { label: 'Continue', value: 'continue' },
             { label: 'Cancel', value: 'cancel' },
@@ -113,28 +114,72 @@ async function setup(playPath, config = {}) {
     const triggerTiles = canvas.tiles.controlled.map(t => t.document);
     if (triggerTiles.length === 0) return ui.notifications.warn('EMP | No trigger tiles selected. Trap setup cancelled.');
 
-    // Step 2: Prompt user to select trap animation tiles
-    const trapResult = await dialog.buttonDialog({
-        title: 'Trap Setup - Step 2: Animation Tiles',
-        buttons: [
-            { label: 'Finish', value: 'finish' },
-            { label: 'Use Trigger Tiles', value: 'use-trigger' },
-            { label: 'Cancel', value: 'cancel' },
-        ],
-    }, {
-        content: '<p>Select the **Trap Animation Tile(s)** where the visual effect will play.</p><p>If the trigger tile and trap tile are the same, click <strong>Use Trigger Tiles</strong> or select the same tile and click <strong>Finish</strong>.</p>'
-    });
+    let originTiles = [];
+    let targetTiles = [];
 
-    if (trapResult === 'cancel' || trapResult === false) return;
+    if (tileCount === 3) {
+        // Step 2: Prompt user to select trap origin/launcher tiles
+        const originResult = await dialog.buttonDialog({
+            title: `Trap Setup - ${trapKey}: Step 2 (Trap Origin/Launcher Tiles)`,
+            buttons: [
+                { label: 'Continue', value: 'continue' },
+                { label: 'Cancel', value: 'cancel' },
+            ],
+        }, {
+            content: '<p>Select the **Trap Origin Tile(s)** on the canvas (where the trap starts or shoots from).</p><p>Click <strong>Continue</strong> once selected.</p>'
+        });
 
-    let trapTiles = [];
-    if (trapResult === 'use-trigger') {
-        trapTiles = triggerTiles;
+        if (originResult !== 'continue') return;
+
+        originTiles = canvas.tiles.controlled.map(t => t.document);
+        if (originTiles.length === 0) return ui.notifications.warn('EMP | No trap origin tiles selected. Trap setup cancelled.');
+
+        // Step 3: Prompt user to select trap target/landing tiles
+        const targetResult = await dialog.buttonDialog({
+            title: `Trap Setup - ${trapKey}: Step 3 (Trap Target/Landing Tiles)`,
+            buttons: [
+                { label: 'Continue', value: 'continue' },
+                { label: 'Use Trigger Tiles', value: 'use-trigger' },
+                { label: 'Cancel', value: 'cancel' },
+            ],
+        }, {
+            content: '<p>Select the **Trap Target Tile(s)** on the canvas (where the trap shoots towards or lands).</p><p>If the target/landing area is the trigger tile, click <strong>Use Trigger Tiles</strong>.</p>'
+        });
+
+        if (targetResult === 'cancel' || targetResult === false) return;
+
+        if (targetResult === 'use-trigger') {
+            targetTiles = triggerTiles;
+        } else {
+            targetTiles = canvas.tiles.controlled.map(t => t.document);
+            if (targetTiles.length === 0) {
+                ui.notifications.warn('EMP | No trap target tiles selected. Defaulting to use Trigger Tiles.');
+                targetTiles = triggerTiles;
+            }
+        }
     } else {
-        trapTiles = canvas.tiles.controlled.map(t => t.document);
-        if (trapTiles.length === 0) {
-            ui.notifications.warn('EMP | No trap animation tiles selected. Defaulting to use Trigger Tiles.');
-            trapTiles = triggerTiles;
+        // Step 2: Prompt user to select trap animation tiles
+        const trapResult = await dialog.buttonDialog({
+            title: `Trap Setup - ${trapKey}: Step 2 (Animation Tiles)`,
+            buttons: [
+                { label: 'Finish', value: 'finish' },
+                { label: 'Use Trigger Tiles', value: 'use-trigger' },
+                { label: 'Cancel', value: 'cancel' },
+            ],
+        }, {
+            content: '<p>Select the **Trap Animation Tile(s)** where the visual effect will play.</p><p>If the trigger tile and trap tile are the same, click <strong>Use Trigger Tiles</strong> or select the same tile and click <strong>Finish</strong>.</p>'
+        });
+
+        if (trapResult === 'cancel' || trapResult === false) return;
+
+        if (trapResult === 'use-trigger') {
+            originTiles = triggerTiles;
+        } else {
+            originTiles = canvas.tiles.controlled.map(t => t.document);
+            if (originTiles.length === 0) {
+                ui.notifications.warn('EMP | No trap animation tiles selected. Defaulting to use Trigger Tiles.');
+                originTiles = triggerTiles;
+            }
         }
     }
 
@@ -160,13 +205,13 @@ async function setup(playPath, config = {}) {
     }
 
     const code = `const playPath = tile.getFlag('${MODULE_ID}', 'trap.playPath');
-const trapTileIds = tile.getFlag('${MODULE_ID}', 'trap.trapTileIds') || [];
+const originTileIds = tile.getFlag('${MODULE_ID}', 'trap.trapOriginTileIds') || tile.getFlag('${MODULE_ID}', 'trap.trapTileIds') || [];
 if (playPath && typeof token !== 'undefined') {
     const trap = foundry.utils.getProperty(globalThis, playPath);
     if (trap && typeof trap.play === 'function') {
-        trapTileIds.forEach(id => {
-            const targetTile = canvas.tiles.get(id);
-            if (targetTile) trap.play(targetTile, [token]);
+        originTileIds.forEach(id => {
+            const originTile = canvas.tiles.get(id);
+            if (originTile) trap.play(originTile, [token]);
         });
     }
 }`;
@@ -176,7 +221,9 @@ if (playPath && typeof token !== 'undefined') {
         const updateData = {
             [`flags.${MODULE_ID}.trap.playPath`]: playPath,
             [`flags.${MODULE_ID}.trap.trapKey`]: trapKey,
-            [`flags.${MODULE_ID}.trap.trapTileIds`]: trapTiles.map(t => t.id),
+            [`flags.${MODULE_ID}.trap.trapOriginTileIds`]: originTiles.map(t => t.id),
+            // Maintain backward compatibility for older runcode scripts
+            [`flags.${MODULE_ID}.trap.trapTileIds`]: originTiles.map(t => t.id),
             [`flags.${MODULE_ID}.trap.isTriggerTile`]: true,
             'flags.monks-active-tiles.active': true,
             'flags.monks-active-tiles.trigger': ['enter'],
@@ -190,19 +237,32 @@ if (playPath && typeof token !== 'undefined') {
     }
 
     // Update trap tiles
-    for (const trapTile of trapTiles) {
+    for (const originTile of originTiles) {
         const updateData = {
             [`flags.${MODULE_ID}.trap.isTrapTile`]: true,
         };
+        if (tileCount === 3) {
+            updateData[`flags.${MODULE_ID}.trap.trapTargetTileIds`] = targetTiles.map(t => t.id);
+        }
         if (config.extraTiles) {
             for (const extra of config.extraTiles) {
                 updateData[`flags.${MODULE_ID}.trap.${extra.key}`] = extraTileResults[extra.key];
             }
         }
-        await socket.tile.edit(trapTile.id, updateData);
+        await socket.tile.edit(originTile.id, updateData);
     }
 
-    ui.notifications.info(`EMP | Successfully setup ${trapKey} trap links for ${triggerTiles.length} trigger tile(s) and ${trapTiles.length} trap tile(s).`);
+    // Update target tiles
+    if (tileCount === 3) {
+        for (const targetTile of targetTiles) {
+            const updateData = {
+                [`flags.${MODULE_ID}.trap.isTargetTile`]: true,
+            };
+            await socket.tile.edit(targetTile.id, updateData);
+        }
+    }
+
+    ui.notifications.info(`EMP | Successfully setup ${trapKey} trap links for ${triggerTiles.length} trigger tile(s) and ${originTiles.length} trap tile(s).`);
 }
 
 export const matt = {

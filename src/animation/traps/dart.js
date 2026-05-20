@@ -17,8 +17,15 @@ async function create(tile, targets, config = {}) {
     config = settingsOverride(config);
     const { repeats, repeatDelay } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
 
-    const triggerTile = canvas.tiles.placeables.find(t => t.document.getFlag(MODULE_ID, 'trap.trapTileIds')?.includes(tile.id));
-    const targetLoc = triggerTile?.center || (targets.length ? (targets[0].object?.center || targets[0]) : null);
+    const targetTileIds = tile.document?.getFlag(MODULE_ID, 'trap.trapTargetTileIds') || [];
+    let targetTile = targetTileIds.length ? canvas.tiles.get(targetTileIds[0]) : null;
+
+    if (!targetTile) {
+        const triggerTile = canvas.tiles.placeables.find(t => t.document.getFlag(MODULE_ID, 'trap.trapTileIds')?.includes(tile.id));
+        if (triggerTile) targetTile = triggerTile;
+    }
+
+    const targetLoc = targetTile?.center || (targets.length ? (targets[0].object?.center || targets[0]) : null);
 
     let seq = new Sequence();
 
@@ -84,7 +91,7 @@ async function stop(tile, config = {}) {
 }
 
 async function setup(config = {}) {
-    return matt.trap.setup('eskie.traps.dart', config);
+    return matt.trap.setup('eskie.traps.dart', { tileCount: 3, ...config });
 }
 
 export const dart = {
