@@ -3,75 +3,22 @@
  * Modular Conversion: bakanabaka
  */
 
-import { MODULE_ID } from '../../lib/constants.js';
-import { closest } from '../../lib/filemanager.js';
-import { settingsOverride } from '../../lib/settings.js';
-import { matt } from '../utils/matt-tiles.js';
-
-const DEFAULT_CONFIG = {
-    repeats: 10,
-    repeatDelay: 50,
-};
+import { projectile } from './projectile.js';
 
 async function create(tile, targets, config = {}) {
-    config = settingsOverride(config);
-    const { repeats, repeatDelay } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
-
-    // Retrieve target/landing tile from flags, falling back to legacy trigger lookup
-    const targetTileIds = tile.document?.getFlag(MODULE_ID, 'trap.trapTargetTileIds') || [];
-    let targetTile = targetTileIds.length ? canvas.tiles.get(targetTileIds[0]) : null;
-
-    if (!targetTile) {
-        const triggerTile = canvas.tiles.placeables.find(t => t.document.getFlag(MODULE_ID, 'trap.trapTileIds')?.includes(tile.id));
-        if (triggerTile) targetTile = triggerTile;
-    }
-
-    const targetTilePlaceable = targetTile?.object || targetTile;
-    const targetLoc = targetTilePlaceable?.center || (targets.length ? (targets[0].object?.center || targets[0]) : null);
-
-    let seq = new Sequence();
-
-    if (targetLoc) {
-        seq = seq
-            .effect()
-            .file(closest('jb2a.arrow.physical.white.01'))
-            .atLocation(tile)
-            .stretchTo(targetLoc, { randomOffset: 0.65, gridUnits: true })
-            .startTime(350)
-            .repeats(repeats, repeatDelay, repeatDelay);
-    }
-
-    if (targets.length > 0) {
-        targets.forEach(target => {
-            seq = seq
-                .effect()
-                .copySprite(target)
-                .delay(250)
-                .attachTo(target)
-                .scaleToObject(1, { considerTokenScale: true })
-                .fadeIn(250)
-                .fadeOut(750)
-                .loopProperty('sprite', 'position.x', { from: -0.05, to: 0.05, duration: 50, pingPong: true, gridUnits: true })
-                .duration(1000)
-                .opacity(0.25);
-        });
-    }
-
-    return seq;
+    return projectile.create(tile, targets, { projectileType: 'arrow', ...config });
 }
 
 async function play(tile, targets, config = {}) {
-    config = settingsOverride(config);
-    const seq = await create(tile, targets, config);
-    return seq.play();
+    return projectile.play(tile, targets, { projectileType: 'arrow', ...config });
 }
 
 async function stop(tile, config = {}) {
-    // No persistent effects to stop
+    return projectile.stop(tile, config);
 }
 
 async function setup(config = {}) {
-    return matt.trap.setup('eskie.traps.arrow', { tileCount: 3, ...config });
+    return projectile.setup({ projectileType: 'arrow', playPath: 'eskie.traps.arrow', ...config });
 }
 
 export const arrow = {
@@ -79,5 +26,5 @@ export const arrow = {
     play,
     stop,
     setup,
-    default_config: DEFAULT_CONFIG,
+    default_config: projectile.default_config,
 };
