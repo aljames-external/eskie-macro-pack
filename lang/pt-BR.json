@@ -18,6 +18,51 @@
             "updated": "Os seguintes efeitos serão atualizados a partir de uma versão anterior do Eskie Macro Pack.",
             "warning": "Isso substituirá quaisquer animações existentes do Eskie Macro Pack com o mesmo nome. Não afetará nenhuma outra animação.",
             "nothing": "Todas as animações do Eskie Macro Pack já estão atualizadas!"
+        },
+        "traps": {
+            "fire": {
+                "title": "Fogo"
+            },
+            "pitfall": {
+                "title": "Fosso"
+            },
+            "projectile": {
+                "title": "Projétil",
+                "chooseTypeTitle": "Configuração de Projétil: Escolher Tipo",
+                "chooseTypeContent": "<p>Escolha o tipo de projétil para esta armadilha.</p>",
+                "noTypeChosen": "EMP | Nenhum tipo de projétil escolhido. Configuração cancelada.",
+                "arrow": "Flecha",
+                "dart": "Dardo",
+                "javelin": "Azagaia"
+            },
+            "spike": {
+                "title": "Espinhos"
+            },
+            "common": {
+                "continue": "Continuar",
+                "cancel": "Cancelar"
+            },
+            "setup": {
+                "chooseTrapTitle": "Configuração de Armadilha: Escolher Armadilha",
+                "chooseTrapContent": "<p>Escolha uma armadilha para configurar e instalar na cena.</p>",
+                "noTrapChosen": "EMP | Nenhuma armadilha escolhida. Configuração cancelada.",
+                "noSetupMethod": "EMP | A armadilha \"{name}\" não possui um método de configuração.",
+                "onlyGm": "EMP | Apenas o Mestre (GM) pode configurar armadilhas.",
+                "step1Title": "Configuração de Armadilha - {name}: Passo 1 (Ladrilhos de Gatilho)",
+                "step1Content": "<p>Selecione os **Ladrilhos de Gatilho (Trigger Tiles)** na cena (que os tokens pisam para disparar a armadilha).</p><p>Clique em <strong>Continuar</strong> após a seleção.</p>",
+                "noTriggerTiles": "EMP | Nenhum ladrilho de gatilho selecionado. Configuração de armadilha cancelada.",
+                "step2OriginTitle": "Configuração de Armadilha - {name}: Passo 2 (Ladrilhos de Origem/Lançador)",
+                "step2OriginContent": "<p>Selecione os **Ladrilhos de Origem da Armadilha (Trap Origin Tiles)** na cena (de onde a armadilha inicia ou dispara).</p><p>Clique em <strong>Continuar</strong> após a seleção.</p>",
+                "noOriginTiles": "EMP | Nenhum ladrilho de origem de armadilha selecionado. Configuração de armadilha cancelada.",
+                "step3TargetTitle": "Configuração de Armadilha - {name}: Passo 3 (Ladrilhos de Alvo/Destino)",
+                "step3TargetContent": "<p>Selecione os **Ladrilhos de Alvo da Armadilha (Trap Target Tiles)** na cena (para onde a armadilha dispara ou aterrissa).</p><p>Clique em <strong>Continuar</strong> após a seleção.</p>",
+                "noTargetTiles": "EMP | Nenhum ladrilho de alvo selecionado. Usando os Ladrilhos de Gatilho como padrão.",
+                "step2AnimTitle": "Configuração de Armadilha - {name}: Passo 2 (Ladrilhos de Animação)",
+                "step2AnimContent": "<p>Selecione os **Ladrilhos de Animação da Armadilha (Trap Animation Tiles)** onde o efeito visual será exibido.</p><p>Clique em <strong>Continuar</strong> após a seleção.</p>",
+                "noAnimTiles": "EMP | Nenhum ladrilho de animação selecionado. Usando os Ladrilhos de Gatilho como padrão.",
+                "extraTitle": "Configuração de Armadilha - {name}",
+                "noExtraTiles": "EMP | Nenhum {name} selecionado. Configuração de armadilha cancelada."
+            }
         }
     }
 }
