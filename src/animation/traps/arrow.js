@@ -3,6 +3,7 @@
  * Modular Conversion: bakanabaka
  */
 
+import { MODULE_ID } from '../../lib/constants.js';
 import { closest } from '../../lib/filemanager.js';
 import { settingsOverride } from '../../lib/settings.js';
 import { matt } from '../utils/matt-tiles.js';
@@ -17,7 +18,7 @@ async function create(tile, targets, config = {}) {
     const { repeats, repeatDelay } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
 
     // Lookup the trigger tile dynamically to determine projectile path
-    const triggerTile = canvas.tiles.placeables.find(t => t.document.getFlag('eskie-macro-pack', 'trap.trapTileIds')?.includes(tile.id));
+    const triggerTile = canvas.tiles.placeables.find(t => t.document.getFlag(MODULE_ID, 'trap.trapTileIds')?.includes(tile.id));
     const targetLoc = triggerTile?.center || (targets.length ? (targets[0].object?.center || targets[0]) : null);
 
     let seq = new Sequence();

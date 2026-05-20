@@ -3,6 +3,7 @@
  * Modular Conversion: bakanabaka
  */
 
+import { MODULE_ID } from '../../lib/constants.js';
 import { closest } from '../../lib/filemanager.js';
 import { settingsOverride } from '../../lib/settings.js';
 import { matt } from '../utils/matt-tiles.js';
@@ -17,7 +18,7 @@ async function create(tile, targets, config = {}) {
     const { boulderSpeed, boulderSize } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
 
     // Retrieve end tile from flags, falling back to Tagger search for backward compatibility
-    const endTileIds = tile.document.getFlag('eskie-macro-pack', 'trap.boulderEndTileIds') || [];
+    const endTileIds = tile.document.getFlag(MODULE_ID, 'trap.boulderEndTileIds') || [];
     let endTile = endTileIds.length ? canvas.tiles.get(endTileIds[0]) : null;
 
     if (!endTile && typeof Tagger !== 'undefined') {

@@ -3,6 +3,7 @@
  * Modular Conversion: bakanabaka
  */
 
+import { MODULE_ID } from '../../lib/constants.js';
 import { closest } from '../../lib/filemanager.js';
 import { settingsOverride } from '../../lib/settings.js';
 import { matt } from '../utils/matt-tiles.js';
@@ -16,7 +17,7 @@ async function create(tile, targets, config = {}) {
     const { fadeTime } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
 
     // Retrieve water spray origin tiles from flags, falling back to tag search for backward compatibility
-    const originIds = tile.document.getFlag('eskie-macro-pack', 'trap.floodingRoomSplashOrigins') || [];
+    const originIds = tile.document.getFlag(MODULE_ID, 'trap.floodingRoomSplashOrigins') || [];
     let splashOrigins = originIds.map(id => canvas.tiles.get(id)).filter(t => t);
     
     if (splashOrigins.length === 0 && typeof Tagger !== 'undefined') {
