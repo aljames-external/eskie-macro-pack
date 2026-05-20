@@ -8,6 +8,24 @@ A collection of community-generated macros utilizing both free and premium asset
 * [Eskie Youtube Channel](https://www.youtube.com/channel/UCnES1fzHV-xSu58rEL7NcDg)
 
 Join the Discord channel! Learn Sequencer and share your own creations!
+---
+
+## Want to Contribute?
+
+**Want to Contribute?** We'd love to have you! There are (at least) two ways to contribute to this project:
+
+1. Post your own Sequencer animations to the Discord and request integration!
+1. Create a PR following the current coding standards:
+    - `create` / `play` functions exported
+    - `DEFAULT_CONFIG` used as the base configuration
+    - Test the animation with token rotation
+    - (If integrating with AA) standardized arguments for `create` / `play` functions
+
+**Hate following coding guidelines?** Me too! I'd recommend using an AI agent to help. The code here isn't a case of life or death; it's a fun side project that shouldn't take up much of your time, please don't feel you need to spend an entire day getting a PR in. Skills have been written to help enforce the coding guidelines, just ask the agent to clean up your code following the discord to module and style guide skills.
+
+Downloading Visual Studio Code and/or an agentic IDE such as Google's Antigravity to help modify code.
+
+**Want this localized into your native language?** I don't entrust that to AI - I need native speaker help! Submit a PR and I'll be happy to give a mild vetting process and approve it.
 
 ## Animation Contributors
 
@@ -330,20 +348,3 @@ if (playPath && typeof token !== 'undefined') {
 ```
 
 The trap/origin tiles store `trap.trapTargetTileIds` (for 3-tile traps) and any extra configuration such as `projectileType`.
-
----
-
-## Want to Contribute?
-
-We'd love to have you! There are (at least) two ways to contribute to this project:
-
-1. Post your own Sequencer animations to the Discord and request integration!
-1. Create a PR following the current coding standards:
-    - `create` / `play` functions exported
-    - `DEFAULT_CONFIG` used as the base configuration
-    - Test the animation with token rotation
-    - (If integrating with AA) standardized arguments for `create` / `play` functions
-
-Hate following coding guidelines? Me too! I'd recommend using an AI agent to help. The code here isn't life saving... you don't need to spend an entire day getting a PR in. Skills have been written to help enforce the coding guidelines, just ask the agent to clean up your code following the discord to module and style guide skills.
-
-Want this localized into your native language? I don't entrust that to AI - I need native speaker help! Submit a PR and I'll be happy to give a mild vetting process and approve it.
