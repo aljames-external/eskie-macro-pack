@@ -5,6 +5,7 @@
 
 import { closest } from '../../lib/filemanager.js';
 import { settingsOverride } from '../../lib/settings.js';
+import { matt } from '../utils/matt-tiles.js';
 
 const DEFAULT_CONFIG = {
     delay: 500,
@@ -71,9 +72,14 @@ async function stop(tile, config = {}) {
     // No persistent effects to stop
 }
 
+async function setup(config = {}) {
+    return matt.trap.setup('eskie.traps.spike', config);
+}
+
 export const spike = {
     create,
     play,
     stop,
+    setup,
     default_config: DEFAULT_CONFIG,
 };
