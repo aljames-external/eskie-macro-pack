@@ -17,23 +17,28 @@ async function create(tile, targets, config = {}) {
     config = settingsOverride(config);
     const { reveal, smokeSize, fallenScale } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
 
-    // Target all tokens currently standing on the trap tile, falling back to triggering targets
+    // Target all tokens currently overlapping the trap tile bounds
     const tileX = tile.document?.x ?? tile.x;
     const tileY = tile.document?.y ?? tile.y;
     const tileWidth = tile.document?.width ?? tile.width;
     const tileHeight = tile.document?.height ?? tile.height;
 
-    const minX = tileX;
-    const maxX = tileX + tileWidth;
-    const minY = tileY;
-    const maxY = tileY + tileHeight;
+    const tileMinX = tileX;
+    const tileMaxX = tileX + tileWidth;
+    const tileMinY = tileY;
+    const tileMaxY = tileY + tileHeight;
 
-    const tokensOnTile = canvas.tokens.placeables.filter(t => {
-        const center = t.center;
-        return center.x >= minX && center.x <= maxX && center.y >= minY && center.y <= maxY;
+    const finalTargets = canvas.tokens.placeables.filter(t => {
+        const tWidth = (t.document?.width ?? t.width ?? 1) * canvas.grid.size;
+        const tHeight = (t.document?.height ?? t.height ?? 1) * canvas.grid.size;
+        const tMinX = t.document?.x ?? t.x;
+        const tMaxX = tMinX + tWidth;
+        const tMinY = t.document?.y ?? t.y;
+        const tMaxY = tMinY + tHeight;
+
+        // Bounding-box intersection check
+        return !(tMaxX <= tileMinX || tMinX >= tileMaxX || tMaxY <= tileMinY || tMinY >= tileMaxY);
     });
-
-    const finalTargets = tokensOnTile.length ? tokensOnTile : targets;
 
     let seq = new Sequence()
         // Dust puff when trap opens
