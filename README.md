@@ -38,6 +38,13 @@ Downloading Visual Studio Code and/or an agentic IDE such as Google's Antigravit
 * Mia Del'Mori (@.tranquilite)
 * Akane (@yamiakane)
 
+## Language Contributors
+
+* Brazilian Portuguese
+    - Kharmans (@kharmans)
+* Spanish 
+    - Cerbe (@cerbe_)
+
 ---
 
 ## Features
