@@ -6,18 +6,18 @@
                 "hint": "Si está desactivado, las macros no podrán reproducir sonidos."
             },
             "autorecUpdate": {
-                "name": "Actualizar Auto-Reconocimiento de las Animaciones Automatizadas",
+                "name": "Actualizar Auto-Reconocimiento de Automated Animations",
                 "label": "Actualizar Autorec de AA",
-                "hint": "Forzar una actualización del Auto-Reconocimiento de las Animaciones Automatizadas."
+                "hint": "Forzar una actualización del Auto-Reconocimiento de Automated Animations."
             }
         },
         "updateMenu": {
-            "added": "Los siguientes nuevos efectos serán añadidos a tus ajustes de Auto-Reconocimiento de Animaciones Automatizadas .",
+            "added": "Los siguientes nuevos efectos serán añadidos a tus ajustes de Auto-Reconocimiento de Automated Animations.",
             "custom": "Los siguientes efectos no serán añadidos debido a que ya existen desde otra fuente.",
             "customHint": "Estos efectos serán ignorados. Para que Eskie Macro Pack se haga cargo, por favor elimínalos de Automated Animations y reenvíalos.",
             "updated": "Los siguientes efectos serán actualizados desde una versión previa de Eskie Macro Pack.",
-            "warning": "Esto sobreescribirá cualquier animación existente desde Eskie Macro Pack con el mismo nombre. No afectará a ninguna otra animación.",
-            "nothing": "Todas las animaciones de Eskie Macro Pack están al actualizadas!"
+            "warning": "Esto sobrescribirá cualquier animación existente de Eskie Macro Pack con el mismo nombre. No afectará a ninguna otra animación.",
+            "nothing": "¡Todas las ya animaciones de Eskie Macro Pack están actualizadas!"
         },
         "traps": {
             "fire": {
@@ -35,29 +35,29 @@
             },
             "setup": {
                 "chooseTrapTitle": "Configuración de Trampa: Elige la Trampa",
-                "chooseTrapContent": "<p>Elige una trampa para configurar e instalar el lienzo.</p>",
-                "noTrapChosen": "EMP | Ninguna trampa seleccionada. Instalación de trampa cancelada.",
-                "noSetupMethod": "EMP | Ningún \"{name}\" de trampa ha sido configurado.",
+                "chooseTrapContent": "<p>Elige una trampa para configurar e instalar en el lienzo.</p>",
+                "noTrapChosen": "EMP | Ninguna trampa seleccionada. Configuración de trampa cancelada.",
+                "noSetupMethod": "EMP | La trampa \"{name}\" no tiene un método de configuración establecido.",
                 "onlyGm": "EMP | Solo un DJ (GM) puede configurar trampas.",
                 "step1Title": "Configuración de Trampa - {name}: Paso 1 (Casillas Activadoras)",
-                "step1Content": "<p>Selecciona la(s) **Casilla(s) Activadora(s)** en el lienzo (donde los tokens deberán pisar para activar la trampa).</p><p>Clica en <strong>Continuar</strong> tras seleccionar.</p>",
+                "step1Content": "<p>Selecciona la(s) **Casilla(s) Activadora(s)** en el lienzo (donde los tokens deberán pisar para activar la trampa).</p><p>Haz clic en <strong>Continuar</strong> tras seleccionar.</p>",
                 "noTriggerTiles": "EMP | No hay casillas activadoras seleccionadas. Configuración de la trampa cancelada.",
                 "step2OriginTitle": "Configuración de la Trampa - {name}: Paso 2 (Origen de la Trampa/Casillas de Lanzamiento)",
-                "step2OriginContent": "<p>Selecciona la(s) **Casilla(s) Activadora(s) de la Trampa** en el lienzo (desde donde la trampa empieza a disparar).</p><p>Clica en <strong>Continuar</strong> tras seleccionar.</p>",
+                "step2OriginContent": "<p>Selecciona la(s) **Casilla(s) de Origen de la Trampa** en el lienzo (desde donde la trampa empieza o dispara).</p><p>Haz clic en <strong>Continuar</strong> tras seleccionar.</p>",
                 "noOriginTiles": "EMP | No hay casillas de origen seleccionadas para la trampa. Configuración de la trampa cancelada.",
-                "step3TargetTitle": "Configuración de la trampa - {name}: Paso 3 (Objetivo de la Trampa/Casillas de Aterrizaje)",
-                "step3TargetContent": "<p>Selecciona la(s) **Casilla(s) de Objetivo para la Trampa** en el lienzo (hacia donde dispara la trampa o donde aterriza).</p><p>Clica en <strong>Continuar</strong> tras seleccionar.</p>",
-                "noTargetTiles": "EMP | No hay casillas de objetivo para la trampa seleccionadas. Se utilizarán las Casillas Activadoras por defecto.",
+                "step3TargetTitle": "Configuración de la Trampa - {name}: Paso 3 (Objetivo de la Trampa/Casillas de Destino)",
+                "step3TargetContent": "<p>Selecciona la(s) **Casilla(s) de Objetivo de la Trampa** en el lienzo (hacia donde dispara la trampa o donde impacta).</p><p>Haz clic en <strong>Continuar</strong> tras seleccionar.</p>",
+                "noTargetTiles": "EMP | No hay casillas de objetivo seleccionadas para la trampa. Se utilizarán las Casillas Activadoras por defecto.",
                 "step2AnimTitle": "Configuración de Trampa - {name}: Paso 2 (Casillas de Animación)",
-                "step2AnimContent": "<p>Selecciona la(s) **Casilla(s) de Animación de Trampas** donde el efecto visual se reproducirá.</p><p>Clica en <strong>Continuar</strong> tras seleccionar.</p>",
-                "noAnimTiles": "EMP | No hay casillas de animación de trampas. Se utilizarán las Casillas Activadoras por defecto.",
+                "step2AnimContent": "<p>Selecciona la(s) **Casilla(s) de Animación de la Trampa** donde el efecto visual se reproducirá.</p><p>Haz clic en <strong>Continuar</strong> tras seleccionar.</p>",
+                "noAnimTiles": "EMP | No hay casillas de animación de trampas seleccionadas. Se utilizarán las Casillas Activadoras por defecto.",
                 "extraTitle": "Configuración de Trampa - {name}",
                 "noExtraTiles": "EMP | Ningún {name} seleccionado. Configuración de la trampa cancelada."
             },
             "projectile": {
                 "title": "Proyectil",
-                "chooseTypeTitle": "Configuración de Trampas de Proyectil: Escoge un tipo",
-                "chooseTypeContent": "<p>Escoge un tipo de proyectil para esta trampa.</p>",
+                "chooseTypeTitle": "Configuración de Trampa de Proyectiles: Escoge un Tipo",
+                "chooseTypeContent": "<p>Escoge el tipo de proyectil para esta trampa.</p>",
                 "noTypeChosen": "EMP | No se ha seleccionado ningún tipo de proyectil. Configuración cancelada.",
                 "arrow": "Flecha",
                 "dart": "Dardo",
