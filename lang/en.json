@@ -6,13 +6,13 @@
                 "hint": "If disabled, macros will not be able to play sounds."
             },
             "autorecUpdate": {
-                "name": "Update Automated Animation Autorecognition",
+                "name": "Update Automated Animations Autorecognition",
                 "label": "Update AA Autorec",
-                "hint": "Force an update of the Automated Animation Autorecognition."
+                "hint": "Force an update of the Automated Animations Autorecognition."
             }
         },
         "updateMenu": {
-            "added": "The following new effects will be added to your Automated Animation Autorecognition settings.",
+            "added": "The following new effects will be added to your Automated Animations Autorecognition settings.",
             "custom": "The following effects will not be added due to them already existing from another source.",
             "customHint": "These effects will be ignored. To have Eskie Macro Pack manage them, please remove them from Automated Animations and resubmit.",
             "updated": "The following effects will be updated from a previous version of Eskie Macro Pack.",

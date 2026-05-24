@@ -6,7 +6,7 @@
                 "hint": "Se desativado, as macros não poderão reproduzir sons."
             },
             "autorecUpdate": {
-                "name": "Atualizar Auto-Reconhecimento do Automated Animation",
+                "name": "Atualizar Auto-Reconhecimento do Automated Animations",
                 "label": "Atualizar AutoRec do AA",
                 "hint": "Força uma atualização do Auto-Reconhecimento do Automated Animations."
             }
@@ -49,7 +49,7 @@
                 "step3TargetContent": "<p>Selecione a(s) **Peça(s) de Alvo de Armadilha** na tela (para onde a armadilha dispara ou onde ela atinge).</p><p>Clique em <strong>Continuar</strong> após selecionar.</p>",
                 "noTargetTiles": "EMP | Nenhuma peça de alvo de armadilha selecionada. Usando as Peças de Gatilho por padrão.",
                 "step2AnimTitle": "Configuração de Armadilha - {name}: Etapa 2 (Peças de Animação)",
-                "step2AnimContent": "<p>Selecione a(s) **Peça(s) de Animação de Armadilha** onde o efeito visual será reproduzido.</p><p>Clique em <strong>Continue</strong> após selecionar.</p>",
+                "step2AnimContent": "<p>Selecione a(s) **Peça(s) de Animação de Armadilha** onde o efeito visual será reproduzido.</p><p>Clique em <strong>Continuar</strong> após selecionar.</p>",
                 "noAnimTiles": "EMP | Nenhuma peça de animação de armadilha selecionada. Usando as Peças de Gatilho por padrão.",
                 "extraTitle": "Configuração de Armadilha - {name}",
                 "noExtraTiles": "EMP | Nenhuma {name} selecionada. Configuração da armadilha cancelada."
