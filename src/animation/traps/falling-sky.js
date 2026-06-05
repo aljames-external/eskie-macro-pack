@@ -138,7 +138,7 @@ async function create(tile, targets, config = {}) {
 
                 // Smoke puff when landing
                 .effect()
-                .file(closest('animated-spell-effects-cartoon.smoke.99'))
+                .file(closest('jb2a.smoke.puff.ring.01.white'))
                 .atLocation(target)
                 .size({ width: targetWidth * smokeSize * canvas.grid.size, height: targetHeight * smokeSize * canvas.grid.size })
                 .opacity(0.8)
