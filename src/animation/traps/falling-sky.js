@@ -103,12 +103,13 @@ async function create(tile, targets, config = {}) {
                 .show(true)
                 .waitUntilFinished()
 
-                // Mini copy sprite representing the token sitting extremely far away (high in the sky)
+                // Mini copy sprite representing the token falling from high in the sky toward the ground
                 .effect()
                 .copySprite(target)
                 .attachTo(target, { offset: { y: -0.4 * targetWidth }, gridUnits: true, bindAlpha: false })
                 .scaleToObject(fallenScale, { considerTokenScale: false })
                 .scaleIn(0, 500, { ease: 'easeOutBack' })
+                .spriteRotation(-target.document.rotation)
                 .opacity(0.9)
                 .aboveLighting()
                 .zIndex(1)
@@ -132,6 +133,7 @@ async function create(tile, targets, config = {}) {
                 .attachTo(target, { bindAlpha: false })
                 .scaleToObject(1, { considerTokenScale: true })
                 .scaleIn(startScale, 1000, { ease: 'easeInQuad' })
+                .spriteRotation(-target.document.rotation)
                 .fadeIn(250)
                 .duration(1000)
                 .waitUntilFinished()
