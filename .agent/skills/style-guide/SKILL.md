@@ -68,6 +68,7 @@ When writing or modifying code in the `eskie-macro-pack` repository, adhere stri
 
 *   **Hooks:** Use `Hooks.once` or `Hooks.on` for all Foundry VTT lifecycle events.
 *   **Settings and Localization:** Use `game.settings.register` and `game.i18n.localize` for module settings and text definitions.
+*   **Flag Scope:** Always import `MODULE_ID` from constants (e.g., `import { MODULE_ID } from '../../lib/constants.js';` or relative path) and use it when getting or setting document flags (e.g., `tile.document.getFlag(MODULE_ID, ...)`). Do NOT hardcode the module ID or folder name strings (such as `'eskie-macro-pack'`) because the active module scope key is `'eskie-macros'`.
 
 ## Sequencer Specifics
 
