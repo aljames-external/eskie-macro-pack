@@ -86,6 +86,20 @@ When writing or modifying code in the `eskie-macro-pack` repository, adhere stri
     }
     ```
 
+*   **copySprite Rotation Fix:** Every `.copySprite(token)` effect MUST include `.spriteRotation(-token.document.rotation)` immediately after to counteract the token's world rotation. Without this, the sprite renders in a rotated orientation that does not match the token's visual appearance.
+    ```javascript
+    // Incorrect: sprite may appear rotated if the token has a non-zero rotation
+    sequence.effect()
+        .copySprite(token)
+        .attachTo(token);
+
+    // Correct: always negate the token's rotation on copySprite effects
+    sequence.effect()
+        .copySprite(token)
+        .attachTo(token)
+        .spriteRotation(-token.document.rotation);
+    ```
+
 ## Automated Linting
 
 *   **Linter Script:** Before finalizing your code changes, you MUST run the provided linter script on any JavaScript files you modified to automatically check for tabs and logging prefix violations.
