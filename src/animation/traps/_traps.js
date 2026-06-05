@@ -6,6 +6,7 @@ import { dialog } from '../../lib/dialog.js';
 import { fire } from './fire.js';
 // import { floodingRoom } from './flooding-room.js';
 import { pitfall } from './pitfall.js';
+import { fallingSky } from './falling-sky.js';
 import { projectile } from './projectile.js';
 // import { rollingBoulder } from './rolling-boulder.js';
 import { spike } from './spike.js';
@@ -51,6 +52,7 @@ export const traps = {
     fire,
     // floodingRoom,
     pitfall,
+    fallingSky,
     projectile,
     // rollingBoulder,
     spike,
