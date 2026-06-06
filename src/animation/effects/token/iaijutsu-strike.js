@@ -37,7 +37,7 @@ function dashEffect(source, target) {
 
     let sequence = new Sequence();
     sequence.effect()
-        .file(closest("animated-spell-effects-cartoon.magic.mind sliver"))
+        .file(closest("eskie.attack.ranged.arrow.01.physical.heavy.redblack"))
         .atLocation(target)
         .rotate(angleDeg)
         .filter("ColorMatrix", { saturate: -1,brightness:1 })
