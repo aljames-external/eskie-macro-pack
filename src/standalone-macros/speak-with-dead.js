@@ -76,7 +76,7 @@ function _addTokenVisualEffects(token, label) {
         .effect()
         .name(label)
         .delay(1000)
-        .file("animated-spell-effects-cartoon.magic.mind sliver")
+        .file("eskie.attack.ranged.arrow.01.physical.medium.green")
         .atLocation(token, { offset: { y: -0.75 * token.document.width }, gridUnits: true })
         .scaleToObject(2)
         .rotate(-90)

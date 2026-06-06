@@ -211,7 +211,7 @@ async function createStarwardSword(token, config = {}, options = {}) {
                         .zIndex(3)
 
                         .effect()
-                        .file("animated-spell-effects-cartoon.magic.mind sliver")
+                        .file("eskie.attack.ranged.arrow.01.physical.medium.purple")
                         .atLocation(initialPoints[u])
                         .stretchTo(position)
                         .filter("ColorMatrix", { hue: 70 })
@@ -315,7 +315,7 @@ async function createStarwardSword(token, config = {}, options = {}) {
                         .zIndex(3)
 
                         .effect()
-                        .file("animated-spell-effects-cartoon.magic.mind sliver")
+                        .file("eskie.attack.ranged.arrow.01.physical.medium.purple")
                         .atLocation(initialPoints[u])
                         .stretchTo(initialPoints[(u + 1)])
                         .filter("ColorMatrix", { hue: 70 })
@@ -353,7 +353,7 @@ async function createStarwardSword(token, config = {}, options = {}) {
 
                 .effect()
                 .name(`location`)
-                .file("animated-spell-effects-cartoon.magic.mind sliver")
+                .file("eskie.attack.ranged.arrow.01.physical.medium.purple")
                 .atLocation(points[e])
                 .stretchTo(points[0])
                 .filter("ColorMatrix", { hue: 70 })
@@ -461,7 +461,7 @@ async function createStarwardSword(token, config = {}, options = {}) {
             mainSequence.addSequence(new Sequence()
 
                 .effect()
-                .file("animated-spell-effects-cartoon.magic.mind sliver")
+                .file("eskie.attack.ranged.arrow.01.physical.medium.purple")
                 .atLocation(points[e])
                 .stretchTo(points[e + 1])
                 .fadeOut(1000)
@@ -469,7 +469,7 @@ async function createStarwardSword(token, config = {}, options = {}) {
                 .zIndex(4)
 
                 .effect()
-                .file("animated-spell-effects-cartoon.magic.mind sliver")
+                .file("eskie.attack.ranged.arrow.01.physical.medium.purple")
                 .atLocation(points[9 - e])
                 .stretchTo(points[9 - e - 1])
                 .fadeOut(1000)

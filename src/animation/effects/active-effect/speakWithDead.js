@@ -96,7 +96,7 @@ function _addTokenVisualEffects(token, label) {
         .effect()
         .name(label)
         .delay(1000)
-        .file(closest("animated-spell-effects-cartoon.magic.mind sliver"))
+        .file(closest("eskie.attack.ranged.arrow.01.physical.heavy.purpleblack"))
         .atLocation(token, { offset: { y: -0.75 * token.document.width }, gridUnits: true })
         .scaleToObject(2)
         .rotate(-90)
@@ -281,7 +281,7 @@ async function preload(config) {
         closest("jb2a.magic_signs.circle.02.necromancy.loop.green"),
         closest("jb2a.particles.outward.blue.01.03"),
         closest("jb2a.detect_magic.circle.blue"),
-        closest("animated-spell-effects-cartoon.magic.mind sliver"),
+        closest("eskie.attack.ranged.arrow.01.physical.heavy.purpleblack"),
         closest("jb2a.token_border.circle.static.blue.012"),
         closest("jb2a.spirit_guardians.blue.spirits"),
         closest("jb2a.magic_signs.rune.necromancy.complete.blue"),
