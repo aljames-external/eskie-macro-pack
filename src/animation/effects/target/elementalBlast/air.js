@@ -85,7 +85,7 @@ async function create(token, target, config = {}) {
     .filter("ColorMatrix", { hue: 150 })
 
     .effect()
-    .file(closest("animated-spell-effects-cartoon.smoke.43"))
+    .file(closest("eskie.smoke.03.white"))
     .atLocation(target,{offset:{x:0, y:0}, gridUnits:true})
     .scale(0.3)
     .filter("ColorMatrix", { hue: 150 })
