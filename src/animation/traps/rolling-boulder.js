@@ -101,7 +101,7 @@ async function create(tile, targets, config = {}) {
         // Explosion smoke cloud
         .effect()
         .delay(100)
-        .file(closest('animated-spell-effects-cartoon.smoke.11'))
+        .file(closest('jb2a.smoke.puff.centered.grey'))
         .atLocation(endLoc)
         .playbackRate(0.65)
         .fadeOut(1500)
