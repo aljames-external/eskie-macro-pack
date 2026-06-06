@@ -64,7 +64,7 @@ async function create(source, config = {}) {
 
         // Smoke effect
         sequence.effect()
-            .file(closest('animated-spell-effects-cartoon.smoke.43'))
+            .file(closest('eskie.smoke.03.white'))
             .atLocation(pos)
             .fadeIn(300)
             .fadeOut(300)

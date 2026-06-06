@@ -24,7 +24,7 @@ async function create(tile, targets, config = {}) {
         seq = seq
             // Electricity burst at the door tile
             .effect()
-            .file(closest('animated-spell-effects-cartoon.electricity.19'))
+            .file(closest('eskie.lightning.03.blue'))
             .atLocation(tile)
             .size(1.25, { gridUnits: true })
             .rotateTowards(target)

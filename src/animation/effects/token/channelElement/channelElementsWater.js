@@ -64,7 +64,7 @@ async function create(token, config = {}) {
 
     sequence.effect()
         .name(effectName)
-        .file(closest("animated-spell-effects-cartoon.water.63"))
+        .file(closest("jb2a.impact.water"))
         .attachTo(token, { offset: { x: 0, y: 0 }, gridUnits: true, bindRotation: false })
         .scaleToObject(2)
         .fadeOut(250)
