@@ -13,7 +13,7 @@ const DEFAULT_CONFIG = {
     duration: 500, // For reformCreate
     effect: { // For death and beam
         smoke: { // For death
-            img: "animated-spell-effects-cartoon.smoke.97",
+            img: "eskie.smoke.05.tan",
             delay: 1000,
             duration: 10000,
             scale: 0.5,
@@ -139,7 +139,7 @@ function getDissolveConfig() {
 }
 
 function dissolveCreate(target, config = {}) {
-    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, {inplace:false});
+    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
     const { id } = mConfig;
 
     let seq = new Sequence();
@@ -173,7 +173,7 @@ async function dissolvePlay(target, config = {}) {
  * @returns {Sequence} A Sequencer sequence object representing the death animation.
  */
 function death(target, config = {}) {
-    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, {inplace:false});
+    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
     const { id, effect: { smoke: smokeEffect, spirit: spiritEffect } } = mConfig;
 
     let seq = new Sequence()
@@ -210,8 +210,8 @@ function death(target, config = {}) {
     return seq;
 }
 
-function beam(token, target, config = {}) { 
-    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, {inplace:false});
+function beam(token, target, config = {}) {
+    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
     const { id, effect: { beam: beamEffects } } = mConfig;
     return beamEffect.create(token, target, { id, effects: beamEffects });
 }
@@ -229,7 +229,7 @@ function beam(token, target, config = {}) {
  */
 async function create(token, target, config = {}) {
     // Merge user config with default config
-    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, {inplace:false});
+    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
 
     let disintegrateEffect = beam(token, target, mConfig);
     if (mConfig.targetDeath) // Chain the death animation if the target is dead
@@ -258,7 +258,7 @@ async function play(token, target, config = {}) {
  * @returns {Promise<void>}
  */
 async function stop(token, config = {}) {
-    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, {inplace:false});
+    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
     const { id } = mConfig;
     return Sequencer.EffectManager.endEffects({ name: id, object: token });
 }
@@ -270,7 +270,7 @@ async function stop(token, config = {}) {
  * @returns {Sequence} A Sequencer sequence object.
  */
 function reformCreate(target, config = {}) {
-    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, {inplace:false});
+    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
     const { id, duration } = mConfig;
     const reformSequence = new Sequence();
     const dissolveSections = getDissolveConfig();
@@ -308,8 +308,8 @@ function reformCreate(target, config = {}) {
 async function reformPlay(target, config = {}) {
     let reform = new Sequence();
     reform = reform
-                .animation().on(target).show(true)
-                .addSequence(reformCreate(target, config));
+        .animation().on(target).show(true)
+        .addSequence(reformCreate(target, config));
     if (reform) { return reform.play(); }
 }
 
@@ -321,12 +321,12 @@ export const disintegrate = {
     // Subfunctions
     beam,
     death,
-    dissolve : {
+    dissolve: {
         create: dissolveCreate,
         play: dissolvePlay,
         default_config: DEFAULT_CONFIG,
     },
-    reform : {
+    reform: {
         create: reformCreate,
         play: reformPlay,
         default_config: DEFAULT_CONFIG,
