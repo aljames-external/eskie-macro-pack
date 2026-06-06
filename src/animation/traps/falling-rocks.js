@@ -58,7 +58,7 @@ async function create(tile, targets, config = {}) {
         // Dust smoke cloud
         .effect()
         .delay(100)
-        .file(closest('animated-spell-effects-cartoon.smoke.11'))
+        .file(closest('jb2a.smoke.puff.centered.grey'))
         .atLocation(tile)
         .playbackRate(0.65)
         .fadeIn(250)
