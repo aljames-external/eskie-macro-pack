@@ -1,8 +1,9 @@
 // Original Author: .eskie
 // Modular Conversion: bakanabaka
 
-import { closest } from '../../../lib/filemanager.js';
 import { utils } from '../../utils/_utils.js';
+import { closest } from '../../../lib/filemanager.js';
+import { autoanimations } from '../../../integration/autoanimations.js';
 
 const DEFAULT_CONFIG = {
     missed: false,
@@ -22,7 +23,8 @@ const DEFAULT_CONFIG = {
  */
 async function create(token, target, config = {}) {
     const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
-    const { missed, timingAdjust, effect } = mConfig;
+    const { hitTargets, timingAdjust, effect } = mConfig;
+    const missed = !hitTargets.includes(target.document.id);
 
     // Determine pull location (best adjacent square to the token along the line to the target)
     const location = utils.grid.getBestAdjacentLocation(token, target);
@@ -102,3 +104,5 @@ export const hookAndPull = {
     stop,
     default_config: DEFAULT_CONFIG,
 };
+
+autoanimations.register("Hook and Pull", "ranged-target", "eskie.effect.hookAndPull", DEFAULT_CONFIG);
