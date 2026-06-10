@@ -24,7 +24,7 @@ const DEFAULT_CONFIG = {
 async function create(token, target, config = {}) {
     const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
     const { hitTargets, timingAdjust, effect } = mConfig;
-    const missed = !hitTargets.includes(target.document.id);
+    const missed = mConfig.missed || !hitTargets?.includes(target.document.id);
 
     // Determine pull location (best adjacent square to the token along the line to the target)
     const location = utils.grid.getBestAdjacentLocation(token, target);
