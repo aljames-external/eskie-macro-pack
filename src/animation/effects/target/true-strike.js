@@ -86,7 +86,7 @@ async function createTrueStrikeCast(token, config = {}) {
         .scaleOut(0, 250)
         .opacity(0.9)
         .persist()
-    ;
+        ;
 
     return sequence;
 }
@@ -178,7 +178,7 @@ async function createTrueStrikeAttack(token, target, config = {}) {
         .delay(40)
 
         .effect()
-        .file(closest("modules/animated-spell-effects-cartoon/spell-effects/cartoon/magic/mind_sliver_LINE.webm"))
+        .file(closest("eskie.attack.ranged.arrow.01.physical.heavy.red.normal"))
         .atLocation(target)
         .anchor({ x: 0.75 })
         .scale(0.075)
@@ -234,7 +234,7 @@ async function createTrueStrikeAttack(token, target, config = {}) {
         .attachTo(target)
         .fadeIn(1000)
         .fadeOut(1000)
-    ;
+        ;
 
     return sequence;
 }

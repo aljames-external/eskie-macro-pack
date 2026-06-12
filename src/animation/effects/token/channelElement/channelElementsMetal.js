@@ -8,19 +8,7 @@ const DEFAULT_CONFIG = {
     effectName: "ChannelMetal",
 };
 
-function _createMetal(sequence, token, xOffset) {
-    sequence.effect()
-        .name(effectName)
-        .file(closest("animated-spell-effects-cartoon.electricity.04"))
-        .attachTo(token, { offset: { x: xOffset * token.document.width, y: 0.6 * token.document.width }, gridUnits: true, bindRotation: false })
-        .stretchTo(token, { offset: { x: xOffset * token.document.width, y: 0 }, gridUnits: true })
-        .rotate(90)
-        .fadeOut(1600)
-        .opacity(1)
-        .filter("ColorMatrix", { saturate: -1, hue: 50 })
-        .spriteOffset({ x: -0.3 * token.document.width, y: 0.4 * token.document.width }, { gridUnits: true })
-        .delay(200);
-
+function _createMetal(sequence, token, effectName, xOffset) {
     sequence.effect()
         .name(effectName)
         .file(closest("jb2a.celestial_bodies.planet.atmo.05.blue"))
@@ -52,13 +40,13 @@ function _createMetal(sequence, token, xOffset) {
 }
 
 async function create(token, config = {}) {
-    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, {inplace:false});
+    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
     const { effectName } = mConfig;
     const sequence = new Sequence();
 
     sequence.effect()
         .name(effectName)
-        .file(closest("animated-spell-effects-cartoon.electricity.35"))
+        .file(closest("eskie.damage.electricity.01.blue"))
         .attachTo(token, { offset: { x: 0.05, y: 0.1 }, gridUnits: true, bindRotation: false })
         .scaleToObject(3.5)
         .scaleIn(0, 500, { ease: "easeOutCubic" })
@@ -89,10 +77,10 @@ async function create(token, config = {}) {
         .tint("#fd9608")
         .mask();
 
-    _createMetal(sequence, token, -0.6);
-    _createMetal(sequence, token, -0.25);
-    _createMetal(sequence, token, 0.25);
-    _createMetal(sequence, token, 0.6);
+    _createMetal(sequence, token, effectName, -0.6);
+    _createMetal(sequence, token, effectName, -0.25);
+    _createMetal(sequence, token, effectName, 0.25);
+    _createMetal(sequence, token, effectName, 0.6);
 
     return sequence;
 }
@@ -103,7 +91,7 @@ async function play(token, config = {}) {
 }
 
 async function stop(token, config = {}) {
-    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, {inplace:false});
+    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
     const { effectName } = mConfig;
     return Sequencer.EffectManager.endEffects({ name: effectName, object: token });
 }

@@ -67,7 +67,7 @@ async function createViciousMockeryCast(token, config = {}) {
         })
         .repeats(5, 200, 200)
         .fadeOut(500)
-    ;
+        ;
 
     return sequence;
 }
@@ -97,7 +97,7 @@ async function createViciousMockeryImpact(target, word, config = {}) {
     sequence
         .effect()
         .atLocation(target, { offset: { x: -0.25 * target.document.width, y: -0.3 * target.document.width }, randomOffset: 0.1, gridUnits: true })
-        .file(closest(`animated-spell-effects-cartoon.level 01.healing word.purple`))
+        .file(closest(`eskie.pulse.energy.02.fast.blue`))
         .fadeOut(250)
         .zIndex(1)
         .scale(0.25 * target.document.width)
@@ -166,7 +166,7 @@ async function createViciousMockeryImpact(target, word, config = {}) {
 
         .effect()
         .delay(800)
-        .file(closest("animated-spell-effects-cartoon.misc.demon"))
+        .file(closest("eskie.emote.confused"))
         .atLocation(target, { offset: { x: -0, y: -0.5 * target.document.width }, gridUnits: true })
         .scaleToObject(0.75)
         .playbackRate(1.5)
@@ -175,13 +175,13 @@ async function createViciousMockeryImpact(target, word, config = {}) {
 
         .effect()
         .delay(1100)
-        .file(closest("animated-spell-effects-cartoon.misc.demon"))
+        .file(closest("eskie.emote.confused"))
         .atLocation(target, { offset: { x: -0.5 * target.document.width, y: -0 }, gridUnits: true })
         .scaleToObject(0.75)
         .playbackRate(1.5)
         .rotate(15)
         .filter("ColorMatrix", { hue: -100 })
-    ;
+        ;
 
     return sequence;
 }
