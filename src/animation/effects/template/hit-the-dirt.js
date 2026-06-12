@@ -59,17 +59,6 @@ async function create(token, config, options) {
         .spriteRotation(-180)
         .opacity(0.5)
 
-        .effect()
-        .delay(900)
-        .file(closest("animated-spell-effects-cartoon.earth.debris.04"))
-        .atLocation(position)
-        .rotateTowards(token)
-        .scaleToObject(1.5)
-        .belowTokens()
-        .spriteOffset({ x: -1.25 }, { gridUnits: true })
-        .spriteRotation(90)
-        .zIndex(0)
-
         // Animate the token jumping
         .effect()
         .copySprite(token)

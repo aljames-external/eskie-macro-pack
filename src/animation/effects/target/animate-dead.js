@@ -116,7 +116,7 @@ async function createAnimateDead(undeadToken, config = {}) {
 
         .effect()
         .delay(250)
-        .file(closest("animated-spell-effects-cartoon.water.117"))
+        .file(closest("blfx.spell.template.circle.wave2.blood1.splatter.red"))
         .attachTo(undeadToken)
         .size(1.3, { gridUnits: true })
         .belowTokens()

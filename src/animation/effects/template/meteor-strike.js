@@ -49,7 +49,7 @@ async function create(source, config = {}) {
 
         // Primary fire effect
         sequence.effect()
-            .file(closest('animated-spell-effects-cartoon.fire.03'))
+            .file(closest('blfx.spell.cast.swirl1.fire1.orange'))
             .atLocation(pos)
             .scale(fireScale)
             .waitUntilFinished(isFirst ? -400 : -600);
@@ -57,7 +57,7 @@ async function create(source, config = {}) {
         // Explosion effect for subsequent strikes
         if (!isFirst) {
             sequence.effect()
-                .file(closest('animated-spell-effects-cartoon.fire.explosion.01'))
+                .file(closest('jb2a.explosion.01.orange'))
                 .atLocation(pos)
                 .scale(isLast ? 1.0 : 0.75);
         }
