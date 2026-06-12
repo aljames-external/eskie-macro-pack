@@ -40,11 +40,11 @@ function bestFit(modulePrefix, ...categories) {
         remainingOptions = Sequencer.Database.getPathsUnder(currentPath);
     }
 
-    if (diverged) { 
+    if (diverged) {
         let msg = `EMP  | Filemanager closest path diverged from requested path.`;
-        msg +=    `\n\tRequested: ${originalPath}`;
-        msg +=    `\n\tResolved as: ${currentPath}`;
-        msg +=    `\n\tAvailable options at divergence: ${divergenceOptions}`;
+        msg += `\n\tRequested: ${originalPath}`;
+        msg += `\n\tResolved as: ${currentPath}`;
+        msg += `\n\tAvailable options at divergence: ${divergenceOptions}`;
         console.warn(msg);
     }
     return currentPath;
@@ -70,10 +70,10 @@ export function closest(path) {
     switch (modulePrefix) {
         // Sounds
         case 'psfx':
-            dependency.someRequired([{ id: 'psfx-patreon', ref: 'PSFX-Patreon'}, { id: 'psfx', ref: "PSFX - Peri's Sound Effects" }]);
+            dependency.someRequired([{ id: 'psfx-patreon', ref: 'PSFX-Patreon' }, { id: 'psfx', ref: "PSFX - Peri's Sound Effects" }]);
             isPatreonUser = dependency.isActivated({ id: 'psfx-patreon', ref: 'PSFX-Patreon' });
             isFreeUser = dependency.isActivated({ id: 'psfx', ref: "PSFX - Peri's Sound Effects" });
-            if (isPatreonUser && isFreeUser) 
+            if (isPatreonUser && isFreeUser)
                 ui.notifications.warn('Both PSFX Patreon and Free are activated, both modules use the path `psfx.` to prefix files! This will cause conflicts! Recommend disabling / uninstalling the free version.');
             modulePrefix = 'psfx';
             break;
@@ -84,29 +84,23 @@ export function closest(path) {
         // Animations
         case 'eskie':
         case 'eskie-free':
-            dependency.someRequired([{ id: 'eskie-effects', ref: 'Eskie Effects'}, { id: 'eskie-effects-free', ref: 'Eskie Effects Free' }]);
+            dependency.someRequired([{ id: 'eskie-effects', ref: 'Eskie Effects' }, { id: 'eskie-effects-free', ref: 'Eskie Effects Free' }]);
             isPatreonUser = dependency.isActivated({ id: 'eskie-effects', ref: 'Eskie Effects' });
             modulePrefix = (isPatreonUser) ? `eskie` : `eskie-free`;
             break;
         case 'jb2a':
-            dependency.someRequired([{ id: 'jb2a_patreon', ref: 'JB2A Patreon'}, { id: 'JB2A_DnD5e', ref: 'JB2A Free' }]);
+            dependency.someRequired([{ id: 'jb2a_patreon', ref: 'JB2A Patreon' }, { id: 'JB2A_DnD5e', ref: 'JB2A Free' }]);
             isFreeUser = dependency.isActivated({ id: 'JB2A_DnD5e' });
             isPatreonUser = dependency.isActivated({ id: 'jb2a_patreon' });
-            if (isPatreonUser && isFreeUser) 
+            if (isPatreonUser && isFreeUser)
                 ui.notifications.warn('Both JB2A Patreon and Free are activated, both modules use the path `jb2a.` to prefix files. This will cause conflicts! Recommend disabling / uninstalling the free version.');
             modulePrefix = `jb2a`;
             break;
-        case 'animated-spell-effects':
-            dependency.required({ id: modulePrefix, ref: "Jack Kerouac's Animated Spell Effects" });
-            break;
-        case 'animated-spell-effects-cartoon':
-            dependency.required({ id: modulePrefix, ref: "Jack Kerouac's Animated Spell Effects - Cartoon" });
-            break;
         case 'blfx':
-            dependency.someRequired([{id: 'boss-loot-assets-premium', ref: 'Boss Loot Assets Premium'}, {id: 'boss-loot-assets-free', ref: 'Boss Loot Assets Free'}]);
+            dependency.someRequired([{ id: 'boss-loot-assets-premium', ref: 'Boss Loot Assets Premium' }, { id: 'boss-loot-assets-free', ref: 'Boss Loot Assets Free' }]);
             isPatreonUser = dependency.isActivated({ id: 'boss-loot-assets-premium' });
             isFreeUser = dependency.isActivated({ id: 'boss-loot-assets-free' });
-            if (isPatreonUser && isFreeUser) 
+            if (isPatreonUser && isFreeUser)
                 ui.notifications.warn('Both Boss Loot Assets Premium and Free are activated, both modules use the path `blfx.` to prefix files. This will cause conflicts! Recommend disabling / uninstalling the free version.');
             modulePrefix = `blfx`;
             break;

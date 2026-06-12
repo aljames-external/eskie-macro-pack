@@ -59,16 +59,7 @@ async function createStunningStrike(token, target, config = {}) {
         .mask(token)
         .fadeOut(250)
 
-        .effect()
-        .file(closest("animated-spell-effects-cartoon.cantrips.mending.yellow"))
-        .atLocation(token)
-        .scaleToObject(3)
-        .opacity(0.75)
-        .filter("ColorMatrix", { saturate: -1, brightness: 2, hue: -185 })
-        .zIndex(1)
-        .waitUntilFinished(-1000)
-
-        .wait(750)
+        .wait(950)
 
         .canvasPan()
         .delay(250)
@@ -155,7 +146,7 @@ async function createStunningStrike(token, target, config = {}) {
         .opacity(1)
         .attachTo(target, { offset: { y: -0.5 * target.document.width }, gridUnits: true })
         .persist()
-    ;
+        ;
 
     return sequence;
 }
