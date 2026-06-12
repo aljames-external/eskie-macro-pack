@@ -78,7 +78,7 @@ async function createCloud(token, config = {}) {
         .animateProperty("spriteContainer", "position.y", { from: 0, to: -0.45, duration: 2500, gridUnits: true });
 
     sequence.effect()
-        .file(closest(`jb2a.sacred_flame.token.${color}`))
+        .file(closest(`jb2a.sacred_flame.target.${color}`))
         .atLocation(position)
         .scale(0.05)
         .playbackRate(1)
