@@ -75,12 +75,22 @@ async function create(tile, targets, config = {}) {
             .on(tile)
             .opacity(0)
 
-            // Smoke at statue origin
+            // Smoke at statue origin (Right)
             .effect()
             .delay(200)
-            .file(closest('animated-spell-effects-cartoon.smoke.53'))
+            .file(closest('eskie.smoke.01.white'))
             .atLocation(tile)
             .size({ width: tile.width * 1.75, height: tile.height * 1.75 })
+            .belowTokens()
+            .opacity(0.5)
+
+            // Smoke at statue origin (Left)
+            .effect()
+            .delay(200)
+            .file(closest('eskie.smoke.01.white'))
+            .atLocation(tile)
+            .size({ width: tile.width * 1.75, height: tile.height * 1.75 })
+            .mirrorX()
             .belowTokens()
             .opacity(0.5);
 
