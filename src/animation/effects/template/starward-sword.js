@@ -439,7 +439,7 @@ async function createStarwardSword(token, config = {}, options = {}) {
                 .wait(400)
 
                 .effect()
-                .file(closest("eskie.lightning.lightning_bolt.blue"))
+                .file(closest("eskie.lightning.lightning_bolt.purple"))
                 .atLocation(position, { offset: { x: size / 2, y: -0.5 }, gridUnits: true })
                 .stretchTo(position, { offset: { x: size / 2 * -1, y: 0.5 }, gridUnits: true })
                 .filter("ColorMatrix", { hue: 60 })
