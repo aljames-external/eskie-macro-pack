@@ -412,7 +412,7 @@ async function createStarwardSword(token, config = {}, options = {}) {
                             .waitUntilFinished(-100)
 
                             .effect()
-                            .file(closest("animated-spell-effects-cartoon.air.puff.01"))
+                            .file(closest("eskie.smoke.06.white"))
                             .atLocation(target)
                             .scaleToObject(1.5)
                             .belowTokens()
