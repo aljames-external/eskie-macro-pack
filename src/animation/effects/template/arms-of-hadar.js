@@ -24,10 +24,10 @@ const DEFAULT_CONFIG = {
  * @returns {Promise<Sequence>} A promise that resolves with the Sequence object.
  */
 async function create(token, config = {}) {
-    const { id, targets } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, {inplace:false});
+    const { id, targets } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
 
     let sequence = new Sequence();
-    sequence.thenDo(function() {
+    sequence.thenDo(function () {
         targets.forEach(target => {
             new Sequence()
                 .effect()
@@ -128,21 +128,13 @@ async function create(token, config = {}) {
         .zIndex(1)
         .duration(2000)
 
-        .thenDo(function() {
+        .thenDo(function () {
             targets.forEach(target => {
                 let newX = target.center.x - (canvas.grid.size / 2.5 * Math.sign(token.center.x - target.center.x));
                 let newY = target.center.y - (canvas.grid.size / 2.5 * Math.sign(token.center.y - target.center.y));
 
                 new Sequence()
-                    .effect()
-                    .file(closest("animated-spell-effects-cartoon.energy.tentacles"))
-                    .atLocation(target)
-                    .moveTowards({ x: newX, y: newY }, { rotate: true, ease: "easeOutBack" })
-                    .scaleToObject(1)
-                    .filter("ColorMatrix", { hue: -100, brightness: 0 })
-                    .opacity(0.75)
-
-                    .thenDo(function() {
+                    .thenDo(function () {
                         Sequencer.EffectManager.endEffects({ name: `${target.name} ${id}`, object: target });
                     })
 
