@@ -51,7 +51,7 @@ async function createCloud(token, config = {}) {
 
     const sequence = new Sequence();
     sequence.effect()
-        .file(closest(`animated-spell-effects-cartoon.flash.25`))
+        .file(closest(`jb2a.fairies.loop.01.greenyellow`))
         .atLocation(position)
         .scale(0.05)
         .playbackRate(1)
