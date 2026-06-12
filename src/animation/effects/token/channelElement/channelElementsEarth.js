@@ -8,24 +8,7 @@ const DEFAULT_CONFIG = {
     effectName: "ChannelEarth",
 };
 
-function _createRock(sequence, token, xOffset, rockFile, smokeFile) {
-    sequence.effect()
-        .name(effectName)
-        .file(closest(rockFile))
-        .attachTo(token, { offset: { x: xOffset * token.document.width, y: 0.4 * token.document.width }, gridUnits: true, bindRotation: false })
-        .scaleToObject(1, { considerTokenScale: true })
-        .mirrorY()
-        .fadeOut(1600)
-        .zIndex(0.1);
-
-    sequence.effect()
-        .name(effectName)
-        .file(closest(smokeFile))
-        .attachTo(token, { offset: { x: xOffset * token.document.width, y: 0.6 * token.document.width }, gridUnits: true, bindRotation: false })
-        .stretchTo(token, { offset: { x: xOffset * token.document.width, y: 0 }, gridUnits: true })
-        .fadeOut(1600)
-        .opacity(0.75);
-
+function _createRock(sequence, token, effectName, xOffset) {
     sequence.effect()
         .name(effectName)
         .file(closest("jb2a.celestial_bodies.asteroid.single.iron.red.01"))
@@ -53,7 +36,7 @@ function _createRock(sequence, token, xOffset, rockFile, smokeFile) {
 }
 
 async function create(token, config = {}) {
-    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, {inplace:false});
+    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
     const { effectName } = mConfig;
     const sequence = new Sequence();
 
@@ -92,10 +75,10 @@ async function create(token, config = {}) {
         .tint("#fd9608")
         .mask();
 
-    _createRock(sequence, token, -0.6, "animated-spell-effects-cartoon.earth.debris.04", "animated-spell-effects-cartoon.smoke.09");
-    _createRock(sequence, token, -0.25, "animated-spell-effects-cartoon.earth.debris.04", "animated-spell-effects-cartoon.smoke.09");
-    _createRock(sequence, token, 0.25, "animated-spell-effects-cartoon.earth.debris.04", "animated-spell-effects-cartoon.smoke.09");
-    _createRock(sequence, token, 0.6, "animated-spell-effects-cartoon.earth.debris.04", "animated-spell-effects-cartoon.smoke.09");
+    _createRock(sequence, token, effectName, -0.6);
+    _createRock(sequence, token, effectName, -0.25);
+    _createRock(sequence, token, effectName, 0.25);
+    _createRock(sequence, token, effectName, 0.6);
 
     return sequence;
 }
@@ -106,7 +89,7 @@ async function play(token, config = {}) {
 }
 
 async function stop(token, config = {}) {
-    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, {inplace:false});
+    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
     const { effectName } = mConfig;
     return Sequencer.EffectManager.endEffects({ name: effectName, object: token });
 }
