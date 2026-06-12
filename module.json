@@ -1,108 +1,103 @@
 {
-  "id": "eskie-macros",
-  "title": "Eskie Macro Pack",
-  "description": "<p> A collection of macros from the <a href=\"https://discord.gg/zkKPp4Zm\" title=\"eskie\">Eskiemoh Discord Server</a>.</p><p> Come contribute and learn how to write better Sequencer macros!</p>",
-  "version": "#{VERSION}#",
-  "authors": [
-    {
-      "name": "Bakana!",
-      "url": "https://github.com/aljames-arctic",
-      "flags": {}
-    }
-  ],
-  "compatibility": {
-    "minimum": "12",
-    "verified": "14"
-  },
-  "esmodules": [
-    "src/module.js"
-  ],
-  "languages": [
-    {
-      "lang": "en",
-      "name": "English",
-      "path": "lang/en.json",
-      "flags": {}
-    },
-    {
-      "lang": "pt-BR",
-      "name": "Português (Brasil)",
-      "path": "lang/pt-BR.json",
-      "flags": {}
-    }
-  ],
-  "url": "#{URL}#",
-  "manifest": "#{MANIFEST}#",
-  "download": "#{DOWNLOAD}#",
-  "changelog": "https://github.com/aljames-arctic/eskie-macros/releases",
-  "bugs": "https://github.com/aljames-arctic/eskie-macros/issues",
-  "license": "LICENSE",
-  "relationships": {
-    "requires": [
-      {
-        "id": "sequencer",
-        "type": "module",
-        "compatibility": {}
-      },
-      {
-        "id": "socketlib",
-        "type": "module",
-        "compatibility": {}
-      }
+    "id": "eskie-macros",
+    "title": "Eskie Macro Pack",
+    "description": "<p> A collection of macros from the <a href=\"https://discord.gg/zkKPp4Zm\" title=\"eskie\">Eskiemoh Discord Server</a>.</p><p> Come contribute and learn how to write better Sequencer macros!</p>",
+    "version": "#{VERSION}#",
+    "authors": [
+        {
+            "name": "Bakana!",
+            "url": "https://github.com/aljames-arctic",
+            "flags": {}
+        }
     ],
-    "recommends": [
-      {
-        "id": "eskie-effects",
-        "type": "module",
-        "compatibility": {}
-      },
-      {
-        "id": "jb2a_patreon",
-        "type": "module",
-        "compatibility": {}
-      },
-      {
-        "id": "animated-spell-effects-cartoon",
-        "type": "module",
-        "compatibility": {}
-      },
-      {
-        "id": "tagger",
-        "type": "module",
-        "compatibility": {}
-      },
-      {
-        "id": "boss-loot-assets-free",
-        "type": "module",
-        "compatibility": {}
-      },
-      {
-        "id": "token-attacher",
-        "type": "module",
-        "compatibility": {}
-      },
-      {
-        "id": "monks-active-tiles",
-        "type": "module",
-        "compatibility": {}
-      }
-    ]
-  },
-  "packs": [
-    {
-      "name": "eskie-aa-integration",
-      "label": "Automated Animation Integration",
-      "path": "packs/eskie-aa-integration",
-      "type": "Macro",
-      "ownership": {
-        "PLAYER": "OBSERVER",
-        "ASSISTANT": "OWNER"
-      }
-    }
-  ],
-  "styles": [
-    "styles/eskie-macros.css"
-  ],
-  "socket": true,
-  "flags": {}
+    "compatibility": {
+        "minimum": "12",
+        "verified": "14"
+    },
+    "esmodules": [
+        "src/module.js"
+    ],
+    "languages": [
+        {
+            "lang": "en",
+            "name": "English",
+            "path": "lang/en.json",
+            "flags": {}
+        },
+        {
+            "lang": "pt-BR",
+            "name": "Português (Brasil)",
+            "path": "lang/pt-BR.json",
+            "flags": {}
+        }
+    ],
+    "url": "#{URL}#",
+    "manifest": "#{MANIFEST}#",
+    "download": "#{DOWNLOAD}#",
+    "changelog": "https://github.com/aljames-arctic/eskie-macros/releases",
+    "bugs": "https://github.com/aljames-arctic/eskie-macros/issues",
+    "license": "LICENSE",
+    "relationships": {
+        "requires": [
+            {
+                "id": "sequencer",
+                "type": "module",
+                "compatibility": {}
+            },
+            {
+                "id": "socketlib",
+                "type": "module",
+                "compatibility": {}
+            }
+        ],
+        "recommends": [
+            {
+                "id": "eskie-effects",
+                "type": "module",
+                "compatibility": {}
+            },
+            {
+                "id": "jb2a_patreon",
+                "type": "module",
+                "compatibility": {}
+            },
+            {
+                "id": "tagger",
+                "type": "module",
+                "compatibility": {}
+            },
+            {
+                "id": "boss-loot-assets-free",
+                "type": "module",
+                "compatibility": {}
+            },
+            {
+                "id": "token-attacher",
+                "type": "module",
+                "compatibility": {}
+            },
+            {
+                "id": "monks-active-tiles",
+                "type": "module",
+                "compatibility": {}
+            }
+        ]
+    },
+    "packs": [
+        {
+            "name": "eskie-aa-integration",
+            "label": "Automated Animation Integration",
+            "path": "packs/eskie-aa-integration",
+            "type": "Macro",
+            "ownership": {
+                "PLAYER": "OBSERVER",
+                "ASSISTANT": "OWNER"
+            }
+        }
+    ],
+    "styles": [
+        "styles/eskie-macros.css"
+    ],
+    "socket": true,
+    "flags": {}
 }
