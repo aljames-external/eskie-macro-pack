@@ -47,7 +47,7 @@ async function createLeap(token, config = {}) {
         .waitUntilFinished()
 
         .effect()
-        .file(closest("animated-spell-effects-cartoon.air.puff.03"))
+        .file(closest("eskie.smoke.06.white"))
         .atLocation(token)
         .scaleToObject(1.75)
         .belowTokens()
@@ -92,7 +92,7 @@ async function createLeap(token, config = {}) {
         .animation()
         .on(token)
         .opacity(1)
-    ;
+        ;
 
     return sequence;
 }
