@@ -14,7 +14,6 @@ import { callLightning } from "./token/call-lightning.js";
 import { chainLightning } from "./token/chain-lightning.js";
 import { channelDivinityControlUndead } from "./target/channelDivinityControlUndead.js";
 import { channelDivinityDreadAspect } from "./token/channelDivinityDreadAspect.js";
-import { channelElement } from "./token/channelElement/_channelElement.js";
 import { charmed } from "./active-effect/charmed.js";
 import { chromaticOrb } from "./on-target/chromatic-orb.js";
 import { cloudOfSand } from "./multi-token/cloudOfSand.js";
@@ -31,7 +30,6 @@ import { dreadLord } from "./token/dreadLord.js";
 import { dreadLordAttack } from "./target/dreadLordAttack.js";
 import { dreadLordFear } from "./target/dreadLordFear.js";
 import { drunk } from "./active-effect/drunk.js";
-import { elementalBlast } from "./target/elementalBlast/_elementalBlast.js";
 import { emote } from "./emote/_emotes.js";
 import { enlargeReduce } from "./active-effect/enlarge-reduce.js";
 import { eyesOfNight } from "./target/eyesOfNight.js";
@@ -122,7 +120,6 @@ export const effect = {
     aerodyneVehicle,
     channelDivinityControlUndead,
     channelDivinityDreadAspect,
-    channelElement,
     charmed,
     chromaticOrb,
     cloudOfSand,
@@ -139,7 +136,6 @@ export const effect = {
     dreadLordAttack,
     dreadLordFear,
     drunk,
-    elementalBlast,
     emote,
     enlargeReduce,
     eyesOfNight,
