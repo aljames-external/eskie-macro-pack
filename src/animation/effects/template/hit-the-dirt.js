@@ -50,13 +50,13 @@ async function create(token, config, options) {
 
         .effect()
             .delay(900)
-            .file(closest("animated-spell-effects-cartoon.smoke.99"))
+            .file(closest("eskie.smoke.01.white"))
             .atLocation(position)
             .rotateTowards(token)
             .scaleToObject(1.5)
             .belowTokens()
             .spriteOffset({x:-1.25}, {gridUnits:true})
-            .spriteRotation(-90)
+            .spriteRotation(-180)
             .opacity(0.5)
 
         .effect()
