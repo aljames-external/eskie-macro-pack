@@ -12,7 +12,7 @@ const DEFAULT_CONFIG = {
 };
 
 async function create(target, config = {}) {
-    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, {inplace:false});
+    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
     const { id, duration } = mConfig;
 
     let seq = new Sequence()
@@ -33,16 +33,15 @@ async function create(target, config = {}) {
 
         .effect()
         .name(id)
-        .file(closest("animated-spell-effects-cartoon.misc.all seeing eye"))
+        .file(closest("eskie.symbol.eye.01.purple"))
         .attachTo(target)
-        .filter("ColorMatrix", { hue: 182 })
         .scaleToObject(0.75)
         .scaleIn(0, 250, { ease: "easeOutCubic" })
         .zIndex(0.1)
 
         .effect()
         .name(id)
-        .file(closest("animated-spell-effects-cartoon.simple.27"))
+        .file(closest("jb2a.smoke.puff.centered.grey"))
         .attachTo(target)
         .scaleToObject(4)
         .spriteOffset({ x: 0.1, y: -0.45 }, { gridUnits: true })
@@ -80,7 +79,7 @@ async function play(target, config = {}) {
 }
 
 async function stop(target, config = {}) {
-    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, {inplace:false});
+    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
     const { id } = mConfig;
     Sequencer.EffectManager.endEffects({ name: id, object: target });
 }

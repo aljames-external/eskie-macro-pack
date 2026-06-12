@@ -8,7 +8,7 @@ const DEFAULT_CONFIG = {
 };
 
 async function createMelee(token, target, config = {}) {
-    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, {inplace:false});
+    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
     const { darkMap } = mConfig;
 
     const sequence = new Sequence();
@@ -36,7 +36,7 @@ async function createMelee(token, target, config = {}) {
         sequence.effect()
             .name(`point`)
             .delay(10 + 50 * i)
-            .file(closest("animated-spell-effects-cartoon.energy.pulse.yellow"))
+            .file(closest("eskie.pulse.energy.01.yellow.yellow"))
             .atLocation(target)
             .rotateTowards(token)
             .scaleToObject(0.4, { gridUnits: true })
@@ -83,7 +83,7 @@ async function createMelee(token, target, config = {}) {
 
     sequence.effect()
         .delay(300)
-        .file(closest("animated-spell-effects-cartoon.energy.pulse.yellow"))
+        .file(closest("eskie.pulse.energy.01.yellow.yellow"))
         .atLocation(target)
         .scaleToObject(1.75)
         .filter("ColorMatrix", { saturate: -1 })
@@ -111,7 +111,7 @@ async function playMelee(token, target, config = {}) {
 }
 
 async function createRanged(token, target, config = {}) {
-    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, {inplace:false});
+    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
     const { darkMap } = mConfig;
 
     const sequence = new Sequence();
@@ -168,7 +168,7 @@ async function createRanged(token, target, config = {}) {
         sequence.effect()
             .name(`point`)
             .delay(10 + 50 * i)
-            .file(closest("animated-spell-effects-cartoon.energy.pulse.yellow"))
+            .file(closest("eskie.pulse.energy.01.yellow.yellow"))
             .atLocation(midpoint, { offset: randomOffset[i], gridUnits: true })
             .scaleToObject(0.5, { gridUnits: true })
             .spriteOffset(offset[i], { gridUnits: false })

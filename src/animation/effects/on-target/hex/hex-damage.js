@@ -6,7 +6,7 @@ import { closest } from "../../../../lib/filemanager.js";
 const DEFAULT_CONFIG = {};
 
 async function create(token, target, config = {}) {
-    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, {inplace:false});
+    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
     const sequence = new Sequence();
 
     sequence.effect()
@@ -24,15 +24,14 @@ async function create(token, target, config = {}) {
         .zIndex(0.2);
 
     sequence.effect()
-        .file(closest("animated-spell-effects-cartoon.misc.all seeing eye"))
+        .file(closest("eskie.symbol.eye.01.purple"))
         .attachTo(target)
-        .filter("ColorMatrix", { hue: 182 })
         .scaleToObject(0.75)
         .scaleIn(0, 250, { ease: "easeOutCubic" })
         .zIndex(0.1);
 
     sequence.effect()
-        .file(closest("animated-spell-effects-cartoon.simple.27"))
+        .file(closest("jb2a.smoke.puff.centered.grey"))
         .attachTo(target)
         .scaleToObject(4)
         .spriteOffset({ x: 0.1, y: -0.45 }, { gridUnits: true })

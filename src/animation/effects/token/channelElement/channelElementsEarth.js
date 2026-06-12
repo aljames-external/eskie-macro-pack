@@ -42,7 +42,7 @@ async function create(token, config = {}) {
 
     sequence.effect()
         .name(effectName)
-        .file(closest("animated-spell-effects-cartoon.energy.pulse.yellow"))
+        .file(closest("eskie.pulse.energy.01.yellow.yellow"))
         .attachTo(token, { offset: { x: 0, y: -0 }, gridUnits: true, bindRotation: false })
         .scaleToObject(3.5)
         .fadeIn(250)

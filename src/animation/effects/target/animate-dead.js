@@ -25,7 +25,7 @@ async function createAnimateDead(undeadToken, config = {}) {
     const sequence = new Sequence();
 
     sequence
-        .thenDo(function() {
+        .thenDo(function () {
             // Note: target.document.update({overlayEffect:" "}) and target.document.delete()
             // should be handled by the calling macro/function *before* this animation starts
             // if the original token is meant to disappear. This function only animates the spawned undead.
@@ -55,7 +55,7 @@ async function createAnimateDead(undeadToken, config = {}) {
         .fadeOut(300, { ease: "linear" })
 
         .effect()
-        .file(closest("animated-spell-effects-cartoon.electricity.ball.06"))
+        .file(closest("eskie.damage.electricity.01.purple"))
         .delay(2250)
         .fadeOut(1500)
         .atLocation(undeadToken)

@@ -96,14 +96,14 @@ function _getPlaneConfig(destination) {
 
 
 async function create(token, config = {}) {
-    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, {inplace:false});
+    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
     mConfig.id = `${token.id} - ${mConfig.id}`;
     const { id, destination, destinationList, template } = mConfig;
 
-    const cfg = { 
+    const cfg = {
         radius: 10,
         max: 60,
-        icon: 'modules/jb2a_patreon/Library/Generic/Portals/Portal_Bright_Purple_V_400x250.webm', 
+        icon: 'modules/jb2a_patreon/Library/Generic/Portals/Portal_Bright_Purple_V_400x250.webm',
         label: 'Gate'
     };
     let [position, _] = await templates.getPosition(template, cfg);
@@ -160,7 +160,7 @@ async function create(token, config = {}) {
         .waitUntilFinished(-1500)
 
         .effect()
-        .file(closest(`animated-spell-effects-cartoon.energy.pulse.${pulseColor}`))
+        .file(closest(`eskie.pulse.energy.01.yellow.${pulseColor}`))
         .atLocation(position)
         .opacity(0.6)
         .scale(2)
