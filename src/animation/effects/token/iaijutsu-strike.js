@@ -40,9 +40,9 @@ function dashEffect(source, target) {
         .file(closest("eskie.attack.ranged.arrow.01.physical.heavy.redblack"))
         .atLocation(target)
         .rotate(angleDeg)
-        .filter("ColorMatrix", { saturate: -1,brightness:1 })
-        .size({width:8, height:1}, {gridUnits:true})
-        .scaleOut(0, 600, {ease: "easeOutCubic"})
+        .filter("ColorMatrix", { saturate: -1, brightness: 1 })
+        .size({ width: 8, height: 1 }, { gridUnits: true })
+        .scaleOut(0, 600, { ease: "easeOutCubic" })
         .aboveLighting()
     return sequence;
 }
@@ -59,16 +59,16 @@ function deathAnimation(target) {
         .atLocation(target)
         .scaleToObject(1, { considerTokenScale: true })
         .shape("polygon", {
-                    lineSize: 1,
-                    lineColor: "#FF0000",
-                    fillColor: "#FF0000",
-        points: [{ x: -1, y: -1},{ x: 1, y: 1},{ x: 1, y: -1} ],
-                    fillAlpha: 1,
-                    gridUnits: true,
-                    isMask:true,
-                    name: "test"
-                })
-        .moveTowards({ x: target.x+canvas.grid.size*target.document.width+0.1, y: target.y+canvas.grid.size*target.document.width+0.1 },{ rotate: false})
+            lineSize: 1,
+            lineColor: "#FF0000",
+            fillColor: "#FF0000",
+            points: [{ x: -1, y: -1 }, { x: 1, y: 1 }, { x: 1, y: -1 }],
+            fillAlpha: 1,
+            gridUnits: true,
+            isMask: true,
+            name: "test"
+        })
+        .moveTowards({ x: target.x + canvas.grid.size * target.document.width + 0.1, y: target.y + canvas.grid.size * target.document.width + 0.1 }, { rotate: false })
         .moveSpeed(100)
         .persist()
         .extraEndDuration(1000)
@@ -80,22 +80,22 @@ function deathAnimation(target) {
         .atLocation(target)
         .scaleToObject(1, { considerTokenScale: true })
         .shape("polygon", {
-                    lineSize: 1,
-                    lineColor: "#FF0000",
-                    fillColor: "#FF0000",
-        points: [{ x: -1, y: -1},{ x: 1, y: 1},{ x: -1, y: 1} ],
-                    fillAlpha: 1,
-                    gridUnits: true,
-                    isMask:true,
-                    name: "test"
-                })
+            lineSize: 1,
+            lineColor: "#FF0000",
+            fillColor: "#FF0000",
+            points: [{ x: -1, y: -1 }, { x: 1, y: 1 }, { x: -1, y: 1 }],
+            fillAlpha: 1,
+            gridUnits: true,
+            isMask: true,
+            name: "test"
+        })
         .zIndex(0.1)
         .persist()
         .fadeOut(500)
 
     sequence.effect()
         .file(closest("jb2a.water_splash.cone.01.red"))
-        .atLocation(target, {offset: {x:0.1,y:-0.1}, gridUnits: true})
+        .atLocation(target, { offset: { x: 0.1, y: -0.1 }, gridUnits: true })
         .delay(250)
         .fadeIn(200)
         .scaleToObject()
@@ -108,21 +108,21 @@ function deathAnimation(target) {
 }
 
 async function create(source, target, config = {}) {
-    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, {inplace:false});
-    const {targetDeath, teleport, cameraFocus, text} = mConfig;
+    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
+    const { targetDeath, teleport, cameraFocus, text } = mConfig;
 
     let position;
 
-    if( teleport === true ){
+    if (teleport === true) {
         let crosshairsConfig = {
-            size:1,
+            size: 1,
             icon: 'icons/skills/melee/blade-tip-orange.webp',
             label: 'Iaijutsu Strike',
             tag: 'katana lol',
             t: 'ray',
             drawIcon: true,
             drawOutline: true,
-            interval:-1,
+            interval: -1,
             rememberControlled: true,
         }
         position = await Sequencer.Crosshair.show(crosshairsConfig);
@@ -130,26 +130,26 @@ async function create(source, target, config = {}) {
 
     let sequence = new Sequence();
 
-    if( cameraFocus.enable ){    
-        sequence.addSequence(cinemaBars.create({dim: true}));
-        sequence.canvasPan({duration: 250, x: target.center.x, y: target.center.y, scale: cameraFocus.scale})
-    }    
+    if (cameraFocus.enable) {
+        sequence.addSequence(cinemaBars.create({ dim: true }));
+        sequence.canvasPan({ duration: 250, x: target.center.x, y: target.center.y, scale: cameraFocus.scale })
+    }
 
     sequence.effect()
-        .file(closest("animated-spell-effects-cartoon.level 01.bless.blue"))
+        .file(closest("eskie.star.02.blue"))
         .scaleToObject(0.75)
-        .atLocation(source, {offset: {x:0.25, y:0.25}, gridUnits: true})
-        .scaleIn(0, 500, {ease: "easeOutCubic"})
-        .rotateIn(-180, 500, {ease: "easeOutCubic"})
+        .atLocation(source, { offset: { x: 0.25, y: 0.25 }, gridUnits: true })
+        .scaleIn(0, 500, { ease: "easeOutCubic" })
+        .rotateIn(-180, 500, { ease: "easeOutCubic" })
         .filter("ColorMatrix", { saturate: -1, brightness: 1.2 })
         .aboveLighting()
         .waitUntilFinished()
 
     sequence.wait(500)
-    
+
     sequence.addSequence(dashEffect(source, target));
 
-    if( teleport == true){
+    if (teleport == true) {
         sequence.animation()
             .on(source)
             .teleportTo(position)
@@ -161,13 +161,13 @@ async function create(source, target, config = {}) {
 
     sequence.addSequence(await textUtil.create(target, "居合術", text));
 
-    if( targetDeath === true){
+    if (targetDeath === true) {
         sequence.addSequence(deathAnimation(target));
     }
 
     sequence.wait(500)
 
-    if( cameraFocus.enable ){
+    if (cameraFocus.enable) {
         sequence.thenDo(() => cinemaBars.stop())
     }
 
@@ -186,7 +186,7 @@ async function clean(target, config = {}) {
         cinemaBars.stop(),
         Sequencer.EffectManager.endEffects({ name: `IaijutsuStrike ${target.name} *` }),
         new Sequence()
-        .animation()
+            .animation()
             .on(target)
             .opacity(1)
             .show(true)

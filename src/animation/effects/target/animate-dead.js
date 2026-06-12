@@ -81,7 +81,8 @@ async function createAnimateDead(undeadToken, config = {}) {
         //Explosion
         .effect()
         .delay(200)
-        .file(closest("animated-spell-effects-cartoon.electricity.04"))
+        .file(closest("eskie.lightning.lightning_bolt.blue"))
+        .rotate(-90)
         .atLocation(undeadToken, { offset: { y: -0.4 }, gridUnits: true })
         .size(1.5, { gridUnits: true })
         .playbackRate(1.5)

@@ -251,7 +251,7 @@ async function createStarwardSword(token, config = {}, options = {}) {
                         .wait(150)
 
                         .effect()
-                        .file(closest("animated-spell-effects-cartoon.air.portal"))
+                        .file(closest("eskie.smoke.07.white"))
                         .atLocation(token)
                         .attachTo(token)
                         .scaleToObject(token.document.texture.scaleX * 1.5)
@@ -439,7 +439,7 @@ async function createStarwardSword(token, config = {}, options = {}) {
                 .wait(400)
 
                 .effect()
-                .file(closest("animated-spell-effects-cartoon.electricity.blast.03"))
+                .file(closest("eskie.lightning.lightning_bolt.blue"))
                 .atLocation(position, { offset: { x: size / 2, y: -0.5 }, gridUnits: true })
                 .stretchTo(position, { offset: { x: size / 2 * -1, y: 0.5 }, gridUnits: true })
                 .filter("ColorMatrix", { hue: 60 })

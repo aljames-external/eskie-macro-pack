@@ -20,7 +20,7 @@ async function create(token, config = {}) {
 
     const seq = new Sequence()
         .effect()
-        .file(closest('animated-spell-effects-cartoon.air.portal'))
+        .file(closest('eskie.smoke.07.white'))
         .atLocation(token)
         .randomRotation()
         .scale(1.2)
@@ -135,7 +135,7 @@ async function stop(token, config = {}) {
         .opacity(1)
 
         .effect()
-        .file(closest('animated-spell-effects-cartoon.air.portal'))
+        .file(closest('eskie.smoke.07.white'))
         .atLocation(token)
         .randomRotation()
         .scale(1.2)
