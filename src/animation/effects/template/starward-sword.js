@@ -112,7 +112,7 @@ async function createStarwardSword(token, config = {}, options = {}) {
         .waitUntilFinished(-300)
 
         .effect()
-        .file(closest("eskie.magic.purple_portal"))
+        .file(closest("eskie.smoke.07.white"))
         .atLocation(token)
         .attachTo(token)
         .scaleToObject(token.document.texture.scaleX * 1.5)
@@ -139,7 +139,7 @@ async function createStarwardSword(token, config = {}, options = {}) {
         .attachTo(token, { bindAlpha: false })
 
         .effect()
-        .file(closest("eskie.damage.electricity.02.pink"))
+        .file(closest("eskie.damage.electricity.01.purple"))
         .atLocation(token)
         .scaleToObject(1.1)
         .filter("ColorMatrix", { saturate: -1, brightness: 10 })
