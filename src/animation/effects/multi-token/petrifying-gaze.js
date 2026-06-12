@@ -20,13 +20,14 @@ const DEFAULT_CONFIG = {
  * @returns {Promise<Sequence>} A promise that resolves with the complete effect sequence.
  */
 async function create(token, targetTokens, config = {}) {
-    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, {inplace:false});
+    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
     const { id } = mConfig;
+    const eyeAnimation = "jb2a.eyes.01.single.orangeyellow";
 
     let sequence = new Sequence();
     sequence
         .effect()
-        .file(closest("animated-spell-effects-cartoon.misc.fiery eyes.04"))
+        .file(closest(eyeAnimation))
         .atLocation(token)
         .size(0.9, { gridUnits: true })
         .anchor({ x: 0.5, y: 0.5 })
@@ -35,7 +36,7 @@ async function create(token, targetTokens, config = {}) {
         .fadeOut(500)
 
         .effect()
-        .file(closest("animated-spell-effects-cartoon.misc.fiery eyes.04"))
+        .file(closest(eyeAnimation))
         .atLocation(token)
         .size(0.9, { gridUnits: true })
         .anchor({ x: 0.5, y: 0.5 })
@@ -57,7 +58,7 @@ async function create(token, targetTokens, config = {}) {
         .fadeOut(500)
 
         .effect()
-        .file(closest("jb2a.extras.tmfx.outflow.circle.02"))
+        .file(closest(eyeAnimation))
         .atLocation(token)
         .belowTokens()
         .opacity(0.25)
@@ -70,7 +71,7 @@ async function create(token, targetTokens, config = {}) {
     for (const target of targetTokens) {
         sequence
             .effect()
-            .file(closest("animated-spell-effects-cartoon.misc.fiery eyes.04"))
+            .file(closest(eyeAnimation))
             .atLocation(token)
             .scale({ x: 0.1, y: 1.25 })
             .anchor({ x: 0.5, y: 0.35 })
@@ -83,7 +84,7 @@ async function create(token, targetTokens, config = {}) {
             .fadeOut(500)
 
             .effect()
-            .file(closest("animated-spell-effects-cartoon.misc.fiery eyes.04"))
+            .file(closest("jb2a.eyes.01.single.orangered"))
             .atLocation(token)
             .scale({ x: 0.1, y: 1.25 })
             .anchor({ x: 0.5, y: 0.35 })

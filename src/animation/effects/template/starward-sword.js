@@ -1,3 +1,4 @@
+import { closest } from "../../../lib/filemanager.js";
 import { templates } from '../../../lib/templates.js';
 import { autoanimations } from "../../../integration/autoanimations.js";
 
@@ -102,7 +103,7 @@ async function createStarwardSword(token, config = {}, options = {}) {
         })
 
         .effect()
-        .file("animated-spell-effects-cartoon.mix.electric ball.01")
+        .file(closest("eskie.damage.electricity.01.blue"))
         .atLocation(token, { offset: { x: 0, y: 0 }, gridUnits: true })
         .attachTo(token)
         .scaleToObject(token.document.texture.scaleX * 1.4)
@@ -111,7 +112,7 @@ async function createStarwardSword(token, config = {}, options = {}) {
         .waitUntilFinished(-300)
 
         .effect()
-        .file("animated-spell-effects-cartoon.air.portal")
+        .file(closest("eskie.magic.purple_portal"))
         .atLocation(token)
         .attachTo(token)
         .scaleToObject(token.document.texture.scaleX * 1.5)
@@ -138,7 +139,7 @@ async function createStarwardSword(token, config = {}, options = {}) {
         .attachTo(token, { bindAlpha: false })
 
         .effect()
-        .file("jb2a.particles.outward.blue.01.03")
+        .file(closest("eskie.damage.electricity.02.pink"))
         .atLocation(token)
         .scaleToObject(1.1)
         .filter("ColorMatrix", { saturate: -1, brightness: 10 })
@@ -169,7 +170,7 @@ async function createStarwardSword(token, config = {}, options = {}) {
                         .wait(200 * (u + 1) - 199)
 
                         .effect()
-                        .file("jb2a.impact.002.pinkpurple")
+                        .file(closest("jb2a.impact.002.pinkpurple"))
                         .atLocation(initialPoints[u])
                         .spriteOffset({ x: -0.6 }, { gridUnits: true })
                         .filter("ColorMatrix", { saturate: -1, brightness: 2 })
@@ -211,7 +212,7 @@ async function createStarwardSword(token, config = {}, options = {}) {
                         .zIndex(3)
 
                         .effect()
-                        .file("eskie.attack.ranged.arrow.01.physical.medium.purple")
+                        .file(closest("eskie.attack.ranged.arrow.01.physical.medium.purple"))
                         .atLocation(initialPoints[u])
                         .stretchTo(position)
                         .filter("ColorMatrix", { hue: 70 })
@@ -236,7 +237,7 @@ async function createStarwardSword(token, config = {}, options = {}) {
                                     .opacity(0.35)
 
                                     .effect()
-                                    .file("jb2a.impact.009.purple")
+                                    .file(closest("jb2a.impact.009.purple"))
                                     .atLocation(target, { randomOffset: 1, gridUnits: true })
                                     .randomRotation()
                                     .filter("ColorMatrix", { saturate: -0.4 })
@@ -250,7 +251,7 @@ async function createStarwardSword(token, config = {}, options = {}) {
                         .wait(150)
 
                         .effect()
-                        .file("animated-spell-effects-cartoon.air.portal")
+                        .file(closest("animated-spell-effects-cartoon.air.portal"))
                         .atLocation(token)
                         .attachTo(token)
                         .scaleToObject(token.document.texture.scaleX * 1.5)
@@ -273,7 +274,7 @@ async function createStarwardSword(token, config = {}, options = {}) {
                         .wait(200 * (u + 1) - 199)
 
                         .effect()
-                        .file("jb2a.impact.002.pinkpurple")
+                        .file(closest("jb2a.impact.002.pinkpurple"))
                         .atLocation(initialPoints[u])
                         .spriteOffset({ x: -0.6 }, { gridUnits: true })
                         .filter("ColorMatrix", { saturate: -1, brightness: 2 })
@@ -315,7 +316,7 @@ async function createStarwardSword(token, config = {}, options = {}) {
                         .zIndex(3)
 
                         .effect()
-                        .file("eskie.attack.ranged.arrow.01.physical.medium.purple")
+                        .file(closest("eskie.attack.ranged.arrow.01.physical.medium.purple"))
                         .atLocation(initialPoints[u])
                         .stretchTo(initialPoints[(u + 1)])
                         .filter("ColorMatrix", { hue: 70 })
@@ -335,7 +336,7 @@ async function createStarwardSword(token, config = {}, options = {}) {
                                     .opacity(0.35)
 
                                     .effect()
-                                    .file("jb2a.impact.009.purple")
+                                    .file(closest("jb2a.impact.009.purple"))
                                     .atLocation(target, { randomOffset: 1, gridUnits: true })
                                     .randomRotation()
                                     .scaleToObject(1)
@@ -353,7 +354,7 @@ async function createStarwardSword(token, config = {}, options = {}) {
 
                 .effect()
                 .name(`location`)
-                .file("eskie.attack.ranged.arrow.01.physical.medium.purple")
+                .file(closest("eskie.attack.ranged.arrow.01.physical.medium.purple"))
                 .atLocation(points[e])
                 .stretchTo(points[0])
                 .filter("ColorMatrix", { hue: 70 })
@@ -374,7 +375,7 @@ async function createStarwardSword(token, config = {}, options = {}) {
                             .opacity(0.35)
 
                             .effect()
-                            .file("jb2a.impact.009.purple")
+                            .file(closest("jb2a.impact.009.purple"))
                             .atLocation(target, { gridUnits: true })
                             .randomRotation()
                             .scaleToObject(2)
@@ -411,7 +412,7 @@ async function createStarwardSword(token, config = {}, options = {}) {
                             .waitUntilFinished(-100)
 
                             .effect()
-                            .file("animated-spell-effects-cartoon.air.puff.01")
+                            .file(closest("animated-spell-effects-cartoon.air.puff.01"))
                             .atLocation(target)
                             .scaleToObject(1.5)
                             .belowTokens()
@@ -438,7 +439,7 @@ async function createStarwardSword(token, config = {}, options = {}) {
                 .wait(400)
 
                 .effect()
-                .file("animated-spell-effects-cartoon.electricity.blast.03")
+                .file(closest("animated-spell-effects-cartoon.electricity.blast.03"))
                 .atLocation(position, { offset: { x: size / 2, y: -0.5 }, gridUnits: true })
                 .stretchTo(position, { offset: { x: size / 2 * -1, y: 0.5 }, gridUnits: true })
                 .filter("ColorMatrix", { hue: 60 })
@@ -461,7 +462,7 @@ async function createStarwardSword(token, config = {}, options = {}) {
             mainSequence.addSequence(new Sequence()
 
                 .effect()
-                .file("eskie.attack.ranged.arrow.01.physical.medium.purple")
+                .file(closest("eskie.attack.ranged.arrow.01.physical.medium.purple"))
                 .atLocation(points[e])
                 .stretchTo(points[e + 1])
                 .fadeOut(1000)
@@ -469,7 +470,7 @@ async function createStarwardSword(token, config = {}, options = {}) {
                 .zIndex(4)
 
                 .effect()
-                .file("eskie.attack.ranged.arrow.01.physical.medium.purple")
+                .file(closest("eskie.attack.ranged.arrow.01.physical.medium.purple"))
                 .atLocation(points[9 - e])
                 .stretchTo(points[9 - e - 1])
                 .fadeOut(1000)
@@ -494,7 +495,7 @@ async function createStarwardSword(token, config = {}, options = {}) {
                             .opacity(0.35)
 
                             .effect()
-                            .file("jb2a.impact.009.purple")
+                            .file(closest("jb2a.impact.009.purple"))
                             .atLocation(target, { randomOffset: 1, gridUnits: true })
                             .randomRotation()
                             .scaleToObject(1)
@@ -508,7 +509,7 @@ async function createStarwardSword(token, config = {}, options = {}) {
                     })
                 })
 
-            .wait(50)
+                .wait(50)
             );  // End addSequence
         }
     }

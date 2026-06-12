@@ -8,7 +8,7 @@ const DEFAULT_CONFIG = {
 };
 
 async function create(token, targets, config = {}) {
-    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, {inplace:false});
+    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
     const { darkMap } = mConfig;
 
     let sequence = new Sequence();
@@ -38,9 +38,9 @@ async function create(token, targets, config = {}) {
         .startTime(1000)
         .filter("ColorMatrix", { saturate: -0.5, hue: -50 })
         .zIndex(1)
-        
+
         .effect()
-        .file(closest("animated-spell-effects-cartoon.misc.all seeing eye"))
+        .file(closest("eskie.symbol.eye.01.red"))
         .attachTo(token)
         .scaleToObject(0.6, { gridUnits: true })
         .filter("ColorMatrix", { saturate: -1, hue: 105 })
@@ -59,7 +59,7 @@ async function create(token, targets, config = {}) {
         .zIndex(1)
 
         .effect()
-        .file(closest("animated-spell-effects-cartoon.energy.pulse.yellow"))
+        .file(closest("eskie.pulse.energy.01.yellow.yellow"))
         .attachTo(token, { offset: { x: 0 }, gridUnits: true })
         .scaleToObject(0.7, { gridUnits: true })
         .filter("ColorMatrix", { saturate: -1 })
@@ -69,7 +69,7 @@ async function create(token, targets, config = {}) {
 }
 
 async function play(token, targets, config = {}) {
-    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, {inplace:false});
+    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
     const { darkMap } = mConfig;
     const sequence = await create(token, targets, mConfig);
     await sequence.play();
@@ -134,7 +134,7 @@ async function play(token, targets, config = {}) {
 
                 .effect()
                 .delay(10 + 100 * u)
-                .file(closest("animated-spell-effects-cartoon.energy.pulse.yellow"))
+                .file(closest("eskie.pulse.energy.01.yellow.yellow"))
                 .attachTo(targetOrder[u + 1], { offset: { x: targetOffsetX[u + 1], y: targetOffsetY[u + 1] }, gridUnits: true })
                 .scaleToObject(0.6, { gridUnits: true })
                 .filter("ColorMatrix", { saturate: -1 })
@@ -158,7 +158,7 @@ async function play(token, targets, config = {}) {
 }
 
 function stop(token, config = {}) {
-    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, {inplace:false});
+    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
     const { id } = mConfig;
     Sequencer.EffectManager.endEffects({ name: id, object: token });
 }
