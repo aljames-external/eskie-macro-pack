@@ -91,11 +91,11 @@ async function createAnimateDead(undeadToken, config = {}) {
         .waitUntilFinished(-200)
 
         .effect()
-        .file(closest("animated-spell-effects-cartoon.electricity.discharge.06"))
+        .file(closest("eskie.damage.electricity.01.purple"))
         .atLocation(undeadToken)
         .size(2.25, { gridUnits: true })
         .filter("ColorMatrix", { saturate: -1, brightness: 0 })
-        .playbackRate(0.8)
+        .playbackRate(0.63)
         .fadeOut(500)
         .zIndex(2)
 
