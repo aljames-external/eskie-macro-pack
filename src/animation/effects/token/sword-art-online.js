@@ -15,19 +15,13 @@ const DEFAULT_CONFIG = {
     }
 };
 
-// Inside your Sword Art Online module code
-
 async function create(source, config = {}) {
     config = settingsOverride(config);
     const { id, tintColor, duration, shatterColor, deleteToken, sound } =
         foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
     const label = `${id}-${source.id}`;
 
-    // Generate a unique sync group identifier for this specific event
-    const syncId = `sao-death-${source.id}-${Date.now()}`;
-
-    let sequence = new Sequence().syncGroup(syncId); // 🌐 Sync all root sequences together
-    
+    let sequence = new Sequence();
     if (sound.enabled) {
         sequence = sequence.sound()
             .file(sound.file)
@@ -43,7 +37,11 @@ async function create(source, config = {}) {
         .attachTo(source)
         .scaleToObject(1.1)
         .opacity(0.15)
-        .filter("ColorMatrix", { hue: 510, saturate: 1.2, brightness: 15 })
+        .filter("ColorMatrix", {
+            hue: 510,
+            saturate: 1.2,
+            brightness: 15
+        })
         .fadeIn(duration)
         .belowTokens(true)
         .name(label)
@@ -61,41 +59,53 @@ async function create(source, config = {}) {
         // 💥 SHATTER + PARTICULES
         .thenDo(async () => {
             // 💥 particules synchronisées
-            let particleSeq = new Sequence().syncGroup(syncId) // 🌐 Bind to same sync group
+            let particleSeq = new Sequence()
                 .effect()
                 .file(closest("eskie.particle.05.blue"))
                 .delay(950)
-                .atLocation(source.center)
+                .atLocation(source.center)        // 🔥 important
                 .size({
                     width: source.document.width * 2.5,
                     height: source.document.height * 2.5
                 }, { gridUnits: true })
                 .playbackRate(0.5)
-                .filter("Glow", { distance: 1, outerStrength: 2, innerStrength: 0, color: 0x1FFFA3, quality: 0.1, knockout: false })
+                .filter("Glow", {
+                    distance: 1,      // Number, distance of the glow in pixels
+                    outerStrength: 2,  // Number, strength of the glow outward from the edge of the sprite
+                    innerStrength: 0,  // Number, strength of the glow inward from the edge of the sprite
+                    color: 0x1FFFA3,   // Hexadecimal, color of the glow
+                    quality: 0.1,      // Number, describes the quality of the glow (0 to 1) - the higher the number the less performant
+                    knockout: false    // Boolean, toggle to hide the contents and only show glow (effectively hides the sprite)
+                })
                 .belowTokens(true);
 
             // Token Overlay colorMatrix for shatter mask
             function colorMatrix(seq) {
                 return seq.tint('#03e8fc')
                     .filter("ColorMatrix", { brightness: 1.5 })
-                    .filter("Glow", { distance: 8, outerStrength: 4, innerStrength: 0, color: 0x1FFFA3, quality: 0.1, knockout: false });
+                    .filter("Glow", {
+                        distance: 8,
+                        outerStrength: 4,
+                        innerStrength: 0,
+                        color: 0x1FFFA3,
+                        quality: 0.1,
+                        knockout: false
+                    });
             }
-            
             // Shatter Mask sequence
             const shatterSeq = await shatterMask.create(source, {
                 id,
                 color: shatterColor,
                 tint: tintColor,
                 deleteToken,
-                callback: { tokenOverlay: colorMatrix },
+                callback: {
+                    tokenOverlay: colorMatrix
+                },
                 overlay: {
                     token: "eskie.texture_mask.tile_base.shatter.center.01",
                     reveal: "eskie.texture_mask.tile_base.shatter.center.01",
                 }
             });
-
-            // Ensure the nested shatter mask sequence also respects the sync group
-            if (shatterSeq) shatterSeq.syncGroup(syncId);
 
             if (particleSeq && shatterSeq) return particleSeq.addSequence(shatterSeq).play();
         });

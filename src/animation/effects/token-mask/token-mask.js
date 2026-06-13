@@ -141,28 +141,33 @@ async function create(token, config = {}) {
         .zIndex(1);
     // Additional customization of the token overlay
     if (callback.tokenOverlay) seq = callback.tokenOverlay(seq)
-// Inside token-mask.js -> create() function
 
-seq = seq.waitUntilFinished()
-    .thenDo(async () => {
-        // 1. Immediately destroy the overlay shape mask
-        await socket.tile.destroy([tokenShapeMask.id]);
-        // 2. Hide the token reveal mask so the shattered sprite disappears cleanly
-        await socket.tile.edit(tokenRevealMask.id, { alpha: 0 });
-        // 3. Clean up the local Sequencer sprite/color effects completely
-        await Sequencer.EffectManager.endEffects({ name: label });
-        
-        // 4. If the token needs to be deleted, delete it NOW while sceneRevealMask is still alpha: 1 covering the canvas
-        if (deleteToken) {
-            await token.document.delete();
-        }
-        
-        // 5. Provide a minor, safer 300ms gap for the database deletion to propagate to clients
-        await time.wait(300);
-        
-        // 6. FINALLY destroy the lingering mask tiles after everything else is gone
-        await socket.tile.destroy([tokenRevealMask.id, sceneRevealMask.id]);
-    });
+    seq = seq.waitUntilFinished()
+        .thenDo(async () => { 
+            // 1. Immediately destroy the top-most overlay shape mask tile
+            await socket.tile.destroy([tokenShapeMask.id]);
+            
+            // 2. Hide the token reveal mask so the shattered sprite disappears cleanly
+            await socket.tile.edit(tokenRevealMask.id, { alpha: 0 });
+            
+            // 3. Clean up the local Sequencer sprite/color effects completely
+            await Sequencer.EffectManager.endEffects({ name: label });
+            
+            // 4. Force the base token to opacity 0 on all clients as a safety fallback
+            await canvas.tokens.get(token.id)?.document.update({ alpha: 0 });
+
+            // 5. If the token needs to be deleted, delete it NOW.
+            // The sceneRevealMask is STILL alpha: 1, completely covering any visual glitches.
+            if (deleteToken) {
+                await token.document.delete();
+            }
+            
+            // 6. Give the database a mandatory 400ms to propagate the token deletion to other clients
+            await time.wait(500); 
+            
+            // 7. FINALLY, drop the curtain by destroying the remaining mask tiles
+            await socket.tile.destroy([tokenRevealMask.id, sceneRevealMask.id]);
+        });
 
     return seq;
 }
