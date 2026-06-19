@@ -25,6 +25,7 @@ async function createTile(updates = {}) {
     };
     updates = foundry.utils.mergeObject(DEFAULT_TILE_UPDATES, updates, { inplace: false });
     
+    if (!canvas.scene) return [];
     return canvas.scene.createEmbeddedDocuments("Tile", [updates]);
 }
 
@@ -34,6 +35,7 @@ async function createTile(updates = {}) {
  * @returns {Promise<TileDocument[]>} An array containing the deleted tile document.
  */
 async function destroyTile(id) {
+    if (!canvas.scene) return [];
     return canvas.scene.deleteEmbeddedDocuments("Tile", [id]);
 }
 
