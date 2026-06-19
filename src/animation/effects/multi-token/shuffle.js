@@ -11,6 +11,7 @@ const DEFAULT_CONFIG = {
 };
 
 function create(targets, config = {}) {
+    targets = targets ? (Array.isArray(targets) ? targets : [targets]) : [];
     const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, {inplace:false});
     mConfig.destinationPoints = targets?.map(t => ({ x: t.x, y: t.y })) ?? [];
     let { sendToCenter, destinationPoints } = mConfig;

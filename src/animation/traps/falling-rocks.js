@@ -14,6 +14,7 @@ const DEFAULT_CONFIG = {
 async function create(tile, targets, config = {}) {
     config = settingsOverride(config);
     const { dustBrightness } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
+    targets = targets ? (Array.isArray(targets) ? targets : [targets]) : [];
 
     const num = Math.floor(Math.random() * 2);
     const mirrorX = Math.random() >= 0.5;
