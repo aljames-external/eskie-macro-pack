@@ -54,6 +54,21 @@ Downloading Visual Studio Code and/or an agentic IDE such as Google's Antigravit
 * User-facing API for macro support!
 * Highly customizable variants!
 * Automated tile-based trap system!
+* Automated roll-triggered animations!
+
+---
+
+## ⚙️ Automated World Scripts (Roll Animations)
+
+EMP features an automated roll animation system that hooks into your game system's roll cards (e.g. dnd5e, Midi-QOL) and automatically plays animations on casting tokens and targets — **no macros required**.
+
+### How to Configure:
+1. Go to **Configure Settings** in Foundry VTT.
+2. Under **Eskie Macro Package**, click the **World Scripts Menu** button.
+3. Toggle the automated scripts you wish to enable:
+   * **Automated Roll Animations (`eskieRollAnimation`)**: Automatically detects spell and weapon rolls (from chat or Midi-QOL) and plays the matching EMP animation on the speaker token and target(s).
+
+---
 
 ## Requirements
 
