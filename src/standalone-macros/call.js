@@ -1,6 +1,13 @@
 // Standalone Macro
 // Original Author: EskieMoh#2969
 
+if (!game.modules.get("tagger")?.active) {
+    return ui.notifications.error("The 'Call' macro requires the 'Tagger' module to be installed and active!");
+}
+if (!game.modules.get("sequencer")?.active) {
+    return ui.notifications.error("The 'Call' macro requires the 'Sequencer' module to be installed and active!");
+}
+
 const token = canvas.tokens.controlled[0];
 if (!token) return ui.notifications.warn('Please select a token!');
 
@@ -66,7 +73,7 @@ if (Tagger.hasTags(token, CALL_TAG)) {
 
     // JB2A red token stage ring behind the icon
     seq.effect()
-        .file('jb2a.token_stage.round.red.01.05')
+        .file(eskie.util.file.closest('jb2a.token_stage.round.red.01.05'))
         .name(EFFECT_NAME)
         .atLocation(token)
         .attachTo(token, { align: 'top-right', edge: 'outer', bindVisibility: false, offset: { x: -0.2, y: 0.2 }, gridUnits: true, followRotation: false })
@@ -88,7 +95,7 @@ if (Tagger.hasTags(token, CALL_TAG)) {
 
     // Left eye glow sparkle effect
     seq.effect()
-        .file('jb2a.twinkling_stars.points04.orange')
+        .file(eskie.util.file.closest('jb2a.twinkling_stars.points04.orange'))
         .name(EFFECT_NAME)
         .atLocation(token, { offset: { x: -0.2, y: -0.16 }, gridUnits: true, local: true })
         .size({ width: 0.4, height: 0.1 }, { gridUnits: true })
@@ -102,7 +109,7 @@ if (Tagger.hasTags(token, CALL_TAG)) {
 
     // Right eye glow sparkle effect
     seq.effect()
-        .file('jb2a.twinkling_stars.points04.orange')
+        .file(eskie.util.file.closest('jb2a.twinkling_stars.points04.orange'))
         .name(EFFECT_NAME)
         .atLocation(token, { offset: { x: 0.12, y: -0.225 }, gridUnits: true, local: true })
         .size({ width: 0.4, height: 0.1 }, { gridUnits: true })
@@ -151,6 +158,9 @@ if (Tagger.hasTags(token, CALL_TAG)) {
 
             i++;
             e++;
+            
+            // Throttle loop execution to prevent thread lock and browser freezes
+            await Sequencer.Helpers.wait(100);
         }
     });
 
