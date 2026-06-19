@@ -1,7 +1,12 @@
 /**
  * World Script: Eskie Roll Animations
  * Plays a custom d20 roll animation sequence above tokens during saving throws and ability checks.
+ * Supports D&D 5e (with or without Midi-QOL), Pathfinder 2e (PF2e), and generic d20 systems.
  */
+
+// ============================================================================
+// SEQUENCER ANIMATION TRIGGER
+// ============================================================================
 
 async function playEskieRollAnimation(token, config = {}) {
     if (!token) return;
@@ -19,6 +24,8 @@ async function playEskieRollAnimation(token, config = {}) {
 
     const verticalOffset = -(token.h * 0.80);
     const locationOptions = { offset: { x: 0, y: verticalOffset } };
+
+    console.log(`[Eskie Animation] Playing animation: rollPath="${rollPath}", token="${token.name}", outcome="${outcome}"`);
 
     new Sequence()
         .effect()
@@ -40,134 +47,343 @@ async function playEskieRollAnimation(token, config = {}) {
         .play({ remote: true }); 
 }
 
+// ============================================================================
+// ABILITY AND SKILL NORMALIZATION HELPERS
+// ============================================================================
+
+const BASE_ABILITY_MAP = {
+    str: "strength", strength: "strength",
+    dex: "dexterity", dexterity: "dexterity",
+    con: "constitution", constitution: "constitution",
+    int: "intelligence", intelligence: "intelligence",
+    wis: "wisdom", wisdom: "wisdom",
+    cha: "charisma", charisma: "charisma"
+};
+
+/**
+ * Shared helper to extract and normalize abilities/skills into Eskie asset names.
+ * Consolidates mapping structures across all adapters to prevent code duplication.
+ */
+function parseAndNormalizeAbility(rawAbility, combinedText, customMap = {}) {
+    let raw = rawAbility;
+    if (!raw) {
+        // Shared regex matching common ability and skill names/abbreviations
+        const abilityRegex = /(strength|dexterity|constitution|intelligence|wisdom|charisma|str|dex|con|int|wis|cha|perception|prc|acr|ath|ste|sle)/;
+        const match = combinedText.match(abilityRegex);
+        if (match) raw = match[1];
+    }
+
+    if (raw) {
+        const lowerRaw = raw.toLowerCase();
+        const mergedMap = { ...BASE_ABILITY_MAP, ...customMap };
+        return mergedMap[lowerRaw] || lowerRaw;
+    }
+    return null;
+}
+
+// ============================================================================
+// MODULE ADAPTERS (AUTOMATION EXTENSIONS)
+// ============================================================================
+
+const MODULE_ADAPTERS = {
+    // ------------------------------------------------------------------------
+    // Midi-QOL Module Adapter
+    // ------------------------------------------------------------------------
+    "midi-qol": {
+        isActive() {
+            return game.modules.get("midi-qol")?.active;
+        },
+        extractRolls(message) {
+            const rolls = [];
+            const contentText = message.content || "";
+
+            // 1. Check for single target outcome flags
+            let outcome = "indeterminant";
+            if (message.flags?.["midi-qol"]?.isSuccess) outcome = "success";
+            else if (message.flags?.["midi-qol"]?.isFailure) outcome = "failure";
+
+            // 2. Parse multi-target saves display HTML using Foundry's built-in jQuery
+            if (contentText.includes("midi-qol")) {
+                const $content = $(contentText);
+                const $saveDisplay = $content.find(".midi-qol-saves-display");
+                
+                if ($saveDisplay.length) {
+                    const $targetLis = $saveDisplay.find("li.midi-qol-target-select");
+                    
+                    // Parse the short ability code from the save display block text
+                    let saveAbility = null;
+                    const textContext = $saveDisplay.text().toLowerCase();
+                    const abilityRegex = /(strength|dexterity|constitution|intelligence|wisdom|charisma|str|dex|con|int|wis|cha|acr|ath|per|ste)/;
+                    const match = textContext.match(abilityRegex);
+                    if (match) saveAbility = match[1];
+
+                    $targetLis.each((index, el) => {
+                        const $li = $(el);
+                        const tokenId = el.dataset.id;
+                        let targetOutcome = "indeterminant";
+                        let isResolved = false;
+
+                        if ($li.hasClass("success") || $li.find(".fa-check").length > 0) {
+                            targetOutcome = "success";
+                            isResolved = true;
+                        } else if ($li.hasClass("failure") || $li.find(".fa-times").length > 0) {
+                            targetOutcome = "failure";
+                            isResolved = true;
+                        }
+
+                        if (isResolved && tokenId) {
+                            rolls.push({
+                                source: "midi-qol-html",
+                                rawAbility: saveAbility,
+                                outcome: targetOutcome,
+                                tokenId: tokenId
+                            });
+                        }
+                    });
+                }
+            }
+
+            // If flag outcomes exist but no HTML saves (e.g., single-target roll card updates)
+            if (rolls.length === 0 && outcome !== "indeterminant") {
+                rolls.push({
+                    source: "midi-qol-flags",
+                    rawAbility: null,
+                    outcome: outcome,
+                    tokenId: null
+                });
+            }
+
+            return { rolls, outcome };
+        }
+    }
+};
+
+// ============================================================================
+// SYSTEM ADAPTERS
+// ============================================================================
+
+const SYSTEM_ADAPTERS = {
+    // ------------------------------------------------------------------------
+    // D&D 5e Adapter
+    // ------------------------------------------------------------------------
+    "dnd5e": {
+        extractRolls(message) {
+            const rolls = [];
+            const flavorText = message.flavor?.toLowerCase() || "";
+            const contentText = message.content || "";
+            const contentLower = contentText.toLowerCase();
+            const combinedText = `${flavorText} ${contentLower}`;
+
+            // 1. Core System Flag Checks (rolls from character sheets)
+            const rollFlags = message.flags?.dnd5e?.roll;
+            if (rollFlags) {
+                const isCoreValid = ["save", "ability", "skill"].includes(rollFlags.type);
+                if (isCoreValid) {
+                    rolls.push({
+                        source: "dnd5e-core-flags",
+                        rawAbility: rollFlags.ability,
+                        outcome: "indeterminant",
+                        tokenId: null
+                    });
+                }
+            }
+
+            // 2. Process Active Module Adapters (e.g. Midi-QOL)
+            let moduleOutcome = "indeterminant";
+            const midiAdapter = MODULE_ADAPTERS["midi-qol"];
+            if (midiAdapter && midiAdapter.isActive()) {
+                const midiData = midiAdapter.extractRolls(message);
+                if (midiData.rolls.length > 0) {
+                    rolls.push(...midiData.rolls);
+                }
+                moduleOutcome = midiData.outcome;
+            }
+
+            // 3. Fallback Keyword Strings (Only run if no rolls have been identified yet)
+            if (rolls.length === 0) {
+                const isItemUsage = message.flags?.dnd5e?.messageType === "usage";
+                const isMidiAttack = midiAdapter?.isActive() && ["attack", "damage", "item"].includes(message.flags?.["midi-qol"]?.messageType);
+                
+                if (!isItemUsage && !isMidiAttack) {
+                    const hasKeywords = /save|saving\s+throw|check|skill/.test(combinedText);
+                    if (hasKeywords) {
+                        rolls.push({
+                            source: "dnd5e-fallback-keywords",
+                            rawAbility: null,
+                            outcome: "indeterminant",
+                            tokenId: null
+                        });
+                    }
+                }
+            }
+
+            // Distribute module-level outcome to core/fallback rolls if they are still indeterminant
+            rolls.forEach(roll => {
+                if (roll.outcome === "indeterminant" && moduleOutcome !== "indeterminant") {
+                    roll.outcome = moduleOutcome;
+                }
+            });
+
+            return rolls;
+        },
+
+        normalizeAbility(rawAbility, combinedText) {
+            // DnD 5e-specific skill and feature abbreviations
+            const dnd5eMap = {
+                ath: "strength",
+                acr: "dexterity", ste: "dexterity", sle: "dexterity",
+                arc: "intelligence", his: "intelligence", inv: "intelligence", nat: "intelligence", rel: "intelligence",
+                ani: "wisdom", ins: "wisdom", med: "wisdom", per: "wisdom", sur: "wisdom",
+                dec: "charisma", itm: "charisma", prf: "charisma", pers: "charisma"
+            };
+            return parseAndNormalizeAbility(rawAbility, combinedText, dnd5eMap);
+        }
+    },
+
+    // ------------------------------------------------------------------------
+    // Pathfinder 2e (PF2e) Adapter
+    // ------------------------------------------------------------------------
+    "pf2e": {
+        extractRolls(message) {
+            const rolls = [];
+            const pf2eContext = message.flags?.pf2e?.context;
+
+            if (pf2eContext) {
+                const rollType = pf2eContext.type;
+                const isValidType = ["saving-throw", "skill-check", "perception-check", "ability-check"].includes(rollType);
+                
+                if (isValidType) {
+                    let outcome = "indeterminant";
+                    const pf2eOutcome = pf2eContext.outcome; // 'success', 'criticalSuccess', 'failure', 'criticalFailure'
+                    
+                    if (pf2eOutcome) {
+                        if (["success", "criticalSuccess"].includes(pf2eOutcome)) outcome = "success";
+                        if (["failure", "criticalFailure"].includes(pf2eOutcome)) outcome = "failure";
+                    }
+
+                    rolls.push({
+                        source: "pf2e-flags",
+                        rawAbility: pf2eContext.ability || null,
+                        outcome: outcome,
+                        tokenId: message.speaker.token || null
+                    });
+                }
+            }
+
+            // Fallback text parsing if flags are missing/unpopulated
+            if (rolls.length === 0) {
+                const flavor = message.flavor?.toLowerCase() || "";
+                const content = message.content?.toLowerCase() || "";
+                const combined = `${flavor} ${content}`;
+                
+                const hasKeywords = /saving throw|check|skill|perception/.test(combined);
+                const isAttack = message.flags?.pf2e?.context?.type === "attack-roll";
+
+                if (hasKeywords && !isAttack) {
+                    rolls.push({
+                        source: "pf2e-fallback",
+                        rawAbility: null,
+                        outcome: "indeterminant",
+                        tokenId: message.speaker.token || null
+                    });
+                }
+            }
+
+            return rolls;
+        },
+
+        normalizeAbility(rawAbility, combinedText) {
+            // PF2e-specific perception/skill checks mapping
+            const pf2eMap = {
+                perception: "wisdom", prc: "wisdom"
+            };
+            return parseAndNormalizeAbility(rawAbility, combinedText, pf2eMap);
+        }
+    },
+
+    // ------------------------------------------------------------------------
+    // Generic / Fallback Adapter (Works for PF1e, D&D 3.5, etc.)
+    // ------------------------------------------------------------------------
+    "generic": {
+        extractRolls(message) {
+            const rolls = [];
+            const flavorText = message.flavor?.toLowerCase() || "";
+            const contentText = message.content || "";
+            const contentLower = contentText.toLowerCase();
+            const combinedText = `${flavorText} ${contentLower}`;
+
+            const hasKeywords = /save|saving\s+throw|check|skill/.test(combinedText);
+            const isAttackOrDamage = /attack|strike|damage|damage\s+roll/.test(combinedText);
+
+            if (hasKeywords && !isAttackOrDamage) {
+                rolls.push({
+                    source: "generic-keywords",
+                    rawAbility: null,
+                    outcome: "indeterminant",
+                    tokenId: null
+                });
+            }
+
+            return rolls;
+        },
+
+        normalizeAbility(rawAbility, combinedText) {
+            return parseAndNormalizeAbility(rawAbility, combinedText);
+        }
+    }
+};
+
+/**
+ * Dynamically resolves the best system adapter for the current game system.
+ */
+function getSystemAdapter() {
+    const systemId = game.system.id;
+    return SYSTEM_ADAPTERS[systemId] || SYSTEM_ADAPTERS["generic"];
+}
+
+// ============================================================================
+// ROLL DETAILS PARSING & DISPATCHING
+// ============================================================================
+
+/**
+ * Parses raw chat text, flavor, and flags using the system adapter
+ * to determine if this card contains actionable rolls.
+ */
 function getRollDetails(message) {
+  const adapter = getSystemAdapter();
+  
+  // Extract raw rolls from the system adapter
+  const rolls = adapter.extractRolls(message);
+  if (rolls.length === 0) return [];
+
   const flavorText = message.flavor?.toLowerCase() || "";
   const contentText = message.content || "";
   const contentLower = contentText.toLowerCase();
   const combinedText = `${flavorText} ${contentLower}`;
-  
-  const rolls = [];
 
-  // 1. Core System Flag Checks (Direct rolls made by a single token)
-  const rollFlags = message.flags?.dnd5e?.roll;
-  if (rollFlags) {
-    const isCoreValid = ["save", "ability", "skill"].includes(rollFlags.type);
-    if (isCoreValid) {
-      rolls.push({
-        source: "core-flags",
-        ability: rollFlags.ability,
-        outcome: "indeterminant",
-        tokenId: null, // Signals fallback to the speaker token (correct for direct rolls)
-        rawAbility: rollFlags.ability
-      });
-    }
-  }
-
-  // 2. Midi-QOL Flag Checks (Single-target outcome flags)
-  let midiOutcome = "indeterminant";
-  if (message.flags?.["midi-qol"]?.isSuccess) midiOutcome = "success";
-  else if (message.flags?.["midi-qol"]?.isFailure) midiOutcome = "failure";
-
-  // 3. Advanced Midi-QOL HTML Parsing (For automated multi-target saves/checks)
-  if (contentText.includes("midi-qol")) {
-    const parser = new DOMParser();
-    const doc = parser.parseFromString(contentText, "text/html");
-    
-    const saveDisplay = doc.querySelector(".midi-qol-saves-display");
-    if (saveDisplay) {
-      // Find all target list items in the save display container
-      const targetLis = saveDisplay.querySelectorAll("li.midi-qol-target-select");
-      
-      // Determine the ability/save type from the display text context
-      let saveAbility = null;
-      const textContext = saveDisplay.textContent.toLowerCase();
-      const abilityRegex = /(strength|dexterity|constitution|intelligence|wisdom|charisma|str|dex|con|int|wis|cha|acr|ath|per|ste)/;
-      const match = textContext.match(abilityRegex);
-      if (match) saveAbility = match[1];
-
-      targetLis.forEach(targetLi => {
-        const tokenId = targetLi.dataset.id;
-        let targetOutcome = "indeterminant";
-        let isResolved = false;
-
-        // Check if this specific target has resolved their save yet
-        if (targetLi.classList.contains("success") || targetLi.querySelector(".fa-check")) {
-          targetOutcome = "success";
-          isResolved = true;
-        } else if (targetLi.classList.contains("failure") || targetLi.querySelector(".fa-times")) {
-          targetOutcome = "failure";
-          isResolved = true;
-        }
-
-        // Only add to rolls if the target has actually resolved their save
-        if (isResolved && tokenId) {
-          rolls.push({
-            source: "midi-html",
-            ability: saveAbility,
-            outcome: targetOutcome,
-            tokenId: tokenId,
-            rawAbility: saveAbility
-          });
-        }
-      });
-    }
-  }
-
-  // 4. Fallback Keyword Strings (Only run if no rolls have been identified yet)
-  if (rolls.length === 0) {
-    // Explicitly ignore item usage, attacks, and damage cards to prevent false positives on caster cards
-    const isItemUsage = message.flags?.dnd5e?.messageType === "usage";
-    const isMidiAttackOrDamage = ["attack", "damage", "item"].includes(message.flags?.["midi-qol"]?.messageType);
-    
-    if (!isItemUsage && !isMidiAttackOrDamage) {
-      const hasKeywords = /save|saving\s+throw|check|skill/.test(combinedText);
-      if (hasKeywords) {
-        rolls.push({
-          source: "fallback-keywords",
-          ability: null,
-          outcome: "indeterminant",
-          tokenId: null // Fallback to speaker
-        });
-      }
-    }
-  }
-
-  // 5. Normalize Abilities & Outcomes for all detected rolls
+  // Normalize outcomes and abilities
   rolls.forEach(roll => {
     // Normalize Outcome
     if (roll.outcome === "indeterminant") {
-      if (midiOutcome !== "indeterminant") {
-        roll.outcome = midiOutcome;
-      } else {
-        if (combinedText.includes("success") || combinedText.includes("pass")) roll.outcome = "success";
-        if (combinedText.includes("failure") || combinedText.includes("fail")) roll.outcome = "failure";
+      const successMatch = /success|pass/.exec(combinedText);
+      const failureMatch = /failure|fail/.exec(combinedText);
+      if (successMatch) {
+        roll.outcome = "success";
+      } else if (failureMatch) {
+        roll.outcome = "failure";
       }
     }
 
-    // Normalize Ability string
-    let raw = roll.rawAbility;
-    if (!raw) {
-      const abilityRegex = /(strength|dexterity|constitution|intelligence|wisdom|charisma|str|dex|con|int|wis|cha)/;
-      const match = combinedText.match(abilityRegex);
-      if (match) raw = match[1];
-    }
-
-    if (raw) {
-      const abilityMap = {
-        str: "strength", strength: "strength", ath: "strength",
-        dex: "dexterity", dexterity: "dexterity", acr: "dexterity", ste: "dexterity", sle: "dexterity",
-        con: "constitution", constitution: "constitution",
-        int: "intelligence", intelligence: "intelligence", arc: "intelligence", his: "intelligence", inv: "intelligence", nat: "intelligence", rel: "intelligence",
-        wis: "wisdom", wisdom: "wisdom", ani: "wisdom", ins: "wisdom", med: "wisdom", per: "wisdom", sur: "wisdom",
-        cha: "charisma", charisma: "charisma", dec: "charisma", itm: "charisma", prf: "charisma", pers: "charisma"
-      };
-      roll.ability = abilityMap[raw.toLowerCase()] || raw;
-    }
+    // Normalize Ability using the adapter
+    roll.ability = adapter.normalizeAbility(roll.rawAbility, combinedText);
   });
 
   return rolls;
 }
 
+/**
+ * Pinpoints the exact rolling token document.
+ */
 function getSpeakerToken(message, extractedTokenId) {
   if (extractedTokenId) {
     const htmlTarget = canvas.tokens.get(extractedTokenId);
@@ -178,6 +394,9 @@ function getSpeakerToken(message, extractedTokenId) {
          || game.user.character?.getActiveTokens()[0];
 }
 
+/**
+ * Evaluates the message and triggers animations for unplayed rolls.
+ */
 async function processMessageAndPlay(message, userId) {
   // Only run validation calculations once on the user machine modifying the doc
   if (game.user.id !== userId) return;
@@ -187,6 +406,10 @@ async function processMessageAndPlay(message, userId) {
 
   // Retrieve the list of token IDs that have already animated for this message
   const firedTokens = message.flags?.world?.eskieAnimatedTokens || [];
+  
+  // Checking newFiredTokens dynamically instead of firedTokens ensures that if
+  // multiple roll records for the same token are extracted in a single update,
+  // we deduplicate in real-time and only play the animation ONCE.
   const newFiredTokens = [...firedTokens];
   let updatedFlags = false;
 
@@ -194,8 +417,8 @@ async function processMessageAndPlay(message, userId) {
     const token = getSpeakerToken(message, roll.tokenId);
     if (!token) continue;
 
-    // Check if we've already animated this specific token for this message
-    if (firedTokens.includes(token.id)) continue;
+    // Check if we've already animated this specific token (in a previous update OR earlier in this loop)
+    if (newFiredTokens.includes(token.id)) continue;
 
     // Trigger the sequence
     playEskieRollAnimation(token, {
@@ -213,8 +436,13 @@ async function processMessageAndPlay(message, userId) {
   }
 }
 
+// ============================================================================
+// RUNTIME HOOKS
+// ============================================================================
+
 export function initialize() {
-  console.log("EMP | Initializing World Script: Eskie Roll Animations");
+  const adapter = getSystemAdapter();
+  console.log(`EMP | Initializing World Script: Eskie Roll Animations. Active System: "${adapter.id}"`);
   
   // Register Hooks
   Hooks.on("createChatMessage", (message, options, userId) => {
