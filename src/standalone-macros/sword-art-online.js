@@ -170,13 +170,13 @@ if (isPlaying) {
                 .waitUntilFinished()
 
                 .thenDo(async () => {
+                    await Sequencer.EffectManager.endEffects({ name: label });
                     if (deleteToken) {
                         await token.document.delete();
                     } else {
                         await canvas.scene.deleteEmbeddedDocuments('Tile', [tokenRevealMask.id, sceneRevealMask.id, tokenShapeMask.id]);
                         await token.document.unsetFlag('eskie-macros', 'sao-shatter-tiles');
                     }
-                    await Sequencer.EffectManager.endEffects({ name: label });
                 });
 
             shatterSeq.play();

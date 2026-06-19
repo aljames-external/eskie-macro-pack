@@ -138,6 +138,7 @@ async function create(token, config = {}) {
         .waitUntilFinished()
 
         .thenDo(async () => {
+            await Sequencer.EffectManager.endEffects({ name: label });
             if (deleteToken) {
                 await token.document.delete();
             } else {
@@ -147,7 +148,6 @@ async function create(token, config = {}) {
                     socket.tile.destroy(sceneRevealMask.id),
                 ]);
             }
-            await Sequencer.EffectManager.endEffects({ name: label });
         });
 
     return seq;
