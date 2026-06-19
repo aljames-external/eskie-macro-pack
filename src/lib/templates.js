@@ -24,12 +24,15 @@ async function getPosition(template, config = {}) {
         } else {
             console.log(`EMP | getPosition: Falling back to legacy MeasuredTemplate support (pre-V14). This support will be removed in Foundry V16.`);
             // Legacy MeasuredTemplate support
-            const templateObject = template.object || template._object;
-            if (templateObject && templateObject.ray) {
-                const farpoint = templateObject.ray.B;
-                secondary = { x: farpoint.x, y: farpoint.y };
+            const isCircle = template.type === "circle" || template.document?.type === "circle";
+            if (!isCircle && template.direction !== undefined && template.distance && canvas.dimensions) {
+                const directionRad = Math.toRadians(template.direction);
+                const rayDistance = (template.distance * canvas.dimensions.size) / canvas.dimensions.distance;
+                secondary = {
+                    x: template.x + Math.cos(directionRad) * rayDistance,
+                    y: template.y + Math.sin(directionRad) * rayDistance
+                };
             } else {
-                // Graceful fallback to origin if ray is not loaded/rendered
                 secondary = { x: template.x, y: template.y };
             }
             primary = { x: template.x, y: template.y };
