@@ -1,5 +1,6 @@
 import { BaseSystemAdapter } from "./base.js";
 import { midiQolAdapter } from "../module/midiQol.js";
+import { debug } from "../../../lib/debug.js";
 
 /**
  * D&D 5e System Adapter Class
@@ -12,7 +13,7 @@ export class Dnd5eAdapter extends BaseSystemAdapter {
 
     qualifyMessage(message) {
         // Add debug logging
-        console.log(`EMP | Dnd5eAdapter.qualifyMessage: message="${message.id}"`, {
+        debug.log(`Dnd5eAdapter.qualifyMessage: message="${message.id}"`, {
             rollType: message.flags?.dnd5e?.roll?.type,
             messageType: message.flags?.dnd5e?.messageType,
             midiMessageType: message.flags?.["midi-qol"]?.messageType,

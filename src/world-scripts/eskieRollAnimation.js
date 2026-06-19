@@ -8,6 +8,7 @@ import { Dnd5eAdapter } from "./adapters/system/dnd5e.js";
 import { Pf2eAdapter } from "./adapters/system/pf2e.js";
 import { GenericAdapter } from "./adapters/system/generic.js";
 import { closest } from "../lib/filemanager.js";
+import { debug } from "../lib/debug.js";
 
 // ============================================================================
 // SEQUENCER ANIMATION TRIGGER
@@ -30,7 +31,7 @@ async function playEskieRollAnimation(token, config = {}) {
     const verticalOffset = -(token.h * 0.80);
     const locationOptions = { offset: { x: 0, y: verticalOffset } };
 
-    console.log(`[Eskie Animation] Playing animation: rollPath="${rollPath}", token="${token.name}", outcome="${outcome}"`);
+    debug.log(`Playing animation: rollPath="${rollPath}", token="${token.name}", outcome="${outcome}"`);
 
     new Sequence()
         .effect()
@@ -84,7 +85,7 @@ export class EskieRollTracker {
     enable() {
         if (this.hookIds.length > 0) return; // Already enabled
 
-        console.log(`EMP | Enabling Eskie Roll Animations. Active System: "${this.activeAdapter.id}"`);
+        debug.log(`Enabling Eskie Roll Animations. Active System: "${this.activeAdapter.id}"`);
 
         const createId = Hooks.on("createChatMessage", (message, options, userId) => {
             this.processMessageAndPlay(message, userId);
@@ -106,7 +107,7 @@ export class EskieRollTracker {
     disable() {
         if (this.hookIds.length === 0) return; // Already disabled
 
-        console.log("EMP | Disabling Eskie Roll Animations");
+        debug.log("Disabling Eskie Roll Animations");
 
         for (const hook of this.hookIds) {
             Hooks.off(hook.name, hook.id);

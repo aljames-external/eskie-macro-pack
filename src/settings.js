@@ -57,4 +57,14 @@ Hooks.once('init', function() {
         type: String,
         default: 'EMP Blank Actor',
     });
+
+    // Debug Logging Toggle Setting
+    game.settings.register(MODULE_ID, 'debugEnabled', {
+        name: 'EMP.settings.debugEnabled.name',
+        hint: 'EMP.settings.debugEnabled.hint',
+        scope: 'client',
+        config: true,
+        type: Boolean,
+        default: false,
+    });
 });

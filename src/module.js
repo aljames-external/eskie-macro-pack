@@ -8,6 +8,7 @@ import { tokens as token } from './lib/tokens.js';
 import { socket } from './integration/socketlib.js';
 import { loadWorldScripts } from './world-scripts/loader.js';
 import { crosshair } from './crosshair/_crosshairs.js';
+import { debug } from './lib/debug.js';
 
 // Import module settings to also run its initialization code
 import './settings.js';
@@ -44,6 +45,7 @@ Hooks.once('init', async () => {
         // Setup dependency API
         setupApiCalls( animation );
         setupApiCalls({ util });
+        setupApiCalls({ debug });
 
         // Alias eskie.utils to eskie.util for backward compatibility
         globalThis.eskie.utils = globalThis.eskie.util;

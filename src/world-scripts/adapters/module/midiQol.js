@@ -1,7 +1,5 @@
-/**
- * Midi-QOL Module Adapter
- * Handles Midi-QOL specific flag checks and multi-target saves display HTML parsing.
- */
+import { debug } from "../../../lib/debug.js";
+
 export const midiQolAdapter = {
     isActive() {
         return game.modules.get("midi-qol")?.active;
@@ -12,7 +10,7 @@ export const midiQolAdapter = {
         const midiFlags = message.flags?.["midi-qol"];
 
         // Add debug logging
-        console.log(`EMP | Midi-QOL Extract Rolls Check:`, {
+        debug.log(`Midi-QOL Extract Rolls Check:`, {
             messageId: message.id,
             messageType: midiFlags?.messageType,
             type: midiFlags?.type,
@@ -24,7 +22,7 @@ export const midiQolAdapter = {
         // Ignore attack, damage, and item usage cards
         const messageType = midiFlags?.messageType || midiFlags?.type;
         if (messageType && ["attack", "damage", "item"].includes(messageType)) {
-            console.log(`EMP | Midi-QOL: Ignoring attack/damage/item messageType: "${messageType}"`);
+            debug.log(`Midi-QOL: Ignoring attack/damage/item messageType: "${messageType}"`);
             return { rolls: [], outcome: "indeterminant" };
         }
 
