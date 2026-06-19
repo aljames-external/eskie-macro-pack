@@ -23,197 +23,284 @@ if (!token) return ui.notifications.warn('Please select a token!');
 const id = 'swordArtOnlineShatter';
 const label = `${id} - ${token.id}`;
 
-// Check if effect is already playing
-const isPlaying = Sequencer.EffectManager.getEffects({ name: label, object: token }).length > 0;
+const eskieModule = game.modules.get('eskie-macros');
 
-if (isPlaying) {
-    new Sequence().animation().on(token).opacity(1).show(true).play();
-    Sequencer.EffectManager.endEffects({ name: label });
-    
-    // Cleanup orphaned tiles if toggle off is triggered manually
-    const orphanedTileIds = token.document.getFlag('eskie-macros', 'sao-shatter-tiles');
-    if (orphanedTileIds) {
-        await canvas.scene.deleteEmbeddedDocuments('Tile', orphanedTileIds);
-        await token.document.unsetFlag('eskie-macros', 'sao-shatter-tiles');
+// Configuration
+const tintColor = '#00FFFF';
+const duration = 1000;
+const shatterColor = 'blue';
+const deleteToken = false;
+const center = true;
+const rotation = 0;
+
+const config = {
+    tintColor,
+    duration,
+    shatterColor,
+    deleteToken,
+    center,
+    rotation
+};
+
+if (eskieModule?.socketlib) {
+    const isPlaying = token.document.getFlag('eskie-macros', 'sao-shatter-tiles') !== undefined;
+
+    if (isPlaying) {
+        const orphanedTileIds = token.document.getFlag('eskie-macros', 'sao-shatter-tiles');
+        if (orphanedTileIds) {
+            await eskieModule.socketlib.executeForEveryone('playSaoShatterLocal', token.id, orphanedTileIds, game.user.id, {
+                ...config,
+                toggleOff: true
+            });
+        }
+    } else {
+        const tokenOverlayRaw = `eskie.wounds.token_mask.shatter.${center ? 'center' : 'side'}.01.${shatterColor}.no_base`;
+        const revealOverlayRaw = `eskie.texture_mask.tile_base.shatter.${center ? 'center' : 'side'}.01`;
+        
+        const tokenOverlay = closest(tokenOverlayRaw);
+        const revealOverlay = closest(revealOverlayRaw);
+        
+        let revealOverlayPath = revealOverlay;
+        try { 
+            const entry = Sequencer.Database.getEntry(revealOverlay, { softFail: true });
+            revealOverlayPath = (typeof entry === 'string') ? entry : (entry?.file || entry?.files?.[0] || revealOverlay);
+        } catch (e) {}
+
+        const scaleXY = token.document.texture.scaleX;
+
+        const overlayMaskUpdates = {
+            'texture.src': revealOverlayPath,
+            'alpha': 0,
+            'hidden': false,
+            'x': token.x - (canvas.grid.size * token.document.width * (scaleXY - 1) / 2),
+            'y': token.y - (canvas.grid.size * token.document.height * (scaleXY - 1) / 2),
+            'video': { autoplay: false, loop: false, volume: 0 },
+            'width': canvas.grid.size * (token.document.width * scaleXY),
+            'height': canvas.grid.size * (token.document.height * scaleXY),
+            'rotation': rotation,
+        };
+
+        const tokenMaskUpdates = {
+            'texture': token.document.texture,
+            'alpha': 0,
+            'hidden': false,
+            'x': token.x,
+            'y': token.y,
+            'rotation': token.document.rotation,
+            'width': canvas.grid.size * token.document.width,
+            'height': canvas.grid.size * token.document.height,
+        };
+
+        // Create tiles using the GM socket
+        const [tokenRevealMaskDoc, sceneRevealMaskDoc, tokenShapeMaskDoc] = await Promise.all([
+            eskie.util.tile.create(overlayMaskUpdates).then(r => r[0]),
+            eskie.util.tile.create(overlayMaskUpdates).then(r => r[0]),
+            eskie.util.tile.create(tokenMaskUpdates).then(r => r[0])
+        ]);
+
+        const tokenRevealMask = canvas.scene.tiles.get(tokenRevealMaskDoc.id);
+        const sceneRevealMask = canvas.scene.tiles.get(sceneRevealMaskDoc.id);
+        const tokenShapeMask = canvas.scene.tiles.get(tokenShapeMaskDoc.id);
+        const tileIds = [tokenRevealMask.id, sceneRevealMask.id, tokenShapeMask.id];
+
+        // Store tile IDs on the token
+        await eskie.util.token.edit(token.id, { "flags.eskie-macros.sao-shatter-tiles": tileIds });
+
+        // Attach to token (requires Token Attacher module)
+        if (typeof tokenAttacher !== 'undefined') {
+            await tokenAttacher.attachElementsToToken([tokenRevealMask, sceneRevealMask, tokenShapeMask], token, true);
+        }
+
+        // Initialize completion tracker on initiator client
+        globalThis.eskie = globalThis.eskie || {};
+        globalThis.eskie.saoShatterTracker = globalThis.eskie.saoShatterTracker || new Map();
+        
+        const activeUserIds = game.users.filter(u => u.active).map(u => u.id);
+        globalThis.eskie.saoShatterTracker.set(token.id, {
+            expected: new Set(activeUserIds),
+            received: new Set(),
+            tileIds: tileIds,
+            deleteToken: deleteToken,
+            timeoutId: setTimeout(async () => {
+                // Safety timeout
+                const tracker = globalThis.eskie.saoShatterTracker.get(token.id);
+                if (tracker) {
+                    globalThis.eskie.saoShatterTracker.delete(token.id);
+                    if (deleteToken) {
+                        await eskie.util.token.destroy(token.id);
+                    } else {
+                        await Promise.all(tracker.tileIds.map(tileId => eskie.util.tile.destroy(tileId)));
+                        await eskie.util.token.edit(token.id, { "flags.eskie-macros.-=sao-shatter-tiles": null });
+                    }
+                }
+            }, duration + 5000)
+        });
+
+        // Trigger execution on everyone's client
+        await eskieModule.socketlib.executeForEveryone('playSaoShatterLocal', token.id, tileIds, game.user.id, config);
     }
 } else {
-    const tintColor = '#00FFFF';
-    const duration = 1000;
-    const shatterColor = 'blue';
-    const deleteToken = false;
-    const center = true;
-    const rotation = 0;
+    // Fallback for standalone use without the module active (executes locally on this client only)
+    const isPlaying = Sequencer.EffectManager.getEffects({ name: label, object: token }).length > 0;
 
-    const tokenOverlayRaw = `eskie.wounds.token_mask.shatter.${center ? 'center' : 'side'}.01.${shatterColor}.no_base`;
-    const revealOverlayRaw = `eskie.texture_mask.tile_base.shatter.${center ? 'center' : 'side'}.01`;
-    
-    const tokenOverlay = closest(tokenOverlayRaw);
-    const revealOverlay = closest(revealOverlayRaw);
-    
-    let revealOverlayPath = revealOverlay;
-    try { 
-        const entry = Sequencer.Database.getEntry(revealOverlay, { softFail: true });
-        revealOverlayPath = (typeof entry === 'string') ? entry : (entry?.file || entry?.files?.[0] || revealOverlay);
-    } catch (e) {}
+    if (isPlaying) {
+        new Sequence().animation().on(token).opacity(1).show(true).play({ remote: false });
+        Sequencer.EffectManager.endEffects({ name: label });
+        
+        const orphanedTileIds = token.document.getFlag('eskie-macros', 'sao-shatter-tiles');
+        if (orphanedTileIds) {
+            await canvas.scene.deleteEmbeddedDocuments('Tile', orphanedTileIds);
+            await token.document.unsetFlag('eskie-macros', 'sao-shatter-tiles');
+        }
+    } else {
+        const tokenOverlayRaw = `eskie.wounds.token_mask.shatter.${center ? 'center' : 'side'}.01.${shatterColor}.no_base`;
+        const revealOverlayRaw = `eskie.texture_mask.tile_base.shatter.${center ? 'center' : 'side'}.01`;
+        
+        const tokenOverlay = closest(tokenOverlayRaw);
+        const revealOverlay = closest(revealOverlayRaw);
+        
+        let revealOverlayPath = revealOverlay;
+        try { 
+            const entry = Sequencer.Database.getEntry(revealOverlay, { softFail: true });
+            revealOverlayPath = (typeof entry === 'string') ? entry : (entry?.file || entry?.files?.[0] || revealOverlay);
+        } catch (e) {}
 
-    let tokenOverlayPath = tokenOverlay;
-    try { 
-        const entry = Sequencer.Database.getEntry(tokenOverlay, { softFail: true });
-        tokenOverlayPath = (typeof entry === 'string') ? entry : (entry?.file || entry?.files?.[0] || tokenOverlay);
-    } catch (e) {}
+        let tokenOverlayPath = tokenOverlay;
+        try { 
+            const entry = Sequencer.Database.getEntry(tokenOverlay, { softFail: true });
+            tokenOverlayPath = (typeof entry === 'string') ? entry : (entry?.file || entry?.files?.[0] || tokenOverlay);
+        } catch (e) {}
 
-    let sequence = new Sequence()
-        .animation()
-        .on(token)
-        .tint(tintColor)
-        .fadeIn(duration)
-        .duration(duration)
-        .waitUntilFinished()
-        .thenDo(async () => {
-            const scaleXY = token.document.texture.scaleX;
+        let sequence = new Sequence()
+            .animation()
+            .on(token)
+            .tint(tintColor)
+            .fadeIn(duration)
+            .duration(duration)
+            .waitUntilFinished()
+            .thenDo(async () => {
+                const scaleXY = token.document.texture.scaleX;
 
-            const overlayMaskUpdates = {
-                'texture.src': revealOverlayPath,
-                'alpha': 0,
-                'hidden': false,
-                'x': token.x - (canvas.grid.size * token.document.width * (scaleXY - 1) / 2),
-                'y': token.y - (canvas.grid.size * token.document.height * (scaleXY - 1) / 2),
-                'video': { autoplay: false, loop: false, volume: 0 },
-                'width': canvas.grid.size * (token.document.width * scaleXY),
-                'height': canvas.grid.size * (token.document.height * scaleXY),
-                'rotation': rotation,
-            };
+                const overlayMaskUpdates = {
+                    'texture.src': revealOverlayPath,
+                    'alpha': 0,
+                    'hidden': false,
+                    'x': token.x - (canvas.grid.size * token.document.width * (scaleXY - 1) / 2),
+                    'y': token.y - (canvas.grid.size * token.document.height * (scaleXY - 1) / 2),
+                    'video': { autoplay: false, loop: false, volume: 0 },
+                    'width': canvas.grid.size * (token.document.width * scaleXY),
+                    'height': canvas.grid.size * (token.document.height * scaleXY),
+                    'rotation': rotation,
+                };
 
-            const tokenMaskUpdates = {
-                'texture': token.document.texture,
-                'alpha': 1,
-                'hidden': false,
-                'x': token.x,
-                'y': token.y,
-                'rotation': token.document.rotation,
-                'width': canvas.grid.size * token.document.width,
-                'height': canvas.grid.size * token.document.height,
-            };
+                const tokenMaskUpdates = {
+                    'texture': token.document.texture,
+                    'alpha': 0,
+                    'hidden': false,
+                    'x': token.x,
+                    'y': token.y,
+                    'rotation': token.document.rotation,
+                    'width': canvas.grid.size * token.document.width,
+                    'height': canvas.grid.size * token.document.height,
+                };
 
-            // Create tiles using standard Foundry API
-            const tiles = await canvas.scene.createEmbeddedDocuments('Tile', [overlayMaskUpdates, overlayMaskUpdates, tokenMaskUpdates]);
-            const tokenRevealMask = canvas.scene.tiles.get(tiles[0].id);
-            const sceneRevealMask = canvas.scene.tiles.get(tiles[1].id);
-            const tokenShapeMask = canvas.scene.tiles.get(tiles[2].id);
+                const tiles = await canvas.scene.createEmbeddedDocuments('Tile', [overlayMaskUpdates, overlayMaskUpdates, tokenMaskUpdates]);
+                const tokenRevealMask = canvas.scene.tiles.get(tiles[0].id);
+                const sceneRevealMask = canvas.scene.tiles.get(tiles[1].id);
+                const tokenShapeMask = canvas.scene.tiles.get(tiles[2].id);
 
-            // Store tile IDs on the token to allow cleanup if interrupted or toggled off
-            await token.document.setFlag('eskie-macros', 'sao-shatter-tiles', [tokenRevealMask.id, sceneRevealMask.id, tokenShapeMask.id]);
+                await token.document.setFlag('eskie-macros', 'sao-shatter-tiles', [tokenRevealMask.id, sceneRevealMask.id, tokenShapeMask.id]);
 
-            // Attach to token (requires Token Attacher module)
-            if (typeof tokenAttacher !== 'undefined') {
-                await tokenAttacher.attachElementsToToken([tokenRevealMask, sceneRevealMask, tokenShapeMask], token, true);
-            }
+                if (typeof tokenAttacher !== 'undefined') {
+                    await tokenAttacher.attachElementsToToken([tokenRevealMask, sceneRevealMask, tokenShapeMask], token, true);
+                }
 
-            // Wait for tiles to load and render with a safety timeout
-            const sleep = (ms) => new Promise(r => setTimeout(r, ms));
-            let retries = 0;
-            const maxRetries = 50; // 5 seconds maximum wait
-            while (!(tokenRevealMask?._object?.sourceElement && sceneRevealMask?._object?.sourceElement && tokenShapeMask?._object?.mesh) && retries < maxRetries) {
-                await sleep(100);
-                retries++;
-            }
-            if (retries >= maxRetries) {
-                // Cleanup tiles to prevent canvas clutter
-                await canvas.scene.deleteEmbeddedDocuments('Tile', [tokenRevealMask.id, sceneRevealMask.id, tokenShapeMask.id]);
-                await token.document.unsetFlag('eskie-macros', 'sao-shatter-tiles');
-                return ui.notifications.error("Failed to load SAO shatter video elements in time!");
-            }
+                const sleep = (ms) => new Promise(r => setTimeout(r, ms));
+                let retries = 0;
+                const maxRetries = 50;
+                while (!(tokenRevealMask?._object?.sourceElement && sceneRevealMask?._object?.sourceElement && tokenShapeMask?._object?.mesh) && retries < maxRetries) {
+                    await sleep(100);
+                    retries++;
+                }
+                if (retries >= maxRetries) {
+                    await canvas.scene.deleteEmbeddedDocuments('Tile', [tokenRevealMask.id, sceneRevealMask.id, tokenShapeMask.id]);
+                    await token.document.unsetFlag('eskie-macros', 'sao-shatter-tiles');
+                    return ui.notifications.error("Failed to load SAO shatter video elements in time!");
+                }
 
-            // Reset video to start
-            tokenRevealMask._object.sourceElement.currentTime = 0;
-            sceneRevealMask._object.sourceElement.currentTime = 0;
+                tokenRevealMask._object.sourceElement.currentTime = 0;
+                sceneRevealMask._object.sourceElement.currentTime = 0;
 
-            let shatterSeq = new Sequence();
-            
-            if (canvas.scene.background.src) {
+                let shatterSeq = new Sequence();
+                
+                if (canvas.scene.background.src) {
+                    shatterSeq = shatterSeq.effect()
+                        .name(label)
+                        .file(canvas.scene.background.src)
+                        .atLocation({x: (canvas.dimensions.width) / 2, y: (canvas.dimensions.height) / 2})
+                        .size({width: canvas.scene.width / canvas.grid.size, height: canvas.scene.height / canvas.grid.size}, {gridUnits: true})
+                        .persist()
+                        .belowTokens()
+                        .mask(sceneRevealMask._object)
+                        .spriteOffset({x: -canvas.scene.background.offsetX, y: -canvas.scene.background.offsetY});
+                }
+
                 shatterSeq = shatterSeq.effect()
                     .name(label)
-                    .file(canvas.scene.background.src)
-                    .atLocation({x: (canvas.dimensions.width) / 2, y: (canvas.dimensions.height) / 2})
-                    .size({width: canvas.scene.width / canvas.grid.size, height: canvas.scene.height / canvas.grid.size}, {gridUnits: true})
+                    .copySprite(token)
+                    .tint(tintColor)
+                    .attachTo(token, {bindAlpha: false, bindVisibility: false, bindRotation: true})
+                    .scaleToObject(1, { considerTokenScale: true })
+                    .spriteRotation(-token.document.rotation)
+                    .mask(tokenRevealMask._object)
                     .persist()
-                    .belowTokens()
-                    .mask(sceneRevealMask._object)
-                    .spriteOffset({x: -canvas.scene.background.offsetX, y: -canvas.scene.background.offsetY});
-            }
 
-            shatterSeq = shatterSeq.effect()
-                .name(label)
-                .copySprite(token)
-                .tint(tintColor) // Uses the tint applied in the user's token-mask.js edit
-                .attachTo(token, {bindAlpha: false, bindVisibility: false, bindRotation: true})
-                .scaleToObject(1, { considerTokenScale: true })
-                .spriteRotation(-token.document.rotation)
-                .mask(tokenRevealMask._object)
-                .persist()
+                    .animation()
+                    .delay(250)
+                    .on(token)
+                    .opacity(0)
+                    .show(false)
 
-                .animation()
-                .delay(250)
-                .on(token)
-                .opacity(0)
-                .show(false)
+                    .wait(250)
+                    .thenDo(async () => {
+                        tokenRevealMask._object.alpha = 1;
+                        sceneRevealMask._object.alpha = 1;
+                        tokenShapeMask._object.alpha = 1;
 
-                .wait(250)
-                .thenDo(async () => {
-                    // Instantly show both video masks on all clients in a single batch database update
-                    await canvas.scene.updateEmbeddedDocuments('Tile', [
-                        { _id: sceneRevealMask.id, alpha: 1 },
-                        { _id: tokenRevealMask.id, alpha: 1 }
-                    ]);
-
-                    // Play both video masks in perfect, simultaneous synchronization on all clients via socketlib
-                    const eskieModule = game.modules.get('eskie-macros');
-                    if (eskieModule?.socketlib) {
-                        await eskieModule.socketlib.executeForEveryone('playVideoLocal', [tokenRevealMask.id, sceneRevealMask.id]);
-                    } else {
-                        // Fallback for standalone use without the module active
                         tokenRevealMask._object.sourceElement.currentTime = 0;
                         tokenRevealMask._object.sourceElement.play().catch(() => {});
                         sceneRevealMask._object.sourceElement.currentTime = 0;
                         sceneRevealMask._object.sourceElement.play().catch(() => {});
-                    }
-                })
+                    })
 
-                .effect()
-                .file(tokenOverlayPath)
-                .attachTo(token, {bindAlpha: false, bindVisibility: false, bindRotation: false})
-                .mask(tokenShapeMask._object)
-                .rotate(-rotation)
-                .scaleToObject(scaleXY)
-                .zIndex(1)
-                .waitUntilFinished()
+                    .effect()
+                    .file(tokenOverlayPath)
+                    .attachTo(token, {bindAlpha: false, bindVisibility: false, bindRotation: false})
+                    .mask(tokenShapeMask._object)
+                    .rotate(-rotation)
+                    .scaleToObject(scaleXY)
+                    .zIndex(1)
+                    .waitUntilFinished()
 
-                .thenDo(async () => {
-                    // Instantly hide the tiles on all clients to prevent visual duplication
-                    // and keep their PIXI meshes intact while the effect is ending
-                    await canvas.scene.updateEmbeddedDocuments('Tile', [
-                        { _id: tokenRevealMask.id, hidden: true },
-                        { _id: sceneRevealMask.id, hidden: true },
-                        { _id: tokenShapeMask.id, hidden: true }
-                    ]);
+                    .thenDo(async () => {
+                        tokenRevealMask._object.visible = false;
+                        sceneRevealMask._object.visible = false;
+                        tokenShapeMask._object.visible = false;
 
-                    // End the effects on all clients
-                    await Sequencer.EffectManager.endEffects({ name: label });
+                        await Sequencer.EffectManager.endEffects({ name: label });
+                        await sleep(1000);
 
-                    // Wait for other clients to receive the endEffects signal and remove it from their rendering trees
-                    await sleep(1000);
+                        if (deleteToken) {
+                            await token.document.delete();
+                        } else {
+                            await canvas.scene.deleteEmbeddedDocuments('Tile', [tokenRevealMask.id, sceneRevealMask.id, tokenShapeMask.id]);
+                            await token.document.unsetFlag('eskie-macros', 'sao-shatter-tiles');
+                        }
+                    });
 
-                    // Safely delete the tiles from the database now that no client is rendering them
-                    if (deleteToken) {
-                        await token.document.delete();
-                    } else {
-                        await canvas.scene.deleteEmbeddedDocuments('Tile', [tokenRevealMask.id, sceneRevealMask.id, tokenShapeMask.id]);
-                        await token.document.unsetFlag('eskie-macros', 'sao-shatter-tiles');
-                    }
-                });
+                shatterSeq.play({ remote: false });
+            });
 
-            shatterSeq.play();
-        });
-
-    sequence.play();
+        sequence.play({ remote: false });
+    }
 }
