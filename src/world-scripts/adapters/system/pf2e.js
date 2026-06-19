@@ -35,25 +35,7 @@ export class Pf2eAdapter extends BaseSystemAdapter {
             }
         }
 
-        // Fallback text parsing if flags are missing/unpopulated
-        if (rolls.length === 0) {
-            const flavor = message.flavor?.toLowerCase() || "";
-            const content = message.content?.toLowerCase() || "";
-            const combined = `${flavor} ${content}`;
-            
-            const hasKeywords = /saving throw|check|skill|perception/.test(combined);
-            const isAttack = message.flags?.pf2e?.context?.type === "attack-roll";
-            const hasRolls = (message.rolls && message.rolls.length > 0) || message.roll;
 
-            if (hasKeywords && !isAttack && hasRolls) {
-                rolls.push({
-                    source: "pf2e-fallback",
-                    rawAbility: null,
-                    outcome: "indeterminant",
-                    tokenId: message.speaker.token || null
-                });
-            }
-        }
 
         return rolls;
     }

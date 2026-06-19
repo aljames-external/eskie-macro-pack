@@ -10,26 +10,8 @@ export class GenericAdapter extends BaseSystemAdapter {
     }
 
     extractRolls(message) {
-        const rolls = [];
-        const flavorText = message.flavor?.toLowerCase() || "";
-        const contentText = message.content || "";
-        const contentLower = contentText.toLowerCase();
-        const combinedText = `${flavorText} ${contentLower}`;
-
-        const hasKeywords = /save|saving\s+throw|check|skill/.test(combinedText);
-        const isAttackOrDamage = /attack|strike|damage|damage\s+roll/.test(combinedText);
-        const hasRolls = (message.rolls && message.rolls.length > 0) || message.roll;
-
-        if (hasKeywords && !isAttackOrDamage && hasRolls) {
-            rolls.push({
-                source: "generic-keywords",
-                rawAbility: null,
-                outcome: "indeterminant",
-                tokenId: null
-            });
-        }
-
-        return rolls;
+        // Generic system rolls are disabled by default (no structured flags available)
+        return [];
     }
 
     normalizeAbility(rawAbility, combinedText) {
