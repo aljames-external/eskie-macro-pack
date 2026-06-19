@@ -108,6 +108,16 @@ cloud-deploy/
 ```
 Claude reads only the relevant reference file.
 
+#### Script-First Architecture (Default Attempt)
+
+Whenever you design or update a skill, the **primary default approach** must be to automate the work via deterministic scripts rather than writing long instructions for the LLM to execute manually in the context window.
+*   **The Script-First Rule:** If the task involves code refactoring, structural file validation, text translations, search-and-replace edits, compiling, or repetitive workflow steps, you **MUST** write a parameterized Python, Node, or Bash helper script inside the skill's `scripts/` directory.
+*   **Why it is mandatory:**
+    *   **Token efficiency:** Offloads heavy regex rules, formatting instructions, and API mapping tables from the LLM's active context window (which are loaded on *every* turn) into a script that runs locally, consuming zero context tokens.
+    *   **Determinism:** Eliminates LLM reasoning mistakes, syntax errors, and omissions.
+    *   **Repeatability:** Provides a permanent, reusable tool that can be executed flawlessly across hundreds of files in the future.
+*   **Implementation:** The main `SKILL.md` should simply instruct the agent to run this script with the appropriate arguments. Only provide manual LLM instructions as a secondary fallback.
+
 #### Principle of Lack of Surprise
 
 This goes without saying, but skills must not contain malware, exploit code, or any content that could compromise system security. A skill's contents should not surprise the user in their intent if described. Don't go along with requests to create misleading skills or skills designed to facilitate unauthorized access, data exfiltration, or other malicious activities. Things like a "roleplay as an XYZ" are OK though.

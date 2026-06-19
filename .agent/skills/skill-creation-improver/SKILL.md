@@ -18,10 +18,11 @@ All robust skills should be testable.
 - Suggest creating an `evals/evals.json` file containing 2-3 realistic test prompts.
 - This allows the `skill-creator` to run automated benchmarks to verify the skill's success rate and catch edge-cases.
 
-## 3. Deterministic Helper Scripts
-Don't make the LLM do things that code can do perfectly.
-- If the skill involves repetitive formatting, API string replacements, or strict rule verification, suggest writing a small Python helper script in a `scripts/` directory (e.g., `scripts/lint.py` or `scripts/pre_convert.py`).
-- Instruct the skill to run the helper script as part of its workflow.
+## 3. Script-First Architecture (Mandatory Default)
+Never make the LLM manually perform operations that code can execute deterministically. This is the **primary default approach** when creating or improving any skill.
+- **Rule:** If the skill involves text transformations, regex search-and-replace, file formatting, compiling, file structural validation, or repetitive API migrations, you **MUST** write a parameterized Python or Bash script in a `scripts/` directory (e.g., `scripts/sync.py`, `scripts/lint.py`).
+- **Trigger:** The main `SKILL.md` should simply instruct the agent to run that script with the appropriate arguments, rather than explaining the manual transformation steps to the LLM.
+- **Why:** This saves thousands of context tokens, prevents LLM reasoning errors/hallucinations, and guarantees perfectly repeatable, deterministic executions. Manual instructions should only be provided as a fallback.
 
 ## 4. Progressive Disclosure (Reference Files)
 Don't overcrowd the main `SKILL.md` (keep it under 500 lines).
