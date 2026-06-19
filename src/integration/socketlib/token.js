@@ -7,6 +7,7 @@ import { MODULE_ID } from "../../lib/constants.js"
  * @returns {Promise<TokenDocument>} The updated token document.
  */
 async function editToken(id, updates = {}) {
+    if (!canvas.tokens) return;
     const token = canvas.tokens.get(id);
     if (!token) return;
     return token.document.update(updates);
