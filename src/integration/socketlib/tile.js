@@ -18,9 +18,10 @@ async function editTile(id, updates = {}) {
  * @returns {Promise<TileDocument[]>} An array containing the new tile document.
  */
 async function createTile(updates = {}) {
+    const gridSize = canvas.dimensions?.size || canvas.grid?.size || 100;
     const DEFAULT_TILE_UPDATES = {
-        width: 1,
-        height: 1
+        width: gridSize,
+        height: gridSize
     };
     updates = foundry.utils.mergeObject(DEFAULT_TILE_UPDATES, updates, { inplace: false });
     
