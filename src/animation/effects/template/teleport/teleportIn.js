@@ -15,17 +15,15 @@ function create(token, targets, config = {}) {
     let sequence = new Sequence();
     sequence = sequence.animation()
         .on(token)
-        .teleportTo(position)
-        .snapToGrid()
-        .offset({ x: -1, y: -1 });
+        .teleportTo(position, { offset: { x: -1, y: -1 } })
+        .snapToGrid();
     targets.forEach(target => {
         let targetX = position.x + (target.center.x - x);
         let targetY = position.y + (target.center.y - y);
         sequence = sequence.animation()
             .on(target)
-            .teleportTo({ x: targetX, y: targetY })
+            .teleportTo({ x: targetX, y: targetY }, { offset: { x: -1, y: -1 } })
             .snapToGrid()
-            .offset({ x: -1, y: -1 })
     });
 
     sequence = sequence.effect()

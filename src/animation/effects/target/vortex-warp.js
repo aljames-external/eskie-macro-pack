@@ -37,9 +37,8 @@ async function create(target, config = {}) {
 
     sequence = sequence.animation()
         .on(target)
-        .teleportTo(config.position)
-        .snapToGrid()
-        .offset({ x: -1, y: -1 });
+        .teleportTo(config.position, { offset: { x: -1, y: -1 } })
+        .snapToGrid();
 
     // Vortex in
     sequence = sequence.effect()

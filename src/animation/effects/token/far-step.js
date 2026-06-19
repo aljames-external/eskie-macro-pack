@@ -49,9 +49,8 @@ async function create(token, position, config = {}) {
     seq = seq
         .animation()
         .on(token)
-        .teleportTo(position)
+        .teleportTo(position, { offset: { x: -1, y: -1 } })
         .snapToGrid()
-        .offset({ x: -1, y: -1 })
         .waitUntilFinished();
 
     seq = seq
