@@ -12,6 +12,13 @@ const WORLD_SCRIPTS = {
 export function loadWorldScripts() {
     console.log("EMP | Loading World Scripts...");
     updateWorldScripts();
+
+    // Listen for settings updates broadcast by the server to sync all clients in real-time!
+    Hooks.on("updateSetting", (setting, changes, options, userId) => {
+        if (setting.key === `${MODULE_ID}.worldScriptsConfig`) {
+            updateWorldScripts();
+        }
+    });
 }
 
 /**
