@@ -1,4 +1,4 @@
-import { MODULE_ID } from "../lib/constants.js";
+import { MODULE_ID, MODULE_TLA } from "../lib/constants.js";
 import { dependency } from "../lib/dependency.js";
 import { defaultMenuSettings } from "./autoanimations/defaultMenuSettings.js";
 import { autorecUpdateFormApplication, generateAutorecUpdate } from "./autoanimations/updateMenu.js";
@@ -35,7 +35,7 @@ function standardizeTrigger(trigger) {
 
         case "range":
         case "ranged-target": return "range";
-        default: throw (`EMP + AA | Unknown trigger type "${trigger}"`);
+        default: throw (`${MODULE_TLA} + AA | Unknown trigger type "${trigger}"`);
     }
 }
 
@@ -75,7 +75,7 @@ function createAutorecEntry(label, trigger, animation, config, version = "0.0.0"
             /* unused */
             break;
         default:
-            throw new Error(`EMP + AA | Unknown trigger type "${trigger}" for effect "${name}".`);
+            throw new Error(`${MODULE_TLA} + AA | Unknown trigger type "${trigger}" for effect "${name}".`);
     }
     config.animation = animation;
 
@@ -156,12 +156,12 @@ async function submit() {
     const shouldUpdate = moduleVersion == developmentVersion || foundry.utils.isNewerVersion(moduleVersion, lastUpdate);
     if (!shouldUpdate) return;
 
-    if (!dependency.isActivated({ id: "autoanimations", min: "6.5.1" }, "EMP | Automated Animations integration skipped.")) { return; }
+    if (!dependency.isActivated({ id: "autoanimations", min: "6.5.1" }, `${MODULE_TLA} | Automated Animations integration skipped.`)) { return; }
     const { missingEntriesList, updatedEntriesList, customEntriesList } = await generateAutorecUpdate(EMP_AA_Menu, true);
     if (missingEntriesList.length || updatedEntriesList.length || customEntriesList.length) {
         new autorecUpdateFormApplication(EMP_AA_Menu).render(true);
     } else {
-        console.info("EMP | All Eskie Macro animations are up to date!");
+        console.info(`${MODULE_TLA} | All Eskie Macro animations are up to date!`);
     }
 
     if (moduleVersion != developmentVersion)

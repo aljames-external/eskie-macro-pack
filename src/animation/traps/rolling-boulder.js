@@ -3,7 +3,7 @@
  * Modular Conversion: bakanabaka
  */
 
-import { MODULE_ID } from '../../lib/constants.js';
+import { MODULE_ID, MODULE_TLA } from '../../lib/constants.js';
 import { closest } from '../../lib/filemanager.js';
 import { settingsOverride } from '../../lib/settings.js';
 import { matt } from '../utils/matt-tiles.js';
@@ -32,7 +32,7 @@ async function create(tile, targets, config = {}) {
     }
 
     if (!endTile) {
-        ui.notifications.warn('EMP | Rolling Boulder Trap: No end tile found.');
+        ui.notifications.warn(`${MODULE_TLA} | Rolling Boulder Trap: No end tile found.`);
         return new Sequence();
     }
 

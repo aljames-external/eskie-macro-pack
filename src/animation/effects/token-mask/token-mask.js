@@ -5,6 +5,7 @@ import { time } from '../../../lib/time.js';
 import { closest } from '../../../lib/filemanager.js'
 import { dependency } from '../../../lib/dependency.js';
 import { socket } from '../../../integration/socketlib.js';
+import { MODULE_TLA } from '../../../lib/constants.js';
 
 const DEFAULT_CONFIG = {
     id: 'tokenMask',
@@ -71,7 +72,7 @@ async function create(token, config = {}) {
     { id: 'monks-active-tiles', ref: "Monk's Active Tile Triggers" }]);
 
     const { id, deleteToken, revealOverlay, tokenOverlay, rotation, tint } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
-    if (!tokenOverlay || !revealOverlay) return console.warn(`EMP | tokenMaskEffect: Missing required configuration 'tokenOverlay' or 'revealOverlay'. Effect aborted.`);
+    if (!tokenOverlay || !revealOverlay) return console.warn(`${MODULE_TLA} | tokenMaskEffect: Missing required configuration 'tokenOverlay' or 'revealOverlay'. Effect aborted.`);
 
     const label = `${id} - ${token.id}`;
     const tiles = await createTiles(token, { revealOverlay, rotation });

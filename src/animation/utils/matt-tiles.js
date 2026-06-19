@@ -1,7 +1,7 @@
 import { time } from '../../lib/time.js';
 import { dependency } from '../../lib/dependency.js';
 import { socket } from '../../integration/socketlib.js';
-import { SECONDS, MODULE_ID } from '../../lib/constants.js';
+import { SECONDS, MODULE_ID, MODULE_TLA } from '../../lib/constants.js';
 import { dialog } from '../../lib/dialog.js';
 
 const DEFAULT_CONFIG = {
@@ -257,7 +257,7 @@ if (playPath && typeof token !== 'undefined') {
         }
     }
 
-    ui.notifications.info(`EMP | Successfully setup ${trapKey} trap links for ${triggerTiles.length} trigger tile(s) and ${originTiles.length} trap tile(s).`);
+    ui.notifications.info(`${MODULE_TLA} | Successfully setup ${trapKey} trap links for ${triggerTiles.length} trigger tile(s) and ${originTiles.length} trap tile(s).`);
 }
 
 export const matt = {

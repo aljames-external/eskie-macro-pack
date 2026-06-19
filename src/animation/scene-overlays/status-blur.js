@@ -1,3 +1,5 @@
+import { MODULE_TLA } from '../../lib/constants.js';
+
 // Original author: Gornetron
 // Updates by: Bakana
 
@@ -15,7 +17,7 @@ function create(users = [], config = {}){
     // Preference of this create function is single users
     const seq = new Sequence();
     if (!canvas?.scene?.background?.src) {
-        console.warn('EMP | canvas.scene.background.src not set. Background blurring failed');
+        console.warn(`${MODULE_TLA} | canvas.scene.background.src not set. Background blurring failed`);
         return seq;
     }
 
