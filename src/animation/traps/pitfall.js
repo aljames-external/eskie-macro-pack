@@ -17,6 +17,8 @@ async function create(tile, targets, config = {}) {
     config = settingsOverride(config);
     const { reveal, smokeSize, fallenScale } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
 
+    if (!tile) return new Sequence();
+
     // Target all tokens currently overlapping the trap tile bounds
     const tileX = tile.document?.x ?? tile.x;
     const tileY = tile.document?.y ?? tile.y;
@@ -28,7 +30,8 @@ async function create(tile, targets, config = {}) {
     const tileMinY = tileY;
     const tileMaxY = tileY + tileHeight;
 
-    const finalTargets = canvas.tokens.placeables.filter(t => {
+    const targetList = (targets && targets.length > 0) ? targets : canvas.tokens.placeables;
+    const finalTargets = targetList.filter(t => {
         const tWidth = (t.document?.width ?? t.width ?? 1) * canvas.grid.size;
         const tHeight = (t.document?.height ?? t.height ?? 1) * canvas.grid.size;
         const tMinX = t.document?.x ?? t.x;
