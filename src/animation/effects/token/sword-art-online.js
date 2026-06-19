@@ -9,7 +9,7 @@ const DEFAULT_CONFIG = {
 };
 
 async function create(source, config = {}) {
-    const { id, tintColor, duration, shatterColor, deleteToken } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
+    const { tintColor, duration, shatterColor, deleteToken, tileIds, localOnly, initiatorUserId } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
 
     let sequence = new Sequence()
         .animation()
@@ -19,21 +19,92 @@ async function create(source, config = {}) {
         .duration(duration)
         .waitUntilFinished()
         .thenDo(async () => {
-            const shatterSeq = await shatterMask.create(source, { color: shatterColor, tint: tintColor, deleteToken });
-            if (shatterSeq) return shatterSeq.play();
+            const shatterSeq = await shatterMask.create(source, { 
+                color: shatterColor, 
+                tint: tintColor, 
+                deleteToken,
+                tileIds,
+                localOnly,
+                initiatorUserId
+            });
+            if (shatterSeq) return shatterSeq.play({ remote: false });
         });
 
     return sequence;
 }
 
-async function play(source, config = {}) {
-    const sequence = await create(source, config);
-    if (sequence) return sequence.play();
+async function play(token, config = {}) {
+    const eskieModule = game.modules.get('eskie-macros');
+    if (eskieModule?.socketlib && !config.localOnly) {
+        const center = true;
+        const rotation = 0;
+        const shatterColor = config.shatterColor || DEFAULT_CONFIG.shatterColor;
+        const duration = config.duration || DEFAULT_CONFIG.duration;
+        const deleteToken = config.deleteToken || DEFAULT_CONFIG.deleteToken;
+        const revealOverlay = `eskie.texture_mask.tile_base.shatter.${center ? 'center' : 'side'}.01`;
+
+        // Create the tiles (using the GM-socketed tile creation)
+        const { createTiles } = await import('../token-mask/token-mask.js');
+        const tiles = await createTiles(token, { revealOverlay, rotation });
+        const tileIds = tiles.map(t => t.id);
+
+        // Store tile IDs on the token flag
+        await eskie.util.token.edit(token.id, { "flags.eskie-macros.sao-shatter-tiles": tileIds });
+
+        // Attach to token
+        if (typeof tokenAttacher !== 'undefined') {
+            await tokenAttacher.attachElementsToToken(tiles, token, true);
+        }
+
+        // Initialize completion tracker on initiator client
+        globalThis.eskie = globalThis.eskie || {};
+        globalThis.eskie.saoShatterTracker = globalThis.eskie.saoShatterTracker || new Map();
+        
+        const activeUserIds = game.users.filter(u => u.active).map(u => u.id);
+        globalThis.eskie.saoShatterTracker.set(token.id, {
+            expected: new Set(activeUserIds),
+            received: new Set(),
+            tileIds: tileIds,
+            deleteToken: deleteToken,
+            timeoutId: setTimeout(async () => {
+                const tracker = globalThis.eskie.saoShatterTracker.get(token.id);
+                if (tracker) {
+                    globalThis.eskie.saoShatterTracker.delete(token.id);
+                    await Promise.all(tracker.tileIds.map(tileId => eskie.util.tile.destroy(tileId)));
+                    await eskie.util.token.edit(token.id, { "flags.eskie-macros.-=sao-shatter-tiles": null });
+                }
+            }, duration + 5000)
+        });
+
+        // Trigger execution on everyone's client
+        await eskieModule.socketlib.executeForEveryone('playSaoShatterLocal', token.id, tileIds, game.user.id, config);
+        return;
+    }
+
+    const sequence = await create(token, config);
+    if (sequence) {
+        if (config.localOnly) {
+            return sequence.play({ remote: false });
+        }
+        return sequence.play();
+    }
 }
 
-async function stop(source, config = {}) {
+async function stop(token, config = {}) {
+    const eskieModule = game.modules.get('eskie-macros');
+    if (eskieModule?.socketlib && !config.localOnly) {
+        const orphanedTileIds = token.document.getFlag('eskie-macros', 'sao-shatter-tiles');
+        if (orphanedTileIds) {
+            await eskieModule.socketlib.executeForEveryone('playSaoShatterLocal', token.id, orphanedTileIds, game.user.id, {
+                ...config,
+                toggleOff: true
+            });
+        }
+        return;
+    }
+
     const { shatterColor, deleteToken } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
-    return shatterMask.stop(source, { color: shatterColor, deleteToken });
+    return shatterMask.stop(token, { color: shatterColor, deleteToken });
 }
 
 export const swordArtOnlineDeath = {

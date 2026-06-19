@@ -10,13 +10,16 @@ import { MODULE_TLA } from '../../../lib/constants.js';
 const DEFAULT_CONFIG = {
     id: 'tokenMask',
     deleteToken: false,
-    tokenOverlay: undefined,    // Internal use only - these functions generally not called by the end user
-    revealOverlay: undefined,   // Internal use only - these functions generally not called by the end user
+    tokenOverlay: undefined,
+    revealOverlay: undefined,
     rotation: 0,
-    tint: 'none'
+    tint: 'none',
+    tileIds: undefined,
+    localOnly: false,
+    initiatorUserId: undefined
 }
 
-async function createTiles(token, config = {}) {
+export async function createTiles(token, config = {}) {
     const { revealOverlay, rotation, tint } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
     const revealOverlayConfig = closest(revealOverlay);
     let revealOverlayPath = revealOverlayConfig;
@@ -75,7 +78,7 @@ async function create(token, config = {}) {
     dependency.required([{ id: 'token-attacher', ref: "Token Attacher" },
     { id: 'monks-active-tiles', ref: "Monk's Active Tile Triggers" }]);
 
-    const { id, deleteToken, revealOverlay, tokenOverlay, rotation, tint } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
+    const { id, deleteToken, revealOverlay, tokenOverlay, rotation, tint, tileIds, localOnly } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
     if (!tokenOverlay || !revealOverlay) return console.warn(`${MODULE_TLA} | tokenMaskEffect: Missing required configuration 'tokenOverlay' or 'revealOverlay'. Effect aborted.`);
 
     const tokenOverlayConfig = closest(tokenOverlay);
@@ -88,7 +91,12 @@ async function create(token, config = {}) {
     }
 
     const label = `${id} - ${token.id}`;
-    const tiles = await createTiles(token, { revealOverlay, rotation });
+    
+    // Use pre-created tiles if provided, otherwise create them
+    const tiles = tileIds
+        ? tileIds.map(tileId => canvas.scene.tiles.get(tileId))
+        : await createTiles(token, { revealOverlay, rotation });
+        
     const [tokenRevealMask, sceneRevealMask, tokenShapeMask] = tiles;
     const paddingXY = token.document.texture.scaleX;
 
@@ -128,13 +136,25 @@ async function create(token, config = {}) {
         .wait(250)
 
         .thenDo(async () => {
-            // Instantly show both video masks on all clients in a single batch database update
-            await canvas.scene.updateEmbeddedDocuments("Tile", [
-                { _id: sceneRevealMask.id, alpha: 1 },
-                { _id: tokenRevealMask.id, alpha: 1 }
-            ]);
-            // Play both video masks in perfect, simultaneous synchronization on all clients via socketlib
-            await socket.tile.playVideo([tokenRevealMask.id, sceneRevealMask.id]);
+            if (localOnly) {
+                // Make all three video masks visible ONLY locally on this client
+                tokenRevealMask._object.alpha = 1;
+                sceneRevealMask._object.alpha = 1;
+                tokenShapeMask._object.alpha = 1;
+
+                tokenRevealMask._object.sourceElement.currentTime = 0;
+                tokenRevealMask._object.sourceElement.play().catch(() => {});
+                sceneRevealMask._object.sourceElement.currentTime = 0;
+                sceneRevealMask._object.sourceElement.play().catch(() => {});
+            } else {
+                // Instantly show both video masks on all clients in a single batch database update
+                await canvas.scene.updateEmbeddedDocuments("Tile", [
+                    { _id: sceneRevealMask.id, alpha: 1 },
+                    { _id: tokenRevealMask.id, alpha: 1 }
+                ]);
+                // Play both video masks in perfect, simultaneous synchronization on all clients via socketlib
+                await socket.tile.playVideo([tokenRevealMask.id, sceneRevealMask.id]);
+            }
         })
 
         .effect()
@@ -147,32 +167,61 @@ async function create(token, config = {}) {
         .waitUntilFinished()
 
         .thenDo(async () => {
-            // Instantly hide the tiles on all clients to prevent visual duplication
-            // and keep their PIXI meshes intact while the effect is ending
-            await canvas.scene.updateEmbeddedDocuments("Tile", [
-                { _id: tokenRevealMask.id, hidden: true },
-                { _id: tokenShapeMask.id, hidden: true },
-                { _id: sceneRevealMask.id, hidden: true }
-            ]);
+            if (localOnly) {
+                // Hide tiles locally
+                tokenRevealMask._object.visible = false;
+                sceneRevealMask._object.visible = false;
+                tokenShapeMask._object.visible = false;
 
-            // End the effects on all clients
-            await Sequencer.EffectManager.endEffects({ name: label });
+                await Sequencer.EffectManager.endEffects({ name: label });
 
-            // Wait for other clients to receive the endEffects signal and remove it from their rendering trees
-            await time.wait(1000);
-
-            // Safely delete the tiles from the database now that no client is rendering them
-            if (deleteToken) {
-                await token.document.delete();
+                const eskieModule = game.modules.get('eskie-macros');
+                if (eskieModule?.socketlib && config.initiatorUserId) {
+                    await eskieModule.socketlib.executeForUsers('saoShatterClientDone', [config.initiatorUserId], token.id, game.user.id);
+                } else {
+                    // Fallback for standalone/no-socket
+                    await time.wait(1000);
+                    if (deleteToken) {
+                        await token.document.delete();
+                    } else {
+                        await Promise.all([
+                            socket.tile.destroy(tokenRevealMask.id),
+                            socket.tile.destroy(tokenShapeMask.id),
+                            socket.tile.destroy(sceneRevealMask.id),
+                        ]);
+                    }
+                }
             } else {
-                await Promise.all([
-                    socket.tile.destroy(tokenRevealMask.id),
-                    socket.tile.destroy(tokenShapeMask.id),
-                    socket.tile.destroy(sceneRevealMask.id),
+                // Instantly hide the tiles on all clients to prevent visual duplication
+                // and keep their PIXI meshes intact while the effect is ending
+                await canvas.scene.updateEmbeddedDocuments("Tile", [
+                    { _id: sceneRevealMask.id, hidden: true },
+                    { _id: tokenShapeMask.id, hidden: true },
+                    { _id: tokenRevealMask.id, hidden: true }
                 ]);
+
+                // End the effects on all clients
+                await Sequencer.EffectManager.endEffects({ name: label });
+
+                // Wait for other clients to receive the endEffects signal and remove it from their rendering trees
+                await time.wait(1000);
+
+                // Safely delete the tiles from the database now that no client is rendering them
+                if (deleteToken) {
+                    await token.document.delete();
+                } else {
+                    await Promise.all([
+                        socket.tile.destroy(tokenRevealMask.id),
+                        socket.tile.destroy(tokenShapeMask.id),
+                        socket.tile.destroy(sceneRevealMask.id),
+                    ]);
+                }
             }
         });
 
+    if (localOnly) {
+        return seq.play({ remote: false });
+    }
     return seq;
 }
 
