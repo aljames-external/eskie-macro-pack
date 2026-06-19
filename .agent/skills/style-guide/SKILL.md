@@ -29,24 +29,7 @@ When writing or modifying code in the `eskie-macro-pack` repository, adhere stri
 
 *   **Module System:** Use ES6 module syntax (`import` and `export`).
 *   **Exports:** Prefer named exports over default exports.
-*   **Function Declarations in Exports:** Do **not** declare functions inline inside an exported variable. Declare the function separately first, then export it.
-    ```javascript
-    // Incorrect: function declared inside the export variable
-    export const actions = {
-        doSomething: function() {
-            // ...
-        },
-    };
-
-    // Correct: function declared outside, then referenced
-    function doSomething() {
-        // ...
-    }
-
-    export const actions = {
-        doSomething,
-    };
-    ```
+*   **Function Declarations in Exports:** Do **not** declare functions inline inside an exported variable. Declare the function separately first, then export it (see [references/examples.md](file:///usr/local/google/home/aljames/jetski/eskie-macro-pack/.agent/skills/style-guide/references/examples.md#1-module-exports-and-declarations)).
 
 ## Control Structures
 
@@ -72,33 +55,9 @@ When writing or modifying code in the `eskie-macro-pack` repository, adhere stri
 
 ## Sequencer Specifics
 
-*   **Optional Asset Libraries:** Optional asset libraries (like `psfx` or similar config parameters) that use `closest()` MUST be protected inside an `if` statement rather than using `.playIf(...)`. If `closest()` is called on an asset that doesn't exist, it throws an error immediately, breaking the script before the `playIf` check even occurs.
-    ```javascript
-    // Incorrect: closest() throws if asset is missing, before playIf evaluates
-    sequence.sound()
-        .file(closest(sound.file))
-        .playIf(sound.enabled);
+*   **Optional Asset Libraries (Sound Safety):** Protect any `closest()` calls on optional assets inside an `if` statement rather than using `.playIf(...)` to prevent immediate runtime crashes when files are missing (see [references/examples.md](file:///usr/local/google/home/aljames/jetski/eskie-macro-pack/.agent/skills/style-guide/references/examples.md#2-optional-asset-libraries-sound-safety)).
 
-    // Correct: closest() is never evaluated if sound is disabled
-    if (sound.enabled) {
-        sequence.sound()
-            .file(closest(sound.file));
-    }
-    ```
-
-*   **copySprite Rotation Fix:** Every `.copySprite(token)` effect MUST include `.spriteRotation(-token.document.rotation)` immediately after to counteract the token's world rotation. Without this, the sprite renders in a rotated orientation that does not match the token's visual appearance.
-    ```javascript
-    // Incorrect: sprite may appear rotated if the token has a non-zero rotation
-    sequence.effect()
-        .copySprite(token)
-        .attachTo(token);
-
-    // Correct: always negate the token's rotation on copySprite effects
-    sequence.effect()
-        .copySprite(token)
-        .attachTo(token)
-        .spriteRotation(-token.document.rotation);
-    ```
+*   **copySprite World Rotation Fix:** Every `.copySprite(token)` effect MUST include `.spriteRotation(-token.document.rotation)` chained immediately after to correct world rotation issues (see [references/examples.md](file:///usr/local/google/home/aljames/jetski/eskie-macro-pack/.agent/skills/style-guide/references/examples.md#3-copysprite-world-rotation-fix)).
 
 ## Automated Linting
 

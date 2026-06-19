@@ -7,73 +7,30 @@ compatibility: Foundry VTT V11+
 # Discord Animation to Modular Format Conversion
 
 When asked to update scripts in the `new-submissions` folder or to convert Discord animations to the modular format, execute the following transformations. You MUST reference the template files in the `references/` directory to understand the exact target structure:
-- For standard or token animations, read `references/template_token.js`. Save these to `src/animation/effects/token/` or `on-target/`.
-- For active effects, read `references/template_active_effect.js`. Save these to `src/animation/effects/active-effect/`.
+- For standard or token animations, read `references/template_token.js`. Save to `src/animation/effects/token/` or `on-target/`.
+- For active effects, read `references/template_active_effect.js`. Save to `src/animation/effects/active-effect/`.
+- For position/crosshair-driven template effects, read `references/template_template.js`. Save to `src/animation/effects/template/`.
 
-> [!NOTE]
-> If a legacy script utilizes a position or crosshair (`warpgate.crosshairs.show`) to place effects at, it is considered a **template-driven** effect. You MUST read `references/template_template.js` to understand its unique structure. These should be saved to `src/animation/effects/template/`.
+## Code Style & Transformations
 
-## Code Style
+*   **Style Guide:** Ensure all code adheres strictly to the [style-guide](file:///usr/local/google/home/aljames/jetski/eskie-macro-pack/.agent/skills/style-guide/SKILL.md) skill (4-space indentation, semicolons, single quotes, 1TBS, single-line if-returns).
+*   **Modular Structure:** Encapsulate animation logic inside an `export async function create(...)` function returning a `Sequence` object. The final module MUST export an object containing `create`, `play`, and `stop` at its root.
+*   **Parameters:**
+    *   **Token & Active Effects:** Signature `(source, target, config = {})` or `(source, targetTokens, config = {})`.
+    *   **Template Effects:** Signature `(source, config = {})`. Target tokens MUST be extracted via `config.targets?.length ? config.targets : Array.from(game.user.targets)`.
+*   **Asset Safety & Image Paths:** Wrap EVERY argument passed to `.file(...)` with the `closest(...)` function imported from `../../../lib/filemanager.js` (e.g., `.file(closest('jb2a.impact.01'))`).
+*   **Sound Configuration:** Sound effects MUST be defined in `DEFAULT_CONFIG`, volume scaled by `sound.volume`, and plays protected inside an `if` block (see [references/examples.md#1-sound-configuration-pattern](file:///usr/local/google/home/aljames/jetski/eskie-macro-pack/.agent/skills/discord-effect-converter/references/examples.md#1-sound-configuration-pattern)).
+*   **Standard Configuration:** Define a global `DEFAULT_CONFIG` at the top of the file, export it in the root object, and merge it safely using `foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false })` inside `create` / `play`.
+*   **Multi-Target Timing:** Do NOT chain `.wait()` sequentially on the main sequence. Instead, create a new isolated Sequence for each target and add it using `sequence.addSequence(targetSeq)`.
+*   **Scale and Rotation Conventions:**
+    *   **`scaleToObject`:** Every `.scaleToObject(...)` call MUST include `{ considerTokenScale: true }`.
+    *   **`copySprite`:** Negate token world rotation using `.spriteRotation(-token.document.rotation)`.
+    *   **`buttonDialog`:** Replace deprecated `warpgate.buttonDialog` with `dialog.buttonDialog` (imported from `../../../lib/dialog.js`) and convert numeric `value` fields into descriptive string identifiers.
 
-*   **Apply Style Guide:** Ensure that all generated or updated code adheres strictly to the project's coding conventions. You MUST refer to the `style-guide` skill (located in `.agent/skills/style-guide/SKILL.md`) and apply its rules (e.g., 4-space indentation, semicolons, single quotes, 1TBS brace style, single-line if-statements) to the resulting module file.
+## Legacy Graphic Cleanups
+*   **Modern Replacements:** Replace legacy `animated-spell-effects-cartoon` assets with modern `eskie.` or `jb2a.` prefixes according to the [cartoon-graphic-cleanup](file:///usr/local/google/home/aljames/jetski/eskie-macro-pack/.agent/skills/cartoon-graphic-cleanup/SKILL.md) skill.
+*   **Offsets & Deletions:** Apply rotation offsets for orientation corrections and delete entire `.effect()` blocks for removed assets (see [references/examples.md#2-ranged-mind-sliver-conversion-example](file:///usr/local/google/home/aljames/jetski/eskie-macro-pack/.agent/skills/discord-effect-converter/references/examples.md#2-ranged-mind-sliver-conversion-example)).
 
-## General Transformations
-
-*   **Modular Structure:** Encapsulate the animation logic within an `export async function create(...)` function. This function MUST return a `Sequence` object.
-*   **Root Exports:** The final module MUST export an object containing `create`, `play`, and `stop` at its root level. The `create` method is absolutely mandatory because the Automated Animations system directly calls `animation.create(token, config)`!
-*   **Toggle Logic (Tagger):** Do NOT use `Tagger` to manage toggling features on/off inside the module's `create` function. The `create` function should solely generate the Sequence to turn the effect on. Use the `stop` function to end the effect.
-*   **Parameter Handling:**
-    *   **Token & Active Effects:** Pass the casting token as `source`. 
-        *   If the animation only affects a single target, pass it as `target`. Signature: `(source, target, config = {})`.
-        *   If the animation affects multiple targets, pass them as an array `targetTokens`. Signature: `(source, targetTokens, config = {})`.
-        *   Pass configurations as `config`.
-    *   **Template Effects:** Template effects only receive two arguments: `(source, config = {})`. Target tokens MUST be extracted via `config.targets?.length ? config.targets : Array.from(game.user.targets)`.
-*   **Template Positioning:** If `config.template` exists, you MUST prioritize extracting the position from it (e.g., `config.template._object?.ray?.B`) instead of spawning a `Sequencer.Crosshair`. Refer to `template_template.js`.
-*   **Multi-Target Timing:** When iterating over multiple targets with a delay (e.g., waiting 2 seconds before striking each), do NOT chain `.wait()` sequentially on the main sequence. You MUST create a new isolated Sequence for each target (`let targetSeq = new Sequence().wait(1000)`) and add it to the main sequence using `sequence.addSequence(targetSeq)`. This prevents cumulative, compounding delays.
-*   **File Relocation:** Move the newly converted file from its input folder (e.g., `new-submissions`) to `src/animation/effects/`.
-*   **Module Integration:** Update `src/animation/effects/_effects.js` to import and export the new modular animation.
-*   **Variable Renaming:** Rename global variables like `targets` to `target` (for single-target) or `targetTokens` (for multi-target) to fit the modular function signature.
-*   **Image Path Conversion:** You MUST wrap EVERY argument passed to `.file(...)` with the `closest(...)` function, regardless of whether it is an image, video, http link, or Sequencer database path. For example, `.file('https://i.imgur.com/image.png')` MUST become `.file(closest('https://i.imgur.com/image.png'))`. Make sure to import `closest` from `../../../lib/filemanager.js` (adjusting the relative path as necessary).
-*   **Effect Comments:** Add descriptive comments explaining the visual or functional purpose of each effect or sequence chunk.
-*   **Standard Configuration Pattern:**
-    *   Every animation MUST have a global `const DEFAULT_CONFIG` object defined at the top level of the file.
-    *   If a legacy script has a local `default_config` (inside `create` or `play`), you MUST move it to the global namespace as `DEFAULT_CONFIG`.
-    *   This `DEFAULT_CONFIG` MUST be exported as `default_config` in the root export object of every animation module.
-    *   **Exclusion**: Index or collection files (typically named `_*.js` or `index.js`) that only group and re-export other animations do NOT need to define or export a `default_config` of their own.
-    *   If the export object contains nested API objects (e.g., `cast`, `target`), ensure `default_config` is present in those as well if they utilize it.
-    *   Inside `create`, `play`, and `stop`, use `foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false })` for safe configuration management.
-    *   Example: `const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });`
-*   **Helper Functions:** Extract complex sequences of effects into smaller, logically grouped helper functions (e.g., `_castSpellEffects(sequence, token)`).
-*   **Sound Configuration Pattern:**
-    *   If an animation includes sound effects, you MUST include a `sound` object in the `DEFAULT_CONFIG`:
-        ```javascript
-        sound: {
-            enabled: true,
-            volume: 0.5,
-        }
-        ```
-    *   All `.sound()` calls MUST be wrapped in an `if (sound.enabled)` block.
-    *   The `.volume()` of every sound effect MUST be multiplied by `sound.volume` (e.g., `.volume(sound.volume)` or `.volume(sound.volume * 0.8)` if it needs a relative adjustment).
-    *   You MUST import `{ settingsOverride }` from `'../../../lib/settings.js'` (adjusting the relative path as necessary) and call `config = settingsOverride(config);` at the very beginning of the `create` (and `play`, if it merges config) function to ensure global sound settings are respected.
-
-## API Updates
-
-Ensure the script uses the latest Foundry VTT API patterns:
-
-*   Replace `target.data.name` with `target.name`.
-*   Replace `target.document.data.width` with `target.document.width`.
-*   Replace `warpgate.crosshairs.show` with `Sequencer.Crosshair.show`.
-*   Change the `t` property in the crosshairs configuration from `'line'` to `'ray'` for valid measured template types.
-*   Replace deprecated `.from()` methods with `.copySprite()`.
-*   **`scaleToObject` Convention:** Every `.scaleToObject(...)` call MUST include `{ considerTokenScale: true }` as its options argument. When scaling an effect to match the token's natural size, always use `.scaleToObject(1, { considerTokenScale: true })`. Never pass `token.document.texture.scaleX` as the scale value — this is already accounted for by the `considerTokenScale` option. For effects intentionally larger or smaller than the token, use a numeric multiplier (e.g. `.scaleToObject(1.5, { considerTokenScale: true })`).
-*   Replace `warpgate.buttonDialog(buttonData)` with `eskie.util.dialog.buttonDialog(buttonData)` (or, inside a module file, import `{ dialog }` from `'../../../lib/dialog.js'` and call `dialog.buttonDialog(buttonData)` directly). The `buttonData` shape is identical — a `buttons` array with `label` and `value` fields, plus an optional `title`. When converting, **replace any numeric `value` fields with descriptive string identifiers** that reflect the semantic meaning of that choice. For example, `{ label: 'Hybrid Form', value: 1 }` should become `{ label: 'Hybrid Form', value: 'hybrid' }`, and `{ label: 'Wolf Form', value: 2 }` should become `{ label: 'Wolf Form', value: 'wolf' }`. Update all downstream comparisons to match the new string values (e.g. `if (result === 'hybrid')`). Since `DialogV2` always returns strings, this also eliminates any type-mismatch issues.
-
-## Bug Fixes
-
-*   Add a validation check to ensure `canvas.scene.background.src` exists before creating effects that rely on it, preventing errors on scenes without background images.
-
-## Attribution
-
-*   **Original Author:** Include a comment at the top of the file crediting the original author of the animation.
-*   **Updater:** Add a comment at the top of the file crediting `bakanabaka` as the author of the modular conversion.
-*   **README Credits:** Check if the original author is already listed in the `README.md` under "Animation Contributors". If they are a new contributor, you MUST add their name to the list in alphabetical order (if possible, or at the bottom if not).
+## Integration & Attribution
+*   **Relocation & Registration:** Move the converted file to `src/animation/effects/`, register it in `_effects.js`, and register it with Automated Animations at the bottom of the file (see [auto-animations-diagnoser](file:///usr/local/google/home/aljames/jetski/eskie-macro-pack/.agent/skills/auto-animations-diagnoser/SKILL.md)).
+*   **Attribution:** Credit the original author and the conversion author at the top of the file. Add the author to the `README.md` if they are a new contributor.
