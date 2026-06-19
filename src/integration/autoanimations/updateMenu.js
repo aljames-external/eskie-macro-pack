@@ -1,8 +1,8 @@
-import { MODULE_ID } from "../../lib/constants.js";
+import { MODULE_ID, MODULE_TLA } from "../../lib/constants.js";
 import { EMP_AA_Menu } from "../autoanimations.js";
 
 export async function generateAutorecUpdate(autorec, quiet = true) {
-    if (quiet) console.group("EMP | Autorecognition Menu Check");
+    if (quiet) console.group(`${MODULE_TLA} | Autorecognition Menu Check`);
     let settings = {};
     const menuKeys = ["melee", "range", "ontoken", "templatefx", "preset", "aura", "aefx"];
     for (const key of menuKeys) {
@@ -183,13 +183,13 @@ export class autorecUpdateFormApplication extends FormApplication {
     async _updateObject(event) {
         $(".emp-animations-autorec-update-buttons").attr("disabled", true);
         if (event.submitter.name === "update") {
-            console.group("EMP | Autorecognition Menu Update");
+            console.group(`${MODULE_TLA} | Autorecognition Menu Update`);
             const { newSettings } = await this.settings();
             if (Object.keys(newSettings).length === 0)
                 return console.log("Nothing to update!");
 
             await AutomatedAnimations.AutorecManager.overwriteMenus(JSON.stringify(newSettings), { submitAll: true });
-            console.log("EMP | Animations have been updated in Automated Animations.");
+            console.log(`${MODULE_TLA} | Animations have been updated in Automated Animations.`);
             console.groupEnd();
         }
     }

@@ -9,6 +9,7 @@ import { socket } from './integration/socketlib.js';
 import { loadWorldScripts } from './world-scripts/loader.js';
 import { crosshair } from './crosshair/_crosshairs.js';
 import { debug } from './lib/debug.js';
+import { MODULE_TLA } from './lib/constants.js';
 
 // Import module settings to also run its initialization code
 import './settings.js';
@@ -52,7 +53,7 @@ Hooks.once('init', async () => {
     }
 
     setupModule();
-    console.log('EMP | Eskie Macro Pack module ready');
+    console.log(`${MODULE_TLA} | Eskie Macro Pack module ready`);
 });
 
 Hooks.once('ready', async () => {

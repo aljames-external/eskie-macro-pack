@@ -23,11 +23,11 @@
             "savedNotify": "Configuração de scripts globais salva com sucesso.",
             "reloadTitle": "Recarregamento Necessário",
             "reloadContent": "Alterar os Scripts Globais ativos requer um recarregamento de página para fazer efeito.",
-            "reloadButton": "Recarregar Agora",
-            "cancelButton": "Recarregar Depois",
-            "eskieRollAnimation": {
-                "name": "Animações de Rolagem d20 Eskie",
-                "hint": "Reproduz uma sequência de animação personalizada de rolagem d20 Eskie logo acima de um token em testes de resistência e testes de habilidade (integra com o Midi-QOL)."
+            "reloadButton": "Recarregar agora",
+            "cancelButton": "Recarregar depois",
+            "rollAnimation": {
+                "name": "Animações de d20 do Eskie",
+                "hint": "Reproduz uma sequência de animação de rolagens de d20 personalizada acima de um token em testes de resistência e jogadas de atributo."
             }
         },
         "updateMenu": {

@@ -66,7 +66,7 @@ EMP features an automated roll animation system that hooks into your game system
 1. Go to **Configure Settings** in Foundry VTT.
 2. Under **Eskie Macro Package**, click the **World Scripts Menu** button.
 3. Toggle the automated scripts you wish to enable:
-   * **Automated Roll Animations (`eskieRollAnimation`)**: Automatically detects spell and weapon rolls (from chat or Midi-QOL) and plays the matching EMP animation on the speaker token and target(s).
+   * **Automated Roll Animations (`rollAnimation`)**: Automatically detects spell and weapon rolls (from chat or Midi-QOL) and plays the matching EMP animation on the speaker token and target(s).
 
 ---
 

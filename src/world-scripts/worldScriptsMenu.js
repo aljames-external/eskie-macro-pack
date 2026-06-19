@@ -3,9 +3,9 @@ import { updateWorldScripts } from "./loader.js";
 
 export const WORLD_SCRIPTS_REGISTRY = [
     {
-        id: "eskieRollAnimation",
-        name: "EMP.worldScripts.eskieRollAnimation.name",
-        description: "EMP.worldScripts.eskieRollAnimation.hint",
+        id: "rollAnimation",
+        name: "EMP.worldScripts.rollAnimation.name",
+        description: "EMP.worldScripts.rollAnimation.hint",
         icon: "fa-solid fa-dice-d20"
     }
 ];
@@ -35,7 +35,7 @@ export class WorldScriptsFormApplication extends FormApplication {
                 enabled: !!currentConfig[script.id]
             };
             // Dynamically attach the auto-detected system name to the roll animations script
-            if (script.id === "eskieRollAnimation") {
+            if (script.id === "rollAnimation") {
                 data.badge = activeSystem;
             }
             return data;

@@ -14,7 +14,7 @@ import { debug } from "../lib/debug.js";
 // SEQUENCER ANIMATION TRIGGER
 // ============================================================================
 
-async function playEskieRollAnimation(token, config = {}) {
+async function playRollAnimation(token, config = {}) {
     if (!token) return;
 
     const rollType = config.rollType || "default";
@@ -57,7 +57,7 @@ async function playEskieRollAnimation(token, config = {}) {
 // ESKIE ROLL TRACKER CLASS (ORCHESTRATOR)
 // ============================================================================
 
-export class EskieRollTracker {
+export class RollTracker {
     constructor() {
         this.hookIds = [];
         this._activeAdapter = null;
@@ -197,7 +197,7 @@ export class EskieRollTracker {
         const localFired = this.localAnimatedTokens.get(messageId);
 
         // Retrieve the list of token IDs that have already animated for this message
-        const firedTokens = message.flags?.world?.eskieAnimatedTokens || [];
+        const firedTokens = message.flags?.world?.rollAnimatedTokens || [];
         
         // Checking newFiredTokens and localFired dynamically prevents race conditions
         // during rapid updates where multiple hooks fire before database flag write completes.
@@ -212,7 +212,7 @@ export class EskieRollTracker {
             if (newFiredTokens.includes(token.id) || localFired.has(token.id)) continue;
 
             // Trigger the sequence
-            playEskieRollAnimation(token, {
+            playRollAnimation(token, {
                 rollType: roll.ability || "default",
                 outcome: roll.outcome
             });
@@ -224,10 +224,10 @@ export class EskieRollTracker {
 
         // Update the message flags if we played any new animations
         if (updatedFlags) {
-            await message.setFlag("world", "eskieAnimatedTokens", newFiredTokens);
+            await message.setFlag("world", "rollAnimatedTokens", newFiredTokens);
         }
     }
 }
 
 // Instantiate a single global tracker instance
-export const eskieRollTracker = new EskieRollTracker();
+export const rollTracker = new RollTracker();

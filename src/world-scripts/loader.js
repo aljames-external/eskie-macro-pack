@@ -1,9 +1,9 @@
 import { MODULE_ID } from "../lib/constants.js";
-import { eskieRollTracker } from "./eskieRollAnimation.js";
+import { rollTracker } from "./rollAnimation.js";
 
-// Registry mapping world-script config keys to their orchestrator instances
-const WORLD_SCRIPTS = {
-    eskieRollAnimation: eskieRollTracker
+// Registry of all available world-script features
+export const worldScripts = {
+    rollAnimation: rollTracker
 };
 
 /**
@@ -28,7 +28,7 @@ export function loadWorldScripts() {
 export function updateWorldScripts() {
     const config = game.settings.get(MODULE_ID, "worldScriptsConfig") || {};
     
-    for (const [scriptId, scriptInstance] of Object.entries(WORLD_SCRIPTS)) {
+    for (const [scriptId, scriptInstance] of Object.entries(worldScripts)) {
         const shouldEnable = !!config[scriptId];
         if (shouldEnable) {
             scriptInstance.enable();

@@ -29,7 +29,7 @@
             "reloadContent": "Changing active World Scripts requires a page reload to take effect.",
             "reloadButton": "Reload Now",
             "cancelButton": "Reload Later",
-            "eskieRollAnimation": {
+            "rollAnimation": {
                 "name": "Eskie d20 Roll Animations",
                 "hint": "Plays a custom Eskie d20 roll animation sequence just above a token on saving throws and ability checks (integrates with Midi-QOL)."
             }

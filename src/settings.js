@@ -1,10 +1,10 @@
-import { MODULE_ID } from "./lib/constants.js";
+import { MODULE_ID, MODULE_TLA } from "./lib/constants.js";
 import { autorecUpdateFormApplication } from "./integration/autoanimations/updateMenu.js";
 import { WorldScriptsFormApplication } from "./world-scripts/worldScriptsMenu.js";
 
 /* Initialize Module Settings */
 Hooks.once('init', function() {
-    console.log('EMP | Initializing Eskie Macro Pack settings');
+    console.log(`${MODULE_TLA} | Initializing Eskie Macro Pack settings`);
 
     // World Scripts Configuration Menu
     game.settings.registerMenu(MODULE_ID, 'worldScripts', {
@@ -37,7 +37,7 @@ Hooks.once('init', function() {
         config: false,
         type: Object,
         default: {
-            eskieRollAnimation: false
+            rollAnimation: false
         }
     });
 

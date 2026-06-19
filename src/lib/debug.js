@@ -1,4 +1,4 @@
-import { MODULE_ID } from "./constants.js";
+import { MODULE_ID, MODULE_TLA } from "./constants.js";
 
 export const debug = {
     get enable() {
@@ -13,7 +13,7 @@ export const debug = {
     },
     log(...args) {
         if (this.enable) {
-            console.log(`%c[Eskie Debug]`, "color: #38bdf8; font-weight: bold;", ...args);
+            console.log(`%c[${MODULE_TLA} Debug]`, "color: #38bdf8; font-weight: bold;", ...args);
         }
     }
 };
