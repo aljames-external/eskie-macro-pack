@@ -15,31 +15,34 @@ export const midiQolAdapter = {
         if (message.flags?.["midi-qol"]?.isSuccess) outcome = "success";
         else if (message.flags?.["midi-qol"]?.isFailure) outcome = "failure";
 
-        // 2. Parse multi-target saves display HTML using Foundry's built-in jQuery
+        // 2. Parse multi-target saves display HTML using modern native DOMParser
         if (contentText.includes("midi-qol")) {
-            const $content = $(contentText);
-            const $saveDisplay = $content.find(".midi-qol-saves-display");
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(contentText, "text/html");
+            const saveDisplay = doc.querySelector(".midi-qol-saves-display");
             
-            if ($saveDisplay.length) {
-                const $targetLis = $saveDisplay.find("li.midi-qol-target-select");
+            if (saveDisplay) {
+                const targetLis = saveDisplay.querySelectorAll("li.midi-qol-target-select");
                 
                 // Parse the short ability code from the save display block text
                 let saveAbility = null;
-                const textContext = $saveDisplay.text().toLowerCase();
+                const textContext = saveDisplay.textContent.toLowerCase();
                 const abilityRegex = /(strength|dexterity|constitution|intelligence|wisdom|charisma|str|dex|con|int|wis|cha|acr|ath|per|ste)/;
                 const match = textContext.match(abilityRegex);
                 if (match) saveAbility = match[1];
 
-                $targetLis.each((index, el) => {
-                    const $li = $(el);
+                targetLis.forEach(el => {
                     const tokenId = el.dataset.id;
                     let targetOutcome = "indeterminant";
                     let isResolved = false;
 
-                    if ($li.hasClass("success") || $li.find(".fa-check").length > 0) {
+                    const hasCheck = el.querySelector(".fa-check") !== null;
+                    const hasTimes = el.querySelector(".fa-times") !== null;
+
+                    if (el.classList.contains("success") || hasCheck) {
                         targetOutcome = "success";
                         isResolved = true;
-                    } else if ($li.hasClass("failure") || $li.find(".fa-times").length > 0) {
+                    } else if (el.classList.contains("failure") || hasTimes) {
                         targetOutcome = "failure";
                         isResolved = true;
                     }
