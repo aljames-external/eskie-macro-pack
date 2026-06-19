@@ -14,10 +14,8 @@ function _isAscending(min, version, max) {
 }
 
 function _getEntity(dependency) {
-    const isModule = game.modules.get(dependency?.id);
-    const entity = isModule ? game.modules.get(dependency?.id) : globalThis[dependency?.id];
-    if (dependency?.id == 'foundry') return game;
-    return entity;
+    if (dependency?.id === 'foundry') return game;
+    return game.modules.get(dependency?.id) || globalThis[dependency?.id];
 }
 
 /**
@@ -135,7 +133,7 @@ function hasSomeRecommended(dependencyList) {
  */
 function required(dependencyList) {
     if (!Array.isArray(dependencyList)) return required([dependencyList]);
-    let errorMsg = `Requires all of the following to be installed and activaged:\n`;
+    let errorMsg = `Requires all of the following to be installed and activated:\n`;
     let dependencyMet = true;
 
     for (let dependency of dependencyList) {
