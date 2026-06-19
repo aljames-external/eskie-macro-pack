@@ -10,6 +10,17 @@ export class BaseSystemAdapter {
     }
 
     /**
+     * Semantically classifies a chat message to determine its purpose.
+     * Returns a string representing the type: "saving throw", "ability check", "attack", "damage", "item description", "text", or "unknown".
+     * @returns {string} The message classification.
+     */
+    qualifyMessage(message) {
+        const hasRolls = (message.rolls && message.rolls.length > 0) || message.roll;
+        if (!hasRolls) return "text";
+        return "unknown";
+    }
+
+    /**
      * Extracts raw roll results from a chat message.
      * Must be implemented by subclasses.
      * @returns {Array} List of rolls: [{ source, rawAbility, outcome, tokenId }]

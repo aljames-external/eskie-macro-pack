@@ -163,11 +163,23 @@ export class EskieRollTracker {
     }
 
     /**
+     * Semantically classifies a chat message to determine its purpose.
+     * @returns {string} The message classification.
+     */
+    qualifyMessage(message) {
+        return this.activeAdapter.qualifyMessage(message);
+    }
+
+    /**
      * Evaluates the message and triggers animations for unplayed rolls.
      */
     async processMessageAndPlay(message, userId) {
         // Only run validation calculations once on the user machine modifying the doc
         if (game.user.id !== userId) return;
+
+        // Centralized Qualification Gate: Only proceed for saving throws and ability checks
+        const messageType = this.qualifyMessage(message);
+        if (!["saving throw", "ability check"].includes(messageType)) return;
 
         const rolls = this.getRollDetails(message);
         if (rolls.length === 0) return;

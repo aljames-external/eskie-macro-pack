@@ -10,32 +10,57 @@ export class Dnd5eAdapter extends BaseSystemAdapter {
         super("dnd5e");
     }
 
-    extractRolls(message) {
-        const rolls = [];
-        const flavorText = message.flavor?.toLowerCase() || "";
-        const contentText = message.content || "";
-        const contentLower = contentText.toLowerCase();
-        const combinedText = `${flavorText} ${contentLower}`;
-
+    qualifyMessage(message) {
         // Add debug logging
-        console.log(`EMP | Dnd5eAdapter: Evaluating message "${message.id}"`, {
+        console.log(`EMP | Dnd5eAdapter.qualifyMessage: message="${message.id}"`, {
             rollType: message.flags?.dnd5e?.roll?.type,
             messageType: message.flags?.dnd5e?.messageType,
+            midiMessageType: message.flags?.["midi-qol"]?.messageType,
+            midiType: message.flags?.["midi-qol"]?.type,
             flavor: message.flavor
         });
+
+        // 1. Core D&D 5e Roll Flags
+        const rollFlags = message.flags?.dnd5e?.roll;
+        if (rollFlags) {
+            if (rollFlags.type === "save") return "saving throw";
+            if (["ability", "skill"].includes(rollFlags.type)) return "ability check";
+            if (rollFlags.type === "attack") return "attack";
+            if (rollFlags.type === "damage") return "damage";
+        }
+
+        // 2. Core Item Usage
+        if (message.flags?.dnd5e?.messageType === "usage") return "item description";
+
+        // 3. Midi-QOL Flags
+        if (midiQolAdapter.isActive()) {
+            const midiFlags = message.flags?.["midi-qol"];
+            const messageType = midiFlags?.messageType || midiFlags?.type;
+            if (messageType) {
+                if (messageType === "save") return "saving throw";
+                if (messageType === "check") return "ability check";
+                if (messageType === "attack") return "attack";
+                if (messageType === "damage") return "damage";
+                if (messageType === "item") return "item description";
+            }
+        }
+
+        // 4. Default Fallback
+        return super.qualifyMessage(message);
+    }
+
+    extractRolls(message) {
+        const rolls = [];
 
         // 1. Core System Flag Checks (rolls from character sheets)
         const rollFlags = message.flags?.dnd5e?.roll;
         if (rollFlags) {
-            const isCoreValid = ["save", "ability", "skill"].includes(rollFlags.type);
-            if (isCoreValid) {
-                rolls.push({
-                    source: "dnd5e-core-flags",
-                    rawAbility: rollFlags.ability,
-                    outcome: "indeterminant",
-                    tokenId: null
-                });
-            }
+            rolls.push({
+                source: "dnd5e-core-flags",
+                rawAbility: rollFlags.ability,
+                outcome: "indeterminant",
+                tokenId: null
+            });
         }
 
         // 2. Process Active Module Adapters (e.g. Midi-QOL)
