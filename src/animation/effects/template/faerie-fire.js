@@ -197,7 +197,7 @@ async function stop(token, config = {}) {
     Sequencer.EffectManager.endEffects({ name: `${id} - ${token.name}`, object: token });
 }
 
-async function clean() {
+async function clean(config = {}) {
     const { id } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
     Sequencer.EffectManager.endEffects({ name: `${id}` });
 }
