@@ -53,8 +53,9 @@ export class Dnd5eAdapter extends BaseSystemAdapter {
             const isItemUsage = message.flags?.dnd5e?.messageType === "usage";
             const isMidiAttack = midiQolAdapter.isActive() && ["attack", "damage", "item"].includes(message.flags?.["midi-qol"]?.messageType);
             const isCoreAttackOrDamage = rollFlags && ["attack", "damage"].includes(rollFlags.type);
+            const hasRolls = (message.rolls && message.rolls.length > 0) || message.roll;
             
-            if (!isItemUsage && !isMidiAttack && !isCoreAttackOrDamage) {
+            if (!isItemUsage && !isMidiAttack && !isCoreAttackOrDamage && hasRolls) {
                 const hasKeywords = /save|saving\s+throw|check|skill/.test(combinedText);
                 if (hasKeywords) {
                     rolls.push({

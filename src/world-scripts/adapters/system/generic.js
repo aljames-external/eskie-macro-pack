@@ -18,8 +18,9 @@ export class GenericAdapter extends BaseSystemAdapter {
 
         const hasKeywords = /save|saving\s+throw|check|skill/.test(combinedText);
         const isAttackOrDamage = /attack|strike|damage|damage\s+roll/.test(combinedText);
+        const hasRolls = (message.rolls && message.rolls.length > 0) || message.roll;
 
-        if (hasKeywords && !isAttackOrDamage) {
+        if (hasKeywords && !isAttackOrDamage && hasRolls) {
             rolls.push({
                 source: "generic-keywords",
                 rawAbility: null,
