@@ -1,12 +1,15 @@
-import { parseAndNormalizeAbility } from "../helper.js";
+import { BaseSystemAdapter } from "./base.js";
 import { midiQolAdapter } from "../module/midiQol.js";
 
 /**
- * D&D 5e System Adapter
+ * D&D 5e System Adapter Class
  * Supports core rolls and handles Midi-QOL automation via its module adapter.
  */
-export const dnd5eAdapter = {
-    id: "dnd5e",
+export class Dnd5eAdapter extends BaseSystemAdapter {
+    constructor() {
+        super("dnd5e");
+    }
+
     extractRolls(message) {
         const rolls = [];
         const flavorText = message.flavor?.toLowerCase() || "";
@@ -75,6 +78,6 @@ export const dnd5eAdapter = {
             ani: "wisdom", ins: "wisdom", med: "wisdom", per: "wisdom", sur: "wisdom",
             dec: "charisma", itm: "charisma", prf: "charisma", pers: "charisma"
         };
-        return parseAndNormalizeAbility(rawAbility, combinedText, dnd5eMap);
+        return super.normalizeAbility(rawAbility, combinedText, dnd5eMap);
     }
-};
+}

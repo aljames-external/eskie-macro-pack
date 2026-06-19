@@ -1,11 +1,14 @@
-import { parseAndNormalizeAbility } from "../helper.js";
+import { BaseSystemAdapter } from "./base.js";
 
 /**
- * Generic Fallback Adapter
+ * Generic Fallback Adapter Class
  * Resolves rolls using regex keyword scans (ideal for PF1e, D&D 3.5, etc.)
  */
-export const genericAdapter = {
-    id: "generic",
+export class GenericAdapter extends BaseSystemAdapter {
+    constructor() {
+        super("generic");
+    }
+
     extractRolls(message) {
         const rolls = [];
         const flavorText = message.flavor?.toLowerCase() || "";
@@ -29,6 +32,6 @@ export const genericAdapter = {
     },
 
     normalizeAbility(rawAbility, combinedText) {
-        return parseAndNormalizeAbility(rawAbility, combinedText);
+        return super.normalizeAbility(rawAbility, combinedText);
     }
-};
+}

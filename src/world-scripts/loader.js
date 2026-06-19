@@ -1,18 +1,32 @@
 import { MODULE_ID } from "../lib/constants.js";
-import { initialize as initEskieRollAnimation } from "./eskieRollAnimation.js";
+import { eskieRollTracker } from "./eskieRollAnimation.js";
+
+// Registry mapping world-script config keys to their orchestrator instances
+const WORLD_SCRIPTS = {
+    eskieRollAnimation: eskieRollTracker
+};
 
 /**
- * Centrally loads and initializes all enabled world scripts.
+ * Centrally loads and initializes all enabled world scripts on startup.
  */
 export function loadWorldScripts() {
     console.log("EMP | Loading World Scripts...");
+    updateWorldScripts();
+}
+
+/**
+ * Updates the active/inactive state of all world scripts dynamically in real-time.
+ * Can be called whenever settings are updated to toggle features instantly without a reload!
+ */
+export function updateWorldScripts() {
     const config = game.settings.get(MODULE_ID, "worldScriptsConfig") || {};
     
-    if (config.eskieRollAnimation) {
-        try {
-            initEskieRollAnimation();
-        } catch (e) {
-            console.error("EMP | Error initializing Eskie Roll Animations:", e);
+    for (const [scriptId, scriptInstance] of Object.entries(WORLD_SCRIPTS)) {
+        const shouldEnable = !!config[scriptId];
+        if (shouldEnable) {
+            scriptInstance.enable();
+        } else {
+            scriptInstance.disable();
         }
     }
 }

@@ -1,4 +1,5 @@
 import { MODULE_ID } from "../lib/constants.js";
+import { updateWorldScripts } from "./loader.js";
 
 export const WORLD_SCRIPTS_REGISTRY = [
     {
@@ -41,30 +42,13 @@ export class WorldScriptsFormApplication extends FormApplication {
     async _updateObject(event, formData) {
         console.log("EMP | Saving World Scripts Configuration:", formData);
         
-        // Save the settings object
+        // 1. Save the settings object
         await game.settings.set(MODULE_ID, "worldScriptsConfig", formData);
         
-        ui.notifications.info(game.i18n.localize("EMP.worldScripts.savedNotify"));
+        // 2. Dynamically enable/disable scripts in real-time (no page reload required!)
+        updateWorldScripts();
         
-        // Prompt for reload to apply/remove hooks cleanly
-        if (typeof SettingsConfig.reloadConfirm === "function") {
-            SettingsConfig.reloadConfirm();
-        } else {
-            // Fallback for older Foundry versions
-            new Dialog({
-                title: game.i18n.localize("EMP.worldScripts.reloadTitle"),
-                content: `<p>${game.i18n.localize("EMP.worldScripts.reloadContent")}</p>`,
-                buttons: {
-                    reload: {
-                        label: game.i18n.localize("EMP.worldScripts.reloadButton"),
-                        callback: () => window.location.reload()
-                    },
-                    cancel: {
-                        label: game.i18n.localize("EMP.worldScripts.cancelButton")
-                    }
-                },
-                default: "reload"
-            }).render(true);
-        }
+        // 3. Show a friendly notification
+        ui.notifications.info(game.i18n.localize("EMP.worldScripts.savedNotify"));
     }
 }

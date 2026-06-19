@@ -1,11 +1,14 @@
-import { parseAndNormalizeAbility } from "../helper.js";
+import { BaseSystemAdapter } from "./base.js";
 
 /**
- * Pathfinder 2e (PF2e) System Adapter
+ * Pathfinder 2e (PF2e) System Adapter Class
  * Supports PF2e ruleset roll flags and degrees of success context.
  */
-export const pf2eAdapter = {
-    id: "pf2e",
+export class Pf2eAdapter extends BaseSystemAdapter {
+    constructor() {
+        super("pf2e");
+    }
+
     extractRolls(message) {
         const rolls = [];
         const pf2eContext = message.flags?.pf2e?.context;
@@ -59,6 +62,6 @@ export const pf2eAdapter = {
         const pf2eMap = {
             perception: "wisdom", prc: "wisdom"
         };
-        return parseAndNormalizeAbility(rawAbility, combinedText, pf2eMap);
+        return super.normalizeAbility(rawAbility, combinedText, pf2eMap);
     }
-};
+}
