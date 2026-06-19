@@ -22,6 +22,10 @@ async function create(token, config = {}) {
     if (!position) { return; }
 
     let sequence = new Sequence()
+        .animation()
+            .on(token)
+            .opacity(0)
+
         .effect()
             .file(closest("jb2a.fireball.beam.purple"))
             .atLocation(token)
@@ -43,6 +47,7 @@ async function create(token, config = {}) {
             .anchor({ x: 0.5, y: 0.8 })
             .duration(3000)
             .zIndex(1)
+            .waitUntilFinished(-2000)
 
         .effect()
             .file(closest("jb2a.portals.vertical.ring.purple"))
@@ -70,7 +75,12 @@ async function create(token, config = {}) {
             .on(token)
             .teleportTo(position, { offset: { x: -1, y: -1 } })
             .snapToGrid()
-            .waitUntilFinished();
+            .waitUntilFinished()
+
+        .animation()
+            .on(token)
+            .opacity(1)
+            .duration(500);
         
     return sequence;
 }
