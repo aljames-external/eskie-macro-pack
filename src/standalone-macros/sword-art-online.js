@@ -1,4 +1,10 @@
 // Standalone Macro: Sword Art Online Death
+if (!game.modules.get("sequencer")?.active) {
+    return ui.notifications.error("The 'Sword Art Online Shatter' macro requires the 'Sequencer' module to be installed and active!");
+}
+if (!game.modules.get("token-attacher")?.active) {
+    return ui.notifications.error("The 'Sword Art Online Shatter' macro requires the 'Token Attacher' module to be installed and active!");
+}
 const token = canvas.tokens.controlled[0];
 if (!token) return ui.notifications.warn('Please select a token!');
 
@@ -11,6 +17,13 @@ const isPlaying = Sequencer.EffectManager.getEffects({ name: label, object: toke
 if (isPlaying) {
     new Sequence().animation().on(token).opacity(1).show(true).play();
     Sequencer.EffectManager.endEffects({ name: label });
+    
+    // Cleanup orphaned tiles if toggle off is triggered manually
+    const orphanedTileIds = token.document.getFlag('eskie-macro-pack', 'sao-shatter-tiles');
+    if (orphanedTileIds) {
+        await canvas.scene.deleteEmbeddedDocuments('Tile', orphanedTileIds);
+        await token.document.unsetFlag('eskie-macro-pack', 'sao-shatter-tiles');
+    }
 } else {
     const tintColor = '#00FFFF';
     const duration = 1000;
@@ -19,12 +32,16 @@ if (isPlaying) {
     const center = true;
     const rotation = 0;
 
-    const tokenOverlay = `eskie.wounds.token_mask.shatter.${center ? 'center' : 'side'}.01.${shatterColor}.no_base`;
-    const revealOverlay = `eskie.texture_mask.tile_base.shatter.${center ? 'center' : 'side'}.01`;
+    const tokenOverlayRaw = `eskie.wounds.token_mask.shatter.${center ? 'center' : 'side'}.01.${shatterColor}.no_base`;
+    const revealOverlayRaw = `eskie.texture_mask.tile_base.shatter.${center ? 'center' : 'side'}.01`;
+    
+    const tokenOverlay = eskie.util.file.closest(tokenOverlayRaw);
+    const revealOverlay = eskie.util.file.closest(revealOverlayRaw);
     
     let revealOverlayPath = revealOverlay;
     try { 
-        revealOverlayPath = Sequencer.Database.getEntry(revealOverlay).originalData; 
+        const entry = Sequencer.Database.getEntry(revealOverlay, { softFail: true });
+        revealOverlayPath = (typeof entry === 'string') ? entry : (entry?.file || entry?.files?.[0] || revealOverlay);
     } catch (e) {}
 
     let sequence = new Sequence()
@@ -66,15 +83,27 @@ if (isPlaying) {
             const sceneRevealMask = canvas.scene.tiles.get(tiles[1].id);
             const tokenShapeMask = canvas.scene.tiles.get(tiles[2].id);
 
+            // Store tile IDs on the token to allow cleanup if interrupted or toggled off
+            await token.document.setFlag('eskie-macro-pack', 'sao-shatter-tiles', [tokenRevealMask.id, sceneRevealMask.id, tokenShapeMask.id]);
+
             // Attach to token (requires Token Attacher module)
             if (typeof tokenAttacher !== 'undefined') {
                 await tokenAttacher.attachElementsToToken([tokenRevealMask, sceneRevealMask, tokenShapeMask], token, true);
             }
 
-            // Wait for tiles to load and render
+            // Wait for tiles to load and render with a safety timeout
             const sleep = (ms) => new Promise(r => setTimeout(r, ms));
-            while (!(tokenRevealMask?._object?.sourceElement && sceneRevealMask?._object?.sourceElement)) {
+            let retries = 0;
+            const maxRetries = 50; // 5 seconds maximum wait
+            while (!(tokenRevealMask?._object?.sourceElement && sceneRevealMask?._object?.sourceElement) && retries < maxRetries) {
                 await sleep(100);
+                retries++;
+            }
+            if (retries >= maxRetries) {
+                // Cleanup tiles to prevent canvas clutter
+                await canvas.scene.deleteEmbeddedDocuments('Tile', [tokenRevealMask.id, sceneRevealMask.id, tokenShapeMask.id]);
+                await token.document.unsetFlag('eskie-macro-pack', 'sao-shatter-tiles');
+                return ui.notifications.error("Failed to load SAO shatter video elements in time!");
             }
 
             // Reset video to start
@@ -133,6 +162,7 @@ if (isPlaying) {
                         await token.document.delete();
                     } else {
                         await canvas.scene.deleteEmbeddedDocuments('Tile', [tokenRevealMask.id, sceneRevealMask.id, tokenShapeMask.id]);
+                        await token.document.unsetFlag('eskie-macro-pack', 'sao-shatter-tiles');
                     }
                     await Sequencer.EffectManager.endEffects({ name: label });
                 });
