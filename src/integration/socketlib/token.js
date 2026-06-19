@@ -18,9 +18,15 @@ async function editToken(id, updates = {}) {
  * @returns {Promise<TokenDocument[]>} An array containing the new token document.
  */
 async function createToken(position, updates = {}) {
-    const actorName = "EMP Blank Actor"; // Change this to your Actor's name
+    let actorName = "EMP Blank Actor";
+    try {
+        actorName = game.settings.get(MODULE_ID, "blankActorName") || actorName;
+    } catch (e) {}
     const actor = game.actors.getName(actorName);
-    const tokenData = await actor.getTokenDocument(position);
+    if (!actor) {
+        throw new Error(`Eskie Macros | Spawning failed: Actor "${actorName}" required for token spawning not found.`);
+    }
+    const tokenData = await actor.getTokenDocument({ ...position, ...updates });
     return canvas.scene.createEmbeddedDocuments("Token", [tokenData]);
 }
 
@@ -68,7 +74,7 @@ async function edit(id, updates = {}) {
  * @returns {Promise<TokenDocument[]>} An array containing the new token document.
  */
 async function create(position, updates = {}) {
-    if (game.user.isGM) return createToken(updates);
+    if (game.user.isGM) return createToken(position, updates);
     const socket = game.modules.get(MODULE_ID).socketlib;
     if (!initialized(socket)) return;
     return socket.executeAsGM("createToken", position, updates);
