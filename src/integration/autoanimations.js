@@ -102,19 +102,19 @@ function createAutorecEntry(label, trigger, animation, config, version = "0.0.0"
 // Convert object to stringified JSON and escape quotes
 // For instance: { key: "value" } -> "{ "key": \"value\"}"
 function JSONformatObject(obj, depth = 1) {
-    var type = typeof obj;
+    const type = typeof obj;
     /* Special case for eskie.effect functions */
-    if(type === 'string' && obj.startsWith("eskie.effect.")) return obj;
+    if (type === 'string' && obj.startsWith("eskie.effect.")) return obj;
     /* Better looking JSON stringify */
-    if(type === 'string') return '\'' + obj + '\'';
-    if(type === 'boolean' || type === 'number') return obj;
-    if(type === 'function') return obj.toString();
-    if(obj instanceof Array) return JSON.stringify(obj);
+    if (type === 'string') return '\'' + obj + '\'';
+    if (type === 'boolean' || type === 'number') return obj;
+    if (type === 'function') return obj.toString();
+    if (obj instanceof Array) return JSON.stringify(obj);
 
-    var ret = [];
-    for(var prop in obj) {
-      ret.push(`\n` + ' '.repeat(depth * 2) +`${prop}: ${JSONformatObject(obj[prop], depth + 1)}`);
-    }
+    // Modernize using Object.entries to prevent prototype inheritance/pollution leaks
+    const ret = Object.entries(obj).map(([prop, val]) => {
+        return `\n` + ' '.repeat(depth * 2) + `${prop}: ${JSONformatObject(val, depth + 1)}`;
+    });
     return `{${ret.join(',')}\n}`;
 }
 
