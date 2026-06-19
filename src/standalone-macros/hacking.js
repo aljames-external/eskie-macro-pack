@@ -4,6 +4,9 @@
 if (!game.modules.get("tagger")?.active) {
     return ui.notifications.error("The 'Hacking' macro requires the 'Tagger' module to be installed and active!");
 }
+if (!game.modules.get("sequencer")?.active) {
+    return ui.notifications.error("The 'Hacking' macro requires the 'Sequencer' module to be installed and active!");
+}
 
 const token = canvas.tokens.controlled[0];
 if (!token) return ui.notifications.warn('Please select a token!');

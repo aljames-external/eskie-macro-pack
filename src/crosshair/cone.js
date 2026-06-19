@@ -1,7 +1,7 @@
 import { closest } from "../lib/filemanager.js";
 
 async function create(token, {id = `Cone Crosshair`, angle = 53.13, coneSize = "thin", distance = 30} = {}) {
-    let targets;
+    const targets = [];
     let coneImage = closest(`eskie.crosshair.cone.${coneSize}.fantasy_01.white.full`);
     async function coneGraphic(crosshair) { 
         new Sequence()
@@ -32,6 +32,10 @@ async function create(token, {id = `Cone Crosshair`, angle = 53.13, coneSize = "
             })
             .callback(Sequencer.Crosshair.CALLBACKS.PLACED, async (crosshair) => {
                 Sequencer.EffectManager.endEffects({ name: id });
+                targets.length = 0;
+                if (crosshair.targets) {
+                    targets.push(...crosshair.targets);
+                }
             })
             .callback(Sequencer.Crosshair.CALLBACKS.CANCEL, () => {
                 Sequencer.EffectManager.endEffects({ name: id });

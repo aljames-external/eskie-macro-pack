@@ -31,10 +31,10 @@ if (isPlaying) {
     Sequencer.EffectManager.endEffects({ name: label });
     
     // Cleanup orphaned tiles if toggle off is triggered manually
-    const orphanedTileIds = token.document.getFlag('eskie-macro-pack', 'sao-shatter-tiles');
+    const orphanedTileIds = token.document.getFlag('eskie-macros', 'sao-shatter-tiles');
     if (orphanedTileIds) {
         await canvas.scene.deleteEmbeddedDocuments('Tile', orphanedTileIds);
-        await token.document.unsetFlag('eskie-macro-pack', 'sao-shatter-tiles');
+        await token.document.unsetFlag('eskie-macros', 'sao-shatter-tiles');
     }
 } else {
     const tintColor = '#00FFFF';
@@ -96,7 +96,7 @@ if (isPlaying) {
             const tokenShapeMask = canvas.scene.tiles.get(tiles[2].id);
 
             // Store tile IDs on the token to allow cleanup if interrupted or toggled off
-            await token.document.setFlag('eskie-macro-pack', 'sao-shatter-tiles', [tokenRevealMask.id, sceneRevealMask.id, tokenShapeMask.id]);
+            await token.document.setFlag('eskie-macros', 'sao-shatter-tiles', [tokenRevealMask.id, sceneRevealMask.id, tokenShapeMask.id]);
 
             // Attach to token (requires Token Attacher module)
             if (typeof tokenAttacher !== 'undefined') {
@@ -114,7 +114,7 @@ if (isPlaying) {
             if (retries >= maxRetries) {
                 // Cleanup tiles to prevent canvas clutter
                 await canvas.scene.deleteEmbeddedDocuments('Tile', [tokenRevealMask.id, sceneRevealMask.id, tokenShapeMask.id]);
-                await token.document.unsetFlag('eskie-macro-pack', 'sao-shatter-tiles');
+                await token.document.unsetFlag('eskie-macros', 'sao-shatter-tiles');
                 return ui.notifications.error("Failed to load SAO shatter video elements in time!");
             }
 
@@ -174,7 +174,7 @@ if (isPlaying) {
                         await token.document.delete();
                     } else {
                         await canvas.scene.deleteEmbeddedDocuments('Tile', [tokenRevealMask.id, sceneRevealMask.id, tokenShapeMask.id]);
-                        await token.document.unsetFlag('eskie-macro-pack', 'sao-shatter-tiles');
+                        await token.document.unsetFlag('eskie-macros', 'sao-shatter-tiles');
                     }
                     await Sequencer.EffectManager.endEffects({ name: label });
                 });
