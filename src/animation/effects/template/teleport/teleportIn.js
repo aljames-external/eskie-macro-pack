@@ -9,7 +9,9 @@ const DEFAULT_CONFIG = {
 
 function create(token, targets, config = {}) {
     const { id, position } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, {inplace:false});
-    const maxDistance = Math.max(...targets.map(target => 3 * Math.max(Math.abs(target.x - token.x), Math.abs(target.y - token.y)) / canvas.dimensions.size + 1));
+    const maxDistance = (targets && targets.length > 0)
+        ? Math.max(...targets.map(target => 3 * Math.max(Math.abs(target.x - token.x), Math.abs(target.y - token.y)) / canvas.dimensions.size + 1))
+        : 1;
     const {x, y} = token.center;
 
     let sequence = new Sequence();
@@ -65,7 +67,7 @@ function create(token, targets, config = {}) {
             .attachTo(target, { bindAlpha: false });
     });
 
-    sequence = sequence.waitUntilFinished()
+    sequence = sequence.wait(500);
     sequence = sequence.animation()
         .on(token)
         .opacity(1.0)
