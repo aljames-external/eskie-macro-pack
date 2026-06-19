@@ -170,7 +170,21 @@ if (isPlaying) {
                 .waitUntilFinished()
 
                 .thenDo(async () => {
+                    // Instantly hide the tiles on all clients to prevent visual duplication
+                    // and keep their PIXI meshes intact while the effect is ending
+                    await canvas.scene.updateEmbeddedDocuments('Tile', [
+                        { _id: tokenRevealMask.id, hidden: true },
+                        { _id: sceneRevealMask.id, hidden: true },
+                        { _id: tokenShapeMask.id, hidden: true }
+                    ]);
+
+                    // End the effects on all clients
                     await Sequencer.EffectManager.endEffects({ name: label });
+
+                    // Wait for other clients to receive the endEffects signal and remove it from their rendering trees
+                    await sleep(1000);
+
+                    // Safely delete the tiles from the database now that no client is rendering them
                     if (deleteToken) {
                         await token.document.delete();
                     } else {
