@@ -128,13 +128,13 @@ async function create(token, config = {}) {
         .wait(250)
 
         .thenDo(async () => {
-            return Promise.all([
-                sceneRevealMask.update({ alpha: 1, }),
-                tokenRevealMask.update({
-                    alpha: 1,
-                    video: { autoplay: true, }
-                })
+            // Instantly show both video masks on all clients in a single batch database update
+            await canvas.scene.updateEmbeddedDocuments("Tile", [
+                { _id: sceneRevealMask.id, alpha: 1 },
+                { _id: tokenRevealMask.id, alpha: 1 }
             ]);
+            // Play both video masks in perfect, simultaneous synchronization on all clients via socketlib
+            await socket.tile.playVideo([tokenRevealMask.id, sceneRevealMask.id]);
         })
 
         .effect()

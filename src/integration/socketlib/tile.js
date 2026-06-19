@@ -40,10 +40,28 @@ async function destroyTile(id) {
     return canvas.scene.deleteEmbeddedDocuments("Tile", [id]);
 }
 
+/**
+ * Plays a video tile locally on the client.
+ * @param {string|string[]} ids - The ID or IDs of the tiles.
+ */
+function playVideoLocal(ids) {
+    if (!canvas.tiles) return;
+    const idList = Array.isArray(ids) ? ids : [ids];
+    for (const id of idList) {
+        const tile = canvas.tiles.get(id);
+        if (!tile || !tile._object?.sourceElement) continue;
+        tile._object.sourceElement.currentTime = 0;
+        tile._object.sourceElement.play().catch(err => {
+            console.warn("EMP | Failed to play video mask locally:", err);
+        });
+    }
+}
+
 export const tileSockets = {
     editTile,
     createTile,
     destroyTile,
+    playVideoLocal,
 };
 
 /**
@@ -93,8 +111,19 @@ async function destroy(id) {
     return socket.executeAsGM("destroyTile", id);
 }
 
+/**
+ * Plays a video tile, executing on all clients.
+ * @param {string|string[]} ids - The ID or IDs of the tiles.
+ */
+async function playVideo(ids) {
+    const socket = game.modules.get(MODULE_ID).socketlib;
+    if (!initialized(socket)) return;
+    return socket.executeForEveryone("playVideoLocal", ids);
+}
+
 export const tile = {
     edit,
     create,
     destroy,
+    playVideo,
 }
