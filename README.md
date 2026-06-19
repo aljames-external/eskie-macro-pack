@@ -249,90 +249,40 @@ await eskie.traps.spike.play(trapTile, [token]);
 
 ---
 
-#### 🔥 Fire Trap — `eskie.traps.fire`
+#### 🎒 Available Trap Types & Configs
 
-A directional fire cone that erupts from an origin tile toward a target tile.
+Once set up via `eskie.traps.setup()`, the following trap types are fully supported and automated:
 
-**Tile setup:** 3 tiles — Trigger → Origin → Target
+| Trap Namespace | Description | Key Configuration Options |
+|:---|:---|:---|
+| `eskie.traps.fire` | Directional fire cone erupting from an origin | `size: 3.5` (cone width in grid units) |
+| `eskie.traps.pitfall` | Hidden pit that opens under targets | `reveal: true`, `smokeSize: 2`, `fallenScale: 0.3` |
+| `eskie.traps.projectile` | Ranged missile volley (arrow, dart, or javelin) | `projectileType: 'arrow'`, `repeats: 10`, `repeatDelay: 50` |
+| `eskie.traps.spike` | Floor spikes shooting upward | `delay: 500` (milliseconds before damage card) |
+| `eskie.traps.bullRushStatue` | Slides out from a recess to push targets | `pushDistance: 1` (grid units pushed) |
+| `eskie.traps.electricDoor` | Electrified door zapping targets repeatedly | `repeats: 5`, `repeatDelay: 300` |
+| `eskie.traps.fallingRocks` | Rock collapse burying targets under rubble | `dustBrightness: 0.8` |
+| `eskie.traps.fallingSky` | Parallel storm of meteors/falling debris | `color: 'grey'`, `randomDelay: 500`, `fallenScale: 0.3` |
+| `eskie.traps.floodingRoom` | Erupting jets with rising room water | `fadeTime: 3000` (milliseconds to fill) |
+| `eskie.traps.rollingBoulder` | Indiana Jones-style giant rolling boulder | `boulderSize: 4.25`, `boulderSpeed: 2500` |
 
-| Config | Default | Description |
-|--------|---------|-------------|
-| `size` | `3.5` | Width of the fire cone in grid units |
+#### 📖 Usage Example (Manual Playback & Setup)
 
-```js
-await eskie.traps.fire.play(originTile, [token], { size: 4 });
-await eskie.traps.fire.setup({ size: 4 });
-```
-
----
-
-#### 🕳️ Pitfall Trap — `eskie.traps.pitfall`
-
-A hidden pit that reveals itself and causes a token to visually fall in.
-
-**Tile setup:** 2 tiles — Trigger → Animation
-
-| Config | Default | Description |
-|--------|---------|-------------|
-| `reveal` | `true` | Whether to unhide the pit tile when triggered |
-| `smokeSize` | `2` | Multiplier for the dust cloud puff size |
-| `fallenScale` | `0.3` | Scale of the fallen token sprite shown at the pit bottom |
+All traps can be run manually in your own macros or configured via their specific APIs. Here is an example using the `projectile` trap:
 
 ```js
-await eskie.traps.pitfall.play(trapTile, [token]);
-await eskie.traps.pitfall.stop(trapTile);  // Fades the pit tile back to hidden
-```
+let originTile = canvas.tiles.get('<tile-id>');
+let targetTokens = Array.from(game.user.targets);
 
----
-
-#### 🏹 Projectile Trap — `eskie.traps.projectile`
-
-A ranged trap that fires a projectile from a launcher tile toward tokens on a target tile. Supports three projectile types.
-
-**Tile setup:** 3 tiles — Trigger → Launcher → Target
-
-| Config | Default | Description |
-|--------|---------|-------------|
-| `projectileType` | _(prompted)_ | `'arrow'`, `'dart'`, or `'javelin'` |
-| `repeats` | `10` | Number of times the projectile fires |
-| `repeatDelay` | `50` | Milliseconds between each repeat |
-| `splashScale` | `1.5` | Scale of the hit/splash effect |
-
-| Type | Description |
-|------|-------------|
-| `arrow` | Repeating arrow volley with slight spread |
-| `dart` | Poison dart; applies a green tint and bubble markers to hit tokens |
-| `javelin` | Single javelin throw with a blood splash on impact |
-
-```js
-// Setup — prompts for projectile type
-await eskie.traps.projectile.setup();
-
-// Setup with a pre-specified type
-await eskie.traps.projectile.setup({ projectileType: 'dart' });
-
-// Manual play
-await eskie.traps.projectile.play(originTile, [token], {
-    projectileType: 'arrow',
-    repeats: 5,
+// 1. Manually trigger a repeating poison dart trap from a launcher tile
+await eskie.traps.projectile.play(originTile, targetTokens, {
+    projectileType: 'dart',
+    repeats: 3,
+    repeatDelay: 200
 });
-```
 
----
-
-#### ⚔️ Spike Trap — `eskie.traps.spike`
-
-Spikes that shoot up from the floor under every token on the trap tile.
-
-**Tile setup:** 2 tiles — Trigger → Animation
-
-| Config | Default | Description |
-|--------|---------|-------------|
-| `delay` | `500` | Milliseconds between the spike visual and the hit effect |
-
-```js
-await eskie.traps.spike.play(trapTile, [token], { delay: 300 });
-await eskie.traps.spike.setup();
+// 2. Or open the interactive setup wizard for this trap
+await eskie.traps.projectile.setup({ projectileType: 'arrow' });
 ```
 
 ---
