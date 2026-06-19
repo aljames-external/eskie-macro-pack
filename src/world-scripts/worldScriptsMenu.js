@@ -25,18 +25,39 @@ export class WorldScriptsFormApplication extends FormApplication {
 
     async getData(options) {
         const currentConfig = game.settings.get(MODULE_ID, "worldScriptsConfig") || {};
+        const activeSystem = game.system.title;
         
-        const scripts = WORLD_SCRIPTS_REGISTRY.map(script => ({
-            ...script,
-            name: game.i18n.localize(script.name),
-            description: game.i18n.localize(script.description),
-            enabled: !!currentConfig[script.id]
-        }));
+        const scripts = WORLD_SCRIPTS_REGISTRY.map(script => {
+            const data = {
+                ...script,
+                name: game.i18n.localize(script.name),
+                description: game.i18n.localize(script.description),
+                enabled: !!currentConfig[script.id]
+            };
+            // Dynamically attach the auto-detected system name to the roll animations script
+            if (script.id === "eskieRollAnimation") {
+                data.badge = activeSystem;
+            }
+            return data;
+        });
 
         return {
             scripts,
             menuHint: game.i18n.localize("EMP.worldScripts.menuHint")
         };
+    }
+
+    activateListeners(html) {
+        super.activateListeners(html);
+
+        // Instantly toggle the .active class on the card when the checkbox changes for real-time visual feedback
+        html.find(".eskie-switch input").on("change", (event) => {
+            const checkbox = event.currentTarget;
+            const card = checkbox.closest(".eskie-script-card");
+            if (card) {
+                card.classList.toggle("active", checkbox.checked);
+            }
+        });
     }
 
     async _updateObject(event, formData) {

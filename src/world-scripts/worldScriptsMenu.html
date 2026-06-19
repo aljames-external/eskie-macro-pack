@@ -16,7 +16,12 @@
                 <i class="{{this.icon}} eskie-card-icon"></i>
             </div>
             <div class="eskie-card-details">
-                <h3 class="eskie-card-title">{{this.name}}</h3>
+                <div class="eskie-card-title-row">
+                    <h3 class="eskie-card-title">{{this.name}}</h3>
+                    {{#if this.badge}}
+                    <span class="eskie-system-badge"><i class="fa-solid fa-microchip"></i> {{this.badge}}</span>
+                    {{/if}}
+                </div>
                 <p class="eskie-card-description">{{this.description}}</p>
             </div>
             <div class="eskie-card-toggle-wrapper">

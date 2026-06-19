@@ -29,7 +29,7 @@ export class GenericAdapter extends BaseSystemAdapter {
         }
 
         return rolls;
-    },
+    }
 
     normalizeAbility(rawAbility, combinedText) {
         return super.normalizeAbility(rawAbility, combinedText);

@@ -67,7 +67,7 @@ export class Dnd5eAdapter extends BaseSystemAdapter {
         });
 
         return rolls;
-    },
+    }
 
     normalizeAbility(rawAbility, combinedText) {
         // DnD 5e-specific skill and feature abbreviations

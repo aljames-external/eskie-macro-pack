@@ -55,7 +55,7 @@ export class Pf2eAdapter extends BaseSystemAdapter {
         }
 
         return rolls;
-    },
+    }
 
     normalizeAbility(rawAbility, combinedText) {
         // PF2e-specific perception/skill checks mapping
