@@ -37,6 +37,7 @@ async function createToken(position, updates = {}) {
  * @returns {Promise<TokenDocument[]>} An array containing the deleted token document.
  */
 async function destroyToken(id) {
+    if (!canvas.scene) return [];
     return canvas.scene.deleteEmbeddedDocuments("Token", [id]);
 }
 
