@@ -8,16 +8,16 @@ Hooks.once('init', function() {
 
     // World Scripts Configuration Menu
     game.settings.registerMenu(MODULE_ID, 'worldScripts', {
-        name: game.i18n.localize('EMP.settings.worldScripts.name'),
-        label: game.i18n.localize('EMP.settings.worldScripts.label'),
+        name: 'EMP.settings.worldScripts.name',
+        label: 'EMP.settings.worldScripts.label',
         icon: 'fa-solid fa-code',
         type: WorldScriptsFormApplication,
         restricted: true
     });
 
     game.settings.registerMenu(MODULE_ID, 'autorecUpdate', {
-        name: game.i18n.localize('EMP.settings.autorecUpdate.name'),
-        label: game.i18n.localize('EMP.settings.autorecUpdate.label'),
+        name: 'EMP.settings.autorecUpdate.name',
+        label: 'EMP.settings.autorecUpdate.label',
         icon: 'fa-solid fa-wrench',
         type: autorecUpdateFormApplication,
         restricted: true
@@ -46,5 +46,15 @@ Hooks.once('init', function() {
         config: false,
         type: String,
         default: '0.0.0',
+    });
+
+    // Spawning blank actor name setting config
+    game.settings.register(MODULE_ID, 'blankActorName', {
+        name: 'EMP.settings.blankActorName.name',
+        hint: 'EMP.settings.blankActorName.hint',
+        scope: 'world',
+        config: true,
+        type: String,
+        default: 'EMP Blank Actor',
     });
 });
