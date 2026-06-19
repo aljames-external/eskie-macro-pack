@@ -19,6 +19,19 @@ function _getEntity(dependency) {
 }
 
 /**
+ * Safely retrieves the version of the dependency (module or core game).
+ * Supports game.release.version in V12+ and falls back to game.version in V10/V11.
+ * @private
+ */
+function _getEntityVersion(dependency, entity) {
+    if (!entity) return undefined;
+    if (dependency?.id === 'foundry') {
+        return game.release?.version || game.version;
+    }
+    return entity.version;
+}
+
+/**
  * Checks if the dependency is installed.
  * @param {object} dependency
  * @param {string} dependency.id
@@ -30,7 +43,7 @@ function _getEntity(dependency) {
 function _isInstalled(dependency) {
     const entity = _getEntity(dependency);
     if (!entity) return [false, undefined];
-    return [true, _isAscending(dependency.min, entity?.version, dependency.max)];
+    return [true, _isAscending(dependency.min, _getEntityVersion(dependency, entity), dependency.max)];
 }
 
 /**
@@ -80,7 +93,7 @@ function isActivated(dependency, warnMessage) {
         if (warnMessage.length) warnMessage += '\n';
         const depRef = dependency?.id + ((dependency?.ref) ? ` (${dependency?.ref})` : '');
         warnMessage += `Warning: ${depRef} is not activated and between expected versions:`;
-        warnMessage += _versionMessageAppend(dependency, _getEntity(dependency)?.version);
+        warnMessage += _versionMessageAppend(dependency, _getEntityVersion(dependency, _getEntity(dependency)));
         console.warn(warnMessage);
     }
     return valid;
@@ -93,7 +106,7 @@ function isInstalled(dependency, warnMessage) {
         if (warnMessage.length) warnMessage += '\n';
         const depRef = dependency?.id + ((dependency?.ref) ? ` (${dependency?.ref})` : '');
         warnMessage += `Warning: ${depRef} is not installed and between expected versions:`;
-        warnMessage += _versionMessageAppend(dependency, _getEntity(dependency)?.version);
+        warnMessage += _versionMessageAppend(dependency, _getEntityVersion(dependency, _getEntity(dependency)));
         console.warn(warnMessage);
     }
     return valid;
@@ -127,9 +140,9 @@ function hasSomeRecommended(dependencyList) {
 }
 
 /**
- * Checks if a required dependency is activated and throws an error if it is not.
- * @param {object} dependency The dependency to check.
- * @returns {null | throw} 
+ * Checks if a list of required dependencies are activated and throws an error if not.
+ * @param {object|object[]} dependencyList - The dependency or list of dependencies to check.
+ * @throws {string} If a dependency is missing or incompatible.
  */
 function required(dependencyList) {
     if (!Array.isArray(dependencyList)) return required([dependencyList]);
@@ -143,7 +156,7 @@ function required(dependencyList) {
 
         const depRef = dependency?.id + ((dependency?.ref) ? ` (${dependency?.ref})` : '');
         errorMsg += `\nModule: ${depRef}`;
-        errorMsg += _versionMessageAppend(dependency, _getEntity(dependency)?.version);
+        errorMsg += _versionMessageAppend(dependency, _getEntityVersion(dependency, _getEntity(dependency)));
     }
 
     if (!dependencyMet) throw errorMsg;
@@ -152,7 +165,7 @@ function required(dependencyList) {
 /**
  * Checks if at least one of a list of required dependencies is activated and throws an error if not.
  * @param {Array<object>} dependencyList The list of dependencies to check.
- * @returns {null | throw} 
+ * @throws {string} If none of the dependencies are activated.
  */
 function someRequired(dependencyList) {
     let errorMsg = `Requires at least one of the following to be installed and activated:\n`;
@@ -163,7 +176,7 @@ function someRequired(dependencyList) {
         if (errorMsg.length) errorMsg += '\n';
         const depRef = dependency?.id + ((dependency?.ref) ? ` (${dependency?.ref})` : '');
         errorMsg += `Module: ${depRef}`;
-        errorMsg += _versionMessageAppend(dependency, _getEntity(dependency)?.version);
+        errorMsg += _versionMessageAppend(dependency, _getEntityVersion(dependency, _getEntity(dependency)));
     }
     throw errorMsg;
 }
