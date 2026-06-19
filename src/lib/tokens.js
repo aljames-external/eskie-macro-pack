@@ -43,15 +43,15 @@ function getNearestSquareCenter(token, target) {
  * @returns {User[]} An array of User objects who are owners of the token.
  */
 function owners(token, config = {}) {
-    if (!token) return [];
-    const ownership = token.actor.ownership;
+    if (!token || !token.actor) return [];
+    const actor = token.actor;
 
-    // Filter users: Level 3 is "Owner"
-    let owners = game.users.filter(user => { return ownership[user.id] === 3; });
-    if (!config.applyPC) owners = owners.filter(user => { return user.isGM === true; });
-    if (!config.applyGM) owners = owners.filter(user => { return user.isGM === false; });
+    // Use Foundry's native document permission API (handles default permissions and GM overrides)
+    let owners = game.users.filter(user => actor.testUserPermission(user, "OWNER"));
+    if (config.applyPC === false) owners = owners.filter(user => user.isGM === true);
+    if (config.applyGM === false) owners = owners.filter(user => user.isGM === false);
     return owners;
-};
+}
 
 export const tokens = {
     owners,
