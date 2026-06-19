@@ -9,11 +9,29 @@ export const midiQolAdapter = {
     extractRolls(message) {
         const rolls = [];
         const contentText = message.content || "";
+        const midiFlags = message.flags?.["midi-qol"];
+
+        // Add debug logging
+        console.log(`EMP | Midi-QOL Extract Rolls Check:`, {
+            messageId: message.id,
+            messageType: midiFlags?.messageType,
+            type: midiFlags?.type,
+            isSuccess: midiFlags?.isSuccess,
+            isFailure: midiFlags?.isFailure,
+            flavor: message.flavor
+        });
+
+        // Ignore attack, damage, and item usage cards
+        const messageType = midiFlags?.messageType || midiFlags?.type;
+        if (messageType && ["attack", "damage", "item"].includes(messageType)) {
+            console.log(`EMP | Midi-QOL: Ignoring attack/damage/item messageType: "${messageType}"`);
+            return { rolls: [], outcome: "indeterminant" };
+        }
 
         // 1. Check for single target outcome flags
         let outcome = "indeterminant";
-        if (message.flags?.["midi-qol"]?.isSuccess) outcome = "success";
-        else if (message.flags?.["midi-qol"]?.isFailure) outcome = "failure";
+        if (midiFlags?.isSuccess) outcome = "success";
+        else if (midiFlags?.isFailure) outcome = "failure";
 
         // 2. Parse multi-target saves display HTML using modern native DOMParser
         if (contentText.includes("midi-qol")) {

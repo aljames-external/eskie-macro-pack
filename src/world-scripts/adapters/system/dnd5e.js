@@ -17,6 +17,13 @@ export class Dnd5eAdapter extends BaseSystemAdapter {
         const contentLower = contentText.toLowerCase();
         const combinedText = `${flavorText} ${contentLower}`;
 
+        // Add debug logging
+        console.log(`EMP | Dnd5eAdapter: Evaluating message "${message.id}"`, {
+            rollType: message.flags?.dnd5e?.roll?.type,
+            messageType: message.flags?.dnd5e?.messageType,
+            flavor: message.flavor
+        });
+
         // 1. Core System Flag Checks (rolls from character sheets)
         const rollFlags = message.flags?.dnd5e?.roll;
         if (rollFlags) {
@@ -45,8 +52,9 @@ export class Dnd5eAdapter extends BaseSystemAdapter {
         if (rolls.length === 0) {
             const isItemUsage = message.flags?.dnd5e?.messageType === "usage";
             const isMidiAttack = midiQolAdapter.isActive() && ["attack", "damage", "item"].includes(message.flags?.["midi-qol"]?.messageType);
+            const isCoreAttackOrDamage = rollFlags && ["attack", "damage"].includes(rollFlags.type);
             
-            if (!isItemUsage && !isMidiAttack) {
+            if (!isItemUsage && !isMidiAttack && !isCoreAttackOrDamage) {
                 const hasKeywords = /save|saving\s+throw|check|skill/.test(combinedText);
                 if (hasKeywords) {
                     rolls.push({
