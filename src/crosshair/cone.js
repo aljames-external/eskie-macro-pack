@@ -41,8 +41,8 @@ async function create(token, {id = `Cone Crosshair`, angle = 53.13, coneSize = "
 }
 
 async function play(token, config = {}) {
-    let cone = await create(token, config);
-    return cone.play();
+    const [coneSequence, targets] = await create(token, config);
+    return coneSequence.play();
 }
 
 async function stop(token, {id = `Cone Crosshair`} = {}) {
