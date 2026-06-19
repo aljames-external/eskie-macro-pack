@@ -8,9 +8,10 @@ const DEFAULT_CONFIG = {
 };
 
 function create(token, targets, config = {}) {
+    targets = targets ? (Array.isArray(targets) ? targets : [targets]) : [];
     const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, {inplace:false});
     const { id } = mConfig;
-    const maxDistance = (targets && targets.length > 0)
+    const maxDistance = targets.length
         ? Math.max(...targets.map(target => 3 * Math.max(Math.abs(target.x - token.x), Math.abs(target.y - token.y)) / canvas.dimensions.size + 1))
         : 1;
 

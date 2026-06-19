@@ -16,6 +16,7 @@ async function create(tile, targets, config = {}) {
     config = settingsOverride(config);
     const { pushDistance } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
 
+    targets = targets ? (Array.isArray(targets) ? targets : [targets]) : [];
     const target = targets.length ? targets[0] : null;
     const targetTileIds = tile.document?.getFlag(MODULE_ID, 'trap.trapTargetTileIds') || [];
     let targetTile = targetTileIds.length ? canvas.tiles.get(targetTileIds[0]) : null;
