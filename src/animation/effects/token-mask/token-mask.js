@@ -108,13 +108,7 @@ async function create(token, config = {}) {
             .spriteOffset({ x: -canvas.scene.background.offsetX, y: -canvas.scene.background.offsetY })
     }
 
-    seq = seq.animation()
-        .delay(250)
-        .on(token)
-        .opacity(0)
-        .show(false)
-
-        .effect()
+    seq = seq.effect()
         .name(label)
         .copySprite(token);
     if (tint) seq = seq.tint(tint);
@@ -124,6 +118,12 @@ async function create(token, config = {}) {
         .spriteRotation(-token.document.rotation)
         .mask(tokenRevealMask._object)
         .persist()
+
+        .animation()
+        .delay(250)
+        .on(token)
+        .opacity(0)
+        .show(false)
 
         .wait(250)
 

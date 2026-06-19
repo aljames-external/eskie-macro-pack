@@ -142,13 +142,7 @@ if (isPlaying) {
                     .spriteOffset({x: -canvas.scene.background.offsetX, y: -canvas.scene.background.offsetY});
             }
 
-            shatterSeq = shatterSeq.animation()
-                .delay(250)
-                .on(token)
-                .opacity(0)
-                .show(false)
-
-                .effect()
+            shatterSeq = shatterSeq.effect()
                 .name(label)
                 .copySprite(token)
                 .tint(tintColor) // Uses the tint applied in the user's token-mask.js edit
@@ -157,6 +151,12 @@ if (isPlaying) {
                 .spriteRotation(-token.document.rotation)
                 .mask(tokenRevealMask._object)
                 .persist()
+
+                .animation()
+                .delay(250)
+                .on(token)
+                .opacity(0)
+                .show(false)
 
                 .wait(250)
                 .thenDo(async () => {
