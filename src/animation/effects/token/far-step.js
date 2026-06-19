@@ -97,6 +97,8 @@ async function play(token, position, config = {}) {
 }
 
 async function stop(token, config = {}) {
+    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
+    const { id } = mConfig;
     Sequencer.EffectManager.endEffects({ name: id, object: token });
     Sequencer.EffectManager.endEffects({ name: `${id}-con`, object: token }); // Stop the persistent condition effect
 }
