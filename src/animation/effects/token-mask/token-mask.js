@@ -60,17 +60,6 @@ export async function createTiles(token, config = {}) {
         socket.tile.create(tokenMaskUpdates)
     ]);
 
-    // Ensure Foundry Tiles are generated are loaded
-    function tilesRendered() { 
-        return tokenRevealMask?._object?.sourceElement && 
-               sceneRevealMask?._object?.sourceElement && 
-               tokenShapeMask?._object?.mesh; 
-    }
-    await time.waitUntil(tilesRendered, { timeout: 5000 });
-
-    // Reset videos to start
-    tokenRevealMask._object.sourceElement.currentTime = 0;
-    sceneRevealMask._object.sourceElement.currentTime = 0;
     return [tokenRevealMask, sceneRevealMask, tokenShapeMask];
 }
 
@@ -93,11 +82,37 @@ async function create(token, config = {}) {
     const label = `${id} - ${token.id}`;
     
     // Use pre-created tiles if provided, otherwise create them
-    const tiles = tileIds
-        ? tileIds.map(tileId => canvas.scene.tiles.get(tileId))
-        : await createTiles(token, { revealOverlay, rotation });
+    let tiles;
+    if (tileIds) {
+        const sleep = (ms) => new Promise(r => setTimeout(r, ms));
+        let retries = 0;
+        const maxRetries = 50;
+        while (tileIds.some(id => !canvas.scene.tiles.has(id)) && retries < maxRetries) {
+            await sleep(100);
+            retries++;
+        }
+        tiles = tileIds.map(tileId => canvas.scene.tiles.get(tileId));
+    } else {
+        tiles = await createTiles(token, { revealOverlay, rotation });
+    }
         
     const [tokenRevealMask, sceneRevealMask, tokenShapeMask] = tiles;
+    if (!tokenRevealMask || !sceneRevealMask || !tokenShapeMask) {
+        return console.warn(`${MODULE_TLA} | tokenMaskEffect: Failed to resolve all three tiles. Effect aborted.`);
+    }
+
+    // Ensure all tiles' PIXI objects are fully rendered and loaded on this client
+    function tilesRendered() { 
+        return tokenRevealMask?._object?.sourceElement && 
+               sceneRevealMask?._object?.sourceElement && 
+               tokenShapeMask?._object?.mesh; 
+    }
+    await time.waitUntil(tilesRendered, { timeout: 5000 });
+
+    // Reset videos to start
+    tokenRevealMask._object.sourceElement.currentTime = 0;
+    sceneRevealMask._object.sourceElement.currentTime = 0;
+
     const paddingXY = token.document.texture.scaleX;
 
     //Attach tiles to token
