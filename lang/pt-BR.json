@@ -5,10 +5,29 @@
                 "name": "Ativar Sons de Macros",
                 "hint": "Se desativado, as macros não poderão reproduzir sons."
             },
+            "worldScripts": {
+                "name": "Configuração de Scripts Globais",
+                "label": "Configurar Scripts Globais",
+                "hint": "Ativar ou desativar scripts globais que rodam ao carregar o jogo para o jogador."
+            },
             "autorecUpdate": {
                 "name": "Atualizar Auto-Reconhecimento do Automated Animations",
                 "label": "Atualizar AutoRec do AA",
                 "hint": "Força uma atualização do Auto-Reconhecimento do Automated Animations."
+            }
+        },
+        "worldScripts": {
+            "menuTitle": "Eskie Macro Pack - Scripts Globais",
+            "menuHint": "Scripts globais são recursos modulares que rodam automaticamente para cada jogador ao carregar o jogo. Configure quais recursos você deseja ativos neste mundo abaixo.",
+            "saveButton": "Salvar Configuração",
+            "savedNotify": "Configuração de scripts globais salva com sucesso.",
+            "reloadTitle": "Recarregamento Necessário",
+            "reloadContent": "Alterar os Scripts Globais ativos requer um recarregamento de página para fazer efeito.",
+            "reloadButton": "Recarregar Agora",
+            "cancelButton": "Recarregar Depois",
+            "eskieRollAnimation": {
+                "name": "Animações de Rolagem d20 Eskie",
+                "hint": "Reproduz uma sequência de animação personalizada de rolagem d20 Eskie logo acima de um token em testes de resistência e testes de habilidade (integra com o Midi-QOL)."
             }
         },
         "updateMenu": {
