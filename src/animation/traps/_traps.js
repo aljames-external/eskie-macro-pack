@@ -1,14 +1,14 @@
 import { dialog } from '../../lib/dialog.js';
 
-// import { bullRushStatue } from './bull-rush-statue.js';
-// import { electricDoor } from './electric-door.js';
-// import { fallingRocks } from './falling-rocks.js';
+import { bullRushStatue } from './bull-rush-statue.js';
+import { electricDoor } from './electric-door.js';
+import { fallingRocks } from './falling-rocks.js';
 import { fire } from './fire.js';
-// import { floodingRoom } from './flooding-room.js';
+import { floodingRoom } from './flooding-room.js';
 import { pitfall } from './pitfall.js';
 import { fallingSky } from './falling-sky.js';
 import { projectile } from './projectile.js';
-// import { rollingBoulder } from './rolling-boulder.js';
+import { rollingBoulder } from './rolling-boulder.js';
 import { spike } from './spike.js';
 
 // High level setup function to select between different traps to configure
@@ -46,15 +46,15 @@ async function setup (config = {}) {
 }
 
 export const traps = {
-    // bullRushStatue,
-    // electricDoor,
-    // fallingRocks,
+    bullRushStatue,
+    electricDoor,
+    fallingRocks,
     fire,
-    // floodingRoom,
+    floodingRoom,
     pitfall,
     fallingSky,
     projectile,
-    // rollingBoulder,
+    rollingBoulder,
     spike,
 
     setup
