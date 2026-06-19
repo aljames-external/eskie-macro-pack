@@ -17,14 +17,18 @@ async function wait(ms) {
  */
 async function waitUntil(condition, {timeout=2000, interval=100}={}) {
     return new Promise((resolve, reject) => {
-        const startTime = game.time.serverTime;
+        const startTime = performance.now();
         const check = () => {
-            if (condition()) {
-                resolve(game.time.serverTime - startTime);
-            } else if (game.time.serverTime - startTime > timeout) {
-                reject(new Error("Timeout waiting for condition."));
-            } else {
-                setTimeout(check, interval);
+            try {
+                if (condition()) {
+                    resolve(performance.now() - startTime);
+                } else if (performance.now() - startTime > timeout) {
+                    reject(new Error("Timeout waiting for condition."));
+                } else {
+                    setTimeout(check, interval);
+                }
+            } catch (error) {
+                reject(error);
             }
         };
         check();
