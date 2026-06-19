@@ -21,7 +21,16 @@ export class Dnd5eAdapter extends BaseSystemAdapter {
             flavor: message.flavor
         });
 
-        // 1. Core D&D 5e Roll Flags
+        // 1. Midi-QOL Saves Display HTML Check (High Priority)
+        // Midi-QOL main workflow cards (messageType: "attack" / "item") can dynamically contain target saving throw outcomes
+        if (midiQolAdapter.isActive()) {
+            const contentText = message.content || "";
+            if (contentText.includes("midi-qol") && contentText.includes("midi-qol-saves-display")) {
+                return "saving throw";
+            }
+        }
+
+        // 2. Core D&D 5e Roll Flags
         const rollFlags = message.flags?.dnd5e?.roll;
         if (rollFlags) {
             if (rollFlags.type === "save") return "saving throw";
@@ -30,10 +39,10 @@ export class Dnd5eAdapter extends BaseSystemAdapter {
             if (rollFlags.type === "damage") return "damage";
         }
 
-        // 2. Core Item Usage
+        // 3. Core Item Usage
         if (message.flags?.dnd5e?.messageType === "usage") return "item description";
 
-        // 3. Midi-QOL Flags
+        // 4. Midi-QOL Flags
         if (midiQolAdapter.isActive()) {
             const midiFlags = message.flags?.["midi-qol"];
             const messageType = midiFlags?.messageType || midiFlags?.type;

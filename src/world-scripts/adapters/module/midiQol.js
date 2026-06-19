@@ -19,9 +19,10 @@ export const midiQolAdapter = {
             flavor: message.flavor
         });
 
-        // Ignore attack, damage, and item usage cards
+        // Ignore attack, damage, and item usage cards (unless they dynamically contain a target saves display)
         const messageType = midiFlags?.messageType || midiFlags?.type;
-        if (messageType && ["attack", "damage", "item"].includes(messageType)) {
+        const hasSavesDisplay = contentText.includes("midi-qol-saves-display");
+        if (messageType && ["attack", "damage", "item"].includes(messageType) && !hasSavesDisplay) {
             debug.log(`Midi-QOL: Ignoring attack/damage/item messageType: "${messageType}"`);
             return { rolls: [], outcome: "indeterminant" };
         }
