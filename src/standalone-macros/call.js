@@ -8,6 +8,17 @@ if (!game.modules.get("sequencer")?.active) {
     return ui.notifications.error("The 'Call' macro requires the 'Sequencer' module to be installed and active!");
 }
 
+/**
+ * Safely resolves Free vs Patreon asset paths if the eskie module is active.
+ * Falls back to the default path if running as a standalone copy-paste macro.
+ */
+const closest = (path) => {
+    if (typeof eskie !== "undefined" && eskie.util?.file?.closest) {
+        return eskie.util.file.closest(path);
+    }
+    return path;
+};
+
 const token = canvas.tokens.controlled[0];
 if (!token) return ui.notifications.warn('Please select a token!');
 
@@ -73,7 +84,7 @@ if (Tagger.hasTags(token, CALL_TAG)) {
 
     // JB2A red token stage ring behind the icon
     seq.effect()
-        .file(eskie.util.file.closest('jb2a.token_stage.round.red.01.05'))
+        .file(closest('jb2a.token_stage.round.red.01.05'))
         .name(EFFECT_NAME)
         .atLocation(token)
         .attachTo(token, { align: 'top-right', edge: 'outer', bindVisibility: false, offset: { x: -0.2, y: 0.2 }, gridUnits: true, followRotation: false })
@@ -95,7 +106,7 @@ if (Tagger.hasTags(token, CALL_TAG)) {
 
     // Left eye glow sparkle effect
     seq.effect()
-        .file(eskie.util.file.closest('jb2a.twinkling_stars.points04.orange'))
+        .file(closest('jb2a.twinkling_stars.points04.orange'))
         .name(EFFECT_NAME)
         .atLocation(token, { offset: { x: -0.2, y: -0.16 }, gridUnits: true, local: true })
         .size({ width: 0.4, height: 0.1 }, { gridUnits: true })
@@ -109,7 +120,7 @@ if (Tagger.hasTags(token, CALL_TAG)) {
 
     // Right eye glow sparkle effect
     seq.effect()
-        .file(eskie.util.file.closest('jb2a.twinkling_stars.points04.orange'))
+        .file(closest('jb2a.twinkling_stars.points04.orange'))
         .name(EFFECT_NAME)
         .atLocation(token, { offset: { x: 0.12, y: -0.225 }, gridUnits: true, local: true })
         .size({ width: 0.4, height: 0.1 }, { gridUnits: true })

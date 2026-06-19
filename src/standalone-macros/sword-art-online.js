@@ -5,6 +5,18 @@ if (!game.modules.get("sequencer")?.active) {
 if (!game.modules.get("token-attacher")?.active) {
     return ui.notifications.error("The 'Sword Art Online Shatter' macro requires the 'Token Attacher' module to be installed and active!");
 }
+
+/**
+ * Safely resolves Free vs Patreon asset paths if the eskie module is active.
+ * Falls back to the default path if running as a standalone copy-paste macro.
+ */
+const closest = (path) => {
+    if (typeof eskie !== "undefined" && eskie.util?.file?.closest) {
+        return eskie.util.file.closest(path);
+    }
+    return path;
+};
+
 const token = canvas.tokens.controlled[0];
 if (!token) return ui.notifications.warn('Please select a token!');
 
@@ -35,8 +47,8 @@ if (isPlaying) {
     const tokenOverlayRaw = `eskie.wounds.token_mask.shatter.${center ? 'center' : 'side'}.01.${shatterColor}.no_base`;
     const revealOverlayRaw = `eskie.texture_mask.tile_base.shatter.${center ? 'center' : 'side'}.01`;
     
-    const tokenOverlay = eskie.util.file.closest(tokenOverlayRaw);
-    const revealOverlay = eskie.util.file.closest(revealOverlayRaw);
+    const tokenOverlay = closest(tokenOverlayRaw);
+    const revealOverlay = closest(revealOverlayRaw);
     
     let revealOverlayPath = revealOverlay;
     try { 
