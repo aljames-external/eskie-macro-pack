@@ -23,7 +23,10 @@ export async function createTiles(token, config = {}) {
     const { revealOverlay, rotation, tint } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
     const revealOverlayConfig = closest(revealOverlay);
     let revealOverlayPath = revealOverlayConfig;
-    try { revealOverlayPath = Sequencer.Database.getEntry(revealOverlayConfig).originalData; } catch (e) { revealOverlayPath = revealOverlayConfig; }
+    try { 
+        const entry = Sequencer.Database.getEntry(revealOverlayConfig, { softFail: true });
+        revealOverlayPath = (typeof entry === 'string') ? entry : (entry?.file || entry?.files?.[0] || revealOverlayConfig);
+    } catch (e) {}
     const scaleXY = token.document.texture.scaleX;
 
     const overlayMaskUpdates = {
