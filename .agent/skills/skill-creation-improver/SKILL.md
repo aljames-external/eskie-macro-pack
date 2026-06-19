@@ -18,11 +18,12 @@ All robust skills should be testable.
 - Suggest creating an `evals/evals.json` file containing 2-3 realistic test prompts.
 - This allows the `skill-creator` to run automated benchmarks to verify the skill's success rate and catch edge-cases.
 
-## 3. Script-First Architecture (Mandatory Default)
-Never make the LLM manually perform operations that code can execute deterministically. This is the **primary default approach** when creating or improving any skill.
-- **Rule:** If the skill involves text transformations, regex search-and-replace, file formatting, compiling, file structural validation, or repetitive API migrations, you **MUST** write a parameterized Python or Bash script in a `scripts/` directory (e.g., `scripts/sync.py`, `scripts/lint.py`).
-- **Trigger:** The main `SKILL.md` should simply instruct the agent to run that script with the appropriate arguments, rather than explaining the manual transformation steps to the LLM.
-- **Why:** This saves thousands of context tokens, prevents LLM reasoning errors/hallucinations, and guarantees perfectly repeatable, deterministic executions. Manual instructions should only be provided as a fallback.
+## 3. Script Automation for Deterministic Tasks (Mandatory Default)
+Never make the LLM manually perform repetitive operations that code can execute deterministically and easily.
+- **Rule:** If the task involves easily automatable operations—such as file formatting, linting, packaging, compiling, structural validation, database syncing, or mechanical search-and-replaces—you **MUST** write a parameterized script in a `scripts/` directory (e.g., `scripts/sync.py`, `scripts/lint.py`).
+- **Exceptions (When NOT to write a script):** Do not attempt to write scripts for tasks requiring semantic understanding, creative reasoning, complex design decisions, or debugging of non-deterministic, highly variable errors. For these tasks, utilize clear, progressive-disclosure-based LLM instructions in `SKILL.md` or `references/` instead.
+- **Trigger:** When automation is applicable, the main `SKILL.md` should simply instruct the agent to run the script. This saves thousands of context tokens and guarantees error-free, repeatable execution.
+
 
 ## 4. Progressive Disclosure (Reference Files)
 Don't overcrowd the main `SKILL.md` (keep it under 500 lines).

@@ -108,15 +108,16 @@ cloud-deploy/
 ```
 Claude reads only the relevant reference file.
 
-#### Script-First Architecture (Default Attempt)
+#### Pragmatic Script Automation (Default Attempt)
 
-Whenever you design or update a skill, the **primary default approach** must be to automate the work via deterministic scripts rather than writing long instructions for the LLM to execute manually in the context window.
-*   **The Script-First Rule:** If the task involves code refactoring, structural file validation, text translations, search-and-replace edits, compiling, or repetitive workflow steps, you **MUST** write a parameterized Python, Node, or Bash helper script inside the skill's `scripts/` directory.
-*   **Why it is mandatory:**
-    *   **Token efficiency:** Offloads heavy regex rules, formatting instructions, and API mapping tables from the LLM's active context window (which are loaded on *every* turn) into a script that runs locally, consuming zero context tokens.
-    *   **Determinism:** Eliminates LLM reasoning mistakes, syntax errors, and omissions.
-    *   **Repeatability:** Provides a permanent, reusable tool that can be executed flawlessly across hundreds of files in the future.
+Whenever you design or update a skill, the **primary default approach** must be to automate the easily automatable, mechanical portions of the task via scripts rather than writing long manual instructions for the LLM to execute in its context window.
+*   **When to write a script:** If the task involves repetitive, structural, or deterministic actions—such as file formatting, linting, packaging, compiling, database syncing, schema validation, or simple search-and-replace edits—you **MUST** write a parameterized Python, Node, or Bash script inside the skill's `scripts/` directory.
+*   **When NOT to write a script:** Do not attempt to write scripts for tasks requiring semantic understanding, creative reasoning, highly subjective decisions, or debugging of non-deterministic, highly variable errors. For these tasks, utilize clear, progressive-disclosure-based LLM instructions in `SKILL.md` or `references/` instead.
+*   **Benefits of Pragmatic Automation:**
+    *   **Token efficiency:** Offloads heavy mechanical instructions, regex rules, and API maps from the LLM's active context window into a script that runs locally, saving context space on every turn.
+    *   **Determinism & Repeatability:** Guarantees error-free, repeatable execution for mechanical tasks while reserving LLM intelligence for high-value reasoning.
 *   **Implementation:** The main `SKILL.md` should simply instruct the agent to run this script with the appropriate arguments. Only provide manual LLM instructions as a secondary fallback.
+
 
 #### Principle of Lack of Surprise
 
