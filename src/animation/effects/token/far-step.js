@@ -62,13 +62,13 @@ async function create(token, position, config = {}) {
         .scaleOut(0, 500, { ease: "easeOutElastic" }) // This scaleOut seems contradictory with persist() but it was in the original, might need review.
         .atLocation(token)
         .attachTo(token, { bindAlpha: false })
-        .scaleToObject(2)
-        .waitUntilFinished();
+        .scaleToObject(2);
 
     seq = seq
         .animation()
         .on(token)
         .opacity(1)
+        .duration(500);
 
     return seq;
 }
