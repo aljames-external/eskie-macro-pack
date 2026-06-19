@@ -89,6 +89,7 @@ async function create(tile, targets, config = {}) {
     }
 
     if (finalTargets.length > 0) {
+        const targetSeqs = [];
         finalTargets.forEach(target => {
             const targetWidth = target.document?.width ?? target.width ?? 1;
             const targetHeight = target.document?.height ?? target.height ?? 1;
@@ -167,9 +168,11 @@ async function create(tile, targets, config = {}) {
                 .on(target)
                 .opacity(1);
 
-            seq = seq.thenDo(async () => {
-                targetSeq.play();
-            });
+            targetSeqs.push(targetSeq);
+        });
+
+        seq = seq.thenDo(async () => {
+            await Promise.all(targetSeqs.map(s => s.play()));
         });
     }
 
