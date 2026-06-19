@@ -107,7 +107,7 @@ if (isPlaying) {
             const sleep = (ms) => new Promise(r => setTimeout(r, ms));
             let retries = 0;
             const maxRetries = 50; // 5 seconds maximum wait
-            while (!(tokenRevealMask?._object?.sourceElement && sceneRevealMask?._object?.sourceElement) && retries < maxRetries) {
+            while (!(tokenRevealMask?._object?.sourceElement && sceneRevealMask?._object?.sourceElement && tokenShapeMask?._object?.mesh) && retries < maxRetries) {
                 await sleep(100);
                 retries++;
             }
@@ -132,7 +132,7 @@ if (isPlaying) {
                     .size({width: canvas.scene.width / canvas.grid.size, height: canvas.scene.height / canvas.grid.size}, {gridUnits: true})
                     .persist()
                     .belowTokens()
-                    .mask(sceneRevealMask)
+                    .mask(sceneRevealMask._object)
                     .spriteOffset({x: -canvas.scene.background.offsetX, y: -canvas.scene.background.offsetY});
             }
 
@@ -149,7 +149,7 @@ if (isPlaying) {
                 .attachTo(token, {bindAlpha: false, bindVisibility: false, bindRotation: true})
                 .scaleToObject(1, { considerTokenScale: true })
                 .spriteRotation(-token.document.rotation)
-                .mask(tokenRevealMask)
+                .mask(tokenRevealMask._object)
                 .persist()
 
                 .wait(250)
@@ -163,7 +163,7 @@ if (isPlaying) {
                 .effect()
                 .file(tokenOverlay)
                 .attachTo(token, {bindAlpha: false, bindVisibility: false, bindRotation: false})
-                .mask(tokenShapeMask)
+                .mask(tokenShapeMask._object)
                 .rotate(-rotation)
                 .scaleToObject(scaleXY)
                 .zIndex(1)

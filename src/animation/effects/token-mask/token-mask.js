@@ -58,7 +58,11 @@ async function createTiles(token, config = {}) {
     ]);
 
     // Ensure Foundry Tiles are generated are loaded
-    function tilesRendered() { return tokenRevealMask?._object?.sourceElement && sceneRevealMask?._object?.sourceElement; }
+    function tilesRendered() { 
+        return tokenRevealMask?._object?.sourceElement && 
+               sceneRevealMask?._object?.sourceElement && 
+               tokenShapeMask?._object?.mesh; 
+    }
     await time.waitUntil(tilesRendered, { timeout: 5000 });
 
     // Reset videos to start
@@ -91,7 +95,7 @@ async function create(token, config = {}) {
             .size({ width: canvas.scene.width / canvas.grid.size, height: canvas.scene.height / canvas.grid.size }, { gridUnits: true })
             .persist()
             .belowTokens()
-            .mask(sceneRevealMask)
+            .mask(sceneRevealMask._object)
             .spriteOffset({ x: -canvas.scene.background.offsetX, y: -canvas.scene.background.offsetY })
     }
 
@@ -109,7 +113,7 @@ async function create(token, config = {}) {
         .attachTo(token, { bindAlpha: false, bindVisibility: false, bindRotation: true })
         .scaleToObject(1, { considerTokenScale: true })
         .spriteRotation(-token.document.rotation)
-        .mask(tokenRevealMask)
+        .mask(tokenRevealMask._object)
         .persist()
 
         .wait(250)
@@ -127,7 +131,7 @@ async function create(token, config = {}) {
         .effect()
         .file(closest(tokenOverlay))
         .attachTo(token, { bindAlpha: false, bindVisibility: false, bindRotation: false })
-        .mask(tokenShapeMask)
+        .mask(tokenShapeMask._object)
         .rotate(-rotation)
         .scaleToObject(paddingXY)
         .zIndex(1)
