@@ -107,7 +107,7 @@ async function create(tile, targets, config = {}) {
                 .opacity(0.9)
                 .aboveLighting()
                 .persist()
-                .waitUntilFinished()
+                .wait(4000)
 
                 // End visual effects and restore token opacity
                 .thenDo(function () {

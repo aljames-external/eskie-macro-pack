@@ -108,7 +108,7 @@ async function create(tile, targets, config = {}) {
                 .fadeOut(500)
                 .belowTokens()
                 .persist()
-                .waitUntilFinished()
+                .wait(4000)
 
                 // Clean up buried target visual effects
                 .thenDo(function () {
