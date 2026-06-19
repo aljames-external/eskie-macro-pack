@@ -7,6 +7,7 @@
 import { Dnd5eAdapter } from "./adapters/system/dnd5e.js";
 import { Pf2eAdapter } from "./adapters/system/pf2e.js";
 import { GenericAdapter } from "./adapters/system/generic.js";
+import { closest } from "../lib/filemanager.js";
 
 // ============================================================================
 // SEQUENCER ANIMATION TRIGGER
@@ -22,8 +23,8 @@ async function playEskieRollAnimation(token, config = {}) {
     if (outcome === "success") color = "green";
     if (outcome === "failure") color = "red";
 
-    const rollPath = `eskie.ui.ability_check.d20.01.roll.${rollType}.${color}`;
-    const smokePath = `eskie.smoke.07.white`;
+    const rollPath = closest(`eskie.ui.ability_check.d20.01.roll.${rollType}.${color}`);
+    const smokePath = closest(`eskie.smoke.07.white`);
     const dieSize = 100; 
 
     const verticalOffset = -(token.h * 0.80);
