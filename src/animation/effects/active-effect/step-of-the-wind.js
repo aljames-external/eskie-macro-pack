@@ -57,8 +57,7 @@ function create(token, config = {}) {
         .fadeOut(250)
         .persist()
         .rotate(-45)
-        .zIndex(1)
-        .waitUntilFinished();
+        .zIndex(1);
 
     return sequenceOn;
 }
