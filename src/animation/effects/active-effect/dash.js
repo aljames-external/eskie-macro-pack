@@ -39,8 +39,7 @@ function create(token, config = {}) {
             .playbackRate(1.5)
             .rotate(90)
             .persist()
-            .opacity(0.5)
-            .waitUntilFinished();
+            .opacity(0.5);
     
     return sequenceOn;
 }
