@@ -78,6 +78,15 @@ async function create(token, config = {}) {
     const { id, deleteToken, revealOverlay, tokenOverlay, rotation, tint } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
     if (!tokenOverlay || !revealOverlay) return console.warn(`${MODULE_TLA} | tokenMaskEffect: Missing required configuration 'tokenOverlay' or 'revealOverlay'. Effect aborted.`);
 
+    const tokenOverlayConfig = closest(tokenOverlay);
+    let tokenOverlayPath = tokenOverlayConfig;
+    try { 
+        const entry = Sequencer.Database.getEntry(tokenOverlayConfig, { softFail: true });
+        tokenOverlayPath = (typeof entry === 'string') ? entry : (entry?.file || entry?.files?.[0] || tokenOverlayConfig);
+    } catch (e) { 
+        tokenOverlayPath = tokenOverlayConfig; 
+    }
+
     const label = `${id} - ${token.id}`;
     const tiles = await createTiles(token, { revealOverlay, rotation });
     const [tokenRevealMask, sceneRevealMask, tokenShapeMask] = tiles;
@@ -129,7 +138,7 @@ async function create(token, config = {}) {
         })
 
         .effect()
-        .file(closest(tokenOverlay))
+        .file(tokenOverlayPath)
         .attachTo(token, { bindAlpha: false, bindVisibility: false, bindRotation: false })
         .mask(tokenShapeMask._object)
         .rotate(-rotation)

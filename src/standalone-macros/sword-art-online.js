@@ -56,6 +56,12 @@ if (isPlaying) {
         revealOverlayPath = (typeof entry === 'string') ? entry : (entry?.file || entry?.files?.[0] || revealOverlay);
     } catch (e) {}
 
+    let tokenOverlayPath = tokenOverlay;
+    try { 
+        const entry = Sequencer.Database.getEntry(tokenOverlay, { softFail: true });
+        tokenOverlayPath = (typeof entry === 'string') ? entry : (entry?.file || entry?.files?.[0] || tokenOverlay);
+    } catch (e) {}
+
     let sequence = new Sequence()
         .animation()
         .on(token)
@@ -161,7 +167,7 @@ if (isPlaying) {
                 })
 
                 .effect()
-                .file(tokenOverlay)
+                .file(tokenOverlayPath)
                 .attachTo(token, {bindAlpha: false, bindVisibility: false, bindRotation: false})
                 .mask(tokenShapeMask._object)
                 .rotate(-rotation)
