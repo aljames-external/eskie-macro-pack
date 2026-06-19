@@ -102,8 +102,18 @@ When writing or modifying code in the `eskie-macro-pack` repository, adhere stri
 
 ## Automated Linting
 
-*   **Linter Script:** Before finalizing your code changes, you MUST run the provided linter script on any JavaScript files you modified to automatically check for tabs and logging prefix violations.
+*   **Linter Script:** Before finalizing your code changes, you MUST run the provided linter script on any JavaScript files you modified to automatically check for style guide adherence.
     ```bash
     python .agent/skills/style-guide/scripts/lint.py <path/to/file.js>
     ```
-    If the linter reports any errors, fix them before completing the task.
+*   **Automated Checks Performed:** The script automatically validates:
+    1.  **Tabs:** Ensures only spaces are used for indentation.
+    2.  **Console Logging:** Verifies all `console.log/warn/error/info` statements are prefixed with `'EMP | '`.
+    3.  **copySprite Rotation Fix:** Ensures all `.copySprite(token)` calls have a matching `.spriteRotation(-token.document.rotation)` chained in the statement to correct world rotation issues.
+    4.  **scaleToObject Scaling:** Ensures all `.scaleToObject(...)` calls specify the `{ considerTokenScale: true }` option.
+    5.  **Sound Safety:** Warns if `.sound()` plays an asset wrapped in `closest(...)` but is not enclosed inside an `if (sound.enabled)` safety check (which would crash if files are missing).
+    6.  **Settings Override:** Verifies all `create` and `play` functions call `config = settingsOverride(config);` at their beginning to respect user settings.
+    7.  **Deprecated VTT APIs:** Detects and flags deprecated VTT properties (like `.data.name`, `.document.data.width`, `warpgate.crosshairs.show`, `warpgate.buttonDialog`, or hardcoded `'eskie-macro-pack'` string in flags).
+
+If the linter reports any errors, you MUST fix them before completing the task.
+
