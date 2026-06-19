@@ -7,6 +7,7 @@ import { MODULE_ID } from "../../lib/constants.js"
  * @returns {Promise<TileDocument>} The updated tile document.
  */
 async function editTile(id, updates = {}) {
+    if (!canvas.tiles) return;
     const tile = canvas.tiles.get(id);
     if (!tile) return;
     return tile.document.update(updates);

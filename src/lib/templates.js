@@ -26,7 +26,7 @@ async function getPosition(template, config = {}) {
             console.log(`EMP | getPosition: Falling back to legacy MeasuredTemplate support (pre-V14). This support will be removed in Foundry V16.`);
             // Legacy MeasuredTemplate support
             const isCircle = template.type === "circle" || template.document?.type === "circle";
-            if (!isCircle && template.direction !== undefined && template.distance && canvas.dimensions) {
+            if (!isCircle && template.direction !== undefined && template.distance && canvas.ready && canvas.dimensions) {
                 const directionRad = Math.toRadians(template.direction);
                 const rayDistance = (template.distance * canvas.dimensions.size) / canvas.dimensions.distance;
                 secondary = {

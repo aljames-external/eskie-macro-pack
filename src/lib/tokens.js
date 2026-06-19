@@ -6,7 +6,7 @@
  * @returns {{x: number, y: number}} The coordinates of the center of the nearest square.
  */
 function getNearestSquareCenter(token, target) {
-  const gs = canvas.grid.size;
+  const gs = canvas.grid?.size || canvas.dimensions?.size || 100;
   const srcCenter = token.center;
 
   const w = target.document.width;  

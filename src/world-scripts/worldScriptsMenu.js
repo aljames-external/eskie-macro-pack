@@ -14,7 +14,7 @@ export class WorldScriptsFormApplication extends FormApplication {
     static get defaultOptions() {
         return foundry.utils.mergeObject(super.defaultOptions, {
             id: "eskie-world-scripts-menu",
-            title: game.i18n.localize("EMP.worldScripts.menuTitle"),
+            title: "EMP.worldScripts.menuTitle",
             template: `modules/${MODULE_ID}/src/world-scripts/worldScriptsMenu.html`,
             classes: ["eskie-world-scripts-form"],
             width: 580,

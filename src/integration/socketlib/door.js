@@ -2,6 +2,7 @@ import { MODULE_ID } from "../../lib/constants.js"
 
 /* To be registered in socketlib */
 async function editDoor(id, updates = {}) {
+    if (!canvas.walls) return;
     const door = canvas.walls.get(id);
     if (!door) return;
     return door.document.update(updates);

@@ -147,6 +147,7 @@ export class EskieRollTracker {
      * Pinpoints the exact rolling token document.
      */
     getSpeakerToken(message, extractedTokenId) {
+        if (!canvas.ready || !canvas.tokens) return null;
         if (extractedTokenId) {
             const htmlTarget = canvas.tokens.get(extractedTokenId);
             if (htmlTarget) return htmlTarget;
