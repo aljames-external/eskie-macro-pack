@@ -26,18 +26,27 @@ Hooks.once('init', async () => {
             );
         }
 
+        const { door, tile, token: socketToken } = socket;
+
         const util = {
                         dialog,
                         file,
                         time,
-                        token,
+                        token: {
+                            ...token,
+                            ...socketToken,
+                        },
+                        door,
+                        tile,
+                        crosshair,
                     };
 
         // Setup dependency API
         setupApiCalls( animation );
         setupApiCalls({ util });
-        setupApiCalls( socket );
-        setupApiCalls({ crosshair });
+
+        // Alias eskie.utils to eskie.util for backward compatibility
+        globalThis.eskie.utils = globalThis.eskie.util;
     }
 
     setupModule();
