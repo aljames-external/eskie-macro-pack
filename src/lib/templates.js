@@ -4,8 +4,9 @@ async function getPosition(template, config = {}) {
         let primary, secondary;
 
         // Foundry V14 Region structures
-        if (template.documentName === 'Region' || template.shapes) {
-            const shape = template.shapes[0];
+        const shapes = template.shapes ?? template.document?.shapes;
+        if (shapes && shapes.length > 0) {
+            const shape = shapes[0];
             primary = { x: shape.x, y: shape.y };
 
             // Calculate the furthest point based on shape rotation and radius
