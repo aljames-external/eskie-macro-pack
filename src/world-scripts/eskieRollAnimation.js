@@ -60,16 +60,17 @@ export class EskieRollTracker {
     constructor() {
         this.hookIds = [];
         this.activeAdapter = null;
+        this.localAnimatedTokens = new Map();
 
-        // Instantiate polymorphic system adapters
-        const adapters = {
-            "dnd5e": new Dnd5eAdapter(),
-            "pf2e": new Pf2eAdapter(),
-            "generic": new GenericAdapter()
-        };
-
+        // Instantiate polymorphic system adapter dynamically based on active system
         const systemId = game.system.id;
-        this.activeAdapter = adapters[systemId] || adapters["generic"];
+        if (systemId === "dnd5e") {
+            this.activeAdapter = new Dnd5eAdapter();
+        } else if (systemId === "pf2e") {
+            this.activeAdapter = new Pf2eAdapter();
+        } else {
+            this.activeAdapter = new GenericAdapter();
+        }
     }
 
     /**
@@ -165,12 +166,22 @@ export class EskieRollTracker {
         const rolls = this.getRollDetails(message);
         if (rolls.length === 0) return;
 
+        const messageId = message.id;
+        if (!this.localAnimatedTokens.has(messageId)) {
+            // Prune map if it grows too large to prevent memory leaks (keep cache under 100 messages)
+            if (this.localAnimatedTokens.size > 100) {
+                const oldestKey = this.localAnimatedTokens.keys().next().value;
+                this.localAnimatedTokens.delete(oldestKey);
+            }
+            this.localAnimatedTokens.set(messageId, new Set());
+        }
+        const localFired = this.localAnimatedTokens.get(messageId);
+
         // Retrieve the list of token IDs that have already animated for this message
         const firedTokens = message.flags?.world?.eskieAnimatedTokens || [];
         
-        // Checking newFiredTokens dynamically instead of firedTokens ensures that if
-        // multiple roll records for the same token are extracted in a single update,
-        // we deduplicate in real-time and only play the animation ONCE.
+        // Checking newFiredTokens and localFired dynamically prevents race conditions
+        // during rapid updates where multiple hooks fire before database flag write completes.
         const newFiredTokens = [...firedTokens];
         let updatedFlags = false;
 
@@ -178,8 +189,8 @@ export class EskieRollTracker {
             const token = this.getSpeakerToken(message, roll.tokenId);
             if (!token) continue;
 
-            // Check if we've already animated this specific token (in a previous update OR earlier in this loop)
-            if (newFiredTokens.includes(token.id)) continue;
+            // Check if we've already animated this specific token
+            if (newFiredTokens.includes(token.id) || localFired.has(token.id)) continue;
 
             // Trigger the sequence
             playEskieRollAnimation(token, {
@@ -188,6 +199,7 @@ export class EskieRollTracker {
             });
 
             newFiredTokens.push(token.id);
+            localFired.add(token.id);
             updatedFlags = true;
         }
 
