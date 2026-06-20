@@ -13,7 +13,7 @@ const DEFAULT_CONFIG = {
     tokenOverlay: undefined,    // Internal use only
     revealOverlay: undefined,   // Internal use only
     rotation: 0,
-    tint: 'none',
+    tint: undefined,
     callback: {},               // Optional callback functions for customisation
     tileIds: undefined,
     localOnly: false,
@@ -80,6 +80,10 @@ async function create(token, config = {}) {
         return console.warn("EMP | tokenMaskEffect: No token provided. Effect aborted.");
     }
 
+    if (typeof window !== 'undefined' && !window.isSecureContext) {
+        console.warn("Eskie Macros | tokenMaskEffect | Warning: Running in an insecure context (HTTP). Advanced WebGL features like the Spritesheet Generator and sprite masks require a secure context and may fail or crash. Please connect using a secure address like https://<domain>:<port> or http://localhost:<port>.");
+    }
+
     dependency.required([
         { id: 'token-attacher', ref: "Token Attacher" },
         { id: 'monks-active-tiles', ref: "Monk's Active Tile Triggers" }
@@ -137,9 +141,9 @@ async function create(token, config = {}) {
 
     // Wait for PIXI objects and video elements to render on this client
     function tilesRendered() { 
-        return tokenRevealMask?._object?.sourceElement && 
-               sceneRevealMask?._object?.sourceElement && 
-               tokenShapeMask?._object?.mesh; 
+        return tokenRevealMask?.object?.sourceElement && 
+               sceneRevealMask?.object?.sourceElement && 
+               tokenShapeMask?.object?.mesh; 
     }
     
     try {
@@ -150,8 +154,8 @@ async function create(token, config = {}) {
     }
 
     // Reset videos to start
-    tokenRevealMask._object.sourceElement.currentTime = 0;
-    sceneRevealMask._object.sourceElement.currentTime = 0;
+    tokenRevealMask.object.sourceElement.currentTime = 0;
+    sceneRevealMask.object.sourceElement.currentTime = 0;
 
     const paddingXY = token.document.texture.scaleX;
 
@@ -169,8 +173,9 @@ async function create(token, config = {}) {
             .size({ width: canvas.scene.width / canvas.grid.size, height: canvas.scene.height / canvas.grid.size }, { gridUnits: true })
             .persist()
             .belowTokens()
-            .mask(sceneRevealMask._object)
+            .mask(sceneRevealMask)
             .spriteOffset({ x: -canvas.scene.background.offsetX, y: -canvas.scene.background.offsetY })
+            .locally(localOnly);
     }
 
     // Token clone
@@ -183,32 +188,25 @@ async function create(token, config = {}) {
     seq = seq.effect()
         .name(label)
         .copySprite(token);
-    if (tint) seq = seq.tint(tint);
+    if (tint && tint !== 'none') seq = seq.tint(tint);
     seq = seq
         .attachTo(token, { bindAlpha: false, bindVisibility: false, bindRotation: true })
         .scaleToObject(1, { considerTokenScale: true })
         .spriteRotation(-token.document.rotation)
-        .mask(tokenRevealMask._object)
+        .mask(tokenRevealMask)
         .persist()
+        .locally(localOnly)
 
         .wait(250)
 
         .thenDo(async () => {
-            if (localOnly) {
-                // Make tiles visible and play videos completely locally
-                tokenRevealMask._object.alpha = 1;
-                sceneRevealMask._object.alpha = 1;
-                tokenShapeMask._object.alpha = 1;
-
-                tokenRevealMask._object.sourceElement.currentTime = 0;
-                tokenRevealMask._object.sourceElement.play().catch(err => {});
-                sceneRevealMask._object.sourceElement.currentTime = 0;
-                sceneRevealMask._object.sourceElement.play().catch(err => {});
-            } else {
-                // Instantly show both video masks on all clients in a single database update
-                await canvas.scene.updateEmbeddedDocuments("Tile", [
-                    { _id: sceneRevealMask.id, alpha: 1 },
-                    { _id: tokenRevealMask.id, alpha: 1 }
+            if (game.user.isGM) {
+                return Promise.all([
+                    sceneRevealMask.update({ alpha: 1 }),
+                    tokenRevealMask.update({
+                        alpha: 1,
+                        video: { autoplay: true }
+                    })
                 ]);
             }
         })
@@ -216,7 +214,7 @@ async function create(token, config = {}) {
         .effect()
         .file(tokenOverlayPath)
         .attachTo(token, { bindAlpha: false, bindVisibility: false, bindRotation: false })
-        .mask(tokenShapeMask._object)
+        .mask(tokenShapeMask)
         .rotate(-rotation)
         .scaleToObject(paddingXY)
         .zIndex(1);
@@ -225,40 +223,23 @@ async function create(token, config = {}) {
 
     seq = seq.waitUntilFinished()
         .thenDo(async () => {
-            if (localOnly) {
-                // Hide tiles locally
-                tokenRevealMask._object.visible = false;
-                sceneRevealMask._object.visible = false;
-                tokenShapeMask._object.visible = false;
+            await Sequencer.EffectManager.endEffects({ name: label });
 
-                await Sequencer.EffectManager.endEffects({ name: label });
-
-                if (eskieModule?.socketlib && config.initiatorUserId) {
-                    await eskieModule.socketlib.executeForUsers('tokenMaskClientDone', [config.initiatorUserId], token.id, game.user.id, config.animationId);
-                } else {
-                    // Fallback for standalone/no-socket localOnly
-                    if (deleteToken) {
-                        await token.document.delete();
-                    } else {
-                        await Promise.all([
-                            socket.tile.destroy(tokenRevealMask.id),
-                            socket.tile.destroy(tokenShapeMask.id),
-                            socket.tile.destroy(sceneRevealMask.id),
-                        ]);
-                    }
-                }
-            } else {
-                // Standalone / Non-socketed cleanup
-                await socket.tile.destroy([tokenShapeMask.id]);
-                await socket.tile.edit(tokenRevealMask.id, { alpha: 0 });
-                await Sequencer.EffectManager.endEffects({ name: label });
-                await canvas.tokens.get(token.id)?.document.update({ alpha: 0 });
-
+            if (!config.animationId) {
+                // Standalone run: clean up database immediately
                 if (deleteToken) {
                     await token.document.delete();
                 } else {
-                    await time.wait(500);
-                    await socket.tile.destroy([tokenRevealMask.id, sceneRevealMask.id]);
+                    await Promise.all([
+                        socket.tile.destroy(tokenRevealMask.id),
+                        socket.tile.destroy(tokenShapeMask.id),
+                        socket.tile.destroy(sceneRevealMask.id),
+                    ]);
+                }
+            } else {
+                // Coordinated run: report completion to GM initiator
+                if (eskieModule?.socketlib && config.initiatorUserId) {
+                    await eskieModule.socketlib.executeForUsers('tokenMaskClientDone', [config.initiatorUserId], token.id, game.user.id, config.animationId);
                 }
             }
         });
