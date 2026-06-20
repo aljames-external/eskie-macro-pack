@@ -208,7 +208,7 @@ function _addTokenVisualEffects(token, label) {
         .loopProperty("spriteContainer", "position.y", { from: 0, to: 0.05, duration: 2500, delay: 4000, gridUnits: true, ease: "easeInOutQuad", pingPong: true })
         .persist()
         .zIndex(0.2)
-        .waitUntilFinished(-500); // Small wait to ensure persistence starts before play returns
+        .wait(500); // Small wait to ensure persistence starts before play returns
     return sequence;
 }
 
