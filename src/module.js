@@ -25,11 +25,15 @@ Hooks.once('init', async () => {
             );
         }
 
+        const { token: socketToken } = socket;
         const util = {
                         dialog,
                         file,
                         time,
-                        token,
+                        token: {
+                            ...token,
+                            ...socketToken,
+                        },
                     };
 
         // Setup dependency API
