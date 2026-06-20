@@ -6,6 +6,7 @@ import { file } from './lib/filemanager.js';
 import { time } from './lib/time.js';
 import { tokens as token } from './lib/tokens.js';
 import { socket } from './integration/socketlib.js';
+import { loadWorldScripts } from './world-scripts/loader.js';
 
 // Import module settings to also run its initialization code
 import './settings.js';
@@ -45,6 +46,9 @@ Hooks.once('ready', async () => {
     status.ready = true;
     if (status.ready && status.aaReady)
         await autoanimations.submit();
+
+    // Load enabled world scripts for the player
+    loadWorldScripts();
 });
 
 Hooks.once('aa.ready', async () => {

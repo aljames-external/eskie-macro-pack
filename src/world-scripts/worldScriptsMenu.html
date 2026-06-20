@@ -1,0 +1,42 @@
+<form class="eskie-world-scripts-container">
+    <header class="eskie-world-scripts-header">
+        <i class="fa-solid fa-gears eskie-header-icon"></i>
+        <div class="eskie-header-text">
+            <h2>{{localize "EMP.worldScripts.menuTitle"}}</h2>
+            <p class="notes">{{menuHint}}</p>
+        </div>
+    </header>
+
+    <hr />
+
+    <main class="eskie-world-scripts-list">
+        {{#each scripts}}
+        <div class="eskie-script-card {{#if this.enabled}}active{{/if}}">
+            <div class="eskie-card-icon-wrapper">
+                <i class="{{this.icon}} eskie-card-icon"></i>
+            </div>
+            <div class="eskie-card-details">
+                <div class="eskie-card-title-row">
+                    <h3 class="eskie-card-title">{{this.name}}</h3>
+                    {{#if this.badge}}
+                    <span class="eskie-system-badge"><i class="fa-solid fa-microchip"></i> {{this.badge}}</span>
+                    {{/if}}
+                </div>
+                <p class="eskie-card-description">{{this.description}}</p>
+            </div>
+            <div class="eskie-card-toggle-wrapper">
+                <label class="eskie-switch">
+                    <input type="checkbox" name="{{this.id}}" {{checked this.enabled}} />
+                    <span class="eskie-slider round"></span>
+                </label>
+            </div>
+        </div>
+        {{/each}}
+    </main>
+
+    <footer class="sheet-footer eskie-world-scripts-footer">
+        <button type="submit" name="submit" class="eskie-btn-primary">
+            <i class="fa-solid fa-floppy-disk"></i> {{localize "EMP.worldScripts.saveButton"}}
+        </button>
+    </footer>
+</form>
