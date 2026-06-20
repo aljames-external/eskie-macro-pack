@@ -42,6 +42,15 @@ async function play(token, config = {}) {
         const duration = config.duration || DEFAULT_CONFIG.duration;
         const deleteToken = config.deleteToken || DEFAULT_CONFIG.deleteToken;
         const revealOverlay = `eskie.texture_mask.tile_base.shatter.${center ? 'center' : 'side'}.01`;
+        const tokenOverlay = `eskie.wounds.token_mask.shatter.${center ? 'center' : 'side'}.01.${shatterColor}.no_base`;
+
+        // Pre-resolve tokenOverlayPath on the initiator client
+        const tokenOverlayConfig = eskie.util.file.closest(tokenOverlay);
+        let tokenOverlayPath = tokenOverlayConfig;
+        try {
+            const entry = Sequencer.Database.getEntry(tokenOverlayConfig, { softFail: true });
+            tokenOverlayPath = (typeof entry === 'string') ? entry : (entry?.file || entry?.files?.[0] || tokenOverlayConfig);
+        } catch (e) {}
 
         // Create the tiles (using the GM-socketed tile creation)
         const { createTiles } = await import('../token-mask/token-mask.js');
@@ -77,7 +86,10 @@ async function play(token, config = {}) {
         });
 
         // Trigger execution on everyone's client
-        await eskieModule.socketlib.executeForEveryone('playSaoShatterLocal', token.id, tileIds, game.user.id, config);
+        await eskieModule.socketlib.executeForEveryone('playSaoShatterLocal', token.id, tileIds, game.user.id, {
+            ...config,
+            tokenOverlayPath
+        });
         return;
     }
 

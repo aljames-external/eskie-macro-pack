@@ -16,7 +16,9 @@ const DEFAULT_CONFIG = {
     tint: 'none',
     tileIds: undefined,
     localOnly: false,
-    initiatorUserId: undefined
+    initiatorUserId: undefined,
+    tokenOverlayPath: undefined,
+    revealOverlayPath: undefined
 }
 
 export async function createTiles(token, config = {}) {
@@ -71,15 +73,19 @@ async function create(token, config = {}) {
     { id: 'monks-active-tiles', ref: "Monk's Active Tile Triggers" }]);
 
     const { id, deleteToken, revealOverlay, tokenOverlay, rotation, tint, tileIds, localOnly } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
-    if (!tokenOverlay || !revealOverlay) return console.warn(`${MODULE_TLA} | tokenMaskEffect: Missing required configuration 'tokenOverlay' or 'revealOverlay'. Effect aborted.`);
 
-    const tokenOverlayConfig = closest(tokenOverlay);
-    let tokenOverlayPath = tokenOverlayConfig;
-    try { 
-        const entry = Sequencer.Database.getEntry(tokenOverlayConfig, { softFail: true });
-        tokenOverlayPath = (typeof entry === 'string') ? entry : (entry?.file || entry?.files?.[0] || tokenOverlayConfig);
-    } catch (e) { 
-        tokenOverlayPath = tokenOverlayConfig; 
+    // Use pre-resolved tokenOverlayPath if provided, otherwise resolve it
+    let tokenOverlayPath = config.tokenOverlayPath;
+    if (!tokenOverlayPath) {
+        if (!tokenOverlay) return console.warn(`${MODULE_TLA} | tokenMaskEffect: Missing required configuration 'tokenOverlay'. Effect aborted.`);
+        const tokenOverlayConfig = closest(tokenOverlay);
+        tokenOverlayPath = tokenOverlayConfig;
+        try { 
+            const entry = Sequencer.Database.getEntry(tokenOverlayConfig, { softFail: true });
+            tokenOverlayPath = (typeof entry === 'string') ? entry : (entry?.file || entry?.files?.[0] || tokenOverlayConfig);
+        } catch (e) { 
+            tokenOverlayPath = tokenOverlayConfig; 
+        }
     }
 
     const label = `${id} - ${token.id}`;
