@@ -121,7 +121,7 @@ async function stop(tile, config = {}) {
 }
 
 async function setup(config = {}) {
-    return matt.trap.setup('eskie.traps.rolling-boulder', { tileCount: 3, ...config });
+    return matt.trap.setup('eskie.traps.rollingBoulder', { tileCount: 3, ...config });
 }
 
 export const rollingBoulder = {
