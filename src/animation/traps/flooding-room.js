@@ -9,7 +9,7 @@ import { settingsOverride } from '../../lib/settings.js';
 import { matt } from '../utils/matt-tiles.js';
 
 const DEFAULT_CONFIG = {
-    fadeTime: 3000,
+    fadeTime: 10000,
 };
 
 async function create(tile, targets, config = {}) {
@@ -47,12 +47,13 @@ async function create(tile, targets, config = {}) {
         });
     }
 
-    // Fade in the water tile representation
+    // Fade in the water tile representation and tint it blue
     seq = seq
         .animation()
         .on(tile)
         .fadeIn(fadeTime, { ease: 'easeInSine' })
-        .opacity(1);
+        .opacity(1)
+        .tint('#4d90fe');
 
     return seq;
 }
@@ -67,12 +68,13 @@ async function stop(tile, config = {}) {
     // Clear water splash effects
     await Sequencer.EffectManager.endEffects({ name: `flooding-room-splash-${tile.id}` });
 
-    // Reset water tile opacity back to 0
+    // Reset water tile opacity back to 0 and restore original tint
     await new Sequence()
         .animation()
         .on(tile)
         .fadeOut(1000)
         .opacity(0)
+        .tint('#ffffff')
         .play();
 }
 
@@ -87,7 +89,7 @@ async function setup(config = {}) {
         ],
         ...config
     };
-    return matt.trap.setup('eskie.traps.flooding-room', setupConfig);
+    return matt.trap.setup('eskie.traps.floodingRoom', setupConfig);
 }
 
 export const floodingRoom = {
