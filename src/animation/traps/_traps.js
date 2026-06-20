@@ -2,7 +2,7 @@ import { dialog } from '../../lib/dialog.js';
 
 import { bullRushStatue } from './bull-rush-statue.js';
 import { electricDoor } from './electric-door.js';
-// import { fallingRocks } from './falling-rocks.js';
+import { fallingRocks } from './falling-rocks.js';
 import { fire } from './fire.js';
 // import { floodingRoom } from './flooding-room.js';
 import { pitfall } from './pitfall.js';
@@ -48,7 +48,7 @@ async function setup (config = {}) {
 export const traps = {
     bullRushStatue,
     electricDoor,
-    // fallingRocks,
+    fallingRocks,
     fire,
     // floodingRoom,
     pitfall,

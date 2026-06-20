@@ -137,7 +137,7 @@ async function stop(tile, config = {}) {
 }
 
 async function setup(config = {}) {
-    return matt.trap.setup('eskie.traps.falling-rocks', config);
+    return matt.trap.setup('eskie.traps.fallingRocks', config);
 }
 
 export const fallingRocks = {
