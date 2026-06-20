@@ -2,13 +2,15 @@ import { MODULE_ID } from '../lib/constants.js';
 import { door, doorSockets } from './socketlib/door.js';
 import { tile, tileSockets } from './socketlib/tile.js';
 import { token, tokenSockets } from './socketlib/token.js';
+import { tokenMaskSockets } from './socketlib/token-mask.js';
 
 async function register() {
     const socket = socketlib.registerModule(MODULE_ID);
     const socketAPI = {
         doorSockets,
         tileSockets,
-        tokenSockets
+        tokenSockets,
+        tokenMaskSockets
     };
 
     Object.entries(socketAPI).forEach(([_, api]) => {
