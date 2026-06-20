@@ -5,10 +5,33 @@
                 "name": "Enable Macro Sounds",
                 "hint": "If disabled, macros will not be able to play sounds."
             },
+            "worldScripts": {
+                "name": "World Scripts Configuration",
+                "label": "Configure World Scripts",
+                "hint": "Enable or disable world scripts that run at player load."
+            },
             "autorecUpdate": {
                 "name": "Update Automated Animations Autorecognition",
                 "label": "Update AA Autorec",
                 "hint": "Force an update of the Automated Animations Autorecognition."
+            },
+            "debugEnabled": {
+                "name": "Enable Debug Logging",
+                "hint": "Prints highly detailed execution and qualification traces to the browser developer console (F12) to diagnose roll tracking issues."
+            }
+        },
+        "worldScripts": {
+            "menuTitle": "Eskie Macro Pack - World Scripts",
+            "menuHint": "World scripts are modular features that run automatically for each player on load. Configure which features you want active in this world below.",
+            "saveButton": "Save Configuration",
+            "savedNotify": "World scripts configuration saved successfully.",
+            "reloadTitle": "Reload Required",
+            "reloadContent": "Changing active World Scripts requires a page reload to take effect.",
+            "reloadButton": "Reload Now",
+            "cancelButton": "Reload Later",
+            "rollAnimation": {
+                "name": "Eskie d20 Roll Animations",
+                "hint": "Plays a custom Eskie d20 roll animation sequence just above a token on saving throws and ability checks."
             }
         },
         "updateMenu": {
