@@ -54,26 +54,43 @@ async function cleanUpSaoShatter(tokenId) {
     
     if (tracker.timeoutId) clearTimeout(tracker.timeoutId);
     
+    console.log(`Eskie Macros | SAO Shatter | cleanUpSaoShatter | Initiating final database cleanup for token: ${tokenId}`);
+    
     const token = canvas.tokens.get(tokenId);
     const { socket } = await import('../socketlib.js');
     
     if (tracker.deleteToken && token) {
+        console.log(`Eskie Macros | SAO Shatter | cleanUpSaoShatter | Deleting token: ${token.id}`);
         await socket.token.destroy(token.id);
     } else {
+        console.log(`Eskie Macros | SAO Shatter | cleanUpSaoShatter | Deleting tiles:`, tracker.tileIds);
         await Promise.all(tracker.tileIds.map(tileId => socket.tile.destroy(tileId)));
         if (token) {
             await socket.token.edit(token.id, { "flags.eskie-macros.-=sao-shatter-tiles": null });
         }
     }
+    console.log(`Eskie Macros | SAO Shatter | cleanUpSaoShatter | Cleanup finished successfully.`);
 }
 
 // Socket function: called on every client
 async function playSaoShatterLocal(tokenId, tileIds, initiatorUserId, config = {}) {
+    console.log("Eskie Macros | SAO Shatter | playSaoShatterLocal | Received socket call:", {
+        tokenId,
+        tileIds,
+        initiatorUserId,
+        toggleOff: !!config.toggleOff,
+        currentUser: game.user.name
+    });
+
     const token = canvas.tokens.get(tokenId);
-    if (!token) return;
+    if (!token) {
+        return console.warn(`Eskie Macros | SAO Shatter | playSaoShatterLocal | Token with ID ${tokenId} not found in active scene.`);
+    }
 
     const eskie = globalThis.eskie;
-    if (!eskie?.effect?.swordArtOnlineDeath) return;
+    if (!eskie?.effect?.swordArtOnlineDeath) {
+        return console.error(`Eskie Macros | SAO Shatter | playSaoShatterLocal | eskie.effect.swordArtOnlineDeath API is not loaded!`);
+    }
 
     if (config.toggleOff) {
         await eskie.effect.swordArtOnlineDeath.stop(token, {
@@ -97,9 +114,17 @@ async function saoShatterClientDone(tokenId, userId) {
     if (!tracker) return;
     tracker.received.add(userId);
     
+    const expectedUsers = [...tracker.expected];
+    const receivedUsers = [...tracker.received];
+    console.log(`Eskie Macros | SAO Shatter | saoShatterClientDone | Initiator received completion signal from user: ${userId}. Tracker status:`, {
+        expected: expectedUsers,
+        received: receivedUsers
+    });
+    
     // Check if all expected active users have responded
-    const allDone = [...tracker.expected].every(id => tracker.received.has(id));
+    const allDone = expectedUsers.every(id => tracker.received.has(id));
     if (allDone) {
+        console.log(`Eskie Macros | SAO Shatter | saoShatterClientDone | All users reported done! Starting cleanup.`);
         await cleanUpSaoShatter(tokenId);
     }
 }

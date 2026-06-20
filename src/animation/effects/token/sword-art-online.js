@@ -35,6 +35,15 @@ async function create(source, config = {}) {
 
 async function play(token, config = {}) {
     const eskieModule = game.modules.get('eskie-macros');
+    
+    console.log("Eskie Macros | SAO Shatter | swordArtOnlineDeath.play | Triggered:", {
+        tokenName: token.name,
+        tokenId: token.id,
+        localOnly: config.localOnly,
+        isGM: game.user.isGM,
+        config
+    });
+
     if (eskieModule?.socketlib && !config.localOnly) {
         const center = true;
         const rotation = 0;
@@ -51,11 +60,13 @@ async function play(token, config = {}) {
             const entry = Sequencer.Database.getEntry(tokenOverlayConfig, { softFail: true });
             tokenOverlayPath = (typeof entry === 'string') ? entry : (entry?.file || entry?.files?.[0] || tokenOverlayConfig);
         } catch (e) {}
+        console.log("Eskie Macros | SAO Shatter | swordArtOnlineDeath.play | Pre-resolved tokenOverlayPath on initiator:", tokenOverlayPath);
 
         // Create the tiles (using the GM-socketed tile creation)
         const { createTiles } = await import('../token-mask/token-mask.js');
         const tiles = await createTiles(token, { revealOverlay, rotation });
         const tileIds = tiles.map(t => t.id);
+        console.log("Eskie Macros | SAO Shatter | swordArtOnlineDeath.play | Pre-created tiles on initiator:", tileIds);
 
         // Store tile IDs on the token flag
         await eskie.util.token.edit(token.id, { "flags.eskie-macros.sao-shatter-tiles": tileIds });
@@ -70,6 +81,8 @@ async function play(token, config = {}) {
         globalThis.eskie.saoShatterTracker = globalThis.eskie.saoShatterTracker || new Map();
         
         const activeUserIds = game.users.filter(u => u.active).map(u => u.id);
+        console.log("Eskie Macros | SAO Shatter | swordArtOnlineDeath.play | Initializing tracker. Active users expected to report completion:", activeUserIds);
+        
         globalThis.eskie.saoShatterTracker.set(token.id, {
             expected: new Set(activeUserIds),
             received: new Set(),
@@ -78,6 +91,7 @@ async function play(token, config = {}) {
             timeoutId: setTimeout(async () => {
                 const tracker = globalThis.eskie.saoShatterTracker.get(token.id);
                 if (tracker) {
+                    console.warn(`Eskie Macros | SAO Shatter | swordArtOnlineDeath.play | Tracker TIMEOUT hit for token ${token.id}! Deleting tiles now.`);
                     globalThis.eskie.saoShatterTracker.delete(token.id);
                     await Promise.all(tracker.tileIds.map(tileId => eskie.util.tile.destroy(tileId)));
                     await eskie.util.token.edit(token.id, { "flags.eskie-macros.-=sao-shatter-tiles": null });
@@ -86,6 +100,7 @@ async function play(token, config = {}) {
         });
 
         // Trigger execution on everyone's client
+        console.log("Eskie Macros | SAO Shatter | swordArtOnlineDeath.play | Broadcasting playSaoShatterLocal socket call to everyone.");
         await eskieModule.socketlib.executeForEveryone('playSaoShatterLocal', token.id, tileIds, game.user.id, {
             ...config,
             tokenOverlayPath
@@ -96,8 +111,10 @@ async function play(token, config = {}) {
     const sequence = await create(token, config);
     if (sequence) {
         if (config.localOnly) {
+            console.log("Eskie Macros | SAO Shatter | swordArtOnlineDeath.play | Starting local sequence execution.");
             return sequence.play({ remote: false });
         }
+        console.log("Eskie Macros | SAO Shatter | swordArtOnlineDeath.play | Starting standard sequence execution.");
         return sequence.play();
     }
 }

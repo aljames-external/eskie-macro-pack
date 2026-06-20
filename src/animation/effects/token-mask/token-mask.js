@@ -58,12 +58,16 @@ export async function createTiles(token, config = {}) {
         "height": canvas.grid.size * token.document.height,
     };
 
+    console.log("Eskie Macros | SAO Shatter | createTiles | Creating tiles in database...");
+
     // Create all tiles
     const [[tokenRevealMask], [sceneRevealMask], [tokenShapeMask]] = await Promise.all([
         socket.tile.create(overlayMaskUpdates),
         socket.tile.create(overlayMaskUpdates),
         socket.tile.create(tokenMaskUpdates)
     ]);
+
+    console.log("Eskie Macros | SAO Shatter | createTiles | Tiles successfully created in database:", [tokenRevealMask.id, sceneRevealMask.id, tokenShapeMask.id]);
 
     return [tokenRevealMask, sceneRevealMask, tokenShapeMask];
 }
@@ -73,6 +77,17 @@ async function create(token, config = {}) {
     { id: 'monks-active-tiles', ref: "Monk's Active Tile Triggers" }]);
 
     const { id, deleteToken, revealOverlay, tokenOverlay, rotation, tint, tileIds, localOnly } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
+
+    console.log("Eskie Macros | SAO Shatter | tokenMaskEffect.create | Invoked:", {
+        tokenId: token.id,
+        tileIds,
+        localOnly,
+        tokenOverlayPath: config.tokenOverlayPath,
+        revealOverlayPath: config.revealOverlayPath,
+        initiatorUserId: config.initiatorUserId,
+        currentUser: game.user.name,
+        isGM: game.user.isGM
+    });
 
     // Use pre-resolved tokenOverlayPath if provided, otherwise resolve it
     let tokenOverlayPath = config.tokenOverlayPath;
@@ -86,6 +101,9 @@ async function create(token, config = {}) {
         } catch (e) { 
             tokenOverlayPath = tokenOverlayConfig; 
         }
+        console.log("Eskie Macros | SAO Shatter | tokenMaskEffect.create | Locally resolved tokenOverlayPath:", tokenOverlayPath);
+    } else {
+        console.log("Eskie Macros | SAO Shatter | tokenMaskEffect.create | Using pre-resolved tokenOverlayPath:", tokenOverlayPath);
     }
 
     const label = `${id} - ${token.id}`;
@@ -93,6 +111,7 @@ async function create(token, config = {}) {
     // Use pre-created tiles if provided, otherwise create them
     let tiles;
     if (tileIds) {
+        console.log("Eskie Macros | SAO Shatter | tokenMaskEffect.create | Reusing tileIds. Waiting for document replication...");
         const sleep = (ms) => new Promise(r => setTimeout(r, ms));
         let retries = 0;
         const maxRetries = 50;
@@ -100,15 +119,20 @@ async function create(token, config = {}) {
             await sleep(100);
             retries++;
         }
+        console.log(`Eskie Macros | SAO Shatter | tokenMaskEffect.create | Document replication finished after ${retries * 100}ms.`);
         tiles = tileIds.map(tileId => canvas.scene.tiles.get(tileId));
     } else {
+        console.log("Eskie Macros | SAO Shatter | tokenMaskEffect.create | No tileIds provided. Creating new tiles...");
         tiles = await createTiles(token, { revealOverlay, rotation });
     }
         
     const [tokenRevealMask, sceneRevealMask, tokenShapeMask] = tiles;
     if (!tokenRevealMask || !sceneRevealMask || !tokenShapeMask) {
+        console.error("Eskie Macros | SAO Shatter | tokenMaskEffect.create | Failed to resolve all three tiles! Aborting effect.");
         return console.warn(`${MODULE_TLA} | tokenMaskEffect: Failed to resolve all three tiles. Effect aborted.`);
     }
+
+    console.log("Eskie Macros | SAO Shatter | tokenMaskEffect.create | Tiles resolved. Waiting for local PIXI objects & video assets to load...");
 
     // Ensure all tiles' PIXI objects are fully rendered and loaded on this client
     function tilesRendered() { 
@@ -116,7 +140,24 @@ async function create(token, config = {}) {
                sceneRevealMask?._object?.sourceElement && 
                tokenShapeMask?._object?.mesh; 
     }
-    await time.waitUntil(tilesRendered, { timeout: 5000 });
+    
+    try {
+        await time.waitUntil(tilesRendered, { timeout: 5000 });
+        console.log("Eskie Macros | SAO Shatter | tokenMaskEffect.create | Local PIXI objects successfully loaded and rendered!");
+    } catch (err) {
+        console.error("Eskie Macros | SAO Shatter | tokenMaskEffect.create | TIMEOUT waiting for local PIXI rendering! State breakdown:", {
+            tokenRevealMaskExists: !!tokenRevealMask,
+            tokenRevealMaskPIXIExists: !!tokenRevealMask?._object,
+            tokenRevealMaskVideoExists: !!tokenRevealMask?._object?.sourceElement,
+            sceneRevealMaskExists: !!sceneRevealMask,
+            sceneRevealMaskPIXIExists: !!sceneRevealMask?._object,
+            sceneRevealMaskVideoExists: !!sceneRevealMask?._object?.sourceElement,
+            tokenShapeMaskExists: !!tokenShapeMask,
+            tokenShapeMaskPIXIExists: !!tokenShapeMask?._object,
+            tokenShapeMaskMeshExists: !!tokenShapeMask?._object?.mesh
+        });
+        throw err;
+    }
 
     // Reset videos to start
     tokenRevealMask._object.sourceElement.currentTime = 0;
@@ -160,6 +201,7 @@ async function create(token, config = {}) {
         .wait(250)
 
         .thenDo(async () => {
+            console.log("Eskie Macros | SAO Shatter | tokenMaskEffect.create | Sequence play event: applying local alphas and starting videos.");
             if (localOnly) {
                 // Make all three video masks visible ONLY locally on this client
                 tokenRevealMask._object.alpha = 1;
@@ -167,9 +209,13 @@ async function create(token, config = {}) {
                 tokenShapeMask._object.alpha = 1;
 
                 tokenRevealMask._object.sourceElement.currentTime = 0;
-                tokenRevealMask._object.sourceElement.play().catch(() => {});
+                tokenRevealMask._object.sourceElement.play().catch(err => {
+                    console.error("Eskie Macros | SAO Shatter | tokenMaskEffect.create | Failed to play tokenRevealMask video locally:", err);
+                });
                 sceneRevealMask._object.sourceElement.currentTime = 0;
-                sceneRevealMask._object.sourceElement.play().catch(() => {});
+                sceneRevealMask._object.sourceElement.play().catch(err => {
+                    console.error("Eskie Macros | SAO Shatter | tokenMaskEffect.create | Failed to play sceneRevealMask video locally:", err);
+                });
             } else {
                 // Instantly show both video masks on all clients in a single batch database update
                 await canvas.scene.updateEmbeddedDocuments("Tile", [
@@ -191,6 +237,7 @@ async function create(token, config = {}) {
         .waitUntilFinished()
 
         .thenDo(async () => {
+            console.log("Eskie Macros | SAO Shatter | tokenMaskEffect.create | Sequence completion event: hiding tiles and triggering cleanup.");
             if (localOnly) {
                 // Hide tiles locally
                 tokenRevealMask._object.visible = false;
@@ -201,9 +248,11 @@ async function create(token, config = {}) {
 
                 const eskieModule = game.modules.get('eskie-macros');
                 if (eskieModule?.socketlib && config.initiatorUserId) {
+                    console.log(`Eskie Macros | SAO Shatter | tokenMaskEffect.create | Signaling completion back to initiator: ${config.initiatorUserId}`);
                     await eskieModule.socketlib.executeForUsers('saoShatterClientDone', [config.initiatorUserId], token.id, game.user.id);
                 } else {
                     // Fallback for standalone/no-socket
+                    console.log("Eskie Macros | SAO Shatter | tokenMaskEffect.create | Standalone fallback: deleting tiles locally.");
                     await time.wait(1000);
                     if (deleteToken) {
                         await token.document.delete();
