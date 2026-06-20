@@ -8,24 +8,25 @@ const DEFAULT_CONFIG = {
 };
 
 function create(token, targets, config = {}) {
+    targets = targets ? (Array.isArray(targets) ? targets : [targets]) : [];
     const { id, position } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, {inplace:false});
-    const maxDistance = Math.max(...targets.map(target => 3 * Math.max(Math.abs(target.x - token.x), Math.abs(target.y - token.y)) / canvas.dimensions.size + 1));
+    const maxDistance = targets.length
+        ? Math.max(...targets.map(target => 3 * Math.max(Math.abs(target.x - token.x), Math.abs(target.y - token.y)) / canvas.dimensions.size + 1))
+        : 1;
     const {x, y} = token.center;
 
     let sequence = new Sequence();
     sequence = sequence.animation()
         .on(token)
-        .teleportTo(position)
-        .snapToGrid()
-        .offset({ x: -1, y: -1 });
+        .teleportTo(position, { offset: { x: -1, y: -1 } })
+        .snapToGrid();
     targets.forEach(target => {
         let targetX = position.x + (target.center.x - x);
         let targetY = position.y + (target.center.y - y);
         sequence = sequence.animation()
             .on(target)
-            .teleportTo({ x: targetX, y: targetY })
+            .teleportTo({ x: targetX, y: targetY }, { offset: { x: -1, y: -1 } })
             .snapToGrid()
-            .offset({ x: -1, y: -1 })
     });
 
     sequence = sequence.effect()
@@ -67,7 +68,7 @@ function create(token, targets, config = {}) {
             .attachTo(target, { bindAlpha: false });
     });
 
-    sequence = sequence.waitUntilFinished()
+    sequence = sequence.wait(500);
     sequence = sequence.animation()
         .on(token)
         .opacity(1.0)

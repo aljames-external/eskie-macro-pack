@@ -28,7 +28,7 @@ async function create(token, config = {}) {
     ]);
 
     return new Sequence()
-        .addSequence(tOut.waitUntilFinished())
+        .addSequence(tOut)
         .addSequence(tIn);
 }
 

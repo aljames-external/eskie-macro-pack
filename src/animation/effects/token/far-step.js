@@ -49,9 +49,8 @@ async function create(token, position, config = {}) {
     seq = seq
         .animation()
         .on(token)
-        .teleportTo(position)
+        .teleportTo(position, { offset: { x: -1, y: -1 } })
         .snapToGrid()
-        .offset({ x: -1, y: -1 })
         .waitUntilFinished();
 
     seq = seq
@@ -63,13 +62,13 @@ async function create(token, position, config = {}) {
         .scaleOut(0, 500, { ease: "easeOutElastic" }) // This scaleOut seems contradictory with persist() but it was in the original, might need review.
         .atLocation(token)
         .attachTo(token, { bindAlpha: false })
-        .scaleToObject(2)
-        .waitUntilFinished();
+        .scaleToObject(2);
 
     seq = seq
         .animation()
         .on(token)
         .opacity(1)
+        .duration(500);
 
     return seq;
 }
@@ -98,6 +97,8 @@ async function play(token, position, config = {}) {
 }
 
 async function stop(token, config = {}) {
+    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
+    const { id } = mConfig;
     Sequencer.EffectManager.endEffects({ name: id, object: token });
     Sequencer.EffectManager.endEffects({ name: `${id}-con`, object: token }); // Stop the persistent condition effect
 }
