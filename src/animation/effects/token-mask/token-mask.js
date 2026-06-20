@@ -22,7 +22,7 @@ const DEFAULT_CONFIG = {
     animationId: undefined
 }
 
-async function createTiles(token, config = {}) {
+export async function createTiles(token, config = {}) {
     const { revealOverlay, rotation, tint } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
     const revealOverlayConfig = closest(revealOverlay);
     let revealOverlayPath = revealOverlayConfig;
