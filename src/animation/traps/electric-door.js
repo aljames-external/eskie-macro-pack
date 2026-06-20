@@ -16,7 +16,7 @@ async function create(tile, targets, config = {}) {
     config = settingsOverride(config);
     const { repeats, repeatDelay } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
 
-    const target = targets.length ? targets[0] : null;
+    const target = (targets && targets.length > 0) ? targets[0] : null;
 
     let seq = new Sequence();
 
@@ -76,7 +76,7 @@ async function setup(config = {}) {
         trigger: ['door'],
         ...config
     };
-    return matt.trap.setup('eskie.traps.electric-door', setupConfig);
+    return matt.trap.setup('eskie.traps.electricDoor', setupConfig);
 }
 
 export const electricDoor = {
