@@ -73,13 +73,13 @@ if (isPlaying) {
 
             // Wait for tiles to load and render
             const sleep = (ms) => new Promise(r => setTimeout(r, ms));
-            while (!(tokenRevealMask?._object?.sourceElement && sceneRevealMask?._object?.sourceElement)) {
+            while (!(tokenRevealMask?.object?.sourceElement && sceneRevealMask?.object?.sourceElement)) {
                 await sleep(100);
             }
 
             // Reset video to start
-            tokenRevealMask._object.sourceElement.currentTime = 0;
-            sceneRevealMask._object.sourceElement.currentTime = 0;
+            tokenRevealMask.object.sourceElement.currentTime = 0;
+            sceneRevealMask.object.sourceElement.currentTime = 0;
 
             let shatterSeq = new Sequence();
             

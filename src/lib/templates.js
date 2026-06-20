@@ -24,7 +24,7 @@ async function getPosition(template, config = {}) {
         } else {
             console.log(`EMP | getPosition: Falling back to legacy MeasuredTemplate support (pre-V14). This support will be removed in Foundry V16.`);
             // Legacy MeasuredTemplate support
-            const farpoint = template._object.ray.B;
+            const farpoint = template.object.ray.B;
             secondary = { x: farpoint.x, y: farpoint.y };
             primary = { x: template.x, y: template.y };
         }
