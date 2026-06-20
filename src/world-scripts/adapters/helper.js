@@ -14,9 +14,11 @@ export const BASE_ABILITY_MAP = {
 export function parseAndNormalizeAbility(rawAbility, combinedText, customMap = {}) {
     let raw = rawAbility;
     if (!raw) {
+        // Strip HTML tags to prevent tags like <strong> from matching "str"
+        const cleanText = combinedText.replace(/<[^>]*>/g, "");
         // Shared regex matching common ability and skill names/abbreviations
         const abilityRegex = /(strength|dexterity|constitution|intelligence|wisdom|charisma|str|dex|con|int|wis|cha|perception|prc|acr|ath|ste|sle)/;
-        const match = combinedText.match(abilityRegex);
+        const match = cleanText.match(abilityRegex);
         if (match) raw = match[1];
     }
 
