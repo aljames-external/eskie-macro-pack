@@ -221,7 +221,7 @@ if (playPath && typeof token !== 'undefined') {
                 action: 'runcode',
                 data: { code },
             }],
-            'flags.monks-active-tiles.controlled': 'gm',
+            'flags.monks-active-tiles.controlled': config.controlled || 'gm',
         };
         await socket.tile.edit(triggerTile.id, updateData);
     }
@@ -258,6 +258,7 @@ if (playPath && typeof token !== 'undefined') {
     }
 
     ui.notifications.info(`EMP | Successfully setup ${trapKey} trap links for ${triggerTiles.length} trigger tile(s) and ${originTiles.length} trap tile(s).`);
+    return { triggerTiles, originTiles, targetTiles };
 }
 
 export const matt = {
