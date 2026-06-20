@@ -1,11 +1,12 @@
 import { MODULE_ID } from "../../lib/constants.js";
+import { debug } from "../../lib/debug.js";
 import { tokenMaskEffect } from "../../animation/effects/token-mask/token-mask.js";
 
 /**
  * Socketlib handler to execute local sequence rendering on a client.
  */
 async function playTokenMaskLocal(tokenId, tileIds, initiatorUserId, config = {}) {
-    console.log(`Eskie Macros | tokenMaskEffect | playTokenMaskLocal | Received socket call:`, {
+    debug.log(`playTokenMaskLocal | Received socket call:`, {
         tokenId,
         tileIds,
         initiatorUserId,
@@ -49,12 +50,12 @@ async function tokenMaskClientDone(tokenId, userId, animationId) {
     const tracker = globalThis.eskie?.tokenMaskTracker?.get(animationId);
     if (tracker) {
         tracker.received.add(userId);
-        console.log(`Eskie Macros | tokenMaskEffect | tokenMaskClientDone | Received completion signal from user ${userId} for session ${animationId}. Progress: ${tracker.received.size}/${tracker.expected.size}`);
+        debug.log(`tokenMaskClientDone | Received completion signal from user ${userId} for session ${animationId}. Progress: ${tracker.received.size}/${tracker.expected.size}`);
         
         // Check if all expected users have completed
         const allCompleted = [...tracker.expected].every(id => tracker.received.has(id));
         if (allCompleted) {
-            console.log(`Eskie Macros | tokenMaskEffect | tokenMaskClientDone | All clients reported completion for session ${animationId}! Triggering database cleanup...`);
+            debug.log(`tokenMaskClientDone | All clients reported completion for session ${animationId}! Triggering database cleanup...`);
             
             // Clean up using the GM-level cleanup
             await cleanUpTokenMask(tokenId, animationId, tracker.tileIds, tracker.deleteToken);
@@ -76,7 +77,7 @@ async function cleanUpTokenMask(tokenId, animationId, tileIds, deleteToken) {
         }
     }
     
-    console.log(`Eskie Macros | tokenMaskEffect | cleanUpTokenMask | Cleaning up database for token ${tokenId} (Session: ${animationId}). Delete token: ${deleteToken}`);
+    debug.log(`cleanUpTokenMask | Cleaning up database for token ${tokenId} (Session: ${animationId}). Delete token: ${deleteToken}`);
     
     if (deleteToken) {
         const token = canvas.tokens.get(tokenId);

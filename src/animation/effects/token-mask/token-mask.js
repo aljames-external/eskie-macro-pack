@@ -37,10 +37,26 @@ export async function createTiles(token, config = {}) {
     }
     const scaleXY = token.document.texture.scaleX;
 
-    const overlayMaskUpdates = {
+    const tokenRevealMaskUpdates = {
         "texture.src": revealOverlayPath,
         "alpha": 0,
-        "hidden": false,
+        "hidden": true,
+        "x": token.x - (canvas.grid.size * token.document.width * (scaleXY - 1) / 2),
+        "y": token.y - (canvas.grid.size * token.document.height * (scaleXY - 1) / 2),
+        "video": {
+            autoplay: false,
+            loop: false,
+            volume: 0
+        },
+        "width": canvas.grid.size * (token.document.width * scaleXY),
+        "height": canvas.grid.size * (token.document.height * scaleXY),
+        "rotation": rotation,
+    };
+
+    const sceneRevealMaskUpdates = {
+        "texture.src": revealOverlayPath,
+        "alpha": 0,
+        "hidden": true,
         "x": token.x - (canvas.grid.size * token.document.width * (scaleXY - 1) / 2),
         "y": token.y - (canvas.grid.size * token.document.height * (scaleXY - 1) / 2),
         "video": {
@@ -56,7 +72,7 @@ export async function createTiles(token, config = {}) {
     const tokenMaskUpdates = {
         "texture": token.document.texture,
         "alpha": 1,
-        "hidden": false,
+        "hidden": true,
         "x": token.x,
         "y": token.y,
         "rotation": token.document.rotation,
@@ -66,8 +82,8 @@ export async function createTiles(token, config = {}) {
 
     // Create all tiles in database
     const [[tokenRevealMask], [sceneRevealMask], [tokenShapeMask]] = await Promise.all([
-        socket.tile.create(overlayMaskUpdates),
-        socket.tile.create(overlayMaskUpdates),
+        socket.tile.create(tokenRevealMaskUpdates),
+        socket.tile.create(sceneRevealMaskUpdates),
         socket.tile.create(tokenMaskUpdates)
     ]);
 
@@ -202,9 +218,10 @@ async function create(token, config = {}) {
         .thenDo(async () => {
             if (game.user.isGM) {
                 return Promise.all([
-                    sceneRevealMask.update({ alpha: 1 }),
+                    sceneRevealMask.update({ alpha: 1, hidden: false, video: { autoplay: true } }),
                     tokenRevealMask.update({
                         alpha: 1,
+                        hidden: false,
                         video: { autoplay: true }
                     })
                 ]);
@@ -223,6 +240,16 @@ async function create(token, config = {}) {
 
     seq = seq.waitUntilFinished()
         .thenDo(async () => {
+            // Instantly hide tiles locally to prevent them from flickering while database deletion syncs
+            if (tokenRevealMask.object) tokenRevealMask.object.visible = false;
+            if (sceneRevealMask.object) sceneRevealMask.object.visible = false;
+            if (tokenShapeMask.object) tokenShapeMask.object.visible = false;
+
+            // If the token is going to be deleted, hide it locally as well to prevent it from popping back
+            if (deleteToken && token.object) {
+                token.object.visible = false;
+            }
+
             await Sequencer.EffectManager.endEffects({ name: label });
 
             if (!config.animationId) {
