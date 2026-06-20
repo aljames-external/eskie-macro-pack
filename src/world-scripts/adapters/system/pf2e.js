@@ -23,6 +23,7 @@ export class Pf2eAdapter extends BaseSystemAdapter {
     extractRolls(message) {
         const rolls = [];
         const pf2eContext = message.flags?.pf2e?.context;
+        const pf2eFlags = message.flags?.pf2e;
 
         if (pf2eContext) {
             let outcome = "indeterminant";
@@ -33,23 +34,35 @@ export class Pf2eAdapter extends BaseSystemAdapter {
                 if (["failure", "criticalFailure"].includes(pf2eOutcome)) outcome = "failure";
             }
 
+            // Extract ability robustly: first from context, then from modifiers list, and finally fallback to modifierName
+            let rawAbility = pf2eContext.ability || null;
+            if (!rawAbility && pf2eFlags) {
+                const abilityModifier = pf2eFlags.modifiers?.find(m => m.type === "ability");
+                if (abilityModifier) {
+                    rawAbility = abilityModifier.ability; // e.g., 'con', 'dex', 'wis'
+                } else {
+                    rawAbility = pf2eFlags.modifierName || null; // e.g., 'fortitude', 'reflex', 'will'
+                }
+            }
+
             rolls.push({
                 source: "pf2e-flags",
-                rawAbility: pf2eContext.ability || null,
+                rawAbility: rawAbility,
                 outcome: outcome,
                 tokenId: message.speaker.token || null
             });
         }
 
-
-
         return rolls;
     }
 
     normalizeAbility(rawAbility, combinedText) {
-        // PF2e-specific perception/skill checks mapping
+        // PF2e-specific perception/skill checks and saving throws mapping
         const pf2eMap = {
-            perception: "wisdom", prc: "wisdom"
+            perception: "wisdom", prc: "wisdom",
+            fortitude: "constitution",
+            reflex: "dexterity",
+            will: "wisdom"
         };
         return super.normalizeAbility(rawAbility, combinedText, pf2eMap);
     }
