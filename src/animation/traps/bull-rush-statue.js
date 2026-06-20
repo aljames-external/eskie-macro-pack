@@ -29,6 +29,20 @@ async function create(tile, targets, config = {}) {
     const targetTilePlaceable = targetTile?.object || targetTile;
     const targetLoc = targetTilePlaceable?.center || (target ? (target.object?.center || target) : null);
 
+    // Direct texture resolution from the Tile Document (Foundry VTT v10+)
+    const textureSrc = tile.document.texture.src;
+    const scaleX = tile.document.texture.scaleX ?? 1;
+    const scaleY = tile.document.texture.scaleY ?? 1;
+
+    if (!targetLoc) {
+        console.warn("EMP | Bull Rush Statue: No target location resolved. Ensure that a target token is passed, or that the trap tile is linked to a target/trigger tile via flags.", {
+            tile,
+            targets,
+            targetTileIds,
+            targetTile
+        });
+    }
+
     let seq = new Sequence();
 
     if (targetLoc) {
@@ -53,21 +67,24 @@ async function create(tile, targets, config = {}) {
             y: targetLoc.y + (canvas.grid.size * pushDistance) * direction.y
         };
 
+        const slideDistance = {
+            x: distance.x - (canvas.grid.size * 0.5) * direction.x,
+            y: distance.y - (canvas.grid.size * 0.5) * direction.y
+        };
+
         seq = seq
             .wait(500)
 
-            // Animate statue sliding out and back
             .effect()
-            .copySprite(tilePlaceable)
+            .file(textureSrc)
             .atLocation(tilePlaceable)
-            .size({ width: tile.width * (tile.texture?.scaleX ?? 1), height: tile.height * (tile.texture?.scaleY ?? 1) })
-            .animateProperty('sprite', 'position.x', { from: 0, to: distance.x * 0.5, duration: 500, ease: 'easeOutQuint', delay: 200 })
-            .animateProperty('sprite', 'position.y', { from: 0, to: distance.y * 0.5, duration: 500, ease: 'easeOutQuint', delay: 200 })
-            .animateProperty('sprite', 'position.x', { from: 0, to: -distance.x * 0.5, duration: 3000, ease: 'easeInOutQuad', delay: 700 })
-            .animateProperty('sprite', 'position.y', { from: 0, to: -distance.y * 0.5, duration: 3000, ease: 'easeInOutQuad', delay: 700 })
-            .belowTokens()
+            .size({ width: tile.document.width * scaleX, height: tile.document.height * scaleY })
+            .spriteRotation(-(tile.document.rotation ?? 0))
+            .animateProperty('spriteContainer', 'position.x', { from: 0, to: slideDistance.x, duration: 500, ease: 'easeOutQuint', delay: 200 })
+            .animateProperty('spriteContainer', 'position.y', { from: 0, to: slideDistance.y, duration: 500, ease: 'easeOutQuint', delay: 200 })
+            .animateProperty('spriteContainer', 'position.x', { from: 0, to: -slideDistance.x, duration: 3000, ease: 'easeInOutQuad', delay: 700 })
+            .animateProperty('spriteContainer', 'position.y', { from: 0, to: -slideDistance.y, duration: 3000, ease: 'easeInOutQuad', delay: 700 })
             .duration(4000)
-            .zIndex(0)
 
             // Hide the actual tile while animating copy sprite
             .animation()
@@ -80,7 +97,7 @@ async function create(tile, targets, config = {}) {
             .delay(200)
             .file(closest('eskie.smoke.01.white'))
             .atLocation(tile)
-            .size({ width: tile.width * 1.75, height: tile.height * 1.75 })
+            .size({ width: tile.document.width * 1.75, height: tile.document.height * 1.75 })
             .belowTokens()
             .opacity(0.5)
 
@@ -89,7 +106,7 @@ async function create(tile, targets, config = {}) {
             .delay(200)
             .file(closest('eskie.smoke.01.white'))
             .atLocation(tile)
-            .size({ width: tile.width * 1.75, height: tile.height * 1.75 })
+            .size({ width: tile.document.width * 1.75, height: tile.document.height * 1.75 })
             .mirrorX()
             .belowTokens()
             .opacity(0.5);
@@ -126,7 +143,7 @@ async function stop(tile, config = {}) {
 }
 
 async function setup(config = {}) {
-    return matt.trap.setup('eskie.traps.bull-rush-statue', { tileCount: 3, ...config });
+    return matt.trap.setup('eskie.traps.bullRushStatue', { tileCount: 3, ...config });
 }
 
 export const bullRushStatue = {
