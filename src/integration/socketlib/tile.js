@@ -37,7 +37,8 @@ async function createTile(updates = {}) {
  */
 async function destroyTile(id) {
     if (!canvas.scene) return [];
-    return canvas.scene.deleteEmbeddedDocuments("Tile", [id]);
+    const ids = Array.isArray(id) ? id : [id];
+    return canvas.scene.deleteEmbeddedDocuments("Tile", ids);
 }
 
 /**
