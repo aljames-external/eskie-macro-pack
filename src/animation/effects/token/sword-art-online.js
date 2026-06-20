@@ -9,7 +9,7 @@ const DEFAULT_CONFIG = {
 };
 
 async function create(source, config = {}) {
-    const { tintColor, duration, shatterColor, deleteToken, tileIds, localOnly, initiatorUserId } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
+    const { tintColor, duration, shatterColor, deleteToken, tileIds, localOnly, initiatorUserId, ...rest } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
 
     let sequence = new Sequence()
         .animation()
@@ -25,7 +25,8 @@ async function create(source, config = {}) {
                 deleteToken,
                 tileIds,
                 localOnly,
-                initiatorUserId
+                initiatorUserId,
+                ...rest
             });
             if (shatterSeq) return shatterSeq.play({ remote: false });
         });
