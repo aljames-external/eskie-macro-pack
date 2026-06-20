@@ -18,6 +18,7 @@ const DEFAULT_CONFIG = {
 async function create(tile, targets, config = {}) {
     config = settingsOverride(config);
     const { repeats, repeatDelay, splashScale } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
+    targets = targets ? (Array.isArray(targets) ? targets : [targets]) : [];
 
     // Retrieve projectile type from flags, defaulting to arrow
     const projectileType = tile.document?.getFlag(MODULE_ID, 'trap.projectileType') || config.projectileType || 'arrow';
