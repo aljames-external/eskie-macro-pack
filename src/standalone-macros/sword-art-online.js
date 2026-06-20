@@ -38,10 +38,22 @@ if (isPlaying) {
         .thenDo(async () => {
             const scaleXY = token.document.texture.scaleX;
 
-            const overlayMaskUpdates = {
+            const tokenRevealMaskUpdates = {
                 'texture.src': revealOverlayPath,
                 'alpha': 0,
-                'hidden': false,
+                'hidden': true,
+                'x': token.x - (canvas.grid.size * token.document.width * (scaleXY - 1) / 2),
+                'y': token.y - (canvas.grid.size * token.document.height * (scaleXY - 1) / 2),
+                'video': { autoplay: false, loop: false, volume: 0 },
+                'width': canvas.grid.size * (token.document.width * scaleXY),
+                'height': canvas.grid.size * (token.document.height * scaleXY),
+                'rotation': rotation,
+            };
+
+            const sceneRevealMaskUpdates = {
+                'texture.src': revealOverlayPath,
+                'alpha': 0,
+                'hidden': true,
                 'x': token.x - (canvas.grid.size * token.document.width * (scaleXY - 1) / 2),
                 'y': token.y - (canvas.grid.size * token.document.height * (scaleXY - 1) / 2),
                 'video': { autoplay: false, loop: false, volume: 0 },
@@ -53,7 +65,7 @@ if (isPlaying) {
             const tokenMaskUpdates = {
                 'texture': token.document.texture,
                 'alpha': 1,
-                'hidden': false,
+                'hidden': true,
                 'x': token.x,
                 'y': token.y,
                 'rotation': token.document.rotation,
@@ -62,7 +74,7 @@ if (isPlaying) {
             };
 
             // Create tiles using standard Foundry API
-            const tiles = await canvas.scene.createEmbeddedDocuments('Tile', [overlayMaskUpdates, overlayMaskUpdates, tokenMaskUpdates]);
+            const tiles = await canvas.scene.createEmbeddedDocuments('Tile', [tokenRevealMaskUpdates, sceneRevealMaskUpdates, tokenMaskUpdates]);
             const tokenRevealMask = canvas.scene.tiles.get(tiles[0].id);
             const sceneRevealMask = canvas.scene.tiles.get(tiles[1].id);
             const tokenShapeMask = canvas.scene.tiles.get(tiles[2].id);
@@ -115,8 +127,8 @@ if (isPlaying) {
                 .wait(250)
                 .thenDo(async () => {
                     return Promise.all([
-                        sceneRevealMask.update({ alpha: 1 }),
-                        tokenRevealMask.update({ alpha: 1, video: { autoplay: true } })
+                        sceneRevealMask.update({ alpha: 1, hidden: false, video: { autoplay: true } }),
+                        tokenRevealMask.update({ alpha: 1, hidden: false, video: { autoplay: true } })
                     ]);
                 })
 
