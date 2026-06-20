@@ -15,10 +15,10 @@ const DEFAULT_CONFIG = {
 };
 
 async function create(token, config = {}) {
-    const { id, deleteToken, center, color, rotation, tint, callback, overlay } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
+    const { id, deleteToken, center, color, rotation, tint, callback, overlay, ...rest } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
     const tokenOverlay = overlay.token ?? `eskie.wounds.token_mask.shatter.${center ? 'center' : 'side'}.01.${color}.no_base`;
     const revealOverlay = overlay.reveal ?? `eskie.texture_mask.tile_base.shatter.${center ? 'center' : 'side'}.01`;
-    return tokenMaskEffect.create(token, { id, deleteToken, tokenOverlay, revealOverlay, rotation, tint, callback, override: {} });
+    return tokenMaskEffect.create(token, { id, deleteToken, tokenOverlay, revealOverlay, rotation, tint, callback, override: {}, ...rest });
 }
 
 async function play(token, config = {}) {
@@ -27,10 +27,10 @@ async function play(token, config = {}) {
 }
 
 async function stop(token, config = {}) {
-    const { id, deleteToken, center, color, rotation, callback, overlay } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
+    const { id, deleteToken, center, color, rotation, callback, overlay, ...rest } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
     const tokenOverlay = overlay.token ?? `eskie.wounds.token_mask.shatter.${center ? 'center' : 'side'}.01.${color}.no_base`;
     const revealOverlay = overlay.reveal ?? `eskie.texture_mask.tile_base.shatter.${center ? 'center' : 'side'}.01`;
-    return tokenMaskEffect.stop(token, { id, deleteToken, tokenOverlay, revealOverlay, rotation, callback });
+    return tokenMaskEffect.stop(token, { id, deleteToken, tokenOverlay, revealOverlay, rotation, callback, ...rest });
 }
 
 export const shatterMask = {

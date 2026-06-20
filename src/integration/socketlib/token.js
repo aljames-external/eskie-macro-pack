@@ -37,7 +37,100 @@ export const tokenSockets = {
     editToken,
     createToken,
     destroyToken,
+    playSaoShatterLocal,
+    saoShatterClientDone,
+    cleanUpSaoShatter
 };
+
+/**
+ * Socketlib handler to execute local sequence rendering on a client.
+ */
+async function playSaoShatterLocal(tokenId, tileIds, initiatorUserId, config = {}) {
+    console.log(`Eskie Macros | SAO Shatter | playSaoShatterLocal | Received socket call:`, {
+        tokenId,
+        tileIds,
+        initiatorUserId,
+        toggleOff: config.toggleOff,
+        currentUser: game.user.name
+    });
+
+    const token = canvas.tokens.get(tokenId);
+    if (!token) {
+        return console.warn(`Eskie Macros | SAO Shatter | playSaoShatterLocal | Token ${tokenId} not found on this client!`);
+    }
+
+    if (config.toggleOff) {
+        // Toggle off / stop the animation session locally
+        return eskie.effect.swordArtOnlineDeath.stop(token, {
+            ...config,
+            localOnly: true
+        });
+    }
+
+    // Play the animation session locally
+    return eskie.effect.swordArtOnlineDeath.play(token, {
+        ...config,
+        tileIds,
+        localOnly: true,
+        initiatorUserId
+    });
+}
+
+/**
+ * Socketlib handler to report local animation completion back to the initiator.
+ */
+async function saoShatterClientDone(tokenId, userId, animationId) {
+    const tracker = globalThis.eskie?.saoShatterTracker?.get(animationId);
+    if (tracker) {
+        tracker.received.add(userId);
+        console.log(`Eskie Macros | SAO Shatter | saoShatterClientDone | Received completion signal from user ${userId} for session ${animationId}. Progress: ${tracker.received.size}/${tracker.expected.size}`);
+        
+        // Check if all expected users have completed
+        const allCompleted = [...tracker.expected].every(id => tracker.received.has(id));
+        if (allCompleted) {
+            console.log(`Eskie Macros | SAO Shatter | saoShatterClientDone | All clients reported completion for session ${animationId}! Triggering database cleanup...`);
+            clearTimeout(tracker.timeoutId);
+            globalThis.eskie.saoShatterTracker.delete(animationId);
+            
+            // Clean up using the GM-level cleanup
+            await cleanUpSaoShatter(tokenId, animationId, tracker.tileIds, tracker.deleteToken);
+        }
+    }
+}
+
+/**
+ * Clean up the session tiles and token flags as GM.
+ */
+async function cleanUpSaoShatter(tokenId, animationId, tileIds, deleteToken) {
+    if (!game.user.isGM) {
+        const socket = game.modules.get(MODULE_ID).socketlib;
+        if (socket) {
+            return socket.executeAsGM("cleanUpSaoShatter", tokenId, animationId, tileIds, deleteToken);
+        }
+    }
+    
+    console.log(`Eskie Macros | SAO Shatter | cleanUpSaoShatter | Cleaning up database for token ${tokenId} (Session: ${animationId}). Delete token: ${deleteToken}`);
+    
+    if (deleteToken) {
+        const token = canvas.tokens.get(tokenId);
+        if (token) {
+            await token.document.delete();
+        }
+    } else {
+        // Delete the tiles
+        if (tileIds && tileIds.length > 0) {
+            const { tile } = await import('./tile.js');
+            await Promise.all(tileIds.map(tileId => tile.destroy(tileId)));
+        }
+        // Remove only this specific animationId session's flag
+        const token = canvas.tokens.get(tokenId);
+        if (token) {
+            await token.document.update({
+                [`flags.eskie-macros.sao-shatters.-=${animationId}`]: null
+            });
+        }
+    }
+}
 
 /**
  * Checks if socketlib is initialized and ready.
@@ -90,4 +183,5 @@ export const token = {
     edit,
     create,
     destroy,
+    cleanUpSaoShatter
 }
