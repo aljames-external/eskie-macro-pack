@@ -3,6 +3,7 @@
 
 import { closest } from '../../../lib/filemanager.js';
 import { autoanimations } from '../../../integration/autoanimations.js';
+import { templates } from '../../../lib/templates.js';
 
 const DEFAULT_CONFIG_CAST = {
     id: 'tashasCausticBrewCast',
@@ -34,10 +35,9 @@ async function createCast(source, config = {}) {
 
     let position;
     if (mConfig.template) {
-        let farpoint = mConfig.template._object?.ray?.B || mConfig.template.ray?.B;
-        if (farpoint) {
-            position = { x: farpoint.x, y: farpoint.y };
-        } else {
+        const [primary, secondary] = await templates.getPosition(mConfig.template);
+        position = secondary || primary;
+        if (!position) {
             position = await Sequencer.Crosshair.show(crosshairConfig);
             if (position.cancelled) return;
         }
