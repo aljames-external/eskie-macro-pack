@@ -1,5 +1,4 @@
 import { MODULE_ID } from "../../lib/constants.js"
-import { closest } from "../../lib/filemanager.js"
 
 /**
  * Edits an existing token document. To be registered in socketlib.
@@ -8,7 +7,6 @@ import { closest } from "../../lib/filemanager.js"
  * @returns {Promise<TokenDocument>} The updated token document.
  */
 async function editToken(id, updates = {}) {
-    if (!canvas.tokens) return;
     const token = canvas.tokens.get(id);
     if (!token) return;
     return token.document.update(updates);
@@ -20,15 +18,9 @@ async function editToken(id, updates = {}) {
  * @returns {Promise<TokenDocument[]>} An array containing the new token document.
  */
 async function createToken(position, updates = {}) {
-    const actorName = game.settings.get(MODULE_ID, "blankActorName") || "EMP Blank Actor";
+    const actorName = "EMP Blank Actor"; // Change this to your Actor's name
     const actor = game.actors.getName(actorName);
-    if (!actor) {
-        throw new Error(`Eskie Macros | Spawning failed: Actor "${actorName}" required for token spawning not found.`);
-    }
-    if (!canvas.scene) {
-        throw new Error(`Eskie Macros | Spawning failed: No active scene found to spawn token onto.`);
-    }
-    const tokenData = await actor.getTokenDocument({ ...position, ...updates });
+    const tokenData = await actor.getTokenDocument(position);
     return canvas.scene.createEmbeddedDocuments("Token", [tokenData]);
 }
 
@@ -38,111 +30,13 @@ async function createToken(position, updates = {}) {
  * @returns {Promise<TokenDocument[]>} An array containing the deleted token document.
  */
 async function destroyToken(id) {
-    if (!canvas.scene) return [];
     return canvas.scene.deleteEmbeddedDocuments("Token", [id]);
-}
-
-// Initialize tracking system on global eskie object
-globalThis.eskie = globalThis.eskie || {};
-globalThis.eskie.saoShatterTracker = globalThis.eskie.saoShatterTracker || new Map();
-
-// Helper to clean up tiles from initiator side
-// Helper to clean up tiles from initiator side
-async function cleanUpSaoShatter(tokenId, animationId) {
-    if (!animationId) {
-        return console.error("Eskie Macros | SAO Shatter | cleanUpSaoShatter | Missing animationId!");
-    }
-    const tracker = globalThis.eskie.saoShatterTracker.get(animationId);
-    if (!tracker) return;
-    globalThis.eskie.saoShatterTracker.delete(animationId);
-    
-    if (tracker.timeoutId) clearTimeout(tracker.timeoutId);
-    
-    console.log(`Eskie Macros | SAO Shatter | cleanUpSaoShatter | Initiating final database cleanup for token: ${tokenId} (Session: ${animationId})`);
-    
-    const token = canvas.tokens.get(tokenId);
-    const { socket } = await import('../socketlib.js');
-    
-    if (tracker.deleteToken && token) {
-        console.log(`Eskie Macros | SAO Shatter | cleanUpSaoShatter | Deleting token: ${token.id}`);
-        await socket.token.destroy(token.id);
-    } else {
-        console.log(`Eskie Macros | SAO Shatter | cleanUpSaoShatter | Deleting tiles:`, tracker.tileIds);
-        await Promise.all(tracker.tileIds.map(tileId => socket.tile.destroy(tileId)));
-        if (token) {
-            await socket.token.edit(token.id, { [`flags.eskie-macros.sao-shatters.-=${animationId}`]: null });
-        }
-    }
-    console.log(`Eskie Macros | SAO Shatter | cleanUpSaoShatter | Cleanup finished successfully.`);
-}
-
-// Socket function: called on every client
-async function playSaoShatterLocal(tokenId, tileIds, initiatorUserId, config = {}) {
-    console.log("Eskie Macros | SAO Shatter | playSaoShatterLocal | Received socket call:", {
-        tokenId,
-        tileIds,
-        initiatorUserId,
-        toggleOff: !!config.toggleOff,
-        animationId: config.animationId,
-        currentUser: game.user.name
-    });
-
-    const token = canvas.tokens.get(tokenId);
-    if (!token) {
-        return console.warn(`Eskie Macros | SAO Shatter | playSaoShatterLocal | Token with ID ${tokenId} not found in active scene.`);
-    }
-
-    const eskie = globalThis.eskie;
-    if (!eskie?.effect?.swordArtOnlineDeath) {
-        return console.error(`Eskie Macros | SAO Shatter | playSaoShatterLocal | eskie.effect.swordArtOnlineDeath API is not loaded!`);
-    }
-
-    if (config.toggleOff) {
-        await eskie.effect.swordArtOnlineDeath.stop(token, {
-            ...config,
-            tileIds,
-            initiatorUserId
-        });
-    } else {
-        await eskie.effect.swordArtOnlineDeath.play(token, {
-            ...config,
-            tileIds,
-            localOnly: true,
-            initiatorUserId
-        });
-    }
-}
-
-// Socket function: called on initiator's client when a client finishes
-async function saoShatterClientDone(tokenId, userId, animationId) {
-    if (!animationId) {
-        return console.error("Eskie Macros | SAO Shatter | saoShatterClientDone | Received completion signal without animationId!");
-    }
-    const tracker = globalThis.eskie.saoShatterTracker.get(animationId);
-    if (!tracker) return;
-    tracker.received.add(userId);
-    
-    const expectedUsers = [...tracker.expected];
-    const receivedUsers = [...tracker.received];
-    console.log(`Eskie Macros | SAO Shatter | saoShatterClientDone | Initiator received completion signal from user: ${userId} (Session: ${animationId}). Tracker status:`, {
-        expected: expectedUsers,
-        received: receivedUsers
-    });
-    
-    // Check if all expected active users have responded
-    const allDone = expectedUsers.every(id => tracker.received.has(id));
-    if (allDone) {
-        console.log(`Eskie Macros | SAO Shatter | saoShatterClientDone | All users reported done for session: ${animationId}! Starting cleanup.`);
-        await cleanUpSaoShatter(tokenId, animationId);
-    }
 }
 
 export const tokenSockets = {
     editToken,
     createToken,
     destroyToken,
-    playSaoShatterLocal,
-    saoShatterClientDone,
 };
 
 /**
@@ -174,7 +68,7 @@ async function edit(id, updates = {}) {
  * @returns {Promise<TokenDocument[]>} An array containing the new token document.
  */
 async function create(position, updates = {}) {
-    if (game.user.isGM) return createToken(position, updates);
+    if (game.user.isGM) return createToken(updates);
     const socket = game.modules.get(MODULE_ID).socketlib;
     if (!initialized(socket)) return;
     return socket.executeAsGM("createToken", position, updates);
