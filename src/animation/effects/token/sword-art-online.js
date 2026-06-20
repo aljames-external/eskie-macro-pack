@@ -54,6 +54,9 @@ async function play(token, config = {}) {
         const revealOverlay = `eskie.texture_mask.tile_base.shatter.${center ? 'center' : 'side'}.01`;
         const tokenOverlay = `eskie.wounds.token_mask.shatter.${center ? 'center' : 'side'}.01.${shatterColor}.no_base`;
 
+        // Generate a unique session ID for this animation run
+        const animationId = randomID();
+
         // Pre-resolve tokenOverlayPath on the initiator client
         const tokenOverlayConfig = eskie.util.file.closest(tokenOverlay);
         let tokenOverlayPath = tokenOverlayConfig;
@@ -61,50 +64,55 @@ async function play(token, config = {}) {
             const entry = Sequencer.Database.getEntry(tokenOverlayConfig, { softFail: true });
             tokenOverlayPath = (typeof entry === 'string') ? entry : (entry?.file || entry?.files?.[0] || tokenOverlayConfig);
         } catch (e) {}
-        console.log("Eskie Macros | SAO Shatter | swordArtOnlineDeath.play | Pre-resolved tokenOverlayPath on initiator:", tokenOverlayPath);
+        console.log(`Eskie Macros | SAO Shatter | swordArtOnlineDeath.play | Pre-resolved tokenOverlayPath on initiator (Session: ${animationId}):`, tokenOverlayPath);
 
         // Create the tiles (using the GM-socketed tile creation)
         const { createTiles } = await import('../token-mask/token-mask.js');
         const tiles = await createTiles(token, { revealOverlay, rotation });
         const tileIds = tiles.map(t => t.id);
-        console.log("Eskie Macros | SAO Shatter | swordArtOnlineDeath.play | Pre-created tiles on initiator:", tileIds);
+        console.log(`Eskie Macros | SAO Shatter | swordArtOnlineDeath.play | Pre-created tiles on initiator (Session: ${animationId}):`, tileIds);
 
-        // Store tile IDs on the token flag
-        await eskie.util.token.edit(token.id, { "flags.eskie-macros.sao-shatter-tiles": tileIds });
+        // Store tile IDs on the token flag under the unique animationId key
+        await eskie.util.token.edit(token.id, { [`flags.eskie-macros.sao-shatters.${animationId}`]: tileIds });
 
         // Attach to token
         if (typeof tokenAttacher !== 'undefined') {
             await tokenAttacher.attachElementsToToken(tiles, token, true);
         }
 
-        // Initialize completion tracker on initiator client
+        // Initialize completion tracker on initiator client keyed by animationId
         globalThis.eskie = globalThis.eskie || {};
         globalThis.eskie.saoShatterTracker = globalThis.eskie.saoShatterTracker || new Map();
         
         const activeUserIds = game.users.filter(u => u.active).map(u => u.id);
-        console.log("Eskie Macros | SAO Shatter | swordArtOnlineDeath.play | Initializing tracker. Active users expected to report completion:", activeUserIds);
+        console.log(`Eskie Macros | SAO Shatter | swordArtOnlineDeath.play | Initializing tracker (Session: ${animationId}). Expected users:`, activeUserIds);
         
-        globalThis.eskie.saoShatterTracker.set(token.id, {
+        globalThis.eskie.saoShatterTracker.set(animationId, {
             expected: new Set(activeUserIds),
             received: new Set(),
             tileIds: tileIds,
             deleteToken: deleteToken,
             timeoutId: setTimeout(async () => {
-                const tracker = globalThis.eskie.saoShatterTracker.get(token.id);
+                const tracker = globalThis.eskie.saoShatterTracker.get(animationId);
                 if (tracker) {
-                    console.warn(`Eskie Macros | SAO Shatter | swordArtOnlineDeath.play | Tracker TIMEOUT hit for token ${token.id}! Deleting tiles now.`);
-                    globalThis.eskie.saoShatterTracker.delete(token.id);
-                    await Promise.all(tracker.tileIds.map(tileId => eskie.util.tile.destroy(tileId)));
-                    await eskie.util.token.edit(token.id, { "flags.eskie-macros.-=sao-shatter-tiles": null });
+                    console.warn(`Eskie Macros | SAO Shatter | swordArtOnlineDeath.play | Tracker TIMEOUT hit for token ${token.id} (Session: ${animationId})! Deleting tiles now.`);
+                    globalThis.eskie.saoShatterTracker.delete(animationId);
+                    if (tracker.deleteToken) {
+                        await eskie.util.token.destroy(token.id);
+                    } else {
+                        await Promise.all(tracker.tileIds.map(tileId => eskie.util.tile.destroy(tileId)));
+                        await eskie.util.token.edit(token.id, { [`flags.eskie-macros.sao-shatters.-=${animationId}`]: null });
+                    }
                 }
             }, duration + 5000)
         });
 
         // Trigger execution on everyone's client
-        console.log("Eskie Macros | SAO Shatter | swordArtOnlineDeath.play | Broadcasting playSaoShatterLocal socket call to everyone.");
+        console.log(`Eskie Macros | SAO Shatter | swordArtOnlineDeath.play | Broadcasting playSaoShatterLocal (Session: ${animationId}) to everyone.`);
         await eskieModule.socketlib.executeForEveryone('playSaoShatterLocal', token.id, tileIds, game.user.id, {
             ...config,
-            tokenOverlayPath
+            tokenOverlayPath,
+            animationId
         });
         return;
     }
@@ -112,7 +120,7 @@ async function play(token, config = {}) {
     const sequence = await create(token, config);
     if (sequence) {
         if (config.localOnly) {
-            console.log("Eskie Macros | SAO Shatter | swordArtOnlineDeath.play | Starting local sequence execution.");
+            console.log(`Eskie Macros | SAO Shatter | swordArtOnlineDeath.play | Starting local sequence execution (Session: ${config.animationId}).`);
             return sequence.play({ remote: false });
         }
         console.log("Eskie Macros | SAO Shatter | swordArtOnlineDeath.play | Starting standard sequence execution.");
@@ -123,12 +131,18 @@ async function play(token, config = {}) {
 async function stop(token, config = {}) {
     const eskieModule = game.modules.get('eskie-macros');
     if (eskieModule?.socketlib && !config.localOnly) {
-        const orphanedTileIds = token.document.getFlag('eskie-macros', 'sao-shatter-tiles');
-        if (orphanedTileIds) {
-            await eskieModule.socketlib.executeForEveryone('playSaoShatterLocal', token.id, orphanedTileIds, game.user.id, {
-                ...config,
-                toggleOff: true
-            });
+        // Stop all active animation sessions currently registered on this token
+        const shatters = token.document.getFlag('eskie-macros', 'sao-shatters') || {};
+        const activeAnimationIds = Object.keys(shatters);
+        if (activeAnimationIds.length > 0) {
+            console.log(`Eskie Macros | SAO Shatter | swordArtOnlineDeath.stop | Requesting stop for all active shatters:`, activeAnimationIds);
+            for (const [animationId, tileIds] of Object.entries(shatters)) {
+                await eskieModule.socketlib.executeForEveryone('playSaoShatterLocal', token.id, tileIds, game.user.id, {
+                    ...config,
+                    toggleOff: true,
+                    animationId
+                });
+            }
         }
         return;
     }

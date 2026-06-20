@@ -248,8 +248,8 @@ async function create(token, config = {}) {
 
                 const eskieModule = game.modules.get('eskie-macros');
                 if (eskieModule?.socketlib && config.initiatorUserId) {
-                    console.log(`Eskie Macros | SAO Shatter | tokenMaskEffect.create | Signaling completion back to initiator: ${config.initiatorUserId}`);
-                    await eskieModule.socketlib.executeForUsers('saoShatterClientDone', [config.initiatorUserId], token.id, game.user.id);
+                    console.log(`Eskie Macros | SAO Shatter | tokenMaskEffect.create | Signaling completion back to initiator: ${config.initiatorUserId} (Session: ${config.animationId})`);
+                    await eskieModule.socketlib.executeForUsers('saoShatterClientDone', [config.initiatorUserId], token.id, game.user.id, config.animationId);
                 } else {
                     // Fallback for standalone/no-socket
                     console.log("Eskie Macros | SAO Shatter | tokenMaskEffect.create | Standalone fallback: deleting tiles locally.");

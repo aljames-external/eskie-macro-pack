@@ -47,14 +47,18 @@ globalThis.eskie = globalThis.eskie || {};
 globalThis.eskie.saoShatterTracker = globalThis.eskie.saoShatterTracker || new Map();
 
 // Helper to clean up tiles from initiator side
-async function cleanUpSaoShatter(tokenId) {
-    const tracker = globalThis.eskie.saoShatterTracker.get(tokenId);
+// Helper to clean up tiles from initiator side
+async function cleanUpSaoShatter(tokenId, animationId) {
+    if (!animationId) {
+        return console.error("Eskie Macros | SAO Shatter | cleanUpSaoShatter | Missing animationId!");
+    }
+    const tracker = globalThis.eskie.saoShatterTracker.get(animationId);
     if (!tracker) return;
-    globalThis.eskie.saoShatterTracker.delete(tokenId);
+    globalThis.eskie.saoShatterTracker.delete(animationId);
     
     if (tracker.timeoutId) clearTimeout(tracker.timeoutId);
     
-    console.log(`Eskie Macros | SAO Shatter | cleanUpSaoShatter | Initiating final database cleanup for token: ${tokenId}`);
+    console.log(`Eskie Macros | SAO Shatter | cleanUpSaoShatter | Initiating final database cleanup for token: ${tokenId} (Session: ${animationId})`);
     
     const token = canvas.tokens.get(tokenId);
     const { socket } = await import('../socketlib.js');
@@ -66,7 +70,7 @@ async function cleanUpSaoShatter(tokenId) {
         console.log(`Eskie Macros | SAO Shatter | cleanUpSaoShatter | Deleting tiles:`, tracker.tileIds);
         await Promise.all(tracker.tileIds.map(tileId => socket.tile.destroy(tileId)));
         if (token) {
-            await socket.token.edit(token.id, { "flags.eskie-macros.-=sao-shatter-tiles": null });
+            await socket.token.edit(token.id, { [`flags.eskie-macros.sao-shatters.-=${animationId}`]: null });
         }
     }
     console.log(`Eskie Macros | SAO Shatter | cleanUpSaoShatter | Cleanup finished successfully.`);
@@ -79,6 +83,7 @@ async function playSaoShatterLocal(tokenId, tileIds, initiatorUserId, config = {
         tileIds,
         initiatorUserId,
         toggleOff: !!config.toggleOff,
+        animationId: config.animationId,
         currentUser: game.user.name
     });
 
@@ -109,14 +114,17 @@ async function playSaoShatterLocal(tokenId, tileIds, initiatorUserId, config = {
 }
 
 // Socket function: called on initiator's client when a client finishes
-async function saoShatterClientDone(tokenId, userId) {
-    const tracker = globalThis.eskie.saoShatterTracker.get(tokenId);
+async function saoShatterClientDone(tokenId, userId, animationId) {
+    if (!animationId) {
+        return console.error("Eskie Macros | SAO Shatter | saoShatterClientDone | Received completion signal without animationId!");
+    }
+    const tracker = globalThis.eskie.saoShatterTracker.get(animationId);
     if (!tracker) return;
     tracker.received.add(userId);
     
     const expectedUsers = [...tracker.expected];
     const receivedUsers = [...tracker.received];
-    console.log(`Eskie Macros | SAO Shatter | saoShatterClientDone | Initiator received completion signal from user: ${userId}. Tracker status:`, {
+    console.log(`Eskie Macros | SAO Shatter | saoShatterClientDone | Initiator received completion signal from user: ${userId} (Session: ${animationId}). Tracker status:`, {
         expected: expectedUsers,
         received: receivedUsers
     });
@@ -124,8 +132,8 @@ async function saoShatterClientDone(tokenId, userId) {
     // Check if all expected active users have responded
     const allDone = expectedUsers.every(id => tracker.received.has(id));
     if (allDone) {
-        console.log(`Eskie Macros | SAO Shatter | saoShatterClientDone | All users reported done! Starting cleanup.`);
-        await cleanUpSaoShatter(tokenId);
+        console.log(`Eskie Macros | SAO Shatter | saoShatterClientDone | All users reported done for session: ${animationId}! Starting cleanup.`);
+        await cleanUpSaoShatter(tokenId, animationId);
     }
 }
 
