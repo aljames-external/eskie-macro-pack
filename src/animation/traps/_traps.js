@@ -4,7 +4,7 @@ import { bullRushStatue } from './bull-rush-statue.js';
 import { electricDoor } from './electric-door.js';
 import { fallingRocks } from './falling-rocks.js';
 import { fire } from './fire.js';
-// import { floodingRoom } from './flooding-room.js';
+import { floodingRoom } from './flooding-room.js';
 import { pitfall } from './pitfall.js';
 import { fallingSky } from './falling-sky.js';
 import { projectile } from './projectile.js';
@@ -50,7 +50,7 @@ export const traps = {
     electricDoor,
     fallingRocks,
     fire,
-    // floodingRoom,
+    floodingRoom,
     pitfall,
     fallingSky,
     projectile,
