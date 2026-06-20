@@ -44,100 +44,10 @@ const config = {
 
 if (eskieModule?.socketlib) {
     const isPlaying = token.document.getFlag('eskie-macros', 'sao-shatter-tiles') !== undefined;
-
     if (isPlaying) {
-        const orphanedTileIds = token.document.getFlag('eskie-macros', 'sao-shatter-tiles');
-        if (orphanedTileIds) {
-            await eskieModule.socketlib.executeForEveryone('playSaoShatterLocal', token.id, orphanedTileIds, game.user.id, {
-                ...config,
-                toggleOff: true
-            });
-        }
+        await eskie.effect.swordArtOnlineDeath.stop(token, config);
     } else {
-        const tokenOverlayRaw = `eskie.wounds.token_mask.shatter.${center ? 'center' : 'side'}.01.${shatterColor}.no_base`;
-        const revealOverlayRaw = `eskie.texture_mask.tile_base.shatter.${center ? 'center' : 'side'}.01`;
-        
-        const tokenOverlay = closest(tokenOverlayRaw);
-        const revealOverlay = closest(revealOverlayRaw);
-        
-        let revealOverlayPath = revealOverlay;
-        try { 
-            const entry = Sequencer.Database.getEntry(revealOverlay, { softFail: true });
-            revealOverlayPath = (typeof entry === 'string') ? entry : (entry?.file || entry?.files?.[0] || revealOverlay);
-        } catch (e) {}
-
-        const scaleXY = token.document.texture.scaleX;
-
-        const overlayMaskUpdates = {
-            'texture.src': revealOverlayPath,
-            'alpha': 0,
-            'hidden': false,
-            'x': token.x - (canvas.grid.size * token.document.width * (scaleXY - 1) / 2),
-            'y': token.y - (canvas.grid.size * token.document.height * (scaleXY - 1) / 2),
-            'video': { autoplay: false, loop: false, volume: 0 },
-            'width': canvas.grid.size * (token.document.width * scaleXY),
-            'height': canvas.grid.size * (token.document.height * scaleXY),
-            'rotation': rotation,
-        };
-
-        const tokenMaskUpdates = {
-            'texture': token.document.texture,
-            'alpha': 0,
-            'hidden': false,
-            'x': token.x,
-            'y': token.y,
-            'rotation': token.document.rotation,
-            'width': canvas.grid.size * token.document.width,
-            'height': canvas.grid.size * token.document.height,
-        };
-
-        // Create tiles using the GM socket
-        const [tokenRevealMaskDoc, sceneRevealMaskDoc, tokenShapeMaskDoc] = await Promise.all([
-            eskie.util.tile.create(overlayMaskUpdates).then(r => r[0]),
-            eskie.util.tile.create(overlayMaskUpdates).then(r => r[0]),
-            eskie.util.tile.create(tokenMaskUpdates).then(r => r[0])
-        ]);
-
-        const tokenRevealMask = canvas.scene.tiles.get(tokenRevealMaskDoc.id);
-        const sceneRevealMask = canvas.scene.tiles.get(sceneRevealMaskDoc.id);
-        const tokenShapeMask = canvas.scene.tiles.get(tokenShapeMaskDoc.id);
-        const tileIds = [tokenRevealMask.id, sceneRevealMask.id, tokenShapeMask.id];
-
-        // Store tile IDs on the token
-        await eskie.util.token.edit(token.id, { "flags.eskie-macros.sao-shatter-tiles": tileIds });
-
-        // Attach to token (requires Token Attacher module)
-        if (typeof tokenAttacher !== 'undefined') {
-            await tokenAttacher.attachElementsToToken([tokenRevealMask, sceneRevealMask, tokenShapeMask], token, true);
-        }
-
-        // Initialize completion tracker on initiator client
-        globalThis.eskie = globalThis.eskie || {};
-        globalThis.eskie.saoShatterTracker = globalThis.eskie.saoShatterTracker || new Map();
-        
-        const activeUserIds = game.users.filter(u => u.active).map(u => u.id);
-        globalThis.eskie.saoShatterTracker.set(token.id, {
-            expected: new Set(activeUserIds),
-            received: new Set(),
-            tileIds: tileIds,
-            deleteToken: deleteToken,
-            timeoutId: setTimeout(async () => {
-                // Safety timeout
-                const tracker = globalThis.eskie.saoShatterTracker.get(token.id);
-                if (tracker) {
-                    globalThis.eskie.saoShatterTracker.delete(token.id);
-                    if (deleteToken) {
-                        await eskie.util.token.destroy(token.id);
-                    } else {
-                        await Promise.all(tracker.tileIds.map(tileId => eskie.util.tile.destroy(tileId)));
-                        await eskie.util.token.edit(token.id, { "flags.eskie-macros.-=sao-shatter-tiles": null });
-                    }
-                }
-            }, duration + 5000)
-        });
-
-        // Trigger execution on everyone's client
-        await eskieModule.socketlib.executeForEveryone('playSaoShatterLocal', token.id, tileIds, game.user.id, config);
+        await eskie.effect.swordArtOnlineDeath.play(token, config);
     }
 } else {
     // Fallback for standalone use without the module active (executes locally on this client only)
