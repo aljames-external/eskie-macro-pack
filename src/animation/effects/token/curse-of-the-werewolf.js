@@ -30,7 +30,7 @@ async function create(target, config = {}) {
         // Red runic sign floats above the target's head.
         .effect()
         .file(closest('jb2a.magic_signs.rune.02.complete.04.red'))
-        .attachTo(target, { offset: { x: 0, y: -0.7 * target.document.width }, gridUnits: true, followRotation: false })
+        .attachTo(target, { offset: { x: 0, y: -0.7 * target.document.width }, gridUnits: true, bindRotation: false })
         .scaleToObject(0.5, { considerTokenScale: true })
         .duration(4000)
         .fadeOut(1000)
@@ -52,7 +52,7 @@ async function create(target, config = {}) {
         .effect()
         .delay(300)
         .file(closest('jb2a.particles.outward.white.01.03'))
-        .attachTo(target, { offset: { y: -0.7 }, gridUnits: true, followRotation: false })
+        .attachTo(target, { offset: { y: -0.7 }, gridUnits: true, bindRotation: false })
         .scaleToObject(0.75, { considerTokenScale: true })
         .duration(1000)
         .fadeOut(800)

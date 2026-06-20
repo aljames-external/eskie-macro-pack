@@ -140,8 +140,7 @@ async function createBanish(target, config = {}) {
     sequence.animation()
         .on(target)
         .opacity(0)
-        .show(false)
-        .waitUntilFinished(-500);
+        .show(false);
 
     sequence.effect()
         .copySprite(target)

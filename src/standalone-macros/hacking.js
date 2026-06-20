@@ -1,6 +1,13 @@
 // Standalone Macro
 // Original Author: EskieMoh#2969
 
+if (!game.modules.get("tagger")?.active) {
+    return ui.notifications.error("The 'Hacking' macro requires the 'Tagger' module to be installed and active!");
+}
+if (!game.modules.get("sequencer")?.active) {
+    return ui.notifications.error("The 'Hacking' macro requires the 'Sequencer' module to be installed and active!");
+}
+
 const token = canvas.tokens.controlled[0];
 if (!token) return ui.notifications.warn('Please select a token!');
 
@@ -103,7 +110,7 @@ if (Tagger.hasTags(token, HACK_TAG)) {
             const ui1 = _randomUiImage();
             const ui2 = _randomUiImage();
 
-            await new Sequence()
+            new Sequence()
                 .wait(200)
 
                 // Primary floating UI panel - randomized position with mirror
@@ -133,6 +140,9 @@ if (Tagger.hasTags(token, HACK_TAG)) {
                 .zIndex(0)
 
                 .play();
+
+            // Throttle the loop to spawn panels once every 1.0 seconds, preventing browser freezes
+            await new Promise(resolve => setTimeout(resolve, 1000));
         }
     });
 

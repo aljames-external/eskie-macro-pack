@@ -9,6 +9,7 @@ const DEFAULT_CONFIG = {
 }
 
 async function create(token, targets, config = {}) {
+    targets = targets ? (Array.isArray(targets) ? targets : [targets]) : [];
     const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, {inplace:false});
     const {darkMap} = mConfig;
 
