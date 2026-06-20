@@ -31,7 +31,7 @@
             "cancelButton": "Reload Later",
             "rollAnimation": {
                 "name": "Eskie d20 Roll Animations",
-                "hint": "Plays a custom Eskie d20 roll animation sequence just above a token on saving throws and ability checks (integrates with Midi-QOL)."
+                "hint": "Plays a custom Eskie d20 roll animation sequence just above a token on saving throws and ability checks."
             }
         },
         "updateMenu": {
