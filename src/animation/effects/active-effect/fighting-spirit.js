@@ -94,7 +94,6 @@ function create(token, config = {}) {
             .loopProperty("sprite", "scale.y", { from: 1, to: 1.15, duration: 1500, pingPong:true})
             .persist()
             .zIndex(0)
-            .waitUntilFinished()
 
         .effect()
             .file(closest("jb2a.impact.010.red"))

@@ -37,9 +37,8 @@ async function create(target, config = {}) {
 
     sequence = sequence.animation()
         .on(target)
-        .teleportTo(config.position)
-        .snapToGrid()
-        .offset({ x: -1, y: -1 });
+        .teleportTo(config.position, { offset: { x: -1, y: -1 } })
+        .snapToGrid();
 
     // Vortex in
     sequence = sequence.effect()
@@ -57,7 +56,7 @@ async function create(target, config = {}) {
     sequence = sequence.effect()
         .copySprite(target)
         .scaleToObject(1, { considerTokenScale: true })
-        .scaleOut(0, 500, { ease: "easeInOutElastic" })
+        .scaleIn(0, 500, { ease: "easeInOutElastic" })
         .rotateIn(180, 300, { ease: "easeOutCubic" })
         .duration(500)
         .waitUntilFinished(-250);
