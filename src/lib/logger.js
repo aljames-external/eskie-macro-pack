@@ -39,7 +39,8 @@ export const log = {
     },
     debug(message, ...args) {
         if (getVerbosityLevel() >= VERBOSITY_LEVELS['debug']) {
-            console.log(`%c[${MODULE_TLA} Debug]`, "color: #38bdf8; font-weight: bold;", message, ...args);
+            const timestamp = game?.time?.serverTime ?? 'Unknown';
+            console.log(`%c[${MODULE_TLA} Debug (${timestamp})]`, "color: #38bdf8; font-weight: bold;", message, ...args);
         }
     },
     group(message, ...args) {
