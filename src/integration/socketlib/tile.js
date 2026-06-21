@@ -33,7 +33,9 @@ async function createTile(updates = {}) {
  * @returns {Promise<TileDocument[]>} An array containing the deleted tile document.
  */
 async function destroyTile(id) {
-    return canvas.scene.deleteEmbeddedDocuments("Tile", [id]);
+    if (!canvas.scene) return [];
+    const ids = Array.isArray(id) ? id : [id];
+    return canvas.scene.deleteEmbeddedDocuments("Tile", ids);
 }
 
 export const tileSockets = {
