@@ -1,5 +1,6 @@
 import { MODULE_ID } from "../lib/constants.js";
 import { updateWorldScripts } from "./loader.js";
+import { log } from '../lib/logger.js';
 
 export const WORLD_SCRIPTS_REGISTRY = [
     {
@@ -61,7 +62,7 @@ export class WorldScriptsFormApplication extends FormApplication {
     }
 
     async _updateObject(event, formData) {
-        console.log("EMP | Saving World Scripts Configuration:", formData);
+        log.info("Saving World Scripts Configuration:", formData);
         
         // 1. Save the settings object
         await game.settings.set(MODULE_ID, "worldScriptsConfig", formData);

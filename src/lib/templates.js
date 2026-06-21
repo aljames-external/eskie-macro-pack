@@ -1,3 +1,4 @@
+import { log } from './logger.js';
 async function getPosition(template, config = {}) {
     let position;
     if (template) {
@@ -22,7 +23,7 @@ async function getPosition(template, config = {}) {
                 secondary = { x: primary.x, y: primary.y };
             }
         } else {
-            console.log(`EMP | getPosition: Falling back to legacy MeasuredTemplate support (pre-V14). This support will be removed in Foundry V16.`);
+            log.info(`getPosition: Falling back to legacy MeasuredTemplate support (pre-V14). This support will be removed in Foundry V16.`);
             // Legacy MeasuredTemplate support
             const farpoint = template.object.ray.B;
             secondary = { x: farpoint.x, y: farpoint.y };
