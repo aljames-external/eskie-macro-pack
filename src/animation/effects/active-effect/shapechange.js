@@ -252,7 +252,7 @@ async function createRevert(token, config = {}) {
         .effect()
         .delay(500)
         .file(closest('jb2a.particles.outward.white.01.03'))
-        .attachTo(token, { offset: { y: 0 }, gridUnits: true, followRotation: false })
+        .attachTo(token, { offset: { y: 0 }, gridUnits: true, bindRotation: false })
         .scaleToObject()
         .duration(1000)
         .fadeOut(800)

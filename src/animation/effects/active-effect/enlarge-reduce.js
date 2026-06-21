@@ -61,7 +61,7 @@ async function createEnlarge(token, config = {}) {
         .zIndex(0)
 
         .thenDo(function () {
-            token.document.update({
+            return token.document.update({
                 height: (token.document.height > 0.5) ? token.document.height + scaleFactor : 1,
                 width: (token.document.width > 0.5) ? token.document.width + scaleFactor : 1,
                 scale: 1,
@@ -186,7 +186,7 @@ async function createReduce(token, config = {}) {
         .zIndex(0)
 
         .thenDo(function () {
-            token.document.update({
+            return token.document.update({
                 height: (token.document.height - scaleFactor) > 0 ? token.document.height - scaleFactor : 0.5,
                 width: (token.document.width - scaleFactor) > 0 ? token.document.width - scaleFactor : 0.5,
                 scale: 1,

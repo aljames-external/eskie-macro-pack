@@ -152,9 +152,8 @@ async function create(source, target, config = {}) {
     if (teleport == true) {
         sequence.animation()
             .on(source)
-            .teleportTo(position)
+            .teleportTo(position, { offset: { x: -1, y: -1 } })
             .snapToGrid()
-            .offset({ x: -1, y: -1 })
     }
 
     sequence.wait(500)

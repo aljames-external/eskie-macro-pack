@@ -20,6 +20,7 @@ const DEFAULT_CONFIG = {
  * @returns {Promise<Sequence>} A promise that resolves with the complete effect sequence.
  */
 async function create(token, targetTokens, config = {}) {
+    targetTokens = targetTokens ? (Array.isArray(targetTokens) ? targetTokens : [targetTokens]) : [];
     const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
     const { id } = mConfig;
     const eyeAnimation = "jb2a.eyes.01.single.orangeyellow";

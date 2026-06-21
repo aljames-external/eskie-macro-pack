@@ -142,6 +142,7 @@ async function stopTarget(target, config = {}) {
 }
 
 function create(token, targets, config = {}) {
+    targets = targets ? (Array.isArray(targets) ? targets : [targets]) : [];
     const sequence = createCaster(token, config);
     targets.forEach(target => {
         sequence.addSequence(createTarget(target, config));
