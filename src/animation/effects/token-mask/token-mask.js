@@ -6,6 +6,7 @@ import { closest } from '../../../lib/filemanager.js';
 import { dependency } from '../../../lib/dependency.js';
 import { socket } from '../../../integration/socketlib.js';
 import { MODULE_ID } from '../../../lib/constants.js';
+import { log } from '../../../lib/logger.js';
 
 const DEFAULT_CONFIG = {
     id: 'tokenMask',
@@ -93,7 +94,7 @@ export async function createTiles(token, config = {}) {
 async function create(token, config = {}) {
     if (!token) {
         ui.notifications?.warn("Eskie Macros | No token provided or selected.");
-        return console.warn("EMP | tokenMaskEffect: No token provided. Effect aborted.");
+        return log.warn("tokenMaskEffect: No token provided. Effect aborted.");
     }
 
     if (typeof window !== 'undefined' && !window.isSecureContext) {
@@ -121,7 +122,7 @@ async function create(token, config = {}) {
     // Otherwise, build the real local animation sequence
     let tokenOverlayPath = config.tokenOverlayPath;
     if (!tokenOverlayPath) {
-        if (!tokenOverlay) return console.warn(`EMP | tokenMaskEffect: Missing required configuration 'tokenOverlay'. Effect aborted.`);
+        if (!tokenOverlay) return log.warn(`tokenMaskEffect: Missing required configuration 'tokenOverlay'. Effect aborted.`);
         const tokenOverlayConfig = closest(tokenOverlay);
         tokenOverlayPath = tokenOverlayConfig;
         try { 
@@ -152,7 +153,7 @@ async function create(token, config = {}) {
 
     const [tokenRevealMask, sceneRevealMask, tokenShapeMask] = tiles;
     if (!tokenRevealMask || !sceneRevealMask || !tokenShapeMask) {
-        return console.warn(`EMP | tokenMaskEffect: Failed to resolve all three tiles. Effect aborted.`);
+        return log.warn(`tokenMaskEffect: Failed to resolve all three tiles. Effect aborted.`);
     }
 
     // Wait for PIXI objects and video elements to render on this client
@@ -165,7 +166,7 @@ async function create(token, config = {}) {
     try {
         await time.waitUntil(tilesRendered, { timeout: 5000 });
     } catch (err) {
-        console.error("EMP | tokenMaskEffect | TIMEOUT waiting for local PIXI rendering!", err);
+        log.error("tokenMaskEffect | TIMEOUT waiting for local PIXI rendering!", err);
         throw err;
     }
 
@@ -327,7 +328,7 @@ async function playSocketed(token, config = {}) {
     const timeoutId = setTimeout(async () => {
         const tracker = globalThis.eskie.tokenMaskTracker.get(animationId);
         if (tracker) {
-            console.warn(`EMP | tokenMaskEffect | Tracker TIMEOUT hit for token ${token.id} (Session: ${animationId})! Cleaning up.`);
+            log.warn(`tokenMaskEffect | Tracker TIMEOUT hit for token ${token.id} (Session: ${animationId})! Cleaning up.`);
             globalThis.eskie.tokenMaskTracker.delete(animationId);
             const eskieModule = game.modules.get(MODULE_ID);
             if (eskieModule?.socketlib) {

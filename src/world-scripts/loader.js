@@ -1,5 +1,6 @@
 import { MODULE_ID } from "../lib/constants.js";
 import { rollTracker } from "./rollAnimation.js";
+import { log } from '../lib/logger.js';
 
 // Registry of all available world-script features
 export const worldScripts = {
@@ -10,7 +11,7 @@ export const worldScripts = {
  * Centrally loads and initializes all enabled world scripts on startup.
  */
 export function loadWorldScripts() {
-    console.log("EMP | Loading World Scripts...");
+    log.info("Loading World Scripts...");
     updateWorldScripts();
 
     // Listen for settings updates broadcast by the server to sync all clients in real-time!
