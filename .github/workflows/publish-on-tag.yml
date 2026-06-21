@@ -65,16 +65,14 @@ jobs:
       #- name: Run validation
       #  run: npm run validate
 
-      # Extract version embedded in the tag.
-      # This step expects the tag to be one of the following formats:
-      #   - "v<major>.<minor>.<patch>" (e.g., "v1.2.3")
-      #   - "<major>.<minor>.<patch>"  (e.g., "1.2.3")
-      #
-      # The version will be used by later steps to fill in the value for the
-      # "version" key required for a valid module manifest.
+      # Extract version directly from the release event tag name.
+      # Strips any leading 'v' if present (e.g., "v1.1.2" -> "1.1.2").
       - name: Extract Version From Tag
         id: get_version
-        uses: battila7/get-version-action@v2
+        run: |
+          TAG="${{ github.event.release.tag_name }}"
+          VERSION="${TAG#v}"
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
 
 
       # Modify "module.json" with values specific to the release.
@@ -89,7 +87,7 @@ jobs:
         with:
           files: 'module.json'
         env:
-          VERSION: ${{steps.get_version.outputs.version-without-v}}
+          VERSION: ${{ steps.get_version.outputs.version }}
           URL: ${{ env.project_url }}
           MANIFEST: ${{ env.release_manifest_url }}
           DOWNLOAD: ${{ env.release_module_url }}
