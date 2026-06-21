@@ -11,6 +11,7 @@ const DEFAULT_CONFIG = {
 };
 
 function create(targets, config = {}) {
+    targets = targets ? (Array.isArray(targets) ? targets : [targets]) : [];
     const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, {inplace:false});
     mConfig.destinationPoints = targets?.map(t => ({ x: t.x, y: t.y })) ?? [];
     let { sendToCenter, destinationPoints } = mConfig;
@@ -46,11 +47,11 @@ function create(targets, config = {}) {
 }
 
 async function play(targets, config = {}) {
+    targets = targets ? (Array.isArray(targets) ? targets : [targets]) : [];
     const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, {inplace:false});
-    mConfig.destinationPoints = targets?.map(t => ({ x: t.x, y: t.y })) ?? [];
-    const {repeat, delay, sendToCenter} = mConfig;
+    mConfig.destinationPoints = targets.map(t => ({ x: t.x, y: t.y }));
+    const {repeat, delay, sendToCenter, destinationPoints} = mConfig;
 
-    const destinationPoints = targets.map(target => ({ x: target.x, y: target.y }));
     for (let i = 0; i <= repeat; i++) {
         let seq = create(targets, {sendToCenter, destinationPoints});
         if (delay > 0) seq = seq.wait(delay);
