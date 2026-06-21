@@ -139,12 +139,12 @@ async function create(token, config = {}) {
     let tiles;
     if (tileIds) {
         // Wait for tiles to replicate to this client's scene
-        const sleep = (ms) => new Promise(r => setTimeout(r, ms));
-        let retries = 0;
-        const maxRetries = 50;
-        while (tileIds.some(tileId => !canvas.scene.tiles.has(tileId)) && retries < maxRetries) {
-            await sleep(100);
-            retries++;
+        try {
+            await time.waitUntil(() => {
+                return tileIds.every(tileId => canvas.scene.tiles.has(tileId));
+            }, { timeout: 5000, interval: 100 });
+        } catch (err) {
+            log.warn("tokenMaskEffect | Timeout waiting for tiles to replicate.");
         }
         tiles = tileIds.map(tileId => canvas.scene.tiles.get(tileId));
     } else {
@@ -252,6 +252,15 @@ async function create(token, config = {}) {
             }
 
             await Sequencer.EffectManager.endEffects({ name: label });
+
+            // Dynamically wait until all masked effects are fully ended and removed from the renderer
+            try {
+                await time.waitUntil(() => {
+                    return Sequencer.EffectManager.getEffects({ name: label }).length === 0;
+                }, { timeout: 2000, interval: 50 });
+            } catch (err) {
+                log.warn(`tokenMaskEffect | Timeout waiting for effects with label "${label}" to end. Proceeding with cleanup.`);
+            }
 
             if (!config.animationId) {
                 // Standalone run: clean up database immediately
