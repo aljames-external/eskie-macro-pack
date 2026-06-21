@@ -2,6 +2,7 @@ import { MODULE_ID } from "../lib/constants.js";
 import { dependency } from "../lib/dependency.js";
 import { defaultMenuSettings } from "./autoanimations/defaultMenuSettings.js";
 import { autorecUpdateFormApplication, generateAutorecUpdate } from "./autoanimations/updateMenu.js";
+import { log } from '../lib/logger.js';
 
 export const EMP_AA_Menu = {
     melee: [],
@@ -156,11 +157,11 @@ async function submit() {
     if (!shouldUpdate) return;
 
     if (!dependency.isActivated({ id: "autoanimations", min: "6.5.1" }, "EMP | Automated Animations integration skipped.")) { return; }
-    const { missingEntriesList, updatedEntriesList, customEntriesList } = await generateAutorecUpdate(EMP_AA_Menu, true);
+    const { missingEntriesList, updatedEntriesList, customEntriesList } = await generateAutorecUpdate(EMP_AA_Menu);
     if (missingEntriesList.length || updatedEntriesList.length || customEntriesList.length) {
         new autorecUpdateFormApplication(EMP_AA_Menu).render(true);
     } else {
-        console.info("EMP | All Eskie Macro animations are up to date!");
+        log.info("All Eskie Macro animations are up to date!");
     }
 
     if (moduleVersion != developmentVersion)

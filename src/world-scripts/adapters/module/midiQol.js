@@ -1,4 +1,4 @@
-import { debug } from "../../../lib/debug.js";
+import { log } from '../../../lib/logger.js';
 
 export const midiQolAdapter = {
     isActive() {
@@ -10,7 +10,7 @@ export const midiQolAdapter = {
         const midiFlags = message.flags?.["midi-qol"];
 
         // Add debug logging
-        debug.log(`Midi-QOL Extract Rolls Check:`, {
+        log.debug(`Midi-QOL Extract Rolls Check:`, {
             messageId: message.id,
             messageType: midiFlags?.messageType,
             type: midiFlags?.type,
@@ -23,7 +23,7 @@ export const midiQolAdapter = {
         const messageType = midiFlags?.messageType || midiFlags?.type;
         const hasSavesDisplay = contentText.includes("midi-qol-saves-display");
         if (messageType && ["attack", "damage", "item"].includes(messageType) && !hasSavesDisplay) {
-            debug.log(`Midi-QOL: Ignoring attack/damage/item messageType: "${messageType}"`);
+            log.debug(`Midi-QOL: Ignoring attack/damage/item messageType: "${messageType}"`);
             return { rolls: [], outcome: "indeterminant" };
         }
 

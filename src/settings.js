@@ -1,10 +1,11 @@
 import { MODULE_ID } from "./lib/constants.js";
 import { autorecUpdateFormApplication } from "./integration/autoanimations/updateMenu.js";
 import { WorldScriptsFormApplication } from "./world-scripts/worldScriptsMenu.js";
+import { log } from './lib/logger.js';
 
 /* Initialize Module Settings */
 Hooks.once('init', function() {
-    console.log('EMP | Initializing Eskie Macro Pack settings');
+    log.info('Initializing Eskie Macro Pack settings');
 
     // World Scripts Configuration Menu
     game.settings.registerMenu(MODULE_ID, 'worldScripts', {
@@ -48,13 +49,19 @@ Hooks.once('init', function() {
         default: '0.0.0',
     });
 
-    // Debug Logging Toggle Setting
-    game.settings.register(MODULE_ID, 'debugEnabled', {
-        name: 'EMP.settings.debugEnabled.name',
-        hint: 'EMP.settings.debugEnabled.hint',
+    // Log Verbosity Level Setting
+    game.settings.register(MODULE_ID, 'logVerbosity', {
+        name: 'EMP.settings.logVerbosity.name',
+        hint: 'EMP.settings.logVerbosity.hint',
         scope: 'client',
         config: true,
-        type: Boolean,
-        default: false,
+        type: String,
+        choices: {
+            'error': 'EMP.settings.logVerbosity.choices.error',
+            'warn': 'EMP.settings.logVerbosity.choices.warn',
+            'info': 'EMP.settings.logVerbosity.choices.info',
+            'debug': 'EMP.settings.logVerbosity.choices.debug'
+        },
+        default: 'warn'
     });
 });
