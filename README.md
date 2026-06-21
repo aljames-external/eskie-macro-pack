@@ -72,9 +72,10 @@ The following modules are optional but unlock additional features when installed
 
 | Module | What It Enables |
 |--------|----------------|
+| [Automated Animations](https://foundryvtt.com/packages/autoanimations) | Interface with Automated Animations to play effects using AA's system. |
 | [Eskie Effects (Patreon)](https://www.patreon.com/EskieEffects) | Additional premium effect assets designed specifically for EMP (or the free variant) |
+| [Jinker's Animated Art Pack](https://foundryvtt.com/packages/jaamod) | Animated asset library used by select effects |
 | [JB2A (Patreon)](https://www.patreon.com/JB2A) | Large library of high-quality animated assets used by many EMP effects (or the free variant) |
-| [Animated Spell Effects: Cartoon](https://foundryvtt.com/packages/animated-spell-effects-cartoon) | Free (being deprecated) animated asset library used by select effects |
 | [Boss Loot Assets (Patreon)](https://www.patreon.com/cw/BossLoot) | Premium asset pack used by select effects (or the free variant) |
 | [Tagger](https://foundryvtt.com/packages/tagger) | Tag-based tile and token lookup; used by some trap and movement effects |
 | [Token Attacher](https://foundryvtt.com/packages/token-attacher) | Attaches tokens to tiles for movement-based trap and tile effects |
