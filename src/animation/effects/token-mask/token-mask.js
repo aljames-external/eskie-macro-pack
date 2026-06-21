@@ -253,6 +253,15 @@ async function create(token, config = {}) {
 
             await Sequencer.EffectManager.endEffects({ name: label });
 
+            // Dynamically wait until all masked effects are fully ended and removed from the renderer
+            try {
+                await time.waitUntil(() => {
+                    return Sequencer.EffectManager.getEffects({ name: label }).length === 0;
+                }, { timeout: 2000, interval: 50 });
+            } catch (err) {
+                log.warn(`tokenMaskEffect | Timeout waiting for effects with label "${label}" to end. Proceeding with cleanup.`);
+            }
+
             if (!config.animationId) {
                 // Standalone run: clean up database immediately
                 if (deleteToken) {
