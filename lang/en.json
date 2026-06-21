@@ -15,9 +15,15 @@
                 "label": "Update AA Autorec",
                 "hint": "Force an update of the Automated Animations Autorecognition."
             },
-            "debugEnabled": {
-                "name": "Enable Debug Logging",
-                "hint": "Prints highly detailed execution and qualification traces to the browser developer console (F12) to diagnose roll tracking issues."
+            "logVerbosity": {
+                "name": "Log Verbosity Level",
+                "hint": "Controls the level of detail printed to the browser console.",
+                "choices": {
+                    "error": "Errors Only",
+                    "warn": "Warnings & Errors (Default)",
+                    "info": "Info, Warnings & Errors",
+                    "debug": "Debug (Everything)"
+                }
             }
         },
         "worldScripts": {

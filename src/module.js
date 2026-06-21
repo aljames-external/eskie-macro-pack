@@ -10,6 +10,7 @@ import { loadWorldScripts } from './world-scripts/loader.js';
 
 // Import module settings to also run its initialization code
 import './settings.js';
+import { log } from './lib/logger.js';
 
 const status = {
     aaReady: false,
@@ -39,7 +40,7 @@ Hooks.once('init', async () => {
     }
 
     setupModule();
-    console.log('EMP | Eskie Macro Pack module ready');
+    log.info('Eskie Macro Pack module ready');
 });
 
 Hooks.once('ready', async () => {

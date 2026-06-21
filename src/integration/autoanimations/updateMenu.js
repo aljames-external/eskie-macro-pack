@@ -1,8 +1,9 @@
 import { MODULE_ID } from "../../lib/constants.js";
 import { EMP_AA_Menu } from "../autoanimations.js";
+import { log } from '../../lib/logger.js';
 
-export async function generateAutorecUpdate(autorec, quiet = true) {
-    if (quiet) console.group("EMP | Autorecognition Menu Check");
+export async function generateAutorecUpdate(autorec) {
+    log.group("Autorecognition Menu Check", 'debug');
     let settings = {};
     const menuKeys = ["melee", "range", "ontoken", "templatefx", "preset", "aura", "aefx"];
     for (const key of menuKeys) {
@@ -55,14 +56,12 @@ export async function generateAutorecUpdate(autorec, quiet = true) {
         });
     }
 
-    if (quiet) {
-        console.info("The following effects did not exist before. They will be ADDED.", missingEntries);
-        console.info("The following effects will be UPDATED to a new version.", updatedEntries);
-        console.info("The following effects are already up-to-date.", same);
-        console.info("The following effects cannot be added or updated, due to a name conflict with an effect from another source. They will be IGNORED.", custom);
-        console.info("The following custom effects will be preserved.", customNew);
-        console.groupEnd();
-    }
+    log.debug("The following effects did not exist before. They will be ADDED.", missingEntries);
+    log.debug("The following effects will be UPDATED to a new version.", updatedEntries);
+    log.debug("The following effects are already up-to-date.", same);
+    log.debug("The following effects cannot be added or updated, due to a name conflict with an effect from another source. They will be IGNORED.", custom);
+    log.debug("The following custom effects will be preserved.", customNew);
+    log.groupEnd();
     
     // Create lists for the dialog
     let missingEntriesList = Object.values(missingEntries).flat().map(e => `${e.label} <i class="emp-animations-muted">(${e.menu})</i>`).sort();
@@ -96,7 +95,7 @@ async function generateAutorecUpdateHTML(autorec) {
         missingEntriesList,
         updatedEntriesList,
         customEntriesList,
-    } = await generateAutorecUpdate(autorec, false);
+    } = await generateAutorecUpdate(autorec);
     let html = `<h1 style="text-align: center; font-weight: bold;">Eskie Macro Pack AA Integration Update Menu</h1>`;
 
     if (missingEntriesList.length || updatedEntriesList.length || customEntriesList.length) {
@@ -183,14 +182,14 @@ export class autorecUpdateFormApplication extends FormApplication {
     async _updateObject(event) {
         $(".emp-animations-autorec-update-buttons").attr("disabled", true);
         if (event.submitter.name === "update") {
-            console.group("EMP | Autorecognition Menu Update");
+            log.group("Autorecognition Menu Update");
             const { newSettings } = await this.settings();
             if (Object.keys(newSettings).length === 0)
-                return console.log("Nothing to update!");
+                return log.debug("Nothing to update!");
 
             await AutomatedAnimations.AutorecManager.overwriteMenus(JSON.stringify(newSettings), { submitAll: true });
-            console.log("EMP | Animations have been updated in Automated Animations.");
-            console.groupEnd();
+            log.info("Animations have been updated in Automated Animations.");
+            log.groupEnd();
         }
     }
 }

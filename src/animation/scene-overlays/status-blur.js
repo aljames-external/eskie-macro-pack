@@ -1,6 +1,8 @@
 // Original author: Gornetron
 // Updates by: Bakana
 
+import { log } from '../../lib/logger.js';
+
 const DEFAULT_CONFIG = {
     id: 'drunken-blur',
     opacity: 1,
@@ -15,7 +17,7 @@ function create(users = [], config = {}){
     // Preference of this create function is single users
     const seq = new Sequence();
     if (!canvas?.scene?.background?.src) {
-        console.warn('EMP | canvas.scene.background.src not set. Background blurring failed');
+        log.warn('canvas.scene.background.src not set. Background blurring failed');
         return seq;
     }
 

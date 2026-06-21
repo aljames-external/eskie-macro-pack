@@ -7,6 +7,7 @@ import { MODULE_ID } from '../../lib/constants.js';
 import { closest } from '../../lib/filemanager.js';
 import { settingsOverride } from '../../lib/settings.js';
 import { matt } from '../utils/matt-tiles.js';
+import { log } from '../../lib/logger.js';
 
 const DEFAULT_CONFIG = {
     pushDistance: 1,
@@ -35,7 +36,7 @@ async function create(tile, targets, config = {}) {
     const scaleY = tile.document.texture.scaleY ?? 1;
 
     if (!targetLoc) {
-        console.warn("EMP | Bull Rush Statue: No target location resolved. Ensure that a target token is passed, or that the trap tile is linked to a target/trigger tile via flags.", {
+        log.warn("Bull Rush Statue: No target location resolved. Ensure that a target token is passed, or that the trap tile is linked to a target/trigger tile via flags.", {
             tile,
             targets,
             targetTileIds,
