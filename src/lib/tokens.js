@@ -1,3 +1,5 @@
+import { dependency } from './dependency.js';
+
 /**
  * Finds the center of the grid square on a target token that is nearest to a source token.
  * @param {Token} token - The source token.
@@ -53,7 +55,35 @@ function owners(token, config = {}) {
     return owners;
 };
 
+async function attachElements(elements, token) {
+    if (dependency.isActivated({ id: 'token-attacher', ref: "Token Attacher" })) {
+        return tokenAttacher.attachElementsToToken(elements, token, true);
+    } else if (dependency.isActivated({ id: 'multi-token-edit', ref: "Baileywiki Mass Edit" })) {
+        return Promise.all(elements.map(element => MassEdit.linker.link([element, token])));
+    }
+
+    dependency.someRequired([
+        { id: 'token-attacher', ref: "Token Attacher" },
+        { id: 'multi-token-edit', ref: "Baileywiki Mass Edit" }
+    ]);
+}
+
+async function detachElements(elements, token) {
+    if (dependency.isActivated({ id: 'token-attacher', ref: "Token Attacher" })) {
+        return tokenAttacher.detachElementsFromToken(elements, token, true);
+    } else if (dependency.isActivated({ id: 'multi-token-edit', ref: "Baileywiki Mass Edit" })) {
+        return Promise.all(elements.map(element => MassEdit.linker.removeLinks([element, token])));
+    }
+
+    dependency.someRequired([
+        { id: 'token-attacher', ref: "Token Attacher" },
+        { id: 'multi-token-edit', ref: "Baileywiki Mass Edit" }
+    ]);
+}
+
 export const tokens = {
     owners,
     getNearestSquareCenter,
+    attachElements,
+    detachElements
 }

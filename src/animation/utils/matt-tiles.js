@@ -3,6 +3,7 @@ import { dependency } from '../../lib/dependency.js';
 import { socket } from '../../integration/socketlib.js';
 import { SECONDS, MODULE_ID } from '../../lib/constants.js';
 import { dialog } from '../../lib/dialog.js';
+import { tokens } from '../../lib/tokens.js';
 
 const DEFAULT_CONFIG = {
     id: 'generic-tile-movement',
@@ -17,9 +18,8 @@ function getLabel(id, token) {
     return `${id} - ${token.id}`;
 }
 
-async function initialize(token, code, config = {}) {
+async function start(token, code, config = {}) {
     dependency.required([{id: 'tagger', ref: "Tagger"},
-                        {id: 'token-attacher', ref: "Token Attacher"},
                         {id: 'monks-active-tiles', ref: "Monk's Active Tile Triggers"}]);
 
     const mergedConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, {inplace:false});
@@ -53,12 +53,12 @@ async function initialize(token, code, config = {}) {
     await socket.tile.edit(tile.id, updateData);
     await Tagger.addTags(tile, label);
 
-    await tokenAttacher.attachElementToToken(tile, token, true);
+    await tokens.attachElements([tile], token);
     await tile.setFlag(MODULE_ID, id, { tileData: getCenter(tile) });
     await tile.setFlag(MODULE_ID, 'config', nonInfoConfig);
 }
 
-async function configuration(token, tile, config = {}) {
+async function configure(token, tile, config = {}) {
     const { id } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, {inplace:false});
     const label = getLabel(id, token);
 
@@ -261,10 +261,17 @@ if (playPath && typeof token !== 'undefined') {
     return { triggerTiles, originTiles, targetTiles };
 }
 
+async function stop(token, label) {
+    const tiles = Tagger.getByTag(label);
+    await tokens.detachElements(tiles, token);
+    tiles.forEach(async (tile) => await socket.tile.destroy(tile.id));
+}
+
 export const matt = {
     movement: {
-        initialize,
-        configuration,
+        start,
+        configure,
+        stop,
     },
     trap: {
         setup,

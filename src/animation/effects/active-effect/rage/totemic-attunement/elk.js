@@ -102,7 +102,7 @@ async function chargePlay(token, config = {}) {
     const mergedConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, {inplace:false});
     const effectFunction = `eskie.effect.totemicAttunement.elk.charge.macro.movement`;
     const code = `${effectFunction}(token.object, tile)`;
-    await matt.movement.initialize(token, code, mergedConfig);    
+    await matt.movement.start(token, code, mergedConfig);
     const sequence = chargeCreate(token, config);
     if (sequence) return sequence.play();
 }
@@ -110,9 +110,7 @@ async function chargePlay(token, config = {}) {
 async function chargeStop(token, config = {}) {
     const { id } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, {inplace:false});
     const label = matt.getLabel(id, token);
-    const tiles = Tagger.getByTag(label);
-
-    tiles.forEach(async (tile) => { await socket.tile.destroy(tile.id); });
+    await matt.movement.stop(token, label);
     Sequencer.EffectManager.endEffects({ name: label, object: token });
 }
 
@@ -169,7 +167,7 @@ async function chargeMovement(token, tile, config = {}) {
     }
 
     const mergedConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, {inplace:false});
-    const {rotation, travelTime, label} = await matt.movement.configuration(token, tile, mergedConfig);
+    const {rotation, travelTime, label} = await matt.movement.configure(token, tile, mergedConfig);
     return travelSequence({tile, rotation, travelTime, label}).play();
 }
 

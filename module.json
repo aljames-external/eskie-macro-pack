@@ -67,11 +67,6 @@
                 "compatibility": {}
             },
             {
-                "id": "token-attacher",
-                "type": "module",
-                "compatibility": {}
-            },
-            {
                 "id": "boss-loot-assets-premium",
                 "type": "module",
                 "compatibility": {}

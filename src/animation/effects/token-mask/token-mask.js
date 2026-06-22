@@ -2,6 +2,7 @@
 //Author: .eskie
 
 import { time } from '../../../lib/time.js';
+import { tokens } from '../../../lib/tokens.js';
 import { closest } from '../../../lib/filemanager.js';
 import { dependency } from '../../../lib/dependency.js';
 import { socket } from '../../../integration/socketlib.js';
@@ -102,7 +103,6 @@ async function create(token, config = {}) {
     }
 
     dependency.required([
-        { id: 'token-attacher', ref: "Token Attacher" },
         { id: 'monks-active-tiles', ref: "Monk's Active Tile Triggers" }
     ]);
 
@@ -177,7 +177,7 @@ async function create(token, config = {}) {
     const paddingXY = token.document.texture.scaleX;
 
     // Attach tiles to token
-    await tokenAttacher.attachElementsToToken([tokenRevealMask, sceneRevealMask, tokenShapeMask], token, true);
+    await tokens.attachElements([tokenRevealMask, sceneRevealMask, tokenShapeMask], token);
 
     let seq = new Sequence();
 
@@ -262,6 +262,8 @@ async function create(token, config = {}) {
                 log.warn(`tokenMaskEffect | Timeout waiting for effects with label "${label}" to end. Proceeding with cleanup.`);
             }
 
+            await tokens.detachElements([tokenRevealMask, sceneRevealMask, tokenShapeMask], token);
+
             if (!config.animationId) {
                 // Standalone run: clean up database immediately
                 if (deleteToken) {
@@ -318,9 +320,7 @@ async function playSocketed(token, config = {}) {
     await socket.token.edit(token.id, { [`flags.eskie-macros.token-masks.${animationId}`]: tileIds });
 
     // 3. Attach tiles to token
-    if (typeof tokenAttacher !== 'undefined') {
-        await tokenAttacher.attachElementsToToken(tiles, token, true);
-    }
+    await tokens.attachElements(tiles, token);
 
     // 4. Set up the tracking promise for all active users
     globalThis.eskie = globalThis.eskie || {};
