@@ -39,7 +39,7 @@ async function play(token, target, config = {}) {
     const mergedConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, {inplace:false});
     const effectFunction = `eskie.effect.grapple.macro.movement`;
     const code = `${effectFunction}(token.object, "${targetuuid}", tile)`;
-    await matt.movement.initialize(token, code, mergedConfig);    
+    await matt.movement.start(token, code, mergedConfig);
     const sequence = create(token, target, config);
     if (sequence) return sequence.play();
 }
@@ -47,9 +47,7 @@ async function play(token, target, config = {}) {
 async function stop(token, target, config = {}) {
     const { id } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, {inplace:false});
     const label = matt.getLabel(id, token);
-    const tiles = Tagger.getByTag(label);
-
-    tiles.forEach(async (tile) => { await socket.tile.destroy(tile.id); });
+    await matt.movement.stop(token, label);
     Sequencer.EffectManager.endEffects({ name: label, object: token });
 }
 
@@ -118,7 +116,7 @@ async function movement(token, targetuuid, tile, config = {}) {
     }
 
     const mergedConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, {inplace:false});
-    const {rotation, travelTime, label, delta: {x: dx, y: dy}} = await matt.movement.configuration(token, tile, mergedConfig);
+    const {rotation, travelTime, label, delta: {x: dx, y: dy}} = await matt.movement.configure(token, tile, mergedConfig);
     return travelSequence({tile, rotation, travelTime, label, delta: {x: dx, y: dy}, follow: config.follow}).play();
 }
 
