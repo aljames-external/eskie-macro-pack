@@ -26,6 +26,16 @@ async function playTokenMaskLocal(tokenId, tileIds, initiatorUserId, config = {}
     }
 
     try {
+        if (config.toggleOff) {
+            await tokenMaskEffect.stop(object, {
+                ...config,
+                tileIds,
+                localOnly: true,
+                initiatorUserId
+            });
+            return;
+        }
+
         // Play the animation locally
         await tokenMaskEffect.play(object, {
             ...config,
