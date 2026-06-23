@@ -27,9 +27,19 @@ const DEFAULT_CONFIG = {
     animationId: undefined
 }
 
+function isTokenObject(object) {
+    const TokenClass = foundry.canvas?.placeables?.Token ?? globalThis.Token;
+    return TokenClass ? (object instanceof TokenClass) : false;
+}
+
+function isTileObject(object) {
+    const TileClass = foundry.canvas?.placeables?.Tile ?? globalThis.Tile;
+    return TileClass ? (object instanceof TileClass) : false;
+}
+
 /* Works for tokens and tiles */
 async function createMaskTiles(object, config = {}) {
-    const widthAdjustment = (object instanceof Token) ? canvas.grid.size : 1;
+    const widthAdjustment = isTokenObject(object) ? canvas.grid.size : 1;
 
     const { revealOverlay, rotation } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
     const revealOverlayPath = absolutePath(revealOverlay);
@@ -87,8 +97,8 @@ async function createLocal(object, tileIds, config = {}) {
         return log.warn("tokenMaskEffect.createLocal: Missing required 'tileIds' for local animation. Effect aborted.");
     }
 
-    const isToken = object instanceof Token;
-    const isTile = object instanceof Tile;
+    const isToken = isTokenObject(object);
+    const isTile = isTileObject(object);
     if (!isToken && !isTile) {
         ui.notifications?.warn("Eskie Macros | Provided object is not a Token or a Tile.");
         return log.warn("tokenMaskEffect.createLocal: Invalid object type. Effect aborted.");
@@ -163,12 +173,15 @@ async function createLocal(object, tileIds, config = {}) {
             .locally(true);
     }
 
-    // Token/Tile clone
-    seq = seq.animation()
-        .delay(250)
-        .on(object)
-        .opacity(0)
-        .show(false);
+    // Token/Tile clone - Only animate database if the current user has permission to update the object
+    const canUpdate = object.document.canUserModify(game.user, "update");
+    if (canUpdate) {
+        seq = seq.animation()
+            .delay(250)
+            .on(object)
+            .opacity(0)
+            .show(false);
+    }
 
     seq = seq.effect()
         .name(label)
@@ -263,8 +276,8 @@ async function create(object, config = {}) {
         return log.warn("tokenMaskEffect: No object provided. Effect aborted.");
     }
 
-    const isToken = object instanceof Token;
-    const isTile = object instanceof Tile;
+    const isToken = isTokenObject(object);
+    const isTile = isTileObject(object);
     if (!isToken && !isTile) {
         ui.notifications?.warn("Eskie Macros | Provided object is not a Token or a Tile.");
         return log.warn("tokenMaskEffect: Invalid object type. Effect aborted.");
@@ -381,10 +394,14 @@ async function stopLocal(object, config = {}) {
     const { id } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
     const label = `${id} - ${object.id}`;
 
-    return Promise.all([
-        new Sequence().animation().on(object).opacity(1).show(true).play(),
-        Sequencer.EffectManager.endEffects({ name: label })
-    ]);
+    const canUpdate = object.document.canUserModify(game.user, "update");
+    const seqs = [Sequencer.EffectManager.endEffects({ name: label })];
+    
+    if (canUpdate) {
+        seqs.push(new Sequence().animation().on(object).opacity(1).show(true).play());
+    }
+
+    return Promise.all(seqs);
 }
 
 /**

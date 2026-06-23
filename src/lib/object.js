@@ -9,7 +9,8 @@ import { log } from './logger.js';
  * @param {PlaceableObject} target - Target Token or Tile.
  */
 async function attach(elements, target) {
-    const isTile = target instanceof Tile;
+    const TileClass = foundry.canvas?.placeables?.Tile ?? globalThis.Tile;
+    const isTile = TileClass ? (target instanceof TileClass) : false;
 
     if (isTile) {
         if (dependency.isActivated({ id: 'multi-token-edit', ref: "Baileywiki Mass Edit" })) {
@@ -38,7 +39,8 @@ async function attach(elements, target) {
  * @param {PlaceableObject} target - Target Token or Tile.
  */
 async function detach(elements, target) {
-    const isTile = target instanceof Tile;
+    const TileClass = foundry.canvas?.placeables?.Tile ?? globalThis.Tile;
+    const isTile = TileClass ? (target instanceof TileClass) : false;
 
     if (isTile) {
         if (dependency.isActivated({ id: 'multi-token-edit', ref: "Baileywiki Mass Edit" })) {
