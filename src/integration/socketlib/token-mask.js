@@ -18,7 +18,7 @@ async function playTokenMaskLocal(tokenId, tileIds, initiatorUserId, config = {}
 
     const object = canvas.tokens.get(tokenId) || canvas.tiles.get(tokenId);
     if (!object) {
-        console.warn(`Eskie Macros | tokenMaskEffect | playTokenMaskLocal | Object ${tokenId} not found on this client!`);
+        log.warn(`playTokenMaskLocal | Object ${tokenId} not found on this client!`);
         // Report completion immediately to not block the initiator
         await socketlib.executeForUsers('tokenMaskClientDone', [initiatorUserId], tokenId, game.user.id, config.animationId);
         return;
@@ -36,7 +36,7 @@ async function playTokenMaskLocal(tokenId, tileIds, initiatorUserId, config = {}
             initiatorUserId
         });
     } catch (err) {
-        console.error("Eskie Macros | tokenMaskEffect | playTokenMaskLocal | Error playing local animation:", err);
+        log.error("playTokenMaskLocal | Error playing local animation:", err);
         // Report completion in case of failure
         await socketlib.executeForUsers('tokenMaskClientDone', [initiatorUserId], object.id, game.user.id, config.animationId);
     }
