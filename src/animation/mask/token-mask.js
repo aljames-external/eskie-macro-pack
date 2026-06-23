@@ -1,13 +1,13 @@
 //Last Updated: 2026-06-20
 //Author: .eskie
 
-import { time } from '../../../lib/time.js';
-import { object as objectAttachment } from '../../../lib/object.js';
-import { closest } from '../../../lib/filemanager.js';
-import { dependency } from '../../../lib/dependency.js';
-import { socket } from '../../../integration/socketlib.js';
-import { MODULE_ID } from '../../../lib/constants.js';
-import { log } from '../../../lib/logger.js';
+import { time } from '../../lib/time.js';
+import { object as objectAttachment } from '../../lib/object.js';
+import { closest } from '../../lib/filemanager.js';
+import { dependency } from '../../lib/dependency.js';
+import { socket } from '../../integration/socketlib.js';
+import { MODULE_ID } from '../../lib/constants.js';
+import { log } from '../../lib/logger.js';
 
 const DEFAULT_CONFIG = {
     id: 'tokenMask',

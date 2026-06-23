@@ -1,6 +1,6 @@
-import { shatterMask } from '../token-mask/shatter-mask.js';
-import { settingsOverride } from "../../../lib/settings.js";
-import { closest } from "../../../lib/filemanager.js";
+import { shatterMask } from './shatter-mask.js';
+import { settingsOverride } from "../../lib/settings.js";
+import { closest } from "../../lib/filemanager.js";
 
 const DEFAULT_CONFIG = {
     id: 'swordArtOnlineShatter',
@@ -129,7 +129,7 @@ async function stop(source, config = {}) {
     ]);
 }
 
-export const swordArtOnlineDeath = {
+export const saoDeath = {
     create,
     play,
     stop,
