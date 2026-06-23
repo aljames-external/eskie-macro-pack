@@ -37,12 +37,12 @@ async function createMaskTiles(object, config = {}) {
 
     const revealMaskUpdatesBase = {
         "texture.src": revealOverlayPath,
-        "alpha": 0,
-        "hidden": true,
+        "alpha": 1, // Must be 1 for PIXI masking to work
+        "hidden": false, // Public so it replicates to all clients
         "x": object.x - (widthAdjustment * object.document.width * (scaleXY - 1) / 2),
         "y": object.y - (widthAdjustment * object.document.height * (scaleXY - 1) / 2),
         "video": {
-            autoplay: false,
+            autoplay: true, // Play in background immediately upon creation
             loop: false,
             volume: 0
         },
@@ -53,8 +53,8 @@ async function createMaskTiles(object, config = {}) {
 
     const objectShapeMaskUpdates = {
         "texture": object.document.texture,
-        "alpha": 1,
-        "hidden": true,
+        "alpha": 1, // Must be 1 for PIXI masking to work
+        "hidden": false, // Public so it replicates to all clients
         "x": object.x,
         "y": object.y,
         "rotation": object.document.rotation,
@@ -107,6 +107,13 @@ async function createLocal(object, tileIds, config = {}) {
         tokenOverlayPath = absolutePath(tokenOverlay);
     }
 
+    let revealOverlayPath = config.revealOverlayPath;
+    if (!revealOverlayPath) {
+        if (revealOverlay) {
+            revealOverlayPath = absolutePath(revealOverlay);
+        }
+    }
+
     const label = `${id} - ${object.id}`;
 
     // Wait for tiles to replicate to this client's scene
@@ -142,6 +149,13 @@ async function createLocal(object, tileIds, config = {}) {
     objectRevealMask.object.sourceElement.currentTime = 0;
     sceneRevealMask.object.sourceElement.currentTime = 0;
 
+    // CRITICAL PIXI OPTIMIZATION: Make the database tiles non-renderable.
+    // This hides them completely from the screen (for both GM and players) while
+    // keeping them 100% active and functional as PIXI masks (since alpha remains 1).
+    if (objectRevealMask.object) objectRevealMask.object.renderable = false;
+    if (sceneRevealMask.object) sceneRevealMask.object.renderable = false;
+    if (objectShapeMask.object) objectShapeMask.object.renderable = false;
+
     const paddingXY = object.document.texture.scaleX;
 
     let seq = new Sequence();
@@ -158,6 +172,27 @@ async function createLocal(object, tileIds, config = {}) {
             .mask(sceneRevealMask)
             .spriteOffset({ x: -canvas.scene.background.offsetX, y: -canvas.scene.background.offsetY })
             .locally(true);
+
+        // Visual flame edge for the background reveal
+        if (revealOverlayPath) {
+            const widthAdjustment = (isToken) ? canvas.grid.size : 1;
+            const tileWidth = (widthAdjustment * object.document.width) * paddingXY;
+            const tileHeight = (widthAdjustment * object.document.height) * paddingXY;
+            const tileX = object.x - (widthAdjustment * object.document.width * (paddingXY - 1) / 2);
+            const tileY = object.y - (widthAdjustment * object.document.height * (paddingXY - 1) / 2);
+
+            seq = seq.effect()
+                .name(label)
+                .file(revealOverlayPath)
+                .atLocation({
+                    x: tileX + (tileWidth / 2),
+                    y: tileY + (tileHeight / 2)
+                })
+                .size({ width: tileWidth / canvas.grid.size, height: tileHeight / canvas.grid.size }, { gridUnits: true })
+                .rotate(rotation)
+                .zIndex(0)
+                .locally(true);
+        }
     }
 
     // Token/Tile clone
@@ -177,22 +212,21 @@ async function createLocal(object, tileIds, config = {}) {
         .spriteRotation(-object.document.rotation)
         .mask(objectRevealMask)
         .persist()
-        .locally(true)
+        .locally(true);
 
-        .wait(250)
+    // Visual flame edge for the token reveal
+    if (revealOverlayPath) {
+        seq = seq.effect()
+            .name(label)
+            .file(revealOverlayPath)
+            .attachTo(object, { bindAlpha: false, bindVisibility: false, bindRotation: true })
+            .scaleToObject(paddingXY, { considerTokenScale: true })
+            .rotate(rotation)
+            .zIndex(2)
+            .locally(true);
+    }
 
-        .thenDo(async () => {
-            if (game.user.isGM) {
-                return Promise.all([
-                    sceneRevealMask.update({ alpha: 1, hidden: false, video: { autoplay: true } }),
-                    objectRevealMask.update({
-                        alpha: 1,
-                        hidden: false,
-                        video: { autoplay: true }
-                    })
-                ]);
-            }
-        })
+    seq = seq.wait(250)
 
         .effect()
         .file(tokenOverlayPath)
