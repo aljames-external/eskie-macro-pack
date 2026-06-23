@@ -2,7 +2,7 @@
 //Author: .eskie
 
 import { time } from '../../lib/time.js';
-import { object as objectAttachment } from '../../lib/object.js';
+import { object as objectAttachment, getDocumentName } from '../../lib/object.js';
 import { absolutePath } from '../../lib/filemanager.js';
 import { dependency } from '../../lib/dependency.js';
 import { socket, socketlib } from '../../integration/socketlib.js';
@@ -27,19 +27,9 @@ const DEFAULT_CONFIG = {
     animationId: undefined
 }
 
-function isTokenObject(object) {
-    const TokenClass = foundry.canvas?.placeables?.Token ?? globalThis.Token;
-    return TokenClass ? (object instanceof TokenClass) : false;
-}
-
-function isTileObject(object) {
-    const TileClass = foundry.canvas?.placeables?.Tile ?? globalThis.Tile;
-    return TileClass ? (object instanceof TileClass) : false;
-}
-
 /* Works for tokens and tiles */
 async function createMaskTiles(object, config = {}) {
-    const widthAdjustment = isTokenObject(object) ? canvas.grid.size : 1;
+    const widthAdjustment = (getDocumentName(object) === 'Token') ? canvas.grid.size : 1;
 
     const { revealOverlay, rotation } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
     const revealOverlayPath = absolutePath(revealOverlay);
@@ -97,8 +87,8 @@ async function createLocal(object, tileIds, config = {}) {
         return log.warn("tokenMaskEffect.createLocal: Missing required 'tileIds' for local animation. Effect aborted.");
     }
 
-    const isToken = isTokenObject(object);
-    const isTile = isTileObject(object);
+    const isToken = getDocumentName(object) === 'Token';
+    const isTile = getDocumentName(object) === 'Tile';
     if (!isToken && !isTile) {
         ui.notifications?.warn("Eskie Macros | Provided object is not a Token or a Tile.");
         return log.warn("tokenMaskEffect.createLocal: Invalid object type. Effect aborted.");
@@ -268,8 +258,8 @@ async function create(object, config = {}) {
         return log.warn("tokenMaskEffect: No object provided. Effect aborted.");
     }
 
-    const isToken = isTokenObject(object);
-    const isTile = isTileObject(object);
+    const isToken = getDocumentName(object) === 'Token';
+    const isTile = getDocumentName(object) === 'Tile';
     if (!isToken && !isTile) {
         ui.notifications?.warn("Eskie Macros | Provided object is not a Token or a Tile.");
         return log.warn("tokenMaskEffect: Invalid object type. Effect aborted.");

@@ -2,6 +2,16 @@ import { dependency } from './dependency.js';
 import { log } from './logger.js';
 
 /**
+ * Gets the native Foundry VTT document name of a placeable object or document.
+ * Safe and compatible across all Foundry versions.
+ * @param {PlaceableObject|Document} object - The object to inspect.
+ * @returns {string|undefined} The document name (e.g., "Token", "Tile") or undefined.
+ */
+export function getDocumentName(object) {
+    return object?.document?.documentName ?? object?.documentName;
+}
+
+/**
  * Attaches elements to a target PlaceableObject (Token or Tile).
  * If the target is a Tile, uses Baileywiki Mass Edit if active.
  * If the target is a Token, falls back to Token Attacher or Mass Edit.
@@ -9,8 +19,7 @@ import { log } from './logger.js';
  * @param {PlaceableObject} target - Target Token or Tile.
  */
 async function attach(elements, target) {
-    const TileClass = foundry.canvas?.placeables?.Tile ?? globalThis.Tile;
-    const isTile = TileClass ? (target instanceof TileClass) : false;
+    const isTile = getDocumentName(target) === 'Tile';
 
     if (isTile) {
         if (dependency.isActivated({ id: 'multi-token-edit', ref: "Baileywiki Mass Edit" })) {
@@ -39,8 +48,7 @@ async function attach(elements, target) {
  * @param {PlaceableObject} target - Target Token or Tile.
  */
 async function detach(elements, target) {
-    const TileClass = foundry.canvas?.placeables?.Tile ?? globalThis.Tile;
-    const isTile = TileClass ? (target instanceof TileClass) : false;
+    const isTile = getDocumentName(target) === 'Tile';
 
     if (isTile) {
         if (dependency.isActivated({ id: 'multi-token-edit', ref: "Baileywiki Mass Edit" })) {
