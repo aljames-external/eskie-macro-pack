@@ -1,6 +1,6 @@
 import { MODULE_ID } from "../../lib/constants.js";
 import { log } from '../../lib/logger.js';
-import { tokenMaskEffect } from "../../animation/effects/token-mask/token-mask.js";
+import { tokenMaskEffect } from "../../animation/mask/token-mask.js";
 
 /**
  * Socketlib handler to execute local sequence rendering on a client.
