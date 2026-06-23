@@ -22,11 +22,10 @@ async function attach(elements, target) {
     const isTile = getDocumentName(target) === 'Tile';
 
     if (isTile) {
-        if (dependency.isActivated({ id: 'multi-token-edit', ref: "Baileywiki Mass Edit" })) {
-            return Promise.all(elements.map(element => MassEdit.linker.link([element, target])));
-        }
-        log.warn("object.attach | Cannot attach elements to a Tile without Baileywiki Mass Edit active.");
-        return;
+        dependency.required([
+            { id: 'multi-token-edit', ref: "Baileywiki Mass Edit" }
+        ]);
+        return Promise.all(elements.map(element => MassEdit.linker.link([element, target])));
     }
 
     // Default Token behavior
@@ -51,10 +50,10 @@ async function detach(elements, target) {
     const isTile = getDocumentName(target) === 'Tile';
 
     if (isTile) {
-        if (dependency.isActivated({ id: 'multi-token-edit', ref: "Baileywiki Mass Edit" })) {
-            return Promise.all(elements.map(element => MassEdit.linker.removeLinks([element, target])));
-        }
-        return;
+        dependency.required([
+            { id: 'multi-token-edit', ref: "Baileywiki Mass Edit" }
+        ]);
+        return Promise.all(elements.map(element => MassEdit.linker.removeLinks([element, target])));
     }
 
     // Default Token behavior
