@@ -1,6 +1,7 @@
 import { MODULE_ID } from "../../lib/constants.js";
 import { log } from '../../lib/logger.js';
 import { socket, socketlib } from "../socketlib.js";
+import { object as objectAttachment } from "../../lib/object.js";
 import { tokenMaskEffect, tokenMaskTracker, playLocal, stopLocal } from "../../animation/mask/token-mask.js";
 
 /**
@@ -74,20 +75,23 @@ async function cleanUpTokenMask(tokenId, animationId, tileIds, deleteObject) {
     
     log.debug(`cleanUpTokenMask | Cleaning up database for object ${tokenId} (Session: ${animationId}). Delete object: ${deleteObject}`);
     
-    if (deleteObject) {
-        const object = canvas.tokens.get(tokenId) || canvas.tiles.get(tokenId);
-        if (object) {
+    const object = canvas.tokens.get(tokenId) || canvas.tiles.get(tokenId);
+    if (object) {
+        // Resolve tiles and detach them in the database
+        const tiles = tileIds ? tileIds.map(id => canvas.scene.tiles.get(id)).filter(t => t) : [];
+        if (tiles.length > 0) {
+            await objectAttachment.detach(tiles, object);
+        }
+
+        if (deleteObject) {
             await object.document.delete();
-        }
-    } else {
-        // Delete the tiles
-        if (tileIds && tileIds.length > 0) {
-            const { tile } = await import('./tile.js');
-            await Promise.all(tileIds.map(tileId => tile.destroy(tileId)));
-        }
-        // Remove only this specific animationId session's flag
-        const object = canvas.tokens.get(tokenId) || canvas.tiles.get(tokenId);
-        if (object) {
+        } else {
+            // Delete the tiles
+            if (tileIds && tileIds.length > 0) {
+                const { tile } = await import('./tile.js');
+                await Promise.all(tileIds.map(tileId => tile.destroy(tileId)));
+            }
+            // Remove only this specific animationId session's flag
             await object.document.update({
                 [`flags.eskie-macros.token-masks.-=${animationId}`]: null
             });
