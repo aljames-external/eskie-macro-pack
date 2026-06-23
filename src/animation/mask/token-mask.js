@@ -181,16 +181,26 @@ async function createLocal(object, tileIds, config = {}) {
 
         .wait(250)
 
-        .thenDo(async () => {
-            if (game.user.isGM) {
-                return Promise.all([
-                    sceneRevealMask.update({ alpha: 1, hidden: false, video: { autoplay: true } }),
-                    objectRevealMask.update({
-                        alpha: 1,
-                        hidden: false,
-                        video: { autoplay: true }
-                    })
-                ]);
+        .thenDo(() => {
+            for (const maskTile of [sceneRevealMask, objectRevealMask]) {
+                // Update local document data so any refreshes preserve this state
+                maskTile.updateSource({ alpha: 1, hidden: false });
+
+                if (maskTile.object) {
+                    maskTile.object.visible = true;
+                    maskTile.object.alpha = 1;
+                    if (maskTile.object.mesh) {
+                        maskTile.object.mesh.visible = true;
+                        maskTile.object.mesh.alpha = 1;
+                    }
+                    const video = maskTile.object.sourceElement;
+                    if (video instanceof HTMLVideoElement) {
+                        video.currentTime = 0;
+                        video.play().catch(err => {
+                            log.error("Failed to play video locally", err);
+                        });
+                    }
+                }
             }
         })
 
