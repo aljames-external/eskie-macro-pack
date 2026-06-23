@@ -3,6 +3,7 @@ import { door, doorSockets } from './socketlib/door.js';
 import { tile, tileSockets } from './socketlib/tile.js';
 import { token, tokenSockets } from './socketlib/token.js';
 import { tokenMaskSockets } from './socketlib/token-mask.js';
+import { object } from './socketlib/object.js';
 
 async function register() {
     const socket = socketlib.registerModule(MODULE_ID);
@@ -28,5 +29,6 @@ export const socketlibapi = {
 export const socket = {
     door,
     tile,
-    token
+    token,
+    object
 }
