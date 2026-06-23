@@ -3,7 +3,7 @@ import { dependency } from '../../lib/dependency.js';
 import { socket } from '../../integration/socketlib.js';
 import { SECONDS, MODULE_ID } from '../../lib/constants.js';
 import { dialog } from '../../lib/dialog.js';
-import { tokens } from '../../lib/tokens.js';
+import { object } from '../../lib/object.js';
 
 const DEFAULT_CONFIG = {
     id: 'generic-tile-movement',
@@ -53,7 +53,7 @@ async function start(token, code, config = {}) {
     await socket.tile.edit(tile.id, updateData);
     await Tagger.addTags(tile, label);
 
-    await tokens.attachElements([tile], token);
+    await object.attach([tile], token);
     await tile.setFlag(MODULE_ID, id, { tileData: getCenter(tile) });
     await tile.setFlag(MODULE_ID, 'config', nonInfoConfig);
 }
@@ -263,7 +263,7 @@ if (playPath && typeof token !== 'undefined') {
 
 async function stop(token, label) {
     const tiles = Tagger.getByTag(label);
-    await tokens.detachElements(tiles, token);
+    await object.detach(tiles, token);
     tiles.forEach(async (tile) => await socket.tile.destroy(tile.id));
 }
 
