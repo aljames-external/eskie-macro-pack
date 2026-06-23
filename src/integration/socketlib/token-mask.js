@@ -99,8 +99,19 @@ async function cleanUpTokenMask(tokenId, animationId, tileIds, deleteObject) {
     }
 }
 
+/**
+ * Socketlib handler to execute coordinated token mask playback as GM.
+ */
+async function playTokenMaskGM(tokenId, config = {}) {
+    if (!game.user.isGM) return;
+    const object = canvas.tokens.get(tokenId) || canvas.tiles.get(tokenId);
+    if (!object) return;
+    return tokenMaskEffect.play(object, config);
+}
+
 export const tokenMaskSockets = {
     playTokenMaskLocal,
     tokenMaskClientDone,
     cleanUpTokenMask,
+    playTokenMaskGM,
 };
