@@ -1,4 +1,5 @@
 import { dependency } from './dependency.js'
+import { log } from './logger.js'
 
 /**
  * Traverses the Sequencer database to find the best-fit path for a given set of categories.
@@ -109,6 +110,24 @@ export function closest(path) {
     return bestFit(modulePrefix, ...categories);
 }
 
+/**
+ * Resolves a Sequencer database entry or file path config to its absolute file path.
+ * @param {string} configPath - The configuration path to resolve.
+ * @returns {string|undefined} The absolute file path, or undefined if empty.
+ */
+export function absolutePath(configPath) {
+    if (!configPath) return undefined;
+    const resolvedConfig = closest(configPath);
+    try {
+        const entry = Sequencer.Database.getEntry(resolvedConfig, { softFail: true });
+        return (typeof entry === 'string') ? entry : (entry?.file || entry?.files?.[0] || resolvedConfig);
+    } catch (e) {
+        log.debug(`filemanager | Failed to resolve Sequencer entry for: ${resolvedConfig}`, e);
+        return resolvedConfig;
+    }
+}
+
 export const file = {
     closest,
+    absolutePath,
 }

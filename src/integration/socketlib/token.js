@@ -1,4 +1,5 @@
 import { MODULE_ID } from "../../lib/constants.js"
+import { socketlib } from "../socketlib.js"
 
 /**
  * Edits an existing token document. To be registered in socketlib.
@@ -40,16 +41,6 @@ export const tokenSockets = {
 };
 
 /**
- * Checks if socketlib is initialized and ready.
- * @param {any} socket - The socket instance.
- * @returns {boolean} True if the socket is initialized, false otherwise.
- */
-function initialized(socket) {
-    if (!socket) { ui.notifications.error("Eskie Macros | socketlib is not initialized"); }
-    return !!socket;
-}
-
-/**
  * Edits a token, executing as GM if the user is not a GM.
  * @param {string} id - The ID of the token to edit.
  * @param {object} [updates={}] - An object containing the updates to apply to the token.
@@ -57,9 +48,7 @@ function initialized(socket) {
  */
 async function edit(id, updates = {}) {
     if (game.user.isGM) return editToken(id, updates);
-    const socket = game.modules.get(MODULE_ID).socketlib;
-    if (!initialized(socket)) return;
-    return socket.executeAsGM("editToken", id, updates);
+    return socketlib.executeAsGM("editToken", id, updates);
 }
 
 /**
@@ -69,9 +58,7 @@ async function edit(id, updates = {}) {
  */
 async function create(position, updates = {}) {
     if (game.user.isGM) return createToken(updates);
-    const socket = game.modules.get(MODULE_ID).socketlib;
-    if (!initialized(socket)) return;
-    return socket.executeAsGM("createToken", position, updates);
+    return socketlib.executeAsGM("createToken", position, updates);
 }
 
 /**
@@ -81,9 +68,7 @@ async function create(position, updates = {}) {
  */
 async function destroy(id) {
     if (game.user.isGM) return destroyToken(id);
-    const socket = game.modules.get(MODULE_ID).socketlib;
-    if (!initialized(socket)) return;
-    return socket.executeAsGM("destroyToken", id);
+    return socketlib.executeAsGM("destroyToken", id);
 }
 
 export const token = {

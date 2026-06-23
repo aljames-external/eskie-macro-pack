@@ -2,12 +2,14 @@
 //Author: .eskie
 
 import { time } from '../../lib/time.js';
-import { object as objectAttachment } from '../../lib/object.js';
-import { closest } from '../../lib/filemanager.js';
+import { object as objectAttachment, getDocumentName } from '../../lib/object.js';
+import { absolutePath } from '../../lib/filemanager.js';
 import { dependency } from '../../lib/dependency.js';
-import { socket } from '../../integration/socketlib.js';
+import { socket, socketlib } from '../../integration/socketlib.js';
 import { MODULE_ID } from '../../lib/constants.js';
 import { log } from '../../lib/logger.js';
+
+export const tokenMaskTracker = new Map();
 
 const DEFAULT_CONFIG = {
     id: 'tokenMask',
@@ -27,41 +29,13 @@ const DEFAULT_CONFIG = {
 
 /* Works for tokens and tiles */
 async function createMaskTiles(object, config = {}) {
-    let widthAdjustment = 1;
-    if (object instanceof Tile) {
-        widthAdjustment = 1;
-    } else if (object instanceof Token) {
-        widthAdjustment = canvas.grid.size;
-    }
+    const widthAdjustment = (getDocumentName(object) === 'Token') ? canvas.grid.size : 1;
 
     const { revealOverlay, rotation } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
-    const revealOverlayConfig = closest(revealOverlay);
-    let revealOverlayPath = revealOverlayConfig;
-    try {
-        const entry = Sequencer.Database.getEntry(revealOverlayConfig, { softFail: true });
-        revealOverlayPath = (typeof entry === 'string') ? entry : (entry?.file || entry?.files?.[0] || revealOverlayConfig);
-    } catch (e) {
-        revealOverlayPath = revealOverlayConfig;
-    }
+    const revealOverlayPath = absolutePath(revealOverlay);
     const scaleXY = object.document.texture.scaleX;
 
-    const objectRevealMaskUpdates = {
-        "texture.src": revealOverlayPath,
-        "alpha": 0,
-        "hidden": true,
-        "x": object.x - (widthAdjustment * object.document.width * (scaleXY - 1) / 2),
-        "y": object.y - (widthAdjustment * object.document.height * (scaleXY - 1) / 2),
-        "video": {
-            autoplay: false,
-            loop: false,
-            volume: 0
-        },
-        "width": (widthAdjustment * object.document.width) * scaleXY,
-        "height": (widthAdjustment * object.document.height) * scaleXY,
-        "rotation": rotation,
-    };
-
-    const sceneRevealMaskUpdates = {
+    const revealMaskUpdatesBase = {
         "texture.src": revealOverlayPath,
         "alpha": 0,
         "hidden": true,
@@ -88,85 +62,66 @@ async function createMaskTiles(object, config = {}) {
         "height": widthAdjustment * object.document.height,
     };
 
+    const revealMaskUpdates = foundry.utils.deepClone(revealMaskUpdatesBase);
+
     // Create all tiles in database
     const [[objectRevealMask], [sceneRevealMask], [objectShapeMask]] = await Promise.all([
-        socket.tile.create(objectRevealMaskUpdates),
-        socket.tile.create(sceneRevealMaskUpdates),
+        socket.tile.create(revealMaskUpdatesBase),
+        socket.tile.create(revealMaskUpdates),
         socket.tile.create(objectShapeMaskUpdates)
     ]);
 
     return [objectRevealMask, sceneRevealMask, objectShapeMask];
 }
 
-async function create(object, config = {}) {
+/**
+ * Internal helper to build the local animation sequence using pre-created tiles.
+ * Guaranteed to be called only locally on the client.
+ */
+async function createLocal(object, tileIds, config = {}) {
     if (!object) {
         ui.notifications?.warn("Eskie Macros | No token or tile provided or selected.");
-        return log.warn("tokenMaskEffect: No object provided. Effect aborted.");
+        return log.warn("tokenMaskEffect.createLocal: No object provided. Effect aborted.");
+    }
+    if (!tileIds || tileIds.length === 0) {
+        return log.warn("tokenMaskEffect.createLocal: Missing required 'tileIds' for local animation. Effect aborted.");
     }
 
-    const isToken = object instanceof Token;
-    const isTile = object instanceof Tile;
+    const isToken = getDocumentName(object) === 'Token';
+    const isTile = getDocumentName(object) === 'Tile';
     if (!isToken && !isTile) {
         ui.notifications?.warn("Eskie Macros | Provided object is not a Token or a Tile.");
-        return log.warn("tokenMaskEffect: Invalid object type. Effect aborted.");
-    }
-
-    if (typeof window !== 'undefined' && !window.isSecureContext) {
-        console.warn("Eskie Macros | tokenMaskEffect | Warning: Running in an insecure context (HTTP). Advanced WebGL features like the Spritesheet Generator and sprite masks require a secure context and may fail or crash. Please connect using a secure address like https://<domain>:<port> or http://localhost:<port>.");
+        return log.warn("tokenMaskEffect.createLocal: Invalid object type. Effect aborted.");
     }
 
     dependency.required([
         { id: 'monks-active-tiles', ref: "Monk's Active Tile Triggers" }
     ]);
 
-    const { id, deleteObject, revealOverlay, tokenOverlay, rotation, tint, callback, tileIds, localOnly } =
+    const { id, deleteObject, revealOverlay, tokenOverlay, rotation, tint, callback } =
         foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
 
-    // If localOnly is false and socketlib is available, coordinate the multi-client animation
-    const eskieModule = game.modules.get(MODULE_ID);
-    if (!localOnly && eskieModule?.socketlib) {
-        let seq = new Sequence();
-        seq.thenDo(async () => {
-            return playSocketed(object, config);
-        });
-        return seq;
-    }
-
-    // Otherwise, build the real local animation sequence
     let tokenOverlayPath = config.tokenOverlayPath;
     if (!tokenOverlayPath) {
-        if (!tokenOverlay) return log.warn(`tokenMaskEffect: Missing required configuration 'tokenOverlay'. Effect aborted.`);
-        const tokenOverlayConfig = closest(tokenOverlay);
-        tokenOverlayPath = tokenOverlayConfig;
-        try {
-            const entry = Sequencer.Database.getEntry(tokenOverlayConfig, { softFail: true });
-            tokenOverlayPath = (typeof entry === 'string') ? entry : (entry?.file || entry?.files?.[0] || tokenOverlayConfig);
-        } catch (e) {
-            tokenOverlayPath = tokenOverlayConfig;
-        }
+        if (!tokenOverlay) return log.warn(`tokenMaskEffect.createLocal: Missing required configuration 'tokenOverlay'. Effect aborted.`);
+        tokenOverlayPath = absolutePath(tokenOverlay);
     }
 
     const label = `${id} - ${object.id}`;
 
-    // Resolve tiles (either reuse pre-created ones or create new ones)
-    let tiles;
-    if (tileIds) {
-        // Wait for tiles to replicate to this client's scene
-        try {
-            await time.waitUntil(() => {
-                return tileIds.every(tileId => canvas.scene.tiles.has(tileId));
-            }, { timeout: 5000, interval: 100 });
-        } catch (err) {
-            log.warn("tokenMaskEffect | Timeout waiting for tiles to replicate.");
-        }
-        tiles = tileIds.map(tileId => canvas.scene.tiles.get(tileId));
-    } else {
-        tiles = await createMaskTiles(object, { revealOverlay, rotation });
+    // Wait for tiles to replicate to this client's scene
+    try {
+        await time.waitUntil(() => {
+            return tileIds.every(tileId => canvas.scene.tiles.has(tileId));
+        }, { timeout: 5000, interval: 100 });
+    } catch (err) {
+        log.warn("tokenMaskEffect.createLocal | Timeout waiting for tiles to replicate.");
     }
+    const tiles = tileIds.map(tileId => canvas.scene.tiles.get(tileId));
 
     const [objectRevealMask, sceneRevealMask, objectShapeMask] = tiles;
     if (!objectRevealMask || !sceneRevealMask || !objectShapeMask) {
-        return log.warn(`tokenMaskEffect: Failed to resolve all three tiles. Effect aborted.`);
+        return log.warn(`tokenMaskEffect.createLocal: Failed to resolve all three tiles. Effect aborted.`);
     }
 
     // Wait for PIXI objects and video elements to render on this client
@@ -179,7 +134,7 @@ async function create(object, config = {}) {
     try {
         await time.waitUntil(tilesRendered, { timeout: 5000 });
     } catch (err) {
-        log.error("tokenMaskEffect | TIMEOUT waiting for local PIXI rendering!", err);
+        log.error("tokenMaskEffect.createLocal | TIMEOUT waiting for local PIXI rendering!", err);
         throw err;
     }
 
@@ -188,9 +143,6 @@ async function create(object, config = {}) {
     sceneRevealMask.object.sourceElement.currentTime = 0;
 
     const paddingXY = object.document.texture.scaleX;
-
-    // Attach tiles to object
-    await objectAttachment.attach([objectRevealMask, sceneRevealMask, objectShapeMask], object);
 
     let seq = new Sequence();
 
@@ -205,7 +157,7 @@ async function create(object, config = {}) {
             .belowTokens()
             .mask(sceneRevealMask)
             .spriteOffset({ x: -canvas.scene.background.offsetX, y: -canvas.scene.background.offsetY })
-            .locally(localOnly);
+            .locally(true);
     }
 
     // Token/Tile clone
@@ -225,7 +177,7 @@ async function create(object, config = {}) {
         .spriteRotation(-object.document.rotation)
         .mask(objectRevealMask)
         .persist()
-        .locally(localOnly)
+        .locally(true)
 
         .wait(250)
 
@@ -272,10 +224,8 @@ async function create(object, config = {}) {
                     return Sequencer.EffectManager.getEffects({ name: label }).length === 0;
                 }, { timeout: 2000, interval: 50 });
             } catch (err) {
-                log.warn(`tokenMaskEffect | Timeout waiting for effects with label "${label}" to end. Proceeding with cleanup.`);
+                log.warn(`tokenMaskEffect.createLocal | Timeout waiting for effects with label "${label}" to end. Proceeding with cleanup.`);
             }
-
-            await objectAttachment.detach([objectRevealMask, sceneRevealMask, objectShapeMask], object);
 
             if (!config.animationId) {
                 // Standalone run: clean up database immediately
@@ -290,8 +240,8 @@ async function create(object, config = {}) {
                 }
             } else {
                 // Coordinated run: report completion to GM initiator
-                if (eskieModule?.socketlib && config.initiatorUserId) {
-                    await eskieModule.socketlib.executeForUsers('tokenMaskClientDone', [config.initiatorUserId], object.id, game.user.id, config.animationId);
+                if (config.initiatorUserId) {
+                    await socketlib.executeForUsers('tokenMaskClientDone', [config.initiatorUserId], object.id, game.user.id, config.animationId);
                 }
             }
         });
@@ -300,28 +250,48 @@ async function create(object, config = {}) {
 }
 
 /**
+ * Public coordinated create. Returns a Sequence wrapper that triggers host-level playSocketed.
+ */
+async function create(object, config = {}) {
+    if (!object) {
+        ui.notifications?.warn("Eskie Macros | No token or tile provided or selected.");
+        return log.warn("tokenMaskEffect: No object provided. Effect aborted.");
+    }
+
+    const isToken = getDocumentName(object) === 'Token';
+    const isTile = getDocumentName(object) === 'Tile';
+    if (!isToken && !isTile) {
+        ui.notifications?.warn("Eskie Macros | Provided object is not a Token or a Tile.");
+        return log.warn("tokenMaskEffect: Invalid object type. Effect aborted.");
+    }
+
+    if (typeof window !== 'undefined' && !window.isSecureContext) {
+        log.warn("Running in an insecure context (HTTP). Advanced WebGL features like the Spritesheet Generator and sprite masks require a secure context and may fail or crash. Please connect using a secure address like https://<domain>:<port> or http://localhost:<port>.");
+    }
+
+    dependency.required([
+        { id: 'monks-active-tiles', ref: "Monk's Active Tile Triggers" }
+    ]);
+
+    let seq = new Sequence();
+    seq.thenDo(async () => {
+        if (!game.user.isGM) {
+            return socketlib.executeAsGM('playTokenMaskGM', object.id, config);
+        }
+        return playSocketed(object, config);
+    });
+    return seq;
+}
+
+/**
  * Coordinated play function that broadcasts local playback to all clients.
  */
 async function playSocketed(object, config = {}) {
-    const eskieModule = game.modules.get(MODULE_ID);
-    if (!eskieModule?.socketlib) return;
-
     const { id, deleteObject, revealOverlay, tokenOverlay, rotation, tint } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
 
     // Pre-resolve paths
-    const tokenOverlayConfig = closest(tokenOverlay);
-    let tokenOverlayPath = tokenOverlayConfig;
-    try {
-        const entry = Sequencer.Database.getEntry(tokenOverlayConfig, { softFail: true });
-        tokenOverlayPath = (typeof entry === 'string') ? entry : (entry?.file || entry?.files?.[0] || tokenOverlayConfig);
-    } catch (e) { }
-
-    const revealOverlayConfig = closest(revealOverlay);
-    let revealOverlayPath = revealOverlayConfig;
-    try {
-        const entry = Sequencer.Database.getEntry(revealOverlayConfig, { softFail: true });
-        revealOverlayPath = (typeof entry === 'string') ? entry : (entry?.file || entry?.files?.[0] || revealOverlayConfig);
-    } catch (e) { }
+    const tokenOverlayPath = absolutePath(tokenOverlay);
+    const revealOverlayPath = absolutePath(revealOverlay);
 
     const animationId = foundry.utils.randomID();
 
@@ -336,9 +306,6 @@ async function playSocketed(object, config = {}) {
     await objectAttachment.attach(tiles, object);
 
     // 4. Set up the tracking promise for all active users
-    globalThis.eskie = globalThis.eskie || {};
-    globalThis.eskie.tokenMaskTracker = globalThis.eskie.tokenMaskTracker || new Map();
-
     const activeUserIds = game.users.filter(u => u.active).map(u => u.id);
 
     let resolvePromise;
@@ -348,19 +315,16 @@ async function playSocketed(object, config = {}) {
 
     // Safety timeout (15 seconds)
     const timeoutId = setTimeout(async () => {
-        const tracker = globalThis.eskie.tokenMaskTracker.get(animationId);
+        const tracker = tokenMaskTracker.get(animationId);
         if (tracker) {
             log.warn(`tokenMaskEffect | Tracker TIMEOUT hit for object ${object.id} (Session: ${animationId})! Cleaning up.`);
-            globalThis.eskie.tokenMaskTracker.delete(animationId);
-            const eskieModule = game.modules.get(MODULE_ID);
-            if (eskieModule?.socketlib) {
-                await eskieModule.socketlib.executeAsGM("cleanUpTokenMask", object.id, animationId, tracker.tileIds, tracker.deleteObject);
-            }
+            tokenMaskTracker.delete(animationId);
+            await socketlib.executeAsGM("cleanUpTokenMask", object.id, animationId, tracker.tileIds, tracker.deleteObject);
             resolvePromise();
         }
     }, 15000);
 
-    globalThis.eskie.tokenMaskTracker.set(animationId, {
+    tokenMaskTracker.set(animationId, {
         expected: new Set(activeUserIds),
         received: new Set(),
         tileIds: tileIds,
@@ -372,7 +336,7 @@ async function playSocketed(object, config = {}) {
     });
 
     // 5. Broadcast play event to all active clients
-    await eskieModule.socketlib.executeForEveryone(
+    await socketlib.executeForEveryone(
         'playTokenMaskLocal',
         object.id,
         tileIds,
@@ -392,36 +356,26 @@ async function playSocketed(object, config = {}) {
     return promise;
 }
 
+/**
+ * Public entry point to play the coordinated multi-client effect.
+ */
 async function play(object, config = {}) {
-    // If running locally as part of a multi-client run, play locally without broadcasting
-    if (config.localOnly) {
-        const seq = await create(object, config);
-        if (seq) return seq.play({ remote: false });
-        return;
-    }
-
-    // Otherwise, trigger the coordinating play flow (which wraps the sequence and broadcasts it)
     const seq = await create(object, config);
     if (seq) return seq.play();
 }
 
-async function stop(object, config = {}) {
-    const eskieModule = game.modules.get(MODULE_ID);
-    if (eskieModule?.socketlib && !config.localOnly) {
-        // Stop all active token mask sessions currently registered on this object
-        const masks = object.document.getFlag('eskie-macros', 'token-masks') || {};
-        const activeAnimationIds = Object.keys(masks);
-        if (activeAnimationIds.length > 0) {
-            for (const [animationId, tileIds] of Object.entries(masks)) {
-                await eskieModule.socketlib.executeForEveryone('playTokenMaskLocal', object.id, tileIds, game.user.id, {
-                    ...config,
-                    toggleOff: true,
-                    animationId
-                });
-            }
-        }
-    }
+/**
+ * Internal entry point to play the local animation sequence on this client.
+ */
+async function playLocal(object, tileIds, config = {}) {
+    const seq = await createLocal(object, tileIds, config);
+    if (seq) return seq.play({ remote: false });
+}
 
+/**
+ * Internal entry point to execute the local stop/cleanup sequence.
+ */
+async function stopLocal(object, config = {}) {
     const { id } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
     const label = `${id} - ${object.id}`;
 
@@ -431,9 +385,31 @@ async function stop(object, config = {}) {
     ]);
 }
 
+/**
+ * Public entry point to stop all active token mask sessions.
+ */
+async function stop(object, config = {}) {
+    // Stop all active token mask sessions currently registered on this object
+    const masks = object.document.getFlag('eskie-macros', 'token-masks') || {};
+    const activeAnimationIds = Object.keys(masks);
+    if (activeAnimationIds.length > 0) {
+        for (const [animationId, tileIds] of Object.entries(masks)) {
+            await socketlib.executeForEveryone('playTokenMaskLocal', object.id, tileIds, game.user.id, {
+                ...config,
+                toggleOff: true,
+                animationId
+            });
+        }
+    }
+
+    return stopLocal(object, config);
+}
+
 export const tokenMaskEffect = {
     create,
     play,
     stop,
     default_config: DEFAULT_CONFIG,
 };
+
+export { createLocal, playLocal, stopLocal };

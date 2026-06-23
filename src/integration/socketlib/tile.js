@@ -1,4 +1,5 @@
 import { MODULE_ID } from "../../lib/constants.js"
+import { socketlib } from "../socketlib.js"
 
 /**
  * Edits an existing tile document. To be registered in socketlib.
@@ -44,16 +45,6 @@ export const tileSockets = {
 };
 
 /**
- * Checks if socketlib is initialized and ready.
- * @param {any} socket - The socket instance.
- * @returns {boolean} True if the socket is initialized, false otherwise.
- */
-function initialized(socket) {
-    if (!socket) { ui.notifications.error("Eskie Macros | socketlib is not initialized"); }
-    return !!socket;
-}
-
-/**
  * Edits a tile, executing as GM if the user is not a GM.
  * @param {string} id - The ID of the tile to edit.
  * @param {object} [updates={}] - An object containing the updates to apply to the tile.
@@ -61,9 +52,7 @@ function initialized(socket) {
  */
 async function edit(id, updates = {}) {
     if (game.user.isGM) return editTile(id, updates);
-    const socket = game.modules.get(MODULE_ID).socketlib;
-    if (!initialized(socket)) return;
-    return socket.executeAsGM("editTile", id, updates);
+    return socketlib.executeAsGM("editTile", id, updates);
 }
 
 /**
@@ -73,9 +62,7 @@ async function edit(id, updates = {}) {
  */
 async function create(updates = {}) {
     if (game.user.isGM) return createTile(updates);
-    const socket = game.modules.get(MODULE_ID).socketlib;
-    if (!initialized(socket)) return;
-    return socket.executeAsGM("createTile", updates);
+    return socketlib.executeAsGM("createTile", updates);
 }
 
 /**
@@ -86,9 +73,7 @@ async function create(updates = {}) {
 async function destroy(id) {
     const ids = Array.isArray(id) ? id : [id];
     if (game.user.isGM) return destroyTiles(ids);
-    const socket = game.modules.get(MODULE_ID).socketlib;
-    if (!initialized(socket)) return;
-    return socket.executeAsGM("destroyTiles", ids);
+    return socketlib.executeAsGM("destroyTiles", ids);
 }
 
 export const tile = {

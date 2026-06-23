@@ -5,8 +5,10 @@ import { token, tokenSockets } from './socketlib/token.js';
 import { tokenMaskSockets } from './socketlib/token-mask.js';
 import { object } from './socketlib/object.js';
 
+export let socketlib;
+
 async function register() {
-    const socket = socketlib.registerModule(MODULE_ID);
+    const socket = globalThis.socketlib.registerModule(MODULE_ID);
     const socketAPI = {
         doorSockets,
         tileSockets,
@@ -20,6 +22,7 @@ async function register() {
         });
     });
     game.modules.get(MODULE_ID).socketlib = socket;
+    socketlib = socket;
 }
 
 export const socketlibapi = {
