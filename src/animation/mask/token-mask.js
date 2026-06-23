@@ -3,11 +3,13 @@
 
 import { time } from '../../lib/time.js';
 import { object as objectAttachment } from '../../lib/object.js';
-import { closest } from '../../lib/filemanager.js';
+import { absolutePath } from '../../lib/filemanager.js';
 import { dependency } from '../../lib/dependency.js';
 import { socket } from '../../integration/socketlib.js';
 import { MODULE_ID } from '../../lib/constants.js';
 import { log } from '../../lib/logger.js';
+
+export const tokenMaskTracker = new Map();
 
 const DEFAULT_CONFIG = {
     id: 'tokenMask',
@@ -27,41 +29,13 @@ const DEFAULT_CONFIG = {
 
 /* Works for tokens and tiles */
 async function createMaskTiles(object, config = {}) {
-    let widthAdjustment = 1;
-    if (object instanceof Tile) {
-        widthAdjustment = 1;
-    } else if (object instanceof Token) {
-        widthAdjustment = canvas.grid.size;
-    }
+    const widthAdjustment = (object instanceof Token) ? canvas.grid.size : 1;
 
     const { revealOverlay, rotation } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
-    const revealOverlayConfig = closest(revealOverlay);
-    let revealOverlayPath = revealOverlayConfig;
-    try {
-        const entry = Sequencer.Database.getEntry(revealOverlayConfig, { softFail: true });
-        revealOverlayPath = (typeof entry === 'string') ? entry : (entry?.file || entry?.files?.[0] || revealOverlayConfig);
-    } catch (e) {
-        revealOverlayPath = revealOverlayConfig;
-    }
+    const revealOverlayPath = absolutePath(revealOverlay);
     const scaleXY = object.document.texture.scaleX;
 
-    const objectRevealMaskUpdates = {
-        "texture.src": revealOverlayPath,
-        "alpha": 0,
-        "hidden": true,
-        "x": object.x - (widthAdjustment * object.document.width * (scaleXY - 1) / 2),
-        "y": object.y - (widthAdjustment * object.document.height * (scaleXY - 1) / 2),
-        "video": {
-            autoplay: false,
-            loop: false,
-            volume: 0
-        },
-        "width": (widthAdjustment * object.document.width) * scaleXY,
-        "height": (widthAdjustment * object.document.height) * scaleXY,
-        "rotation": rotation,
-    };
-
-    const sceneRevealMaskUpdates = {
+    const revealMaskUpdatesBase = {
         "texture.src": revealOverlayPath,
         "alpha": 0,
         "hidden": true,
@@ -88,10 +62,12 @@ async function createMaskTiles(object, config = {}) {
         "height": widthAdjustment * object.document.height,
     };
 
+    const revealMaskUpdates = foundry.utils.deepClone(revealMaskUpdatesBase);
+
     // Create all tiles in database
     const [[objectRevealMask], [sceneRevealMask], [objectShapeMask]] = await Promise.all([
-        socket.tile.create(objectRevealMaskUpdates),
-        socket.tile.create(sceneRevealMaskUpdates),
+        socket.tile.create(revealMaskUpdatesBase),
+        socket.tile.create(revealMaskUpdates),
         socket.tile.create(objectShapeMaskUpdates)
     ]);
 
@@ -136,14 +112,7 @@ async function create(object, config = {}) {
     let tokenOverlayPath = config.tokenOverlayPath;
     if (!tokenOverlayPath) {
         if (!tokenOverlay) return log.warn(`tokenMaskEffect: Missing required configuration 'tokenOverlay'. Effect aborted.`);
-        const tokenOverlayConfig = closest(tokenOverlay);
-        tokenOverlayPath = tokenOverlayConfig;
-        try {
-            const entry = Sequencer.Database.getEntry(tokenOverlayConfig, { softFail: true });
-            tokenOverlayPath = (typeof entry === 'string') ? entry : (entry?.file || entry?.files?.[0] || tokenOverlayConfig);
-        } catch (e) {
-            tokenOverlayPath = tokenOverlayConfig;
-        }
+        tokenOverlayPath = absolutePath(tokenOverlay);
     }
 
     const label = `${id} - ${object.id}`;
@@ -309,19 +278,8 @@ async function playSocketed(object, config = {}) {
     const { id, deleteObject, revealOverlay, tokenOverlay, rotation, tint } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
 
     // Pre-resolve paths
-    const tokenOverlayConfig = closest(tokenOverlay);
-    let tokenOverlayPath = tokenOverlayConfig;
-    try {
-        const entry = Sequencer.Database.getEntry(tokenOverlayConfig, { softFail: true });
-        tokenOverlayPath = (typeof entry === 'string') ? entry : (entry?.file || entry?.files?.[0] || tokenOverlayConfig);
-    } catch (e) { }
-
-    const revealOverlayConfig = closest(revealOverlay);
-    let revealOverlayPath = revealOverlayConfig;
-    try {
-        const entry = Sequencer.Database.getEntry(revealOverlayConfig, { softFail: true });
-        revealOverlayPath = (typeof entry === 'string') ? entry : (entry?.file || entry?.files?.[0] || revealOverlayConfig);
-    } catch (e) { }
+    const tokenOverlayPath = absolutePath(tokenOverlay);
+    const revealOverlayPath = absolutePath(revealOverlay);
 
     const animationId = foundry.utils.randomID();
 
@@ -336,9 +294,6 @@ async function playSocketed(object, config = {}) {
     await objectAttachment.attach(tiles, object);
 
     // 4. Set up the tracking promise for all active users
-    globalThis.eskie = globalThis.eskie || {};
-    globalThis.eskie.tokenMaskTracker = globalThis.eskie.tokenMaskTracker || new Map();
-
     const activeUserIds = game.users.filter(u => u.active).map(u => u.id);
 
     let resolvePromise;
@@ -348,10 +303,10 @@ async function playSocketed(object, config = {}) {
 
     // Safety timeout (15 seconds)
     const timeoutId = setTimeout(async () => {
-        const tracker = globalThis.eskie.tokenMaskTracker.get(animationId);
+        const tracker = tokenMaskTracker.get(animationId);
         if (tracker) {
             log.warn(`tokenMaskEffect | Tracker TIMEOUT hit for object ${object.id} (Session: ${animationId})! Cleaning up.`);
-            globalThis.eskie.tokenMaskTracker.delete(animationId);
+            tokenMaskTracker.delete(animationId);
             const eskieModule = game.modules.get(MODULE_ID);
             if (eskieModule?.socketlib) {
                 await eskieModule.socketlib.executeAsGM("cleanUpTokenMask", object.id, animationId, tracker.tileIds, tracker.deleteObject);
@@ -360,7 +315,7 @@ async function playSocketed(object, config = {}) {
         }
     }, 15000);
 
-    globalThis.eskie.tokenMaskTracker.set(animationId, {
+    tokenMaskTracker.set(animationId, {
         expected: new Set(activeUserIds),
         received: new Set(),
         tileIds: tileIds,
