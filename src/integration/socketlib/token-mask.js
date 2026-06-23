@@ -1,6 +1,6 @@
 import { MODULE_ID } from "../../lib/constants.js";
 import { log } from '../../lib/logger.js';
-import { tokenMaskEffect, tokenMaskTracker } from "../../animation/mask/token-mask.js";
+import { tokenMaskEffect, tokenMaskTracker, playLocal, stopLocal } from "../../animation/mask/token-mask.js";
 
 /**
  * Socketlib handler to execute local sequence rendering on a client.
@@ -25,20 +25,13 @@ async function playTokenMaskLocal(tokenId, tileIds, initiatorUserId, config = {}
 
     try {
         if (config.toggleOff) {
-            await tokenMaskEffect.stop(object, {
-                ...config,
-                tileIds,
-                localOnly: true,
-                initiatorUserId
-            });
+            await stopLocal(object, config);
             return;
         }
 
         // Play the animation locally
-        await tokenMaskEffect.play(object, {
+        await playLocal(object, tileIds, {
             ...config,
-            tileIds,
-            localOnly: true,
             initiatorUserId
         });
     } catch (err) {
