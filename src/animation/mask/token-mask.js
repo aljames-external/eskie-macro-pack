@@ -183,23 +183,56 @@ async function createLocal(object, tileIds, config = {}) {
 
         .thenDo(() => {
             for (const maskTile of [sceneRevealMask, objectRevealMask]) {
+                const prevHidden = maskTile.hidden;
+                const prevAlpha = maskTile.alpha;
+
                 // Update local document data so any refreshes preserve this state
                 maskTile.updateSource({ alpha: 1, hidden: false });
 
-                if (maskTile.object) {
-                    maskTile.object.visible = true;
-                    maskTile.object.alpha = 1;
-                    if (maskTile.object.mesh) {
-                        maskTile.object.mesh.visible = true;
-                        maskTile.object.mesh.alpha = 1;
+                const tileObj = maskTile.object;
+                if (tileObj) {
+                    log.debug(`tokenMaskEffect | Local unhide starting for tile ${maskTile.id}:`, {
+                        prevHidden,
+                        prevAlpha,
+                        objVisible: tileObj.visible,
+                        meshVisible: tileObj.mesh?.visible,
+                        videoSrc: tileObj.sourceElement?.src
+                    });
+
+                    // Refresh the placeable to synchronize with the updated local document state
+                    if (typeof tileObj.refresh === "function") {
+                        tileObj.refresh();
                     }
-                    const video = maskTile.object.sourceElement;
+
+                    // Explicitly ensure visibility and alpha are set locally as a fallback
+                    tileObj.visible = true;
+                    tileObj.alpha = 1;
+                    if (tileObj.mesh) {
+                        tileObj.mesh.visible = true;
+                        tileObj.mesh.alpha = 1;
+                    }
+
+                    // Play the video
+                    const video = tileObj.sourceElement;
                     if (video instanceof HTMLVideoElement) {
                         video.currentTime = 0;
-                        video.play().catch(err => {
-                            log.error("Failed to play video locally", err);
-                        });
+                        video.play()
+                            .then(() => {
+                                log.debug(`tokenMaskEffect | Video playback started locally for tile ${maskTile.id}.`);
+                            })
+                            .catch(err => {
+                                log.error(`tokenMaskEffect | Failed to play video locally for tile ${maskTile.id}:`, err);
+                            });
                     }
+
+                    log.debug(`tokenMaskEffect | Local unhide complete for tile ${maskTile.id}:`, {
+                        nowHidden: maskTile.hidden,
+                        nowAlpha: maskTile.alpha,
+                        objVisible: tileObj.visible,
+                        meshVisible: tileObj.mesh?.visible
+                    });
+                } else {
+                    log.warn(`tokenMaskEffect | Placeable object for tile ${maskTile.id} was not found!`);
                 }
             }
         })
