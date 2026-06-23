@@ -154,9 +154,6 @@ async function createLocal(object, tileIds, config = {}) {
 
     const paddingXY = object.document.texture.scaleX;
 
-    // Attach tiles to object
-    await objectAttachment.attach([objectRevealMask, sceneRevealMask, objectShapeMask], object);
-
     let seq = new Sequence();
 
     // Background mask
@@ -242,8 +239,6 @@ async function createLocal(object, tileIds, config = {}) {
             } catch (err) {
                 log.warn(`tokenMaskEffect.createLocal | Timeout waiting for effects with label "${label}" to end. Proceeding with cleanup.`);
             }
-
-            await objectAttachment.detach([objectRevealMask, sceneRevealMask, objectShapeMask], object);
 
             if (!config.animationId) {
                 // Standalone run: clean up database immediately
