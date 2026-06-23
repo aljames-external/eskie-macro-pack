@@ -25,33 +25,39 @@ const DEFAULT_CONFIG = {
     animationId: undefined
 }
 
-export const pendingRuns = new Map();
+/* Works for tokens and tiles */
+async function createMaskTiles(element, config = {}) {
+    let widthAdjustment = 1;
+    if (element instanceof Tile) {
+        widthAdjustment = 1;
+    } else if (element instanceof Token) {
+        widthAdjustment = canvas.grid.size;
+    }
 
-export async function createTiles(token, config = {}) {
     const { revealOverlay, rotation } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
     const revealOverlayConfig = closest(revealOverlay);
     let revealOverlayPath = revealOverlayConfig;
-    try { 
+    try {
         const entry = Sequencer.Database.getEntry(revealOverlayConfig, { softFail: true });
         revealOverlayPath = (typeof entry === 'string') ? entry : (entry?.file || entry?.files?.[0] || revealOverlayConfig);
-    } catch (e) { 
-        revealOverlayPath = revealOverlayConfig; 
+    } catch (e) {
+        revealOverlayPath = revealOverlayConfig;
     }
-    const scaleXY = token.document.texture.scaleX;
+    const scaleXY = element.document.texture.scaleX;
 
-    const tokenRevealMaskUpdates = {
+    const elementRevealMaskUpdates = {
         "texture.src": revealOverlayPath,
         "alpha": 0,
         "hidden": true,
-        "x": token.x - (canvas.grid.size * token.document.width * (scaleXY - 1) / 2),
-        "y": token.y - (canvas.grid.size * token.document.height * (scaleXY - 1) / 2),
+        "x": element.x - (widthAdjustment * element.document.width * (scaleXY - 1) / 2),
+        "y": element.y - (widthAdjustment * element.document.height * (scaleXY - 1) / 2),
         "video": {
             autoplay: false,
             loop: false,
             volume: 0
         },
-        "width": canvas.grid.size * (token.document.width * scaleXY),
-        "height": canvas.grid.size * (token.document.height * scaleXY),
+        "width": (widthAdjustment * element.document.width) * scaleXY,
+        "height": (widthAdjustment * element.document.height) * scaleXY,
         "rotation": rotation,
     };
 
@@ -59,37 +65,37 @@ export async function createTiles(token, config = {}) {
         "texture.src": revealOverlayPath,
         "alpha": 0,
         "hidden": true,
-        "x": token.x - (canvas.grid.size * token.document.width * (scaleXY - 1) / 2),
-        "y": token.y - (canvas.grid.size * token.document.height * (scaleXY - 1) / 2),
+        "x": element.x - (widthAdjustment * element.document.width * (scaleXY - 1) / 2),
+        "y": element.y - (widthAdjustment * element.document.height * (scaleXY - 1) / 2),
         "video": {
             autoplay: false,
             loop: false,
             volume: 0
         },
-        "width": canvas.grid.size * (token.document.width * scaleXY),
-        "height": canvas.grid.size * (token.document.height * scaleXY),
+        "width": (widthAdjustment * element.document.width) * scaleXY,
+        "height": (widthAdjustment * element.document.height) * scaleXY,
         "rotation": rotation,
     };
 
-    const tokenMaskUpdates = {
-        "texture": token.document.texture,
+    const elementMaskUpdates = {
+        "texture": element.document.texture,
         "alpha": 1,
         "hidden": true,
-        "x": token.x,
-        "y": token.y,
-        "rotation": token.document.rotation,
-        "width": canvas.grid.size * token.document.width,
-        "height": canvas.grid.size * token.document.height,
+        "x": element.x,
+        "y": element.y,
+        "rotation": element.document.rotation,
+        "width": widthAdjustment * element.document.width,
+        "height": widthAdjustment * element.document.height,
     };
 
     // Create all tiles in database
-    const [[tokenRevealMask], [sceneRevealMask], [tokenShapeMask]] = await Promise.all([
-        socket.tile.create(tokenRevealMaskUpdates),
+    const [[elementRevealMask], [sceneRevealMask], [elementShapeMask]] = await Promise.all([
+        socket.tile.create(elementRevealMaskUpdates),
         socket.tile.create(sceneRevealMaskUpdates),
-        socket.tile.create(tokenMaskUpdates)
+        socket.tile.create(elementMaskUpdates)
     ]);
 
-    return [tokenRevealMask, sceneRevealMask, tokenShapeMask];
+    return [elementRevealMask, sceneRevealMask, elementShapeMask];
 }
 
 async function create(token, config = {}) {
@@ -125,11 +131,11 @@ async function create(token, config = {}) {
         if (!tokenOverlay) return log.warn(`tokenMaskEffect: Missing required configuration 'tokenOverlay'. Effect aborted.`);
         const tokenOverlayConfig = closest(tokenOverlay);
         tokenOverlayPath = tokenOverlayConfig;
-        try { 
+        try {
             const entry = Sequencer.Database.getEntry(tokenOverlayConfig, { softFail: true });
             tokenOverlayPath = (typeof entry === 'string') ? entry : (entry?.file || entry?.files?.[0] || tokenOverlayConfig);
-        } catch (e) { 
-            tokenOverlayPath = tokenOverlayConfig; 
+        } catch (e) {
+            tokenOverlayPath = tokenOverlayConfig;
         }
     }
 
@@ -148,7 +154,7 @@ async function create(token, config = {}) {
         }
         tiles = tileIds.map(tileId => canvas.scene.tiles.get(tileId));
     } else {
-        tiles = await createTiles(token, { revealOverlay, rotation });
+        tiles = await createMaskTiles(token, { revealOverlay, rotation });
     }
 
     const [tokenRevealMask, sceneRevealMask, tokenShapeMask] = tiles;
@@ -157,12 +163,12 @@ async function create(token, config = {}) {
     }
 
     // Wait for PIXI objects and video elements to render on this client
-    function tilesRendered() { 
-        return tokenRevealMask?.object?.sourceElement && 
-               sceneRevealMask?.object?.sourceElement && 
-               tokenShapeMask?.object?.mesh; 
+    function tilesRendered() {
+        return tokenRevealMask?.object?.sourceElement &&
+            sceneRevealMask?.object?.sourceElement &&
+            tokenShapeMask?.object?.mesh;
     }
-    
+
     try {
         await time.waitUntil(tilesRendered, { timeout: 5000 });
     } catch (err) {
@@ -298,22 +304,22 @@ async function playSocketed(token, config = {}) {
     // Pre-resolve paths
     const tokenOverlayConfig = closest(tokenOverlay);
     let tokenOverlayPath = tokenOverlayConfig;
-    try { 
+    try {
         const entry = Sequencer.Database.getEntry(tokenOverlayConfig, { softFail: true });
         tokenOverlayPath = (typeof entry === 'string') ? entry : (entry?.file || entry?.files?.[0] || tokenOverlayConfig);
-    } catch (e) {}
+    } catch (e) { }
 
     const revealOverlayConfig = closest(revealOverlay);
     let revealOverlayPath = revealOverlayConfig;
-    try { 
+    try {
         const entry = Sequencer.Database.getEntry(revealOverlayConfig, { softFail: true });
         revealOverlayPath = (typeof entry === 'string') ? entry : (entry?.file || entry?.files?.[0] || revealOverlayConfig);
-    } catch (e) {}
+    } catch (e) { }
 
     const animationId = foundry.utils.randomID();
 
     // 1. Create the tiles in the database
-    const tiles = await createTiles(token, { revealOverlay, rotation });
+    const tiles = await createMaskTiles(token, { revealOverlay, rotation });
     const tileIds = tiles.map(t => t.id);
 
     // 2. Store tile IDs on the token flags as a backup
@@ -327,7 +333,7 @@ async function playSocketed(token, config = {}) {
     globalThis.eskie.tokenMaskTracker = globalThis.eskie.tokenMaskTracker || new Map();
 
     const activeUserIds = game.users.filter(u => u.active).map(u => u.id);
-    
+
     let resolvePromise;
     const promise = new Promise((resolve) => {
         resolvePromise = resolve;
@@ -422,7 +428,5 @@ export const tokenMaskEffect = {
     create,
     play,
     stop,
-    createTiles,
-    pendingRuns,
     default_config: DEFAULT_CONFIG,
 };
