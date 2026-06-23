@@ -14,9 +14,9 @@ async function playTokenMaskLocal(tokenId, tileIds, initiatorUserId, config = {}
         animationId: config.animationId
     });
 
-    const token = canvas.tokens.get(tokenId);
-    if (!token) {
-        console.warn(`Eskie Macros | tokenMaskEffect | playTokenMaskLocal | Token ${tokenId} not found on this client!`);
+    const object = canvas.tokens.get(tokenId) || canvas.tiles.get(tokenId);
+    if (!object) {
+        console.warn(`Eskie Macros | tokenMaskEffect | playTokenMaskLocal | Object ${tokenId} not found on this client!`);
         // Report completion immediately to not block the initiator
         const eskieModule = game.modules.get('eskie-macros');
         if (eskieModule?.socketlib) {
@@ -27,7 +27,7 @@ async function playTokenMaskLocal(tokenId, tileIds, initiatorUserId, config = {}
 
     try {
         // Play the animation locally
-        await tokenMaskEffect.play(token, {
+        await tokenMaskEffect.play(object, {
             ...config,
             tileIds,
             localOnly: true,
@@ -38,7 +38,7 @@ async function playTokenMaskLocal(tokenId, tileIds, initiatorUserId, config = {}
         // Report completion in case of failure
         const eskieModule = game.modules.get('eskie-macros');
         if (eskieModule?.socketlib) {
-            await eskieModule.socketlib.executeForUsers('tokenMaskClientDone', [initiatorUserId], token.id, game.user.id, config.animationId);
+            await eskieModule.socketlib.executeForUsers('tokenMaskClientDone', [initiatorUserId], object.id, game.user.id, config.animationId);
         }
     }
 }
@@ -58,7 +58,7 @@ async function tokenMaskClientDone(tokenId, userId, animationId) {
             log.debug(`tokenMaskClientDone | All clients reported completion for session ${animationId}! Triggering database cleanup...`);
             
             // Clean up using the GM-level cleanup
-            await cleanUpTokenMask(tokenId, animationId, tracker.tileIds, tracker.deleteToken);
+            await cleanUpTokenMask(tokenId, animationId, tracker.tileIds, tracker.deleteObject);
             
             // Resolve the initiator's promise
             tracker.resolve();
@@ -69,20 +69,20 @@ async function tokenMaskClientDone(tokenId, userId, animationId) {
 /**
  * Clean up the session tiles and token flags as GM.
  */
-async function cleanUpTokenMask(tokenId, animationId, tileIds, deleteToken) {
+async function cleanUpTokenMask(tokenId, animationId, tileIds, deleteObject) {
     if (!game.user.isGM) {
         const eskieModule = game.modules.get('eskie-macros');
         if (eskieModule?.socketlib) {
-            return eskieModule.socketlib.executeAsGM("cleanUpTokenMask", tokenId, animationId, tileIds, deleteToken);
+            return eskieModule.socketlib.executeAsGM("cleanUpTokenMask", tokenId, animationId, tileIds, deleteObject);
         }
     }
     
-    log.debug(`cleanUpTokenMask | Cleaning up database for token ${tokenId} (Session: ${animationId}). Delete token: ${deleteToken}`);
+    log.debug(`cleanUpTokenMask | Cleaning up database for object ${tokenId} (Session: ${animationId}). Delete object: ${deleteObject}`);
     
-    if (deleteToken) {
-        const token = canvas.tokens.get(tokenId);
-        if (token) {
-            await token.document.delete();
+    if (deleteObject) {
+        const object = canvas.tokens.get(tokenId) || canvas.tiles.get(tokenId);
+        if (object) {
+            await object.document.delete();
         }
     } else {
         // Delete the tiles
@@ -91,9 +91,9 @@ async function cleanUpTokenMask(tokenId, animationId, tileIds, deleteToken) {
             await Promise.all(tileIds.map(tileId => tile.destroy(tileId)));
         }
         // Remove only this specific animationId session's flag
-        const token = canvas.tokens.get(tokenId);
-        if (token) {
-            await token.document.update({
+        const object = canvas.tokens.get(tokenId) || canvas.tiles.get(tokenId);
+        if (object) {
+            await object.document.update({
                 [`flags.eskie-macros.token-masks.-=${animationId}`]: null
             });
         }
