@@ -170,15 +170,12 @@ async function createLocal(object, tileIds, config = {}) {
             .locally(true);
     }
 
-    // Token/Tile clone - Only animate database if the current user has permission to update the object
-    const canUpdate = object.document.canUserModify(game.user, "update");
-    if (canUpdate) {
-        seq = seq.animation()
-            .delay(250)
-            .on(object)
-            .opacity(0)
-            .show(false);
-    }
+    // Token/Tile clone
+    seq = seq.animation()
+        .delay(250)
+        .on(object)
+        .opacity(0)
+        .show(false);
 
     seq = seq.effect()
         .name(label)
@@ -389,14 +386,10 @@ async function stopLocal(object, config = {}) {
     const { id } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
     const label = `${id} - ${object.id}`;
 
-    const canUpdate = object.document.canUserModify(game.user, "update");
-    const seqs = [Sequencer.EffectManager.endEffects({ name: label })];
-    
-    if (canUpdate) {
-        seqs.push(new Sequence().animation().on(object).opacity(1).show(true).play());
-    }
-
-    return Promise.all(seqs);
+    return Promise.all([
+        new Sequence().animation().on(object).opacity(1).show(true).play(),
+        Sequencer.EffectManager.endEffects({ name: label })
+    ]);
 }
 
 /**
