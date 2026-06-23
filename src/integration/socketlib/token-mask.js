@@ -19,9 +19,7 @@ async function playTokenMaskLocal(tokenId, tileIds, initiatorUserId, config = {}
         console.warn(`Eskie Macros | tokenMaskEffect | playTokenMaskLocal | Object ${tokenId} not found on this client!`);
         // Report completion immediately to not block the initiator
         const eskieModule = game.modules.get(MODULE_ID);
-        if (eskieModule?.socketlib) {
-            await eskieModule.socketlib.executeForUsers('tokenMaskClientDone', [initiatorUserId], tokenId, game.user.id, config.animationId);
-        }
+        await eskieModule.socketlib.executeForUsers('tokenMaskClientDone', [initiatorUserId], tokenId, game.user.id, config.animationId);
         return;
     }
 
@@ -47,9 +45,7 @@ async function playTokenMaskLocal(tokenId, tileIds, initiatorUserId, config = {}
         console.error("Eskie Macros | tokenMaskEffect | playTokenMaskLocal | Error playing local animation:", err);
         // Report completion in case of failure
         const eskieModule = game.modules.get(MODULE_ID);
-        if (eskieModule?.socketlib) {
-            await eskieModule.socketlib.executeForUsers('tokenMaskClientDone', [initiatorUserId], object.id, game.user.id, config.animationId);
-        }
+        await eskieModule.socketlib.executeForUsers('tokenMaskClientDone', [initiatorUserId], object.id, game.user.id, config.animationId);
     }
 }
 
@@ -82,9 +78,7 @@ async function tokenMaskClientDone(tokenId, userId, animationId) {
 async function cleanUpTokenMask(tokenId, animationId, tileIds, deleteObject) {
     if (!game.user.isGM) {
         const eskieModule = game.modules.get(MODULE_ID);
-        if (eskieModule?.socketlib) {
-            return eskieModule.socketlib.executeAsGM("cleanUpTokenMask", tokenId, animationId, tileIds, deleteObject);
-        }
+        return eskieModule.socketlib.executeAsGM("cleanUpTokenMask", tokenId, animationId, tileIds, deleteObject);
     }
     
     log.debug(`cleanUpTokenMask | Cleaning up database for object ${tokenId} (Session: ${animationId}). Delete object: ${deleteObject}`);
