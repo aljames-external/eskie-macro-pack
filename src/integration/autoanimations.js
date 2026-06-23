@@ -104,8 +104,8 @@ function createAutorecEntry(label, trigger, animation, config, version = "0.0.0"
 // For instance: { key: "value" } -> "{ "key": \"value\"}"
 function JSONformatObject(obj, depth = 1) {
     var type = typeof obj;
-    /* Special case for eskie.effect functions */
-    if(type === 'string' && obj.startsWith("eskie.effect.")) return obj;
+    /* Special case for eskie.effect and eskie.mask functions */
+    if(type === 'string' && (obj.startsWith("eskie.effect.") || obj.startsWith("eskie.mask."))) return obj;
     /* Better looking JSON stringify */
     if(type === 'string') return '\'' + obj + '\'';
     if(type === 'boolean' || type === 'number') return obj;

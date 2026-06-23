@@ -2,7 +2,7 @@ import { tokenMaskEffect } from "./token-mask.js";
 
 const DEFAULT_CONFIG = {
     id: 'ShatteredTokenMask',
-    deleteToken: false,
+    deleteObject: false,
     center: true,
     color: 'white',
     rotation: 0,
@@ -14,23 +14,23 @@ const DEFAULT_CONFIG = {
     }
 };
 
-async function create(token, config = {}) {
-    const { id, deleteToken, center, color, rotation, tint, callback, overlay } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
+async function create(object, config = {}) {
+    const { id, deleteObject, center, color, rotation, tint, callback, overlay } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
     const tokenOverlay = overlay.token ?? `eskie.wounds.token_mask.shatter.${center ? 'center' : 'side'}.01.${color}.no_base`;
     const revealOverlay = overlay.reveal ?? `eskie.texture_mask.tile_base.shatter.${center ? 'center' : 'side'}.01`;
-    return tokenMaskEffect.create(token, { id, deleteToken, tokenOverlay, revealOverlay, rotation, tint, callback, override: {} });
+    return tokenMaskEffect.create(object, { id, deleteObject, tokenOverlay, revealOverlay, rotation, tint, callback, override: {} });
 }
 
-async function play(token, config = {}) {
-    const seq = await create(token, config);
+async function play(object, config = {}) {
+    const seq = await create(object, config);
     if (seq) return seq.play();
 }
 
-async function stop(token, config = {}) {
-    const { id, deleteToken, center, color, rotation, callback, overlay } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
+async function stop(object, config = {}) {
+    const { id, deleteObject, center, color, rotation, callback, overlay } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
     const tokenOverlay = overlay.token ?? `eskie.wounds.token_mask.shatter.${center ? 'center' : 'side'}.01.${color}.no_base`;
     const revealOverlay = overlay.reveal ?? `eskie.texture_mask.tile_base.shatter.${center ? 'center' : 'side'}.01`;
-    return tokenMaskEffect.stop(token, { id, deleteToken, tokenOverlay, revealOverlay, rotation, callback });
+    return tokenMaskEffect.stop(object, { id, deleteObject, tokenOverlay, revealOverlay, rotation, callback });
 }
 
 export const shatterMask = {

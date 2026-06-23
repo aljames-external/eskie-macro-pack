@@ -1,17 +1,17 @@
 //Last Updated: 2026-06-20
 //Author: .eskie
 
-import { time } from '../../../lib/time.js';
-import { tokens } from '../../../lib/tokens.js';
-import { closest } from '../../../lib/filemanager.js';
-import { dependency } from '../../../lib/dependency.js';
-import { socket } from '../../../integration/socketlib.js';
-import { MODULE_ID } from '../../../lib/constants.js';
-import { log } from '../../../lib/logger.js';
+import { time } from '../../lib/time.js';
+import { object as objectAttachment } from '../../lib/object.js';
+import { closest } from '../../lib/filemanager.js';
+import { dependency } from '../../lib/dependency.js';
+import { socket } from '../../integration/socketlib.js';
+import { MODULE_ID } from '../../lib/constants.js';
+import { log } from '../../lib/logger.js';
 
 const DEFAULT_CONFIG = {
     id: 'tokenMask',
-    deleteToken: false,
+    deleteObject: false,
     tokenOverlay: undefined,    // Internal use only
     revealOverlay: undefined,   // Internal use only
     rotation: 0,
@@ -25,33 +25,39 @@ const DEFAULT_CONFIG = {
     animationId: undefined
 }
 
-export const pendingRuns = new Map();
+/* Works for tokens and tiles */
+async function createMaskTiles(object, config = {}) {
+    let widthAdjustment = 1;
+    if (object instanceof Tile) {
+        widthAdjustment = 1;
+    } else if (object instanceof Token) {
+        widthAdjustment = canvas.grid.size;
+    }
 
-export async function createTiles(token, config = {}) {
     const { revealOverlay, rotation } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
     const revealOverlayConfig = closest(revealOverlay);
     let revealOverlayPath = revealOverlayConfig;
-    try { 
+    try {
         const entry = Sequencer.Database.getEntry(revealOverlayConfig, { softFail: true });
         revealOverlayPath = (typeof entry === 'string') ? entry : (entry?.file || entry?.files?.[0] || revealOverlayConfig);
-    } catch (e) { 
-        revealOverlayPath = revealOverlayConfig; 
+    } catch (e) {
+        revealOverlayPath = revealOverlayConfig;
     }
-    const scaleXY = token.document.texture.scaleX;
+    const scaleXY = object.document.texture.scaleX;
 
-    const tokenRevealMaskUpdates = {
+    const objectRevealMaskUpdates = {
         "texture.src": revealOverlayPath,
         "alpha": 0,
         "hidden": true,
-        "x": token.x - (canvas.grid.size * token.document.width * (scaleXY - 1) / 2),
-        "y": token.y - (canvas.grid.size * token.document.height * (scaleXY - 1) / 2),
+        "x": object.x - (widthAdjustment * object.document.width * (scaleXY - 1) / 2),
+        "y": object.y - (widthAdjustment * object.document.height * (scaleXY - 1) / 2),
         "video": {
             autoplay: false,
             loop: false,
             volume: 0
         },
-        "width": canvas.grid.size * (token.document.width * scaleXY),
-        "height": canvas.grid.size * (token.document.height * scaleXY),
+        "width": (widthAdjustment * object.document.width) * scaleXY,
+        "height": (widthAdjustment * object.document.height) * scaleXY,
         "rotation": rotation,
     };
 
@@ -59,43 +65,50 @@ export async function createTiles(token, config = {}) {
         "texture.src": revealOverlayPath,
         "alpha": 0,
         "hidden": true,
-        "x": token.x - (canvas.grid.size * token.document.width * (scaleXY - 1) / 2),
-        "y": token.y - (canvas.grid.size * token.document.height * (scaleXY - 1) / 2),
+        "x": object.x - (widthAdjustment * object.document.width * (scaleXY - 1) / 2),
+        "y": object.y - (widthAdjustment * object.document.height * (scaleXY - 1) / 2),
         "video": {
             autoplay: false,
             loop: false,
             volume: 0
         },
-        "width": canvas.grid.size * (token.document.width * scaleXY),
-        "height": canvas.grid.size * (token.document.height * scaleXY),
+        "width": (widthAdjustment * object.document.width) * scaleXY,
+        "height": (widthAdjustment * object.document.height) * scaleXY,
         "rotation": rotation,
     };
 
-    const tokenMaskUpdates = {
-        "texture": token.document.texture,
+    const objectShapeMaskUpdates = {
+        "texture": object.document.texture,
         "alpha": 1,
         "hidden": true,
-        "x": token.x,
-        "y": token.y,
-        "rotation": token.document.rotation,
-        "width": canvas.grid.size * token.document.width,
-        "height": canvas.grid.size * token.document.height,
+        "x": object.x,
+        "y": object.y,
+        "rotation": object.document.rotation,
+        "width": widthAdjustment * object.document.width,
+        "height": widthAdjustment * object.document.height,
     };
 
     // Create all tiles in database
-    const [[tokenRevealMask], [sceneRevealMask], [tokenShapeMask]] = await Promise.all([
-        socket.tile.create(tokenRevealMaskUpdates),
+    const [[objectRevealMask], [sceneRevealMask], [objectShapeMask]] = await Promise.all([
+        socket.tile.create(objectRevealMaskUpdates),
         socket.tile.create(sceneRevealMaskUpdates),
-        socket.tile.create(tokenMaskUpdates)
+        socket.tile.create(objectShapeMaskUpdates)
     ]);
 
-    return [tokenRevealMask, sceneRevealMask, tokenShapeMask];
+    return [objectRevealMask, sceneRevealMask, objectShapeMask];
 }
 
-async function create(token, config = {}) {
-    if (!token) {
-        ui.notifications?.warn("Eskie Macros | No token provided or selected.");
-        return log.warn("tokenMaskEffect: No token provided. Effect aborted.");
+async function create(object, config = {}) {
+    if (!object) {
+        ui.notifications?.warn("Eskie Macros | No token or tile provided or selected.");
+        return log.warn("tokenMaskEffect: No object provided. Effect aborted.");
+    }
+
+    const isToken = object instanceof Token;
+    const isTile = object instanceof Tile;
+    if (!isToken && !isTile) {
+        ui.notifications?.warn("Eskie Macros | Provided object is not a Token or a Tile.");
+        return log.warn("tokenMaskEffect: Invalid object type. Effect aborted.");
     }
 
     if (typeof window !== 'undefined' && !window.isSecureContext) {
@@ -106,7 +119,7 @@ async function create(token, config = {}) {
         { id: 'monks-active-tiles', ref: "Monk's Active Tile Triggers" }
     ]);
 
-    const { id, deleteToken, revealOverlay, tokenOverlay, rotation, tint, callback, tileIds, localOnly } =
+    const { id, deleteObject, revealOverlay, tokenOverlay, rotation, tint, callback, tileIds, localOnly } =
         foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
 
     // If localOnly is false and socketlib is available, coordinate the multi-client animation
@@ -114,7 +127,7 @@ async function create(token, config = {}) {
     if (!localOnly && eskieModule?.socketlib) {
         let seq = new Sequence();
         seq.thenDo(async () => {
-            return playSocketed(token, config);
+            return playSocketed(object, config);
         });
         return seq;
     }
@@ -125,15 +138,15 @@ async function create(token, config = {}) {
         if (!tokenOverlay) return log.warn(`tokenMaskEffect: Missing required configuration 'tokenOverlay'. Effect aborted.`);
         const tokenOverlayConfig = closest(tokenOverlay);
         tokenOverlayPath = tokenOverlayConfig;
-        try { 
+        try {
             const entry = Sequencer.Database.getEntry(tokenOverlayConfig, { softFail: true });
             tokenOverlayPath = (typeof entry === 'string') ? entry : (entry?.file || entry?.files?.[0] || tokenOverlayConfig);
-        } catch (e) { 
-            tokenOverlayPath = tokenOverlayConfig; 
+        } catch (e) {
+            tokenOverlayPath = tokenOverlayConfig;
         }
     }
 
-    const label = `${id} - ${token.id}`;
+    const label = `${id} - ${object.id}`;
 
     // Resolve tiles (either reuse pre-created ones or create new ones)
     let tiles;
@@ -148,21 +161,21 @@ async function create(token, config = {}) {
         }
         tiles = tileIds.map(tileId => canvas.scene.tiles.get(tileId));
     } else {
-        tiles = await createTiles(token, { revealOverlay, rotation });
+        tiles = await createMaskTiles(object, { revealOverlay, rotation });
     }
 
-    const [tokenRevealMask, sceneRevealMask, tokenShapeMask] = tiles;
-    if (!tokenRevealMask || !sceneRevealMask || !tokenShapeMask) {
+    const [objectRevealMask, sceneRevealMask, objectShapeMask] = tiles;
+    if (!objectRevealMask || !sceneRevealMask || !objectShapeMask) {
         return log.warn(`tokenMaskEffect: Failed to resolve all three tiles. Effect aborted.`);
     }
 
     // Wait for PIXI objects and video elements to render on this client
-    function tilesRendered() { 
-        return tokenRevealMask?.object?.sourceElement && 
-               sceneRevealMask?.object?.sourceElement && 
-               tokenShapeMask?.object?.mesh; 
+    function tilesRendered() {
+        return objectRevealMask?.object?.sourceElement &&
+            sceneRevealMask?.object?.sourceElement &&
+            objectShapeMask?.object?.mesh;
     }
-    
+
     try {
         await time.waitUntil(tilesRendered, { timeout: 5000 });
     } catch (err) {
@@ -171,13 +184,13 @@ async function create(token, config = {}) {
     }
 
     // Reset videos to start
-    tokenRevealMask.object.sourceElement.currentTime = 0;
+    objectRevealMask.object.sourceElement.currentTime = 0;
     sceneRevealMask.object.sourceElement.currentTime = 0;
 
-    const paddingXY = token.document.texture.scaleX;
+    const paddingXY = object.document.texture.scaleX;
 
-    // Attach tiles to token
-    await tokens.attachElements([tokenRevealMask, sceneRevealMask, tokenShapeMask], token);
+    // Attach tiles to object
+    await objectAttachment.attach([objectRevealMask, sceneRevealMask, objectShapeMask], object);
 
     let seq = new Sequence();
 
@@ -195,22 +208,22 @@ async function create(token, config = {}) {
             .locally(localOnly);
     }
 
-    // Token clone
+    // Token/Tile clone
     seq = seq.animation()
         .delay(250)
-        .on(token)
+        .on(object)
         .opacity(0)
         .show(false);
 
     seq = seq.effect()
         .name(label)
-        .copySprite(token);
+        .copySprite(object);
     if (tint && tint !== 'none') seq = seq.tint(tint);
     seq = seq
-        .attachTo(token, { bindAlpha: false, bindVisibility: false, bindRotation: true })
+        .attachTo(object, { bindAlpha: false, bindVisibility: false, bindRotation: true })
         .scaleToObject(1, { considerTokenScale: true })
-        .spriteRotation(-token.document.rotation)
-        .mask(tokenRevealMask)
+        .spriteRotation(-object.document.rotation)
+        .mask(objectRevealMask)
         .persist()
         .locally(localOnly)
 
@@ -220,7 +233,7 @@ async function create(token, config = {}) {
             if (game.user.isGM) {
                 return Promise.all([
                     sceneRevealMask.update({ alpha: 1, hidden: false, video: { autoplay: true } }),
-                    tokenRevealMask.update({
+                    objectRevealMask.update({
                         alpha: 1,
                         hidden: false,
                         video: { autoplay: true }
@@ -231,8 +244,8 @@ async function create(token, config = {}) {
 
         .effect()
         .file(tokenOverlayPath)
-        .attachTo(token, { bindAlpha: false, bindVisibility: false, bindRotation: false })
-        .mask(tokenShapeMask)
+        .attachTo(object, { bindAlpha: false, bindVisibility: false, bindRotation: false })
+        .mask(objectShapeMask)
         .rotate(-rotation)
         .scaleToObject(paddingXY)
         .zIndex(1);
@@ -242,13 +255,13 @@ async function create(token, config = {}) {
     seq = seq.waitUntilFinished()
         .thenDo(async () => {
             // Instantly hide tiles locally to prevent them from flickering while database deletion syncs
-            if (tokenRevealMask.object) tokenRevealMask.object.visible = false;
+            if (objectRevealMask.object) objectRevealMask.object.visible = false;
             if (sceneRevealMask.object) sceneRevealMask.object.visible = false;
-            if (tokenShapeMask.object) tokenShapeMask.object.visible = false;
+            if (objectShapeMask.object) objectShapeMask.object.visible = false;
 
-            // If the token is going to be deleted, hide it locally as well to prevent it from popping back
-            if (deleteToken && token.object) {
-                token.object.visible = false;
+            // If the object is going to be deleted, hide it locally as well to prevent it from popping back
+            if (deleteObject && object.object) {
+                object.object.visible = false;
             }
 
             await Sequencer.EffectManager.endEffects({ name: label });
@@ -262,23 +275,23 @@ async function create(token, config = {}) {
                 log.warn(`tokenMaskEffect | Timeout waiting for effects with label "${label}" to end. Proceeding with cleanup.`);
             }
 
-            await tokens.detachElements([tokenRevealMask, sceneRevealMask, tokenShapeMask], token);
+            await objectAttachment.detach([objectRevealMask, sceneRevealMask, objectShapeMask], object);
 
             if (!config.animationId) {
                 // Standalone run: clean up database immediately
-                if (deleteToken) {
-                    await token.document.delete();
+                if (deleteObject) {
+                    await object.document.delete();
                 } else {
                     await Promise.all([
-                        socket.tile.destroy(tokenRevealMask.id),
-                        socket.tile.destroy(tokenShapeMask.id),
+                        socket.tile.destroy(objectRevealMask.id),
+                        socket.tile.destroy(objectShapeMask.id),
                         socket.tile.destroy(sceneRevealMask.id),
                     ]);
                 }
             } else {
                 // Coordinated run: report completion to GM initiator
                 if (eskieModule?.socketlib && config.initiatorUserId) {
-                    await eskieModule.socketlib.executeForUsers('tokenMaskClientDone', [config.initiatorUserId], token.id, game.user.id, config.animationId);
+                    await eskieModule.socketlib.executeForUsers('tokenMaskClientDone', [config.initiatorUserId], object.id, game.user.id, config.animationId);
                 }
             }
         });
@@ -289,45 +302,45 @@ async function create(token, config = {}) {
 /**
  * Coordinated play function that broadcasts local playback to all clients.
  */
-async function playSocketed(token, config = {}) {
+async function playSocketed(object, config = {}) {
     const eskieModule = game.modules.get(MODULE_ID);
     if (!eskieModule?.socketlib) return;
 
-    const { id, deleteToken, revealOverlay, tokenOverlay, rotation, tint } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
+    const { id, deleteObject, revealOverlay, tokenOverlay, rotation, tint } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
 
     // Pre-resolve paths
     const tokenOverlayConfig = closest(tokenOverlay);
     let tokenOverlayPath = tokenOverlayConfig;
-    try { 
+    try {
         const entry = Sequencer.Database.getEntry(tokenOverlayConfig, { softFail: true });
         tokenOverlayPath = (typeof entry === 'string') ? entry : (entry?.file || entry?.files?.[0] || tokenOverlayConfig);
-    } catch (e) {}
+    } catch (e) { }
 
     const revealOverlayConfig = closest(revealOverlay);
     let revealOverlayPath = revealOverlayConfig;
-    try { 
+    try {
         const entry = Sequencer.Database.getEntry(revealOverlayConfig, { softFail: true });
         revealOverlayPath = (typeof entry === 'string') ? entry : (entry?.file || entry?.files?.[0] || revealOverlayConfig);
-    } catch (e) {}
+    } catch (e) { }
 
     const animationId = foundry.utils.randomID();
 
     // 1. Create the tiles in the database
-    const tiles = await createTiles(token, { revealOverlay, rotation });
+    const tiles = await createMaskTiles(object, { revealOverlay, rotation });
     const tileIds = tiles.map(t => t.id);
 
-    // 2. Store tile IDs on the token flags as a backup
-    await socket.token.edit(token.id, { [`flags.eskie-macros.token-masks.${animationId}`]: tileIds });
+    // 2. Store tile IDs on the object flags as a backup
+    await socket.object.edit(object.id, { [`flags.eskie-macros.token-masks.${animationId}`]: tileIds });
 
-    // 3. Attach tiles to token
-    await tokens.attachElements(tiles, token);
+    // 3. Attach tiles to object
+    await objectAttachment.attach(tiles, object);
 
     // 4. Set up the tracking promise for all active users
     globalThis.eskie = globalThis.eskie || {};
     globalThis.eskie.tokenMaskTracker = globalThis.eskie.tokenMaskTracker || new Map();
 
     const activeUserIds = game.users.filter(u => u.active).map(u => u.id);
-    
+
     let resolvePromise;
     const promise = new Promise((resolve) => {
         resolvePromise = resolve;
@@ -337,11 +350,11 @@ async function playSocketed(token, config = {}) {
     const timeoutId = setTimeout(async () => {
         const tracker = globalThis.eskie.tokenMaskTracker.get(animationId);
         if (tracker) {
-            log.warn(`tokenMaskEffect | Tracker TIMEOUT hit for token ${token.id} (Session: ${animationId})! Cleaning up.`);
+            log.warn(`tokenMaskEffect | Tracker TIMEOUT hit for object ${object.id} (Session: ${animationId})! Cleaning up.`);
             globalThis.eskie.tokenMaskTracker.delete(animationId);
             const eskieModule = game.modules.get(MODULE_ID);
             if (eskieModule?.socketlib) {
-                await eskieModule.socketlib.executeAsGM("cleanUpTokenMask", token.id, animationId, tracker.tileIds, tracker.deleteToken);
+                await eskieModule.socketlib.executeAsGM("cleanUpTokenMask", object.id, animationId, tracker.tileIds, tracker.deleteObject);
             }
             resolvePromise();
         }
@@ -351,7 +364,7 @@ async function playSocketed(token, config = {}) {
         expected: new Set(activeUserIds),
         received: new Set(),
         tileIds: tileIds,
-        deleteToken: deleteToken,
+        deleteObject: deleteObject,
         resolve: () => {
             clearTimeout(timeoutId);
             resolvePromise();
@@ -361,7 +374,7 @@ async function playSocketed(token, config = {}) {
     // 5. Broadcast play event to all active clients
     await eskieModule.socketlib.executeForEveryone(
         'playTokenMaskLocal',
-        token.id,
+        object.id,
         tileIds,
         game.user.id,
         {
@@ -371,7 +384,7 @@ async function playSocketed(token, config = {}) {
             tokenOverlayPath,
             revealOverlayPath,
             animationId,
-            deleteToken
+            deleteObject
         }
     );
 
@@ -379,28 +392,28 @@ async function playSocketed(token, config = {}) {
     return promise;
 }
 
-async function play(token, config = {}) {
+async function play(object, config = {}) {
     // If running locally as part of a multi-client run, play locally without broadcasting
     if (config.localOnly) {
-        const seq = await create(token, config);
+        const seq = await create(object, config);
         if (seq) return seq.play({ remote: false });
         return;
     }
 
     // Otherwise, trigger the coordinating play flow (which wraps the sequence and broadcasts it)
-    const seq = await create(token, config);
+    const seq = await create(object, config);
     if (seq) return seq.play();
 }
 
-async function stop(token, config = {}) {
+async function stop(object, config = {}) {
     const eskieModule = game.modules.get(MODULE_ID);
     if (eskieModule?.socketlib && !config.localOnly) {
-        // Stop all active token mask sessions currently registered on this token
-        const masks = token.document.getFlag('eskie-macros', 'token-masks') || {};
+        // Stop all active token mask sessions currently registered on this object
+        const masks = object.document.getFlag('eskie-macros', 'token-masks') || {};
         const activeAnimationIds = Object.keys(masks);
         if (activeAnimationIds.length > 0) {
             for (const [animationId, tileIds] of Object.entries(masks)) {
-                await eskieModule.socketlib.executeForEveryone('playTokenMaskLocal', token.id, tileIds, game.user.id, {
+                await eskieModule.socketlib.executeForEveryone('playTokenMaskLocal', object.id, tileIds, game.user.id, {
                     ...config,
                     toggleOff: true,
                     animationId
@@ -410,10 +423,10 @@ async function stop(token, config = {}) {
     }
 
     const { id } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
-    const label = `${id} - ${token.id}`;
+    const label = `${id} - ${object.id}`;
 
     return Promise.all([
-        new Sequence().animation().on(token).opacity(1).show(true).play(),
+        new Sequence().animation().on(object).opacity(1).show(true).play(),
         Sequencer.EffectManager.endEffects({ name: label })
     ]);
 }
@@ -422,7 +435,5 @@ export const tokenMaskEffect = {
     create,
     play,
     stop,
-    createTiles,
-    pendingRuns,
     default_config: DEFAULT_CONFIG,
 };
