@@ -1,5 +1,6 @@
 import { MODULE_ID } from "../../lib/constants.js";
 import { log } from '../../lib/logger.js';
+import { socket, socketlib } from "../socketlib.js";
 import { tokenMaskEffect, tokenMaskTracker, playLocal, stopLocal } from "../../animation/mask/token-mask.js";
 
 /**
@@ -18,8 +19,7 @@ async function playTokenMaskLocal(tokenId, tileIds, initiatorUserId, config = {}
     if (!object) {
         console.warn(`Eskie Macros | tokenMaskEffect | playTokenMaskLocal | Object ${tokenId} not found on this client!`);
         // Report completion immediately to not block the initiator
-        const socket = game.modules.get(MODULE_ID).socketlib;
-        await socket.executeForUsers('tokenMaskClientDone', [initiatorUserId], tokenId, game.user.id, config.animationId);
+        await socketlib.executeForUsers('tokenMaskClientDone', [initiatorUserId], tokenId, game.user.id, config.animationId);
         return;
     }
 
@@ -37,8 +37,7 @@ async function playTokenMaskLocal(tokenId, tileIds, initiatorUserId, config = {}
     } catch (err) {
         console.error("Eskie Macros | tokenMaskEffect | playTokenMaskLocal | Error playing local animation:", err);
         // Report completion in case of failure
-        const socket = game.modules.get(MODULE_ID).socketlib;
-        await socket.executeForUsers('tokenMaskClientDone', [initiatorUserId], object.id, game.user.id, config.animationId);
+        await socketlib.executeForUsers('tokenMaskClientDone', [initiatorUserId], object.id, game.user.id, config.animationId);
     }
 }
 
@@ -70,8 +69,7 @@ async function tokenMaskClientDone(tokenId, userId, animationId) {
  */
 async function cleanUpTokenMask(tokenId, animationId, tileIds, deleteObject) {
     if (!game.user.isGM) {
-        const socket = game.modules.get(MODULE_ID).socketlib;
-        return socket.executeAsGM("cleanUpTokenMask", tokenId, animationId, tileIds, deleteObject);
+        return socketlib.executeAsGM("cleanUpTokenMask", tokenId, animationId, tileIds, deleteObject);
     }
     
     log.debug(`cleanUpTokenMask | Cleaning up database for object ${tokenId} (Session: ${animationId}). Delete object: ${deleteObject}`);

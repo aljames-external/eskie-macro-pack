@@ -5,7 +5,7 @@ import { time } from '../../lib/time.js';
 import { object as objectAttachment } from '../../lib/object.js';
 import { absolutePath } from '../../lib/filemanager.js';
 import { dependency } from '../../lib/dependency.js';
-import { socket } from '../../integration/socketlib.js';
+import { socket, socketlib } from '../../integration/socketlib.js';
 import { MODULE_ID } from '../../lib/constants.js';
 import { log } from '../../lib/logger.js';
 
@@ -245,9 +245,8 @@ async function createLocal(object, tileIds, config = {}) {
                 }
             } else {
                 // Coordinated run: report completion to GM initiator
-                const socket = game.modules.get(MODULE_ID).socketlib;
                 if (config.initiatorUserId) {
-                    await socket.executeForUsers('tokenMaskClientDone', [config.initiatorUserId], object.id, game.user.id, config.animationId);
+                    await socketlib.executeForUsers('tokenMaskClientDone', [config.initiatorUserId], object.id, game.user.id, config.animationId);
                 }
             }
         });
@@ -290,8 +289,6 @@ async function create(object, config = {}) {
  * Coordinated play function that broadcasts local playback to all clients.
  */
 async function playSocketed(object, config = {}) {
-    const socket = game.modules.get(MODULE_ID).socketlib;
-
     const { id, deleteObject, revealOverlay, tokenOverlay, rotation, tint } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
 
     // Pre-resolve paths
@@ -324,8 +321,7 @@ async function playSocketed(object, config = {}) {
         if (tracker) {
             log.warn(`tokenMaskEffect | Tracker TIMEOUT hit for object ${object.id} (Session: ${animationId})! Cleaning up.`);
             tokenMaskTracker.delete(animationId);
-            const socket = game.modules.get(MODULE_ID).socketlib;
-            await socket.executeAsGM("cleanUpTokenMask", object.id, animationId, tracker.tileIds, tracker.deleteObject);
+            await socketlib.executeAsGM("cleanUpTokenMask", object.id, animationId, tracker.tileIds, tracker.deleteObject);
             resolvePromise();
         }
     }, 15000);
@@ -342,7 +338,7 @@ async function playSocketed(object, config = {}) {
     });
 
     // 5. Broadcast play event to all active clients
-    await socket.executeForEveryone(
+    await socketlib.executeForEveryone(
         'playTokenMaskLocal',
         object.id,
         tileIds,
@@ -395,13 +391,12 @@ async function stopLocal(object, config = {}) {
  * Public entry point to stop all active token mask sessions.
  */
 async function stop(object, config = {}) {
-    const socket = game.modules.get(MODULE_ID).socketlib;
     // Stop all active token mask sessions currently registered on this object
     const masks = object.document.getFlag('eskie-macros', 'token-masks') || {};
     const activeAnimationIds = Object.keys(masks);
     if (activeAnimationIds.length > 0) {
         for (const [animationId, tileIds] of Object.entries(masks)) {
-            await socket.executeForEveryone('playTokenMaskLocal', object.id, tileIds, game.user.id, {
+            await socketlib.executeForEveryone('playTokenMaskLocal', object.id, tileIds, game.user.id, {
                 ...config,
                 toggleOff: true,
                 animationId
