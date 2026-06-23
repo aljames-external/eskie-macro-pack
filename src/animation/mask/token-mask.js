@@ -38,7 +38,7 @@ async function createMaskTiles(object, config = {}) {
     const revealMaskUpdatesBase = {
         "texture.src": revealOverlayPath,
         "alpha": 0,
-        "hidden": true,
+        "hidden": false,
         "x": object.x - (widthAdjustment * object.document.width * (scaleXY - 1) / 2),
         "y": object.y - (widthAdjustment * object.document.height * (scaleXY - 1) / 2),
         "video": {
