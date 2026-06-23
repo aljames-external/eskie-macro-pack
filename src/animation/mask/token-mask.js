@@ -285,6 +285,9 @@ async function create(object, config = {}) {
 
     let seq = new Sequence();
     seq.thenDo(async () => {
+        if (!game.user.isGM) {
+            return socketlib.executeAsGM('playTokenMaskGM', object.id, config);
+        }
         return playSocketed(object, config);
     });
     return seq;
@@ -367,9 +370,6 @@ async function playSocketed(object, config = {}) {
  * Public entry point to play the coordinated multi-client effect.
  */
 async function play(object, config = {}) {
-    if (!game.user.isGM) {
-        return socketlib.executeAsGM('playTokenMaskGM', object.id, config);
-    }
     const seq = await create(object, config);
     if (seq) return seq.play();
 }
