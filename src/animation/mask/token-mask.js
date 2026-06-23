@@ -266,7 +266,7 @@ async function create(object, config = {}) {
     }
 
     if (typeof window !== 'undefined' && !window.isSecureContext) {
-        console.warn("Eskie Macros | tokenMaskEffect | Warning: Running in an insecure context (HTTP). Advanced WebGL features like the Spritesheet Generator and sprite masks require a secure context and may fail or crash. Please connect using a secure address like https://<domain>:<port> or http://localhost:<port>.");
+        log.warn("Running in an insecure context (HTTP). Advanced WebGL features like the Spritesheet Generator and sprite masks require a secure context and may fail or crash. Please connect using a secure address like https://<domain>:<port> or http://localhost:<port>.");
     }
 
     dependency.required([
