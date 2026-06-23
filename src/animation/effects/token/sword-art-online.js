@@ -7,7 +7,7 @@ const DEFAULT_CONFIG = {
     tintColor: '#00BFFF',
     duration: 600,
     shatterColor: 'blue',
-    deleteToken: false,
+    deleteObject: false,
     sound: {
         enabled: false,
         volume: 0.3,
@@ -17,7 +17,7 @@ const DEFAULT_CONFIG = {
 
 async function create(source, config = {}) {
     config = settingsOverride(config);
-    const { id, tintColor, duration, shatterColor, deleteToken, sound } =
+    const { id, tintColor, duration, shatterColor, deleteObject, sound } =
         foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
     const label = `${id}-${source.id}`;
 
@@ -97,7 +97,7 @@ async function create(source, config = {}) {
                 id,
                 color: shatterColor,
                 tint: tintColor,
-                deleteToken,
+                deleteObject,
                 callback: {
                     tokenOverlay: colorMatrix
                 },
@@ -119,13 +119,13 @@ async function play(source, config = {}) {
 }
 
 async function stop(source, config = {}) {
-    const { id, shatterColor, deleteToken } =
+    const { id, shatterColor, deleteObject } =
         foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
     const label = `${id}-${source.id}`;
 
     return Promise.all([
         Sequencer.EffectManager.endEffects({ name: label }),
-        shatterMask.stop(source, { id, color: shatterColor, deleteToken })
+        shatterMask.stop(source, { id, color: shatterColor, deleteObject })
     ]);
 }
 
