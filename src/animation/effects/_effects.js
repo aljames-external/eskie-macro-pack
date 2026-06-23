@@ -7,7 +7,7 @@ import { benignTransportation } from "./on-target/benign-transportation.js";
 import { blastLock } from "./template/blast-lock.js";
 import { bless } from "./active-effect/bless.js";
 import { blurredVision } from "./active-effect/blurred-vision.js";
-import { burnMask } from "./token-mask/burn-mask.js";
+import { burnMask } from "../mask/burn-mask.js";
 import { call } from "./token/call.js";
 import { curseOfTheWerewolf } from "./token/curse-of-the-werewolf.js";
 import { callLightning } from "./token/call-lightning.js";
@@ -75,13 +75,13 @@ import { romanCandle } from "./target/roman-candle.js";
 import { sandevistan } from "./active-effect/sandevistan.js";
 import { sanctuary } from "./target/sanctuary.js";
 import { shapechange } from "./active-effect/shapechange.js";
-import { shatterMask } from "./token-mask/shatter-mask.js";
+import { shatterMask } from "../mask/shatter-mask.js";
 import { shockingGrasp } from "./target/shocking-grasp.js";
 import { shuffle } from "./multi-token/shuffle.js";
 import { silence } from "./template/silence.js";
 import { skyRocket } from "./target/sky-rocket.js";
 import { sleep } from "./target/sleep.js";
-import { smokeMask } from "./token-mask/smoke-mask.js";
+import { smokeMask } from "../mask/smoke-mask.js";
 import { sneakAttack } from "./on-target/sneak-attack.js";
 import { speakWithDead } from "./active-effect/speakWithDead.js";
 import { spikeGrowth } from "./template/spike-growth.js";
@@ -94,14 +94,29 @@ import { stunningStrike } from "./target/stunning-strike.js";
 import { suggestion } from "./target/suggestion.js";
 import { surprised } from "./token/surprised.js";
 import { tashasCausticBrew } from "./template/tashas-caustic-brew.js";
-import { tearMask } from "./token-mask/tear-mask.js";
+import { tearMask } from "../mask/tear-mask.js";
 import { teleport } from "./template/teleport.js";
 import { totemicAttunement } from "./active-effect/rage/totemic-attunement/_attunement.js";
 import { trueStrike } from "./target/true-strike.js";
 import { viciousMockery } from "./target/vicious-mockery.js";
 import { vortexWarp } from "./target/vortex-warp.js";
 import { wingsV2 } from "./token/wings-v2.js";
-import { swordArtOnlineDeath } from "./token/sword-art-online.js";
+import { saoDeath } from "../mask/sao-death.js";
+
+function deprecateObject(newObj, oldPath, newPath, dateStr) {
+    const wrapped = {};
+    for (const [key, val] of Object.entries(newObj)) {
+        if (typeof val === 'function') {
+            wrapped[key] = async function(...args) {
+                console.warn(`Eskie Macros | Deprecation Warning: '${oldPath}.${key}' is deprecated and will be removed on ${dateStr}. Please update your call to use '${newPath}.${key}' instead.`);
+                return val(...args);
+            };
+        } else {
+            wrapped[key] = val;
+        }
+    }
+    return wrapped;
+}
 
 export const effect = {
     animateDead,
@@ -202,14 +217,14 @@ export const effect = {
     teleport,
     totemicAttunement,
     tokenMask: {
-        burn: burnMask,
-        shatter: shatterMask,
-        tear: tearMask,
-        smoke: smokeMask,
+        burn: deprecateObject(burnMask, 'eskie.effect.tokenMask.burn', 'eskie.mask.burn', 'January 1, 2028'),
+        shatter: deprecateObject(shatterMask, 'eskie.effect.tokenMask.shatter', 'eskie.mask.shatter', 'January 1, 2028'),
+        tear: deprecateObject(tearMask, 'eskie.effect.tokenMask.tear', 'eskie.mask.tear', 'January 1, 2028'),
+        smoke: deprecateObject(smokeMask, 'eskie.effect.tokenMask.smoke', 'eskie.mask.smoke', 'January 1, 2028'),
     },
     trueStrike,
     viciousMockery,
     vortexWarp,
     wingsV2,
-    swordArtOnlineDeath,
+    swordArtOnlineDeath: deprecateObject(saoDeath, 'eskie.effect.swordArtOnlineDeath', 'eskie.mask.saoDeath', 'January 1, 2028'),
 };
