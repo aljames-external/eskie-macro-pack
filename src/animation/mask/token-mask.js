@@ -98,9 +98,7 @@ async function create(object, config = {}) {
     const { id, deleteObject, revealOverlay, tokenOverlay, rotation, tint, callback, tileIds, localOnly } =
         foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
 
-    // If localOnly is false and socketlib is available, coordinate the multi-client animation
-    const eskieModule = game.modules.get(MODULE_ID);
-    if (!localOnly && eskieModule?.socketlib) {
+    if (!localOnly) {
         let seq = new Sequence();
         seq.thenDo(async () => {
             return playSocketed(object, config);
@@ -259,7 +257,7 @@ async function create(object, config = {}) {
                 }
             } else {
                 // Coordinated run: report completion to GM initiator
-                if (eskieModule?.socketlib && config.initiatorUserId) {
+                if (config.initiatorUserId) {
                     await eskieModule.socketlib.executeForUsers('tokenMaskClientDone', [config.initiatorUserId], object.id, game.user.id, config.animationId);
                 }
             }
@@ -273,7 +271,6 @@ async function create(object, config = {}) {
  */
 async function playSocketed(object, config = {}) {
     const eskieModule = game.modules.get(MODULE_ID);
-    if (!eskieModule?.socketlib) return;
 
     const { id, deleteObject, revealOverlay, tokenOverlay, rotation, tint } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
 
@@ -308,9 +305,7 @@ async function playSocketed(object, config = {}) {
             log.warn(`tokenMaskEffect | Tracker TIMEOUT hit for object ${object.id} (Session: ${animationId})! Cleaning up.`);
             tokenMaskTracker.delete(animationId);
             const eskieModule = game.modules.get(MODULE_ID);
-            if (eskieModule?.socketlib) {
-                await eskieModule.socketlib.executeAsGM("cleanUpTokenMask", object.id, animationId, tracker.tileIds, tracker.deleteObject);
-            }
+            await eskieModule.socketlib.executeAsGM("cleanUpTokenMask", object.id, animationId, tracker.tileIds, tracker.deleteObject);
             resolvePromise();
         }
     }, 15000);
@@ -362,7 +357,7 @@ async function play(object, config = {}) {
 
 async function stop(object, config = {}) {
     const eskieModule = game.modules.get(MODULE_ID);
-    if (eskieModule?.socketlib && !config.localOnly) {
+    if (!config.localOnly) {
         // Stop all active token mask sessions currently registered on this object
         const masks = object.document.getFlag('eskie-macros', 'token-masks') || {};
         const activeAnimationIds = Object.keys(masks);
