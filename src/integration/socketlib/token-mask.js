@@ -1,6 +1,6 @@
 import { MODULE_ID } from "../../lib/constants.js";
 import { log } from '../../lib/logger.js';
-import { tokenMaskEffect } from "../../animation/mask/token-mask.js";
+import { tokenMaskEffect, tokenMaskTracker } from "../../animation/mask/token-mask.js";
 
 /**
  * Socketlib handler to execute local sequence rendering on a client.
@@ -18,7 +18,7 @@ async function playTokenMaskLocal(tokenId, tileIds, initiatorUserId, config = {}
     if (!object) {
         console.warn(`Eskie Macros | tokenMaskEffect | playTokenMaskLocal | Object ${tokenId} not found on this client!`);
         // Report completion immediately to not block the initiator
-        const eskieModule = game.modules.get('eskie-macros');
+        const eskieModule = game.modules.get(MODULE_ID);
         if (eskieModule?.socketlib) {
             await eskieModule.socketlib.executeForUsers('tokenMaskClientDone', [initiatorUserId], tokenId, game.user.id, config.animationId);
         }
@@ -36,7 +36,7 @@ async function playTokenMaskLocal(tokenId, tileIds, initiatorUserId, config = {}
     } catch (err) {
         console.error("Eskie Macros | tokenMaskEffect | playTokenMaskLocal | Error playing local animation:", err);
         // Report completion in case of failure
-        const eskieModule = game.modules.get('eskie-macros');
+        const eskieModule = game.modules.get(MODULE_ID);
         if (eskieModule?.socketlib) {
             await eskieModule.socketlib.executeForUsers('tokenMaskClientDone', [initiatorUserId], object.id, game.user.id, config.animationId);
         }
@@ -47,7 +47,7 @@ async function playTokenMaskLocal(tokenId, tileIds, initiatorUserId, config = {}
  * Socketlib handler to report local animation completion back to the initiator.
  */
 async function tokenMaskClientDone(tokenId, userId, animationId) {
-    const tracker = globalThis.eskie?.tokenMaskTracker?.get(animationId);
+    const tracker = tokenMaskTracker.get(animationId);
     if (tracker) {
         tracker.received.add(userId);
         log.debug(`tokenMaskClientDone | Received completion signal from user ${userId} for session ${animationId}. Progress: ${tracker.received.size}/${tracker.expected.size}`);
@@ -71,7 +71,7 @@ async function tokenMaskClientDone(tokenId, userId, animationId) {
  */
 async function cleanUpTokenMask(tokenId, animationId, tileIds, deleteObject) {
     if (!game.user.isGM) {
-        const eskieModule = game.modules.get('eskie-macros');
+        const eskieModule = game.modules.get(MODULE_ID);
         if (eskieModule?.socketlib) {
             return eskieModule.socketlib.executeAsGM("cleanUpTokenMask", tokenId, animationId, tileIds, deleteObject);
         }
