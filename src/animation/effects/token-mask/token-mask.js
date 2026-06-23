@@ -310,7 +310,7 @@ async function playSocketed(token, config = {}) {
         revealOverlayPath = (typeof entry === 'string') ? entry : (entry?.file || entry?.files?.[0] || revealOverlayConfig);
     } catch (e) {}
 
-    const animationId = randomID();
+    const animationId = foundry.utils.randomID();
 
     // 1. Create the tiles in the database
     const tiles = await createTiles(token, { revealOverlay, rotation });
