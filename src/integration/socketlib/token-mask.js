@@ -83,12 +83,14 @@ async function cleanUpTokenMask(tokenId, animationId, tileIds, deleteObject) {
         if (tiles.length > 0) {
             await objectAttachment.detach(tiles, object);
         }
+    }
 
-        // Always delete the tiles
-        if (tileIds && tileIds.length > 0) {
-            await Promise.all(tileIds.map(tileId => tile.destroy(tileId)));
-        }
+    // Always delete the tiles, even if the target object was already deleted
+    if (tileIds && tileIds.length > 0) {
+        await Promise.all(tileIds.map(tileId => tile.destroy(tileId)));
+    }
 
+    if (object) {
         if (deleteObject) {
             await object.document.delete();
         } else if (animationId) {
