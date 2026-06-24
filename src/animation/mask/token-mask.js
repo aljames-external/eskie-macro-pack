@@ -78,13 +78,16 @@ async function createMaskTiles(object, config = {}) {
  * Internal helper to build the local animation sequence using pre-created tiles.
  * Guaranteed to be called only locally on the client.
  */
-async function createLocal(object, tileIds, config = {}) {
+async function createLocal(object, tileIds, animationId, config = {}) {
     if (!object) {
         ui.notifications?.warn("Eskie Macros | No token or tile provided or selected.");
         return log.warn("tokenMaskEffect.createLocal: No object provided. Effect aborted.");
     }
     if (!tileIds || tileIds.length === 0) {
         return log.warn("tokenMaskEffect.createLocal: Missing required 'tileIds' for local animation. Effect aborted.");
+    }
+    if (!animationId) {
+        throw new Error("tokenMaskEffect.createLocal: 'animationId' is required.");
     }
 
     const isToken = getDocumentName(object) === 'Token';
@@ -227,15 +230,11 @@ async function createLocal(object, tileIds, config = {}) {
                 log.warn(`tokenMaskEffect.createLocal | Timeout waiting for effects with label "${label}" to end. Proceeding with cleanup.`);
             }
 
-            if (!config.animationId) {
-                // Standalone run: clean up database immediately via GM
-                const tileIds = [objectRevealMask.id, sceneRevealMask.id, objectShapeMask.id];
-                await socketlib.executeAsGM("cleanUpTokenMask", object.id, null, tileIds, deleteObject);
+            // Coordinated run: report completion to GM initiator
+            if (config.initiatorUserId) {
+                await socketlib.executeForUsers('tokenMaskClientDone', [config.initiatorUserId], object.id, game.user.id, animationId);
             } else {
-                // Coordinated run: report completion to GM initiator
-                if (config.initiatorUserId) {
-                    await socketlib.executeForUsers('tokenMaskClientDone', [config.initiatorUserId], object.id, game.user.id, config.animationId);
-                }
+                log.warn(`tokenMaskEffect.createLocal | Missing 'initiatorUserId'. Completion could not be reported for session ${animationId}.`);
             }
         });
 
@@ -360,8 +359,8 @@ async function play(object, config = {}) {
 /**
  * Internal entry point to play the local animation sequence on this client.
  */
-async function playLocal(object, tileIds, config = {}) {
-    const seq = await createLocal(object, tileIds, config);
+async function playLocal(object, tileIds, animationId, config = {}) {
+    const seq = await createLocal(object, tileIds, animationId, config);
     if (seq) return seq.play({ remote: false });
 }
 
@@ -392,6 +391,15 @@ async function stop(object, config = {}) {
                 toggleOff: true,
                 animationId
             });
+
+            // Clean up the database immediately via GM
+            await socketlib.executeAsGM('cleanUpTokenMask', object.id, animationId, tileIds, config.deleteObject || false);
+
+            // Resolve the tracker if it exists on this client
+            const tracker = tokenMaskTracker.get(animationId);
+            if (tracker) {
+                tracker.resolve();
+            }
         }
     }
 

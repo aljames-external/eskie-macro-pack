@@ -32,7 +32,7 @@ async function playTokenMaskLocal(tokenId, tileIds, initiatorUserId, config = {}
         }
 
         // Play the animation locally
-        await playLocal(object, tileIds, {
+        await playLocal(object, tileIds, config.animationId, {
             ...config,
             initiatorUserId
         });
