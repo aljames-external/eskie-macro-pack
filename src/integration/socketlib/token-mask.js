@@ -3,6 +3,7 @@ import { log } from '../../lib/logger.js';
 import { socket, socketlib } from "../socketlib.js";
 import { object as objectAttachment } from "../../lib/object.js";
 import { tokenMaskEffect, tokenMaskTracker, playLocal, stopLocal } from "../../animation/mask/token-mask.js";
+import { tile } from "./tile.js";
 
 /**
  * Socketlib handler to execute local sequence rendering on a client.
@@ -31,7 +32,7 @@ async function playTokenMaskLocal(tokenId, tileIds, initiatorUserId, config = {}
         }
 
         // Play the animation locally
-        await playLocal(object, tileIds, {
+        await playLocal(object, tileIds, config.animationId, {
             ...config,
             initiatorUserId
         });
@@ -82,15 +83,17 @@ async function cleanUpTokenMask(tokenId, animationId, tileIds, deleteObject) {
         if (tiles.length > 0) {
             await objectAttachment.detach(tiles, object);
         }
+    }
 
+    // Always delete the tiles, even if the target object was already deleted
+    if (tileIds && tileIds.length > 0) {
+        await Promise.all(tileIds.map(tileId => tile.destroy(tileId)));
+    }
+
+    if (object) {
         if (deleteObject) {
             await object.document.delete();
-        } else {
-            // Delete the tiles
-            if (tileIds && tileIds.length > 0) {
-                const { tile } = await import('./tile.js');
-                await Promise.all(tileIds.map(tileId => tile.destroy(tileId)));
-            }
+        } else if (animationId) {
             // Remove only this specific animationId session's flag
             await object.document.update({
                 [`flags.eskie-macros.token-masks.-=${animationId}`]: null
