@@ -10,7 +10,7 @@ const DEFAULT_CONFIG = {
     deleteObject: false,
     sound: {
         enabled: false,
-        volume: 0.3,
+        volume: 0.2,
         file: "SAO/sfx/saoexplo.mp3",   // Replace this with a file in some asset library (PSFX, etc)
     }
 };
@@ -24,7 +24,7 @@ async function create(source, config = {}) {
     let sequence = new Sequence();
     if (sound.enabled) {
         sequence = sequence.sound()
-            .file(sound.file)
+            .file(closest(sound.file))
             .volume(sound.volume)
             .fadeInAudio(50)
             .fadeOutAudio(500);
@@ -36,14 +36,14 @@ async function create(source, config = {}) {
         .file(closest("jaamod.spells_effects.antilife_shell"))
         .attachTo(source)
         .scaleToObject(1.1)
-        .opacity(0.15)
+        .opacity(1)
         .filter("ColorMatrix", {
             hue: 510,
             saturate: 1.2,
             brightness: 15
         })
         .fadeIn(duration)
-        .belowTokens(true)
+        .belowTokens(false)
         .name(label)
         .persist()
 
@@ -77,7 +77,29 @@ async function create(source, config = {}) {
                     quality: 0.1,      // Number, describes the quality of the glow (0 to 1) - the higher the number the less performant
                     knockout: false    // Boolean, toggle to hide the contents and only show glow (effectively hides the sprite)
                 })
-                .belowTokens(true);
+                .belowTokens(true)
+
+                .effect()
+                .file(closest("jb2a.markers.circle_of_stars.blue"))
+                .size({
+                    width: source.document.width * 1.8,
+                    height: source.document.height * 1.8
+                }, { gridUnits: true })
+                .delay(1050)
+                .fadeIn(600)
+                .scaleIn(0.1, 400)
+                .fadeOut(600)
+                .duration(1800)
+                .atLocation(source.center)        // 🔥 important
+                .filter("Glow", {
+                    distance: 1,      // Number, distance of the glow in pixels
+                    outerStrength: 1,  // Number, strength of the glow outward from the edge of the sprite
+                    innerStrength: 0,  // Number, strength of the glow inward from the edge of the sprite
+                    color: 0x1FFFA3,   // Hexadecimal, color of the glow
+                    quality: 0.1,      // Number, describes the quality of the glow (0 to 1) - the higher the number the less performant
+                    knockout: false    // Boolean, toggle to hide the contents and only show glow (effectively hides the sprite)
+                })
+                .belowTokens(false);
 
             // Token Overlay colorMatrix for shatter mask
             function colorMatrix(seq) {
