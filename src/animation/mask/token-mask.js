@@ -228,16 +228,9 @@ async function createLocal(object, tileIds, config = {}) {
             }
 
             if (!config.animationId) {
-                // Standalone run: clean up database immediately
-                if (deleteObject) {
-                    await object.document.delete();
-                } else {
-                    await Promise.all([
-                        socket.tile.destroy(objectRevealMask.id),
-                        socket.tile.destroy(objectShapeMask.id),
-                        socket.tile.destroy(sceneRevealMask.id),
-                    ]);
-                }
+                // Standalone run: clean up database immediately via GM
+                const tileIds = [objectRevealMask.id, sceneRevealMask.id, objectShapeMask.id];
+                await socketlib.executeAsGM("cleanUpTokenMask", object.id, null, tileIds, deleteObject);
             } else {
                 // Coordinated run: report completion to GM initiator
                 if (config.initiatorUserId) {
@@ -318,9 +311,8 @@ async function playSocketed(object, config = {}) {
         const tracker = tokenMaskTracker.get(animationId);
         if (tracker) {
             log.warn(`tokenMaskEffect | Tracker TIMEOUT hit for object ${object.id} (Session: ${animationId})! Cleaning up.`);
-            tokenMaskTracker.delete(animationId);
             await socketlib.executeAsGM("cleanUpTokenMask", object.id, animationId, tracker.tileIds, tracker.deleteObject);
-            resolvePromise();
+            tracker.resolve();
         }
     }, 15000);
 
@@ -331,6 +323,7 @@ async function playSocketed(object, config = {}) {
         deleteObject: deleteObject,
         resolve: () => {
             clearTimeout(timeoutId);
+            tokenMaskTracker.delete(animationId);
             resolvePromise();
         }
     });
