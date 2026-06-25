@@ -100,14 +100,14 @@ import { totemicAttunement } from "./active-effect/rage/totemic-attunement/_attu
 import { trueStrike } from "./target/true-strike.js";
 import { viciousMockery } from "./target/vicious-mockery.js";
 import { vortexWarp } from "./target/vortex-warp.js";
-import { wingsV2 } from "./token/wings-v2.js";
+import { wings } from "./token/wings.js";
 import { saoDeath } from "../mask/sao-death.js";
 
 function deprecateObject(newObj, oldPath, newPath, dateStr) {
     const wrapped = {};
     for (const [key, val] of Object.entries(newObj)) {
         if (typeof val === 'function') {
-            wrapped[key] = async function(...args) {
+            wrapped[key] = async function (...args) {
                 console.warn(`Eskie Macros | Deprecation Warning: '${oldPath}.${key}' is deprecated and will be removed on ${dateStr}. Please update your call to use '${newPath}.${key}' instead.`);
                 return val(...args);
             };
@@ -225,6 +225,7 @@ export const effect = {
     trueStrike,
     viciousMockery,
     vortexWarp,
-    wingsV2,
+    wings,
+    wingsV2: deprecateObject(wings, 'eskie.effect.wingsV2', 'eskie.mask.wings', 'January 1, 2028'),
     swordArtOnlineDeath: deprecateObject(saoDeath, 'eskie.effect.swordArtOnlineDeath', 'eskie.mask.saoDeath', 'January 1, 2028'),
 };

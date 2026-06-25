@@ -6,9 +6,9 @@
 import { closest } from "../../../lib/filemanager.js";
 
 const DEFAULT_CONFIG = {
-    id: 'wingsV2',
+    id: 'wings',
     image: 'eskie.wings',
-    offset: {x: 0, y: 0},
+    offset: { x: 0, y: 0 },
     hue: 0,             // Hue change
     wingSize: 1,        // Wing Size
     speedMulti: 1,      // Wing Speed multiplier
@@ -22,7 +22,7 @@ const DEFAULT_CONFIG = {
  * @param {object} config Configuration options for the animation.
  * @returns {Sequence} The created Sequence object.
  */
-async function createWingsV2(token, config = {}) {
+async function createWings(token, config = {}) {
     const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
     const { id, image, offset, hue, wingSize, speedMulti, swayMulti } = mConfig;
 
@@ -62,7 +62,7 @@ async function createWingsV2(token, config = {}) {
         .effect()
         .name(`${id} - ${token.id}`) // Unique name for stopping
         .file(closest(image))
-        .attachTo(token, { offset: { y: offset.y -0.5 - (0.1 * swayMulti), x: offset.x}, gridUnits: true, bindAlpha: false })
+        .attachTo(token, { offset: { y: offset.y - 0.5 - (0.1 * swayMulti), x: offset.x }, gridUnits: true, bindAlpha: false })
         .scaleToObject(3 * wingSize)
         .persist()
         .animateProperty("spriteContainer", "position.y", { from: 0.5 + (0.1 * swayMulti), to: -0, duration: 1000, gridUnits: true, ease: "easeOutBack" })
@@ -73,8 +73,7 @@ async function createWingsV2(token, config = {}) {
 
         .animation()
         .on(token)
-        .opacity(1)
-    ;
+        .opacity(1);
 
     return sequence;
 }
@@ -87,8 +86,8 @@ async function createWingsV2(token, config = {}) {
  * @param {object} config Configuration options for the animation.
  * @returns {Promise<void>} A promise that resolves when the effect is played or stopped.
  */
-async function playWingsV2(token, config = {}) {
-    const sequence = await createWingsV2(token, config);
+async function playWings(token, config = {}) {
+    const sequence = await createWings(token, config);
     if (sequence) { sequence.play(); }
 }
 
@@ -98,16 +97,16 @@ async function playWingsV2(token, config = {}) {
  * @param {Token} token The token to remove wings from.
  * @param {object} config Configuration options for the animation.
  */
-function stopWingsV2(token, config = {}) {
+function stopWings(token, config = {}) {
     const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
     const { id } = mConfig;
 
     Sequencer.EffectManager.endEffects({ name: `${id} - ${token.id}` });
 }
 
-export const wingsV2 = {
-    create: createWingsV2,
-    play: playWingsV2,
-    stop: stopWingsV2,
+export const wings = {
+    create: createWings,
+    play: playWings,
+    stop: stopWings,
     default_config: DEFAULT_CONFIG,
 };
