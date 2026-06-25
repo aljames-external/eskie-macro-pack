@@ -12,7 +12,9 @@ const DEFAULT_CONFIG = {
     hue: 0,             // Hue change
     wingSize: 1,        // Wing Size
     speedMulti: 1,      // Wing Speed multiplier
-    swayMulti: 1        // Token Sway Distance multiplier
+    swayMulti: 1,       // Token Sway Distance multiplier
+    mirrorX: false,
+    mirrorY: false,
 };
 
 /**
@@ -24,7 +26,7 @@ const DEFAULT_CONFIG = {
  */
 async function createWings(token, config = {}) {
     const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
-    const { id, image, offset, hue, wingSize, speedMulti, swayMulti } = mConfig;
+    const { id, image, offset, hue, wingSize, speedMulti, swayMulti, mirrorX, mirrorY } = mConfig;
 
     const sequence = new Sequence();
 
@@ -62,6 +64,8 @@ async function createWings(token, config = {}) {
         .effect()
         .name(`${id} - ${token.id}`) // Unique name for stopping
         .file(closest(image))
+        .mirrorX(mirrorX)
+        .mirrorY(mirrorY)
         .attachTo(token, { offset: { y: offset.y - 0.5 - (0.1 * swayMulti), x: offset.x }, gridUnits: true, bindAlpha: false })
         .scaleToObject(3 * wingSize)
         .persist()
