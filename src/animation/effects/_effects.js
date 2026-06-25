@@ -1,3 +1,5 @@
+import { log } from '../../lib/logger.js'
+
 import { aerodyneVehicle } from "./token/aerodyne-vehicle.js";
 import { animateDead } from "./target/animate-dead.js";
 import { armorOfAgathys } from "./target/armor-of-agathys/_armor-of-agathys.js";
@@ -108,7 +110,7 @@ function deprecateObject(newObj, oldPath, newPath, dateStr) {
     for (const [key, val] of Object.entries(newObj)) {
         if (typeof val === 'function') {
             wrapped[key] = async function (...args) {
-                console.warn(`Eskie Macros | Deprecation Warning: '${oldPath}.${key}' is deprecated and will be removed on ${dateStr}. Please update your call to use '${newPath}.${key}' instead.`);
+                log.warn(`Deprecation Warning: '${oldPath}.${key}' is deprecated and will be removed on ${dateStr}. Please update your call to use '${newPath}.${key}' instead.`);
                 return val(...args);
             };
         } else {
