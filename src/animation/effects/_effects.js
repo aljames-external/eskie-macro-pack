@@ -213,6 +213,6 @@ export const effect = {
     viciousMockery,
     vortexWarp,
     wings,
-    wingsV2: warn.deprecation(wings, 'eskie.effect.wingsV2', 'eskie.mask.wings', 'January 1, 2028'),
+    wingsV2: warn.deprecation(wings, 'eskie.effect.wingsV2', 'eskie.effect.wings', 'January 1, 2028'),
     swordArtOnlineDeath: warn.deprecation(saoDeath, 'eskie.effect.swordArtOnlineDeath', 'eskie.mask.saoDeath', 'January 1, 2028'),
 };
