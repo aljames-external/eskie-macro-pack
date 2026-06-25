@@ -1,4 +1,4 @@
-import { log } from '../../lib/logger.js'
+import { warn } from '../../lib/warnings.js'
 
 import { aerodyneVehicle } from "./token/aerodyne-vehicle.js";
 import { animateDead } from "./target/animate-dead.js";
@@ -105,21 +105,6 @@ import { vortexWarp } from "./target/vortex-warp.js";
 import { wings } from "./token/wings.js";
 import { saoDeath } from "../mask/sao-death.js";
 
-function deprecateObject(newObj, oldPath, newPath, dateStr) {
-    const wrapped = {};
-    for (const [key, val] of Object.entries(newObj)) {
-        if (typeof val === 'function') {
-            wrapped[key] = async function (...args) {
-                log.warn(`Deprecation Warning: '${oldPath}.${key}' is deprecated and will be removed on ${dateStr}. Please update your call to use '${newPath}.${key}' instead.`);
-                return val(...args);
-            };
-        } else {
-            wrapped[key] = val;
-        }
-    }
-    return wrapped;
-}
-
 export const effect = {
     animateDead,
     armorOfAgathys,
@@ -219,15 +204,15 @@ export const effect = {
     teleport,
     totemicAttunement,
     tokenMask: {
-        burn: deprecateObject(burnMask, 'eskie.effect.tokenMask.burn', 'eskie.mask.burn', 'January 1, 2028'),
-        shatter: deprecateObject(shatterMask, 'eskie.effect.tokenMask.shatter', 'eskie.mask.shatter', 'January 1, 2028'),
-        tear: deprecateObject(tearMask, 'eskie.effect.tokenMask.tear', 'eskie.mask.tear', 'January 1, 2028'),
-        smoke: deprecateObject(smokeMask, 'eskie.effect.tokenMask.smoke', 'eskie.mask.smoke', 'January 1, 2028'),
+        burn: warn.deprecation(burnMask, 'eskie.effect.tokenMask.burn', 'eskie.mask.burn', 'January 1, 2028'),
+        shatter: warn.deprecation(shatterMask, 'eskie.effect.tokenMask.shatter', 'eskie.mask.shatter', 'January 1, 2028'),
+        tear: warn.deprecation(tearMask, 'eskie.effect.tokenMask.tear', 'eskie.mask.tear', 'January 1, 2028'),
+        smoke: warn.deprecation(smokeMask, 'eskie.effect.tokenMask.smoke', 'eskie.mask.smoke', 'January 1, 2028'),
     },
     trueStrike,
     viciousMockery,
     vortexWarp,
     wings,
-    wingsV2: deprecateObject(wings, 'eskie.effect.wingsV2', 'eskie.mask.wings', 'January 1, 2028'),
-    swordArtOnlineDeath: deprecateObject(saoDeath, 'eskie.effect.swordArtOnlineDeath', 'eskie.mask.saoDeath', 'January 1, 2028'),
+    wingsV2: warn.deprecation(wings, 'eskie.effect.wingsV2', 'eskie.mask.wings', 'January 1, 2028'),
+    swordArtOnlineDeath: warn.deprecation(saoDeath, 'eskie.effect.swordArtOnlineDeath', 'eskie.mask.saoDeath', 'January 1, 2028'),
 };
