@@ -74,22 +74,34 @@ async function propagateBigBolts(nodeIndex, sourceToken, targetTokens, A, N, cas
         ? { offset: { x: caster.document.width * 0.25 }, gridUnits: true, local: true }
         : { offset: { x: -0.1 }, gridUnits: true, local: true };
 
-    // Big lightning bolt
+    // 1. Big lightning bolt
     seq.effect()
         .file(file)
         .atLocation(sourceToken, offset)
         .stretchTo(currentToken)
         .zIndex(2);
 
-    // Shake/copy sprite on impact
+    // 2. Shocking static electricity on target (from electric-door)
+    seq.effect()
+        .file(closest('jb2a.static_electricity.03.blue'))
+        .attachTo(currentToken)
+        .scaleToObject(1.25, { considerTokenScale: true })
+        .opacity(1)
+        .playbackRate(1)
+        .fadeOut(1000)
+        .randomRotation()
+        .repeats(3, 300, 300);
+
+    // 3. Shaking copy sprite representing electrocution (from electric-door)
     seq.effect()
         .copySprite(currentToken)
+        .spriteRotation(-(currentToken.document?.rotation ?? currentToken.rotation ?? 0))
         .attachTo(currentToken)
         .scaleToObject(1, { considerTokenScale: true })
         .fadeIn(250)
-        .fadeOut(1250)
-        .loopProperty("sprite", "position.x", { from: -0.05, to: 0.05, duration: 50, pingPong: true, gridUnits: true })
-        .duration(2000)
+        .fadeOut(1500)
+        .loopProperty('sprite', 'position.x', { from: -0.05, to: 0.05, duration: 50, pingPong: true, gridUnits: true })
+        .duration(4000)
         .opacity(0.25);
 
     // Play the big strike (non-blocking)
