@@ -14,6 +14,7 @@ import { call } from "./token/call.js";
 import { curseOfTheWerewolf } from "./token/curse-of-the-werewolf.js";
 import { callLightning } from "./token/call-lightning.js";
 import { chainLightning } from "./token/chain-lightning.js";
+import { chainLightningAdjacent } from "./token/chain-lightning-adjacent.js";
 import { channelDivinityControlUndead } from "./target/channelDivinityControlUndead.js";
 import { channelDivinityDreadAspect } from "./token/channelDivinityDreadAspect.js";
 import { charmed } from "./active-effect/charmed.js";
@@ -118,6 +119,7 @@ export const effect = {
     callLightning,
     curseOfTheWerewolf,
     chainLightning,
+    chainLightningAdjacent,
     hologram,
     aerodyneVehicle,
     channelDivinityControlUndead,
