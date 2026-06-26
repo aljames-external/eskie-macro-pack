@@ -231,14 +231,17 @@ async function create(token, targetTokens, config = {}) {
         const N = targetTokens.length;
         const A = buildAdjacencyMatrix(targetTokens, config.fudgeFactor);
 
-        // Phase 1: Little bolts propagate first, pre-charging the path
-        await propagateLittleBolts(0, token, targetTokens, A, N, config.propagationDelay);
+        // Phase 1: Start little bolts propagation (non-blocking)
+        const littleBoltsPromise = propagateLittleBolts(0, token, targetTokens, A, N, config.propagationDelay);
 
-        // Short dramatic pause between pre-charge and the big strike
+        // Wait releaseDelay from the start of the initial little bolt
         await sleep(config.releaseDelay);
 
-        // Phase 2: Big bolts follow the exact same paths to deliver the final strike
-        await propagateBigBolts(0, token, targetTokens, A, N, token, config.propagationDelay);
+        // Phase 2: Start big bolts propagation
+        const bigBoltsPromise = propagateBigBolts(0, token, targetTokens, A, N, token, config.propagationDelay);
+
+        // Wait for both trees to fully complete before finishing the sequence
+        await Promise.all([littleBoltsPromise, bigBoltsPromise]);
     });
 
     return masterSequence;
