@@ -151,8 +151,6 @@ async function create(object, config = {}) {
             particleSeq.addSequence(shatterSeq)
                 .thenDo(async () => {
                     // Clean up the antilife shell tile after shatter animation
-                    log.debug(visibleTile);
-                    log.debug(visibleTile.id);
                     await socket.tile.destroy(visibleTile.id);
                 }).play();
         });
@@ -172,7 +170,8 @@ async function stop(object, config = {}) {
 
     return Promise.all([
         Sequencer.EffectManager.endEffects({ name: label }),
-        shatterMask.stop(object, { id, color: shatterColor, deleteObject })
+        shatterMask.stop(object, { id, color: shatterColor, deleteObject }),
+        object.document.update({ "texture.tint": "#ffffff" })
     ]);
 }
 
