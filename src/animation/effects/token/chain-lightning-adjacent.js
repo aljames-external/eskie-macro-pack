@@ -5,7 +5,8 @@ import { closest } from "../../../lib/filemanager.js";
 
 const DEFAULT_CONFIG = {
     releaseDelay: 200,
-    fudgeFactor: 0
+    fudgeFactor: 0,
+    propagationDelay: 50
 };
 
 /**
@@ -115,7 +116,7 @@ const sleep = (ms) => new Promise(r => setTimeout(r, ms));
 /**
  * Propagates the "little bolts" (electric arcs) along the MST adjacency tree.
  */
-async function propagateLittleBolts(nodeIndex, sourceToken, targetTokens, A, N) {
+async function propagateLittleBolts(nodeIndex, sourceToken, targetTokens, A, N, propagationDelay) {
     const currentToken = targetTokens[nodeIndex];
     const children = [];
     for (let j = 0; j < N; j++) {
@@ -139,12 +140,12 @@ async function propagateLittleBolts(nodeIndex, sourceToken, targetTokens, A, N) 
     // Play the little bolt (non-blocking)
     seq.play();
 
-    // Rapid stagger delay (50ms) for high-speed cascading flow
-    await sleep(50);
+    // Configurable stagger delay (propagationDelay) for cascading flow
+    await sleep(propagationDelay);
 
     if (children.length > 0) {
         await Promise.all(children.map(childIndex => 
-            propagateLittleBolts(childIndex, currentToken, targetTokens, A, N)
+            propagateLittleBolts(childIndex, currentToken, targetTokens, A, N, propagationDelay)
         ));
     } else {
         // Let the final leaf node's arc finish fading slightly
@@ -155,7 +156,7 @@ async function propagateLittleBolts(nodeIndex, sourceToken, targetTokens, A, N) 
 /**
  * Propagates the "big bolts" (primary/secondary chain lightning) along the MST adjacency tree.
  */
-async function propagateBigBolts(nodeIndex, sourceToken, targetTokens, A, N, caster) {
+async function propagateBigBolts(nodeIndex, sourceToken, targetTokens, A, N, caster, propagationDelay) {
     const currentToken = targetTokens[nodeIndex];
     const children = [];
     for (let j = 0; j < N; j++) {
@@ -196,13 +197,13 @@ async function propagateBigBolts(nodeIndex, sourceToken, targetTokens, A, N, cas
     seq.play();
 
     // If it's the primary bolt (caster to initial target), wait 800ms for it to hit.
-    // Otherwise, use a rapid 50ms stagger delay for the secondary cascade.
-    const staggerDelay = isPrimary ? 800 : 50;
+    // Otherwise, use the configurable propagation delay.
+    const staggerDelay = isPrimary ? 800 : propagationDelay;
     await sleep(staggerDelay);
 
     if (children.length > 0) {
         await Promise.all(children.map(childIndex => 
-            propagateBigBolts(childIndex, currentToken, targetTokens, A, N, caster)
+            propagateBigBolts(childIndex, currentToken, targetTokens, A, N, caster, propagationDelay)
         ));
     } else {
         // Let the final strike's visual effects linger
@@ -231,13 +232,13 @@ async function create(token, targetTokens, config = {}) {
         const A = buildAdjacencyMatrix(targetTokens, config.fudgeFactor);
 
         // Phase 1: Little bolts propagate first, pre-charging the path
-        await propagateLittleBolts(0, token, targetTokens, A, N);
+        await propagateLittleBolts(0, token, targetTokens, A, N, config.propagationDelay);
 
         // Short dramatic pause between pre-charge and the big strike
         await sleep(config.releaseDelay);
 
         // Phase 2: Big bolts follow the exact same paths to deliver the final strike
-        await propagateBigBolts(0, token, targetTokens, A, N, token);
+        await propagateBigBolts(0, token, targetTokens, A, N, token, config.propagationDelay);
     });
 
     return masterSequence;
