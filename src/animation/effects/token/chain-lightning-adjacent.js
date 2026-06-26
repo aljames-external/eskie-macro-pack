@@ -2,6 +2,7 @@
 // Adjacency Matrix Refactoring: Antigravity
 
 import { closest } from "../../../lib/filemanager.js";
+import { time } from "../../../lib/time.js";
 
 const DEFAULT_CONFIG = {
     releaseDelay: 200,
@@ -109,11 +110,6 @@ function buildAdjacencyMatrix(tokens, fudgeFactor = 0) {
 }
 
 /**
- * Standard sleep utility.
- */
-const sleep = (ms) => new Promise(r => setTimeout(r, ms));
-
-/**
  * Propagates the "little bolts" (electric arcs) along the MST adjacency tree.
  */
 async function propagateLittleBolts(nodeIndex, sourceToken, targetTokens, A, N, propagationDelay) {
@@ -141,7 +137,7 @@ async function propagateLittleBolts(nodeIndex, sourceToken, targetTokens, A, N, 
     seq.play();
 
     // Configurable stagger delay (propagationDelay) for cascading flow
-    await sleep(propagationDelay);
+    await time.wait(propagationDelay);
 
     if (children.length > 0) {
         await Promise.all(children.map(childIndex => 
@@ -149,7 +145,7 @@ async function propagateLittleBolts(nodeIndex, sourceToken, targetTokens, A, N, 
         ));
     } else {
         // Let the final leaf node's arc finish fading slightly
-        await sleep(100);
+        await time.wait(100);
     }
 }
 
@@ -199,7 +195,7 @@ async function propagateBigBolts(nodeIndex, sourceToken, targetTokens, A, N, cas
     // If it's the primary bolt (caster to initial target), wait 800ms for it to hit.
     // Otherwise, use the configurable propagation delay.
     const staggerDelay = isPrimary ? 800 : propagationDelay;
-    await sleep(staggerDelay);
+    await time.wait(staggerDelay);
 
     if (children.length > 0) {
         await Promise.all(children.map(childIndex => 
@@ -207,7 +203,7 @@ async function propagateBigBolts(nodeIndex, sourceToken, targetTokens, A, N, cas
         ));
     } else {
         // Let the final strike's visual effects linger
-        await sleep(1200);
+        await time.wait(1200);
     }
 }
 
@@ -235,7 +231,7 @@ async function create(token, targetTokens, config = {}) {
         const littleBoltsPromise = propagateLittleBolts(0, token, targetTokens, A, N, config.propagationDelay);
 
         // Wait releaseDelay from the start of the initial little bolt
-        await sleep(config.releaseDelay);
+        await time.wait(config.releaseDelay);
 
         // Phase 2: Start big bolts propagation
         const bigBoltsPromise = propagateBigBolts(0, token, targetTokens, A, N, token, config.propagationDelay);
