@@ -29,65 +29,51 @@ const getDistance = (t1, t2) => {
 };
 
 /**
- * Constructs the adjacency matrix based on closest positive distances,
- * ensuring each token is visited exactly once.
+ * Constructs the adjacency matrix using Prim's Minimum Spanning Tree algorithm.
+ * This guarantees the "path of least resistance" by always choosing the shortest
+ * possible jump from any already-connected token to any unconnected token.
  */
 function buildAdjacencyMatrix(tokens) {
     const N = tokens.length;
     const A = Array.from({ length: N }, () => Array(N).fill(Infinity));
 
-    // 1. Initialize matrix with distances
+    // 1. Precompute 3D distances between all target tokens
+    const D = Array.from({ length: N }, () => Array(N).fill(Infinity));
     for (let i = 0; i < N; i++) {
         for (let j = 0; j < N; j++) {
             if (i !== j) {
-                A[i][j] = getDistance(tokens[i], tokens[j]);
+                D[i][j] = getDistance(tokens[i], tokens[j]);
             }
         }
     }
 
-    const visited = new Set([0]);
-    const queue = [0];
+    const visited = new Set([0]); // Start with the initial target (index 0)
 
-    while (queue.length > 0) {
-        const rowIndex = queue.shift();
-        const row = A[rowIndex];
+    // Prim's Algorithm loop
+    while (visited.size < N) {
+        let minWeight = Infinity;
+        let bestU = -1;
+        let bestV = -1;
 
-        // 3a. Set all entries corresponding to already visited rows to Infinity
-        for (let j = 0; j < N; j++) {
-            if (visited.has(j) && row[j] !== 0) {
-                row[j] = Infinity;
-            }
-        }
-
-        // Find the smallest positive integer in this row
-        let minVal = Infinity;
-        for (let j = 0; j < N; j++) {
-            if (row[j] > 0 && row[j] < minVal) {
-                minVal = row[j];
-            }
-        }
-
-        // Set the smallest to 0, all others to Infinity
-        if (minVal !== Infinity) {
-            for (let j = 0; j < N; j++) {
-                if (row[j] === minVal) {
-                    row[j] = 0;
-                    // If we haven't visited this target yet, mark it visited and queue it
-                    if (!visited.has(j)) {
-                        visited.add(j);
-                        queue.push(j);
+        // Find the shortest edge connecting a visited node 'u' to an unvisited node 'v'
+        for (const u of visited) {
+            for (let v = 0; v < N; v++) {
+                if (!visited.has(v)) {
+                    if (D[u][v] < minWeight) {
+                        minWeight = D[u][v];
+                        bestU = u;
+                        bestV = v;
                     }
-                } else if (row[j] !== 0) {
-                    row[j] = Infinity;
                 }
             }
+        }
+
+        // If we found a valid shortest connection, add it to the adjacency matrix
+        if (bestU !== -1 && bestV !== -1) {
+            A[bestU][bestV] = 0;
+            visited.add(bestV);
         } else {
-            // No positive integers left, set everything else to Infinity
-            for (let j = 0; j < N; j++) {
-                if (row[j] !== 0) {
-                    row[j] = Infinity;
-                }
-            }
+            break; // Fallback in case of unreachable nodes
         }
     }
 
@@ -100,7 +86,7 @@ function buildAdjacencyMatrix(tokens) {
 const sleep = (ms) => new Promise(r => setTimeout(r, ms));
 
 /**
- * Propagates the "little bolts" (electric arcs) along the adjacency tree.
+ * Propagates the "little bolts" (electric arcs) along the MST adjacency tree.
  */
 async function propagateLittleBolts(nodeIndex, sourceToken, targetTokens, A, N) {
     const currentToken = targetTokens[nodeIndex];
@@ -126,8 +112,8 @@ async function propagateLittleBolts(nodeIndex, sourceToken, targetTokens, A, N) 
     // Play the little bolt (non-blocking)
     seq.play();
 
-    // Stagger the next connections by 500ms for a cascading flow
-    await sleep(500);
+    // Rapid stagger delay (50ms) for high-speed cascading flow
+    await sleep(50);
 
     if (children.length > 0) {
         await Promise.all(children.map(childIndex => 
@@ -140,7 +126,7 @@ async function propagateLittleBolts(nodeIndex, sourceToken, targetTokens, A, N) 
 }
 
 /**
- * Propagates the "big bolts" (primary/secondary chain lightning) along the adjacency tree.
+ * Propagates the "big bolts" (primary/secondary chain lightning) along the MST adjacency tree.
  */
 async function propagateBigBolts(nodeIndex, sourceToken, targetTokens, A, N, caster) {
     const currentToken = targetTokens[nodeIndex];
@@ -182,8 +168,8 @@ async function propagateBigBolts(nodeIndex, sourceToken, targetTokens, A, N, cas
     // Play the big strike (non-blocking)
     seq.play();
 
-    // Wait 800ms for the lightning to connect/strike before propagating further
-    await sleep(800);
+    // Rapid stagger delay (50ms) for a powerful, continuous crackling strike
+    await sleep(50);
 
     if (children.length > 0) {
         await Promise.all(children.map(childIndex => 
@@ -217,6 +203,9 @@ async function create(token, targetTokens, config = {}) {
 
         // Phase 1: Little bolts propagate first, pre-charging the path
         await propagateLittleBolts(0, token, targetTokens, A, N);
+
+        // Short dramatic pause between pre-charge and the big strike
+        await sleep(300);
 
         // Phase 2: Big bolts follow the exact same paths to deliver the final strike
         await propagateBigBolts(0, token, targetTokens, A, N, token);
