@@ -55,7 +55,34 @@ function owners(token, config = {}) {
     return owners;
 };
 
+/**
+ * Calculates the 3D distance between two tokens in scene units (e.g., feet), rounded up.
+ * @param {Token} t1 - The first token.
+ * @param {Token} t2 - The second token.
+ * @returns {number} The 3D distance in scene units, rounded up.
+ */
+function getDistance(t1, t2) {
+    const p1 = t1.center || { x: t1.x, y: t1.y };
+    const p2 = t2.center || { x: t2.x, y: t2.y };
+    const dist2DPx = Math.hypot(p1.x - p2.x, p1.y - p2.y);
+    
+    // Convert 2D pixel distance to scene units (e.g., feet/meters)
+    const gridSize = canvas.grid?.size || 100;
+    const gridDistance = canvas.scene?.grid?.distance || 5;
+    const dist2DUnits = (dist2DPx / gridSize) * gridDistance;
+    
+    // Get elevation difference (already in scene units)
+    const el1 = t1.document?.elevation ?? 0;
+    const el2 = t2.document?.elevation ?? 0;
+    const elDiff = el1 - el2;
+    
+    // 3D Euclidean distance in scene units, rounded up
+    const dist3DUnits = Math.hypot(dist2DUnits, elDiff);
+    return Math.ceil(dist3DUnits);
+}
+
 export const tokens = {
     owners,
-    getNearestSquareCenter
+    getNearestSquareCenter,
+    getDistance
 }

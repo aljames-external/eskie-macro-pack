@@ -4,34 +4,12 @@
 import { closest } from "../../../lib/filemanager.js";
 import { time } from "../../../lib/time.js";
 import { primMST } from "../../../lib/algorithms.js";
+import { tokens } from "../../../lib/tokens.js";
 
 const DEFAULT_CONFIG = {
     releaseDelay: 200,
     fudgeFactor: 0,
     propagationDelay: 50
-};
-
-/**
- * Helper to calculate 3D distance between two tokens in scene units (e.g., feet), rounded up.
- */
-const getDistance = (t1, t2) => {
-    const p1 = t1.center || { x: t1.x, y: t1.y };
-    const p2 = t2.center || { x: t2.x, y: t2.y };
-    const dist2DPx = Math.hypot(p1.x - p2.x, p1.y - p2.y);
-    
-    // Convert 2D pixel distance to scene units (e.g., feet/meters)
-    const gridSize = canvas.grid?.size || 100;
-    const gridDistance = canvas.scene?.grid?.distance || 5;
-    const dist2DUnits = (dist2DPx / gridSize) * gridDistance;
-    
-    // Get elevation difference (already in scene units)
-    const el1 = t1.document?.elevation ?? 0;
-    const el2 = t2.document?.elevation ?? 0;
-    const elDiff = el1 - el2;
-    
-    // 3D Euclidean distance in scene units, rounded up
-    const dist3DUnits = Math.hypot(dist2DUnits, elDiff);
-    return Math.ceil(dist3DUnits);
 };
 
 /**
@@ -150,7 +128,7 @@ async function create(token, targetTokens, config = {}) {
 
     masterSequence.thenDo(async () => {
         const N = targetTokens.length;
-        const A = primMST(targetTokens, config.fudgeFactor, getDistance);
+        const A = primMST(targetTokens, config.fudgeFactor, tokens.getDistance);
 
         // Phase 1: Start little bolts propagation (non-blocking)
         const littleBoltsPromise = propagateLittleBolts(0, token, targetTokens, A, N, config.propagationDelay);
