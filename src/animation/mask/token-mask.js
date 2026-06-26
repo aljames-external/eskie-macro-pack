@@ -71,11 +71,11 @@ async function createMaskTiles(object, config = {}) {
         socket.tile.create(objectShapeMaskUpdates)
     ]);
 
-    // Wait for all three tiles to replicate to all active clients in parallel
-    await Promise.all([
-        socket.tile.sync(objectRevealMask.id),
-        socket.tile.sync(sceneRevealMask.id),
-        socket.tile.sync(objectShapeMask.id)
+    // Wait for all three tiles to replicate to all active clients
+    await socket.tile.sync([
+        objectRevealMask.id,
+        sceneRevealMask.id,
+        objectShapeMask.id
     ]);
 
     return [objectRevealMask, sceneRevealMask, objectShapeMask];
