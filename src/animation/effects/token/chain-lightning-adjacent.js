@@ -4,7 +4,8 @@
 import { closest } from "../../../lib/filemanager.js";
 
 const DEFAULT_CONFIG = {
-    releaseDelay: 200
+    releaseDelay: 200,
+    fudgeFactor: 0
 };
 
 /**
@@ -31,13 +32,16 @@ const getDistance = (t1, t2) => {
 };
 
 /**
- * Constructs the adjacency matrix using Prim's Minimum Spanning Tree algorithm.
- * This guarantees the "path of least resistance" by always choosing the shortest
- * possible jump from any already-connected token to any unconnected token.
+ * Constructs the adjacency matrix using Prim's Minimum Spanning Tree algorithm,
+ * extended with a fudgeFactor. This guarantees the "path of least resistance"
+ * while allowing parallel branching to targets that are roughly the same distance.
  */
-function buildAdjacencyMatrix(tokens) {
+function buildAdjacencyMatrix(tokens, fudgeFactor = 0) {
     const N = tokens.length;
     const A = Array.from({ length: N }, () => Array(N).fill(Infinity));
+    
+    // Negative fudge factors default to 0
+    const fudge = Math.max(0, fudgeFactor);
 
     // 1. Precompute 3D distances between all target tokens
     const D = Array.from({ length: N }, () => Array(N).fill(Infinity));
@@ -53,29 +57,50 @@ function buildAdjacencyMatrix(tokens) {
 
     // Prim's Algorithm loop
     while (visited.size < N) {
-        let minWeight = Infinity;
-        let bestU = -1;
-        let bestV = -1;
+        const bestParent = {};
+        const bestDist = {};
+        let globalMinDist = Infinity;
 
-        // Find the shortest edge connecting a visited node 'u' to an unvisited node 'v'
-        for (const u of visited) {
-            for (let v = 0; v < N; v++) {
-                if (!visited.has(v)) {
-                    if (D[u][v] < minWeight) {
-                        minWeight = D[u][v];
-                        bestU = u;
-                        bestV = v;
+        // For each unvisited node v, find its best parent u in visited and the minimum distance
+        for (let v = 0; v < N; v++) {
+            if (!visited.has(v)) {
+                let minDistToV = Infinity;
+                let parentOfV = -1;
+                for (const u of visited) {
+                    if (D[u][v] < minDistToV) {
+                        minDistToV = D[u][v];
+                        parentOfV = u;
+                    }
+                }
+                if (parentOfV !== -1) {
+                    bestDist[v] = minDistToV;
+                    bestParent[v] = parentOfV;
+                    if (minDistToV < globalMinDist) {
+                        globalMinDist = minDistToV;
                     }
                 }
             }
         }
 
-        // If we found a valid shortest connection, add it to the adjacency matrix
-        if (bestU !== -1 && bestV !== -1) {
-            A[bestU][bestV] = 0;
-            visited.add(bestV);
-        } else {
-            break; // Fallback in case of unreachable nodes
+        if (globalMinDist === Infinity) {
+            break; // No more reachable nodes
+        }
+
+        // Find all unvisited nodes v whose shortest distance to the tree is within globalMinDist + fudge
+        const threshold = globalMinDist + fudge;
+        let addedAny = false;
+
+        for (let v = 0; v < N; v++) {
+            if (!visited.has(v) && bestDist[v] <= threshold) {
+                const u = bestParent[v];
+                A[u][v] = 0;
+                visited.add(v);
+                addedAny = true;
+            }
+        }
+
+        if (!addedAny) {
+            break; // Safety breakout to prevent infinite loops
         }
     }
 
@@ -203,7 +228,7 @@ async function create(token, targetTokens, config = {}) {
 
     masterSequence.thenDo(async () => {
         const N = targetTokens.length;
-        const A = buildAdjacencyMatrix(targetTokens);
+        const A = buildAdjacencyMatrix(targetTokens, config.fudgeFactor);
 
         // Phase 1: Little bolts propagate first, pre-charging the path
         await propagateLittleBolts(0, token, targetTokens, A, N);
