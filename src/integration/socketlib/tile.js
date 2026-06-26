@@ -1,6 +1,77 @@
 import { MODULE_ID } from "../../lib/constants.js"
 import { socketlib } from "../socketlib.js"
 
+const tileTrackers = new Map();
+
+/**
+ * Helper function to wait for a tile to be replicated and loaded on all active players' clients.
+ */
+async function waitForTileReplication(tileId) {
+    const activeUsers = game.users.filter(u => u.active);
+    const expectedUserIds = activeUsers.map(u => u.id);
+    
+    let resolvePromise;
+    const promise = new Promise((resolve) => {
+        resolvePromise = resolve;
+    });
+
+    const trackerId = foundry.utils.randomID();
+    
+    // Safety timeout (10 seconds)
+    const timeoutId = setTimeout(() => {
+        const tracker = tileTrackers.get(trackerId);
+        if (tracker) {
+            console.warn(`Eskie Macros | waitForTileReplication | Timeout waiting for tile ${tileId} to replicate to all players.`);
+            tracker.resolve();
+        }
+    }, 10000);
+
+    tileTrackers.set(trackerId, {
+        expected: new Set(expectedUserIds),
+        received: new Set(),
+        resolve: () => {
+            clearTimeout(timeoutId);
+            tileTrackers.delete(trackerId);
+            resolvePromise();
+        }
+    });
+
+    // Broadcast verification request to everyone
+    await socketlib.executeForEveryone("verifyTileReceivedLocal", tileId, game.user.id, trackerId);
+
+    return promise;
+}
+
+/**
+ * Socketlib handler to locally verify a tile exists in the client's scene.
+ */
+async function verifyTileReceivedLocal(tileId, gmUserId, trackerId) {
+    const hasTile = () => canvas.scene?.tiles?.has(tileId);
+    
+    const sleep = (ms) => new Promise(r => setTimeout(r, ms));
+    let attempts = 0;
+    while (!hasTile() && attempts < 100) { // Max 5 seconds
+        await sleep(50);
+        attempts++;
+    }
+    
+    await socketlib.executeForUsers("reportTileReceived", [gmUserId], tileId, game.user.id, trackerId);
+}
+
+/**
+ * Socketlib handler for clients to report back tile replication completion.
+ */
+async function reportTileReceived(tileId, userId, trackerId) {
+    const tracker = tileTrackers.get(trackerId);
+    if (tracker) {
+        tracker.received.add(userId);
+        const allCompleted = [...tracker.expected].every(id => tracker.received.has(id));
+        if (allCompleted) {
+            tracker.resolve();
+        }
+    }
+}
+
 /**
  * Edits an existing tile document. To be registered in socketlib.
  * @param {string} id - The ID of the tile to edit.
@@ -16,15 +87,21 @@ async function editTile(id, updates = {}) {
 /**
  * Creates a new tile document. To be registered in socketlib.
  * @param {object} [updates={}] - An object containing the data for the new tile.
+ * @param {object} [options={}] - Options for tile creation, including waitForPlayers.
  * @returns {Promise<TileDocument[]>} An array containing the new tile document.
  */
-async function createTile(updates = {}) {
+async function createTile(updates = {}, options = {}) {
     const DEFAULT_TILE_UPDATES = {
         width: 1,
         height: 1
     };
     updates = foundry.utils.mergeObject(DEFAULT_TILE_UPDATES, updates, { inplace: false });
-    return canvas.scene.createEmbeddedDocuments("Tile", [updates]);
+    const docs = await canvas.scene.createEmbeddedDocuments("Tile", [updates]);
+    const doc = docs[0];
+    if (doc && options.waitForPlayers) {
+        await waitForTileReplication(doc.id);
+    }
+    return docs;
 }
 
 /**
@@ -42,6 +119,8 @@ export const tileSockets = {
     editTile,
     createTile,
     destroyTiles,
+    verifyTileReceivedLocal,
+    reportTileReceived,
 };
 
 /**
@@ -58,11 +137,12 @@ async function edit(id, updates = {}) {
 /**
  * Creates a tile, executing as GM if the user is not a GM.
  * @param {object} [updates={}] - An object containing the data for the new tile.
+ * @param {object} [options={}] - Options, e.g. { waitForPlayers: true }
  * @returns {Promise<TileDocument[]>} An array containing the new tile document.
  */
-async function create(updates = {}) {
-    if (game.user.isGM) return createTile(updates);
-    return socketlib.executeAsGM("createTile", updates);
+async function create(updates = {}, options = {}) {
+    if (game.user.isGM) return createTile(updates, options);
+    return socketlib.executeAsGM("createTile", updates, options);
 }
 
 /**

@@ -44,7 +44,7 @@ async function create(object, config = {}) {
         "height": object.document.height * widthAdjustment,
         "rotation": object.document.rotation,
         "overhead": true,
-    });
+    }, { waitForPlayers: true });
 
     sequence = sequence
         // 🔵 Aura AVANT shatter
