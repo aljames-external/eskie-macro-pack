@@ -95,6 +95,107 @@ function buildAdjacencyMatrix(tokens) {
 }
 
 /**
+ * Standard sleep utility.
+ */
+const sleep = (ms) => new Promise(r => setTimeout(r, ms));
+
+/**
+ * Propagates the "little bolts" (electric arcs) along the adjacency tree.
+ */
+async function propagateLittleBolts(nodeIndex, sourceToken, targetTokens, A, N) {
+    const currentToken = targetTokens[nodeIndex];
+    const children = [];
+    for (let j = 0; j < N; j++) {
+        if (A[nodeIndex][j] === 0) {
+            children.push(j);
+        }
+    }
+
+    const seq = new Sequence();
+    seq.effect()
+        .file(closest("jb2a.electric_arc.blue02"))
+        .atLocation(sourceToken)
+        .stretchTo(currentToken, { onlyX: true })
+        .duration(1000)
+        .fadeIn(250)
+        .fadeOut(750)
+        .belowTokens()
+        .animateProperty("sprite", "height", { from: -2, to: -1, duration: 200, gridUnits: true })
+        .opacity(0.75);
+
+    // Play the little bolt (non-blocking)
+    seq.play();
+
+    // Stagger the next connections by 500ms for a cascading flow
+    await sleep(500);
+
+    if (children.length > 0) {
+        await Promise.all(children.map(childIndex => 
+            propagateLittleBolts(childIndex, currentToken, targetTokens, A, N)
+        ));
+    } else {
+        // Let the final leaf node's arc finish fading
+        await sleep(500);
+    }
+}
+
+/**
+ * Propagates the "big bolts" (primary/secondary chain lightning) along the adjacency tree.
+ */
+async function propagateBigBolts(nodeIndex, sourceToken, targetTokens, A, N, caster) {
+    const currentToken = targetTokens[nodeIndex];
+    const children = [];
+    for (let j = 0; j < N; j++) {
+        if (A[nodeIndex][j] === 0) {
+            children.push(j);
+        }
+    }
+
+    const seq = new Sequence();
+    const isPrimary = (sourceToken === caster);
+    const file = isPrimary 
+        ? closest("jb2a.chain_lightning.primary.blue")
+        : closest("jb2a.chain_lightning.secondary.blue");
+        
+    const offset = isPrimary
+        ? { offset: { x: caster.document.width * 0.25 }, gridUnits: true, local: true }
+        : { offset: { x: -0.1 }, gridUnits: true, local: true };
+
+    // Big lightning bolt
+    seq.effect()
+        .file(file)
+        .atLocation(sourceToken, offset)
+        .stretchTo(currentToken)
+        .zIndex(2);
+
+    // Shake/copy sprite on impact
+    seq.effect()
+        .copySprite(currentToken)
+        .attachTo(currentToken)
+        .scaleToObject(1, { considerTokenScale: true })
+        .fadeIn(250)
+        .fadeOut(1250)
+        .loopProperty("sprite", "position.x", { from: -0.05, to: 0.05, duration: 50, pingPong: true, gridUnits: true })
+        .duration(2000)
+        .opacity(0.25);
+
+    // Play the big strike (non-blocking)
+    seq.play();
+
+    // Wait 800ms for the lightning to connect/strike before propagating further
+    await sleep(800);
+
+    if (children.length > 0) {
+        await Promise.all(children.map(childIndex => 
+            propagateBigBolts(childIndex, currentToken, targetTokens, A, N, caster)
+        ));
+    } else {
+        // Let the final strike's visual effects linger
+        await sleep(1200);
+    }
+}
+
+/**
  * Creates the Adjacent Chain Lightning sequence effects.
  * @param {Token} token - The casting token.
  * @param {Array<Token>} targetTokens - An array of target tokens.
@@ -114,71 +215,11 @@ async function create(token, targetTokens, config = {}) {
         const N = targetTokens.length;
         const A = buildAdjacencyMatrix(targetTokens);
 
-        function propagate(nodeIndex, sourceToken) {
-            const currentToken = targetTokens[nodeIndex];
-            
-            // Find all children (destinations where A[nodeIndex][j] === 0)
-            const children = [];
-            for (let j = 0; j < N; j++) {
-                if (A[nodeIndex][j] === 0) {
-                    children.push(j);
-                }
-            }
+        // Phase 1: Little bolts propagate first, pre-charging the path
+        await propagateLittleBolts(0, token, targetTokens, A, N);
 
-            const seq = new Sequence();
-            
-            const isPrimary = (sourceToken === token);
-            const file = isPrimary 
-                ? closest("jb2a.chain_lightning.primary.blue")
-                : closest("jb2a.chain_lightning.secondary.blue");
-                
-            const offset = isPrimary
-                ? { offset: { x: token.document.width * 0.25 }, gridUnits: true, local: true }
-                : { offset: { x: -0.1 }, gridUnits: true, local: true };
-
-            // Primary/Secondary lightning effect
-            seq.effect()
-                .file(file)
-                .atLocation(sourceToken, offset)
-                .stretchTo(currentToken)
-                .zIndex(2);
-
-            // Electric arc background effect
-            seq.effect()
-                .delay(150)
-                .file(closest("jb2a.electric_arc.blue02"))
-                .atLocation(sourceToken)
-                .stretchTo(currentToken, { onlyX: true })
-                .duration(1000)
-                .fadeIn(250)
-                .fadeOut(750)
-                .belowTokens()
-                .animateProperty("sprite", "height", { from: -2, to: -1, duration: 200, gridUnits: true })
-                .opacity(0.75);
-
-            // Shake/copy sprite on impact
-            seq.effect()
-                .copySprite(currentToken)
-                .attachTo(currentToken)
-                .scaleToObject(1, { considerTokenScale: true })
-                .fadeIn(250)
-                .fadeOut(1250)
-                .loopProperty("sprite", "position.x", { from: -0.05, to: 0.05, duration: 50, pingPong: true, gridUnits: true })
-                .duration(2000)
-                .opacity(0.25);
-
-            // Propagate further when this sequence finishes
-            seq.thenDo(function() {
-                for (const childIndex of children) {
-                    propagate(childIndex, currentToken);
-                }
-            });
-
-            seq.play();
-        }
-
-        // Start propagation from the caster to the initial target (index 0)
-        propagate(0, token);
+        // Phase 2: Big bolts follow the exact same paths to deliver the final strike
+        await propagateBigBolts(0, token, targetTokens, A, N, token);
     });
 
     return masterSequence;
