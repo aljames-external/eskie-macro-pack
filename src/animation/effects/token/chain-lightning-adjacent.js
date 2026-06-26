@@ -3,6 +3,7 @@
 
 import { closest } from "../../../lib/filemanager.js";
 import { time } from "../../../lib/time.js";
+import { primMST } from "../../../lib/algorithms.js";
 
 const DEFAULT_CONFIG = {
     releaseDelay: 200,
@@ -32,82 +33,6 @@ const getDistance = (t1, t2) => {
     const dist3DUnits = Math.hypot(dist2DUnits, elDiff);
     return Math.ceil(dist3DUnits);
 };
-
-/**
- * Constructs the adjacency matrix using Prim's Minimum Spanning Tree algorithm,
- * extended with a fudgeFactor. This guarantees the "path of least resistance"
- * while allowing parallel branching to targets that are roughly the same distance.
- */
-function buildAdjacencyMatrix(tokens, fudgeFactor = 0) {
-    const N = tokens.length;
-    const A = Array.from({ length: N }, () => Array(N).fill(Infinity));
-    
-    // Negative fudge factors default to 0
-    const fudge = Math.max(0, fudgeFactor);
-
-    // 1. Precompute 3D distances between all target tokens
-    const D = Array.from({ length: N }, () => Array(N).fill(Infinity));
-    for (let i = 0; i < N; i++) {
-        for (let j = 0; j < N; j++) {
-            if (i !== j) {
-                D[i][j] = getDistance(tokens[i], tokens[j]);
-            }
-        }
-    }
-
-    const visited = new Set([0]); // Start with the initial target (index 0)
-
-    // Prim's Algorithm loop
-    while (visited.size < N) {
-        const bestParent = {};
-        const bestDist = {};
-        let globalMinDist = Infinity;
-
-        // For each unvisited node v, find its best parent u in visited and the minimum distance
-        for (let v = 0; v < N; v++) {
-            if (!visited.has(v)) {
-                let minDistToV = Infinity;
-                let parentOfV = -1;
-                for (const u of visited) {
-                    if (D[u][v] < minDistToV) {
-                        minDistToV = D[u][v];
-                        parentOfV = u;
-                    }
-                }
-                if (parentOfV !== -1) {
-                    bestDist[v] = minDistToV;
-                    bestParent[v] = parentOfV;
-                    if (minDistToV < globalMinDist) {
-                        globalMinDist = minDistToV;
-                    }
-                }
-            }
-        }
-
-        if (globalMinDist === Infinity) {
-            break; // No more reachable nodes
-        }
-
-        // Find all unvisited nodes v whose shortest distance to the tree is within globalMinDist + fudge
-        const threshold = globalMinDist + fudge;
-        let addedAny = false;
-
-        for (let v = 0; v < N; v++) {
-            if (!visited.has(v) && bestDist[v] <= threshold) {
-                const u = bestParent[v];
-                A[u][v] = 0;
-                visited.add(v);
-                addedAny = true;
-            }
-        }
-
-        if (!addedAny) {
-            break; // Safety breakout to prevent infinite loops
-        }
-    }
-
-    return A;
-}
 
 /**
  * Propagates the "little bolts" (electric arcs) along the MST adjacency tree.
@@ -225,7 +150,7 @@ async function create(token, targetTokens, config = {}) {
 
     masterSequence.thenDo(async () => {
         const N = targetTokens.length;
-        const A = buildAdjacencyMatrix(targetTokens, config.fudgeFactor);
+        const A = primMST(targetTokens, config.fudgeFactor, getDistance);
 
         // Phase 1: Start little bolts propagation (non-blocking)
         const littleBoltsPromise = propagateLittleBolts(0, token, targetTokens, A, N, config.propagationDelay);
