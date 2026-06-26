@@ -3,7 +3,9 @@
 
 import { closest } from "../../../lib/filemanager.js";
 
-const DEFAULT_CONFIG = {};
+const DEFAULT_CONFIG = {
+    releaseDelay: 200
+};
 
 /**
  * Helper to calculate 3D distance between two tokens in scene units (e.g., feet), rounded up.
@@ -206,8 +208,8 @@ async function create(token, targetTokens, config = {}) {
         // Phase 1: Little bolts propagate first, pre-charging the path
         await propagateLittleBolts(0, token, targetTokens, A, N);
 
-        // Short dramatic pause between pre-charge and the big strike (200ms)
-        await sleep(200);
+        // Short dramatic pause between pre-charge and the big strike
+        await sleep(config.releaseDelay);
 
         // Phase 2: Big bolts follow the exact same paths to deliver the final strike
         await propagateBigBolts(0, token, targetTokens, A, N, token);
