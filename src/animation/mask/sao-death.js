@@ -1,6 +1,9 @@
 import { shatterMask } from './shatter-mask.js';
 import { settingsOverride } from "../../lib/settings.js";
 import { closest } from "../../lib/filemanager.js";
+import { socket } from "../../integration/socketlib.js";
+import { log } from "../../lib/logger.js";
+import { getDocumentName } from "../../lib/object.js";
 
 const DEFAULT_CONFIG = {
     id: 'swordArtOnlineShatter',
@@ -15,11 +18,11 @@ const DEFAULT_CONFIG = {
     }
 };
 
-async function create(source, config = {}) {
+async function create(object, config = {}) {
     config = settingsOverride(config);
     const { id, tintColor, duration, shatterColor, deleteObject, sound } =
         foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
-    const label = `${id}-${source.id}`;
+    const label = `${id}-${object.id}`;
 
     let sequence = new Sequence();
     if (sound.enabled) {
@@ -30,11 +33,24 @@ async function create(source, config = {}) {
             .fadeOutAudio(500);
     }
 
+    const widthAdjustment = (getDocumentName(object) === 'Token') ? canvas.grid.size : 1;
+    const [visibleTile] = await socket.tile.create({
+        "texture.src": null,
+        "alpha": 1,                // Alphe must be 1 or else the animation will not render
+        "hidden": false,
+        "x": object.x,
+        "y": object.y,
+        "width": object.document.width * widthAdjustment,
+        "height": object.document.height * widthAdjustment,
+        "rotation": object.document.rotation,
+        "overhead": true,
+    });
+
     sequence = sequence
         // 🔵 Aura AVANT shatter
         .effect()
         .file(closest("jaamod.spells_effects.antilife_shell"))
-        .attachTo(source)
+        .attachTo(visibleTile)
         .scaleToObject(1.1)
         .opacity(1)
         .filter("ColorMatrix", {
@@ -49,7 +65,7 @@ async function create(source, config = {}) {
 
         // 🎨 Tint token
         .animation()
-        .on(source)
+        .on(object)
         .tint(tintColor)
         .fadeIn(duration)
         .duration(duration)
@@ -63,10 +79,10 @@ async function create(source, config = {}) {
                 .effect()
                 .file(closest("eskie.particle.05.blue"))
                 .delay(950)
-                .atLocation(source.center)        // 🔥 important
+                .atLocation(visibleTile)        // 🔥 important
                 .size({
-                    width: source.document.width * 2.5,
-                    height: source.document.height * 2.5
+                    width: object.document.width * 2.5,
+                    height: object.document.height * 2.5
                 }, { gridUnits: true })
                 .playbackRate(0.5)
                 .filter("Glow", {
@@ -82,15 +98,15 @@ async function create(source, config = {}) {
                 .effect()
                 .file(closest("jb2a.markers.circle_of_stars.blue"))
                 .size({
-                    width: source.document.width * 1.8,
-                    height: source.document.height * 1.8
+                    width: object.document.width * 1.8,
+                    height: object.document.height * 1.8
                 }, { gridUnits: true })
                 .delay(1050)
                 .fadeIn(600)
                 .scaleIn(0.1, 400)
                 .fadeOut(600)
                 .duration(1800)
-                .atLocation(source.center)        // 🔥 important
+                .atLocation(object)        // 🔥 important
                 .filter("Glow", {
                     distance: 1,      // Number, distance of the glow in pixels
                     outerStrength: 1,  // Number, strength of the glow outward from the edge of the sprite
@@ -115,7 +131,7 @@ async function create(source, config = {}) {
                     });
             }
             // Shatter Mask sequence
-            const shatterSeq = await shatterMask.create(source, {
+            const shatterSeq = await shatterMask.create(object, {
                 id,
                 color: shatterColor,
                 tint: tintColor,
@@ -129,25 +145,32 @@ async function create(source, config = {}) {
                 }
             });
 
-            if (particleSeq && shatterSeq) return particleSeq.addSequence(shatterSeq).play();
+            if (!particleSeq || !shatterSeq) return log.error("tokenMaskEffect.createLocal: Failed to create particle or shatter sequence.");
+            particleSeq.addSequence(shatterSeq)
+                .thenDo(async () => {
+                    // Clean up the antilife shell tile after shatter animation
+                    log.debug(visibleTile);
+                    log.debug(visibleTile.id);
+                    await socket.tile.destroy(visibleTile.id);
+                }).play();
         });
 
     return sequence;
 }
 
-async function play(source, config = {}) {
-    const sequence = await create(source, config);
+async function play(object, config = {}) {
+    const sequence = await create(object, config);
     if (sequence) return sequence.play();
 }
 
-async function stop(source, config = {}) {
+async function stop(object, config = {}) {
     const { id, shatterColor, deleteObject } =
         foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
-    const label = `${id}-${source.id}`;
+    const label = `${id}-${object.id}`;
 
     return Promise.all([
         Sequencer.EffectManager.endEffects({ name: label }),
-        shatterMask.stop(source, { id, color: shatterColor, deleteObject })
+        shatterMask.stop(object, { id, color: shatterColor, deleteObject })
     ]);
 }
 
