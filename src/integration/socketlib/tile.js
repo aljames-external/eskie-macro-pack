@@ -73,6 +73,14 @@ async function reportTileReceived(tileId, userId, trackerId) {
 }
 
 /**
+ * Socketlib handler to execute waitForTileReplication as GM.
+ */
+async function waitForTileReplicationGM(tileId) {
+    if (!game.user.isGM) return;
+    return waitForTileReplication(tileId);
+}
+
+/**
  * Edits an existing tile document. To be registered in socketlib.
  * @param {string} id - The ID of the tile to edit.
  * @param {object} [updates={}] - An object containing the updates to apply to the tile.
@@ -87,21 +95,15 @@ async function editTile(id, updates = {}) {
 /**
  * Creates a new tile document. To be registered in socketlib.
  * @param {object} [updates={}] - An object containing the data for the new tile.
- * @param {object} [options={}] - Options for tile creation, including waitForPlayers.
  * @returns {Promise<TileDocument[]>} An array containing the new tile document.
  */
-async function createTile(updates = {}, options = {}) {
+async function createTile(updates = {}) {
     const DEFAULT_TILE_UPDATES = {
         width: 1,
         height: 1
     };
     updates = foundry.utils.mergeObject(DEFAULT_TILE_UPDATES, updates, { inplace: false });
-    const docs = await canvas.scene.createEmbeddedDocuments("Tile", [updates]);
-    const doc = docs[0];
-    if (doc && options.waitForPlayers) {
-        await waitForTileReplication(doc.id);
-    }
-    return docs;
+    return canvas.scene.createEmbeddedDocuments("Tile", [updates]);
 }
 
 /**
@@ -121,6 +123,7 @@ export const tileSockets = {
     destroyTiles,
     verifyTileReceivedLocal,
     reportTileReceived,
+    waitForTileReplicationGM,
 };
 
 /**
@@ -137,12 +140,11 @@ async function edit(id, updates = {}) {
 /**
  * Creates a tile, executing as GM if the user is not a GM.
  * @param {object} [updates={}] - An object containing the data for the new tile.
- * @param {object} [options={}] - Options, e.g. { waitForPlayers: true }
  * @returns {Promise<TileDocument[]>} An array containing the new tile document.
  */
-async function create(updates = {}, options = {}) {
-    if (game.user.isGM) return createTile(updates, options);
-    return socketlib.executeAsGM("createTile", updates, options);
+async function create(updates = {}) {
+    if (game.user.isGM) return createTile(updates);
+    return socketlib.executeAsGM("createTile", updates);
 }
 
 /**
@@ -156,8 +158,19 @@ async function destroy(id) {
     return socketlib.executeAsGM("destroyTiles", ids);
 }
 
+/**
+ * Synchronizes the tile to all active clients, waiting until it exists locally for everyone.
+ * @param {string} tileId - The ID of the tile to synchronize.
+ * @returns {Promise<void>}
+ */
+async function sync(tileId) {
+    if (game.user.isGM) return waitForTileReplication(tileId);
+    return socketlib.executeAsGM("waitForTileReplicationGM", tileId);
+}
+
 export const tile = {
     edit,
     create,
-    destroy
+    destroy,
+    sync,
 }

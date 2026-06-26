@@ -64,11 +64,18 @@ async function createMaskTiles(object, config = {}) {
 
     const revealMaskUpdates = foundry.utils.deepClone(revealMaskUpdatesBase);
 
-    // Create all tiles in database and wait for them to replicate to all clients
+    // Create all tiles in database in parallel
     const [[objectRevealMask], [sceneRevealMask], [objectShapeMask]] = await Promise.all([
-        socket.tile.create(revealMaskUpdatesBase, { waitForPlayers: true }),
-        socket.tile.create(revealMaskUpdates, { waitForPlayers: true }),
-        socket.tile.create(objectShapeMaskUpdates, { waitForPlayers: true })
+        socket.tile.create(revealMaskUpdatesBase),
+        socket.tile.create(revealMaskUpdates),
+        socket.tile.create(objectShapeMaskUpdates)
+    ]);
+
+    // Wait for all three tiles to replicate to all active clients in parallel
+    await Promise.all([
+        socket.tile.sync(objectRevealMask.id),
+        socket.tile.sync(sceneRevealMask.id),
+        socket.tile.sync(objectShapeMask.id)
     ]);
 
     return [objectRevealMask, sceneRevealMask, objectShapeMask];
