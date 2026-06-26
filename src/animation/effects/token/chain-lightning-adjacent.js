@@ -120,8 +120,8 @@ async function propagateLittleBolts(nodeIndex, sourceToken, targetTokens, A, N) 
             propagateLittleBolts(childIndex, currentToken, targetTokens, A, N)
         ));
     } else {
-        // Let the final leaf node's arc finish fading
-        await sleep(500);
+        // Let the final leaf node's arc finish fading slightly
+        await sleep(100);
     }
 }
 
@@ -168,8 +168,10 @@ async function propagateBigBolts(nodeIndex, sourceToken, targetTokens, A, N, cas
     // Play the big strike (non-blocking)
     seq.play();
 
-    // Rapid stagger delay (50ms) for a powerful, continuous crackling strike
-    await sleep(50);
+    // If it's the primary bolt (caster to initial target), wait 800ms for it to hit.
+    // Otherwise, use a rapid 50ms stagger delay for the secondary cascade.
+    const staggerDelay = isPrimary ? 800 : 50;
+    await sleep(staggerDelay);
 
     if (children.length > 0) {
         await Promise.all(children.map(childIndex => 
@@ -204,8 +206,8 @@ async function create(token, targetTokens, config = {}) {
         // Phase 1: Little bolts propagate first, pre-charging the path
         await propagateLittleBolts(0, token, targetTokens, A, N);
 
-        // Short dramatic pause between pre-charge and the big strike
-        await sleep(300);
+        // Short dramatic pause between pre-charge and the big strike (200ms)
+        await sleep(200);
 
         // Phase 2: Big bolts follow the exact same paths to deliver the final strike
         await propagateBigBolts(0, token, targetTokens, A, N, token);
