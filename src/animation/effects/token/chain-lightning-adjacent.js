@@ -8,7 +8,6 @@ import { tokens } from "../../../lib/tokens.js";
 
 const DEFAULT_CONFIG = {
     releaseDelay: 200,
-    fudgeFactor: 0,
     propagationDelay: 50
 };
 
@@ -140,7 +139,7 @@ async function create(token, targetTokens, config = {}) {
 
     masterSequence.thenDo(async () => {
         const N = targetTokens.length;
-        const A = primMST(targetTokens, config.fudgeFactor, tokens.getDistance);
+        const A = primMST(targetTokens, tokens.getDistance);
 
         // Phase 1: Start little bolts propagation (non-blocking)
         const littleBoltsPromise = propagateLittleBolts(0, token, targetTokens, A, N, config.propagationDelay);
