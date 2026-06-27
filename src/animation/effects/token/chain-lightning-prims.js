@@ -12,11 +12,7 @@ const DEFAULT_CONFIG = {
     fudgeFactor: 0,
     sound: {
         enabled: true,
-        volume: 0.5,
-        littleBoltFile: "psfx.weapon-shooshes.lightning",
-        littleBoltVolume: 1.0,
-        bigBoltFile: "psfx.cantrips.thunderclap.v1",
-        bigBoltVolume: 0.4
+        volume: 0.5
     }
 };
 
@@ -80,10 +76,10 @@ function create(token, targetTokens, config = {}) {
         }
 
         // Play shoosh sound when hit, if enabled
-        if (sound.enabled && sound.littleBoltFile) {
+        if (sound.enabled) {
             seq.sound()
-                .file(closest(sound.littleBoltFile))
-                .volume(sound.volume * sound.littleBoltVolume)
+                .file(closest("psfx.weapon-shooshes.lightning"))
+                .volume(sound.volume)
                 .delay(delayTime);
         }
     }
@@ -148,10 +144,10 @@ function create(token, targetTokens, config = {}) {
             .delay(delayTime);
 
         // 5. Thunderclap sound when hit, if enabled
-        if (sound.enabled && sound.bigBoltFile) {
+        if (sound.enabled) {
             seq.sound()
-                .file(closest(sound.bigBoltFile))
-                .volume(sound.volume * sound.bigBoltVolume)
+                .file(closest("psfx.cantrips.thunderclap.v1"))
+                .volume(sound.volume * 0.4) // Scales to 0.2 at default volume of 0.5
                 .delay(delayTime);
         }
     }
