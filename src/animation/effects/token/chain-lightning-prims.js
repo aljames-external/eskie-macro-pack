@@ -12,7 +12,8 @@ const DEFAULT_CONFIG = {
     fudgeFactor: 0,
     sound: {
         enabled: true,
-        volume: 0.5
+        littleBoltVolume: 0.5,
+        bigBoltVolume: 0.2
     }
 };
 
@@ -79,7 +80,7 @@ function create(token, targetTokens, config = {}) {
         if (sound.enabled) {
             seq.sound()
                 .file(closest("psfx.weapon-shooshes.lightning"))
-                .volume(sound.volume)
+                .volume(sound.littleBoltVolume ?? 0.5)
                 .delay(delayTime);
         }
     }
@@ -147,7 +148,7 @@ function create(token, targetTokens, config = {}) {
         if (sound.enabled) {
             seq.sound()
                 .file(closest("psfx.cantrips.thunderclap.v1"))
-                .volume(sound.volume * 0.4) // Scales to 0.2 at default volume of 0.5
+                .volume(sound.bigBoltVolume ?? 0.2)
                 .delay(delayTime);
         }
     }
