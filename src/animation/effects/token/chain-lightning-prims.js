@@ -4,20 +4,19 @@
 import { closest } from "../../../lib/filemanager.js";
 import { primMST } from "../../../lib/algorithms.js";
 import { tokens } from "../../../lib/tokens.js";
+import { settingsOverride } from "../../../lib/settings.js";
 
 const DEFAULT_CONFIG = {
     releaseDelay: 200,
     propagationDelay: 50,
     fudgeFactor: 0,
-    littleBoltSound: {
-        enable: true,
-        file: "psfx.weapon-shooshes.lightning",
-        volume: 0.5
-    },
-    bigBoltSound: {
-        enable: true,
-        file: "psfx.cantrips.thunderclap.v1",
-        volume: 0.2
+    sound: {
+        enabled: true,
+        volume: 0.5,
+        littleBoltFile: "psfx.weapon-shooshes.lightning",
+        littleBoltVolume: 1.0,
+        bigBoltFile: "psfx.cantrips.thunderclap.v1",
+        bigBoltVolume: 0.4
     }
 };
 
@@ -29,12 +28,14 @@ const DEFAULT_CONFIG = {
  * @returns {Sequence} The created Sequence object.
  */
 function create(token, targetTokens, config = {}) {
+    config = settingsOverride(config);
     config = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
     if (!targetTokens || targetTokens.length === 0) {
         console.warn("Chain Lightning (Adjacent): No targets provided.");
         return new Sequence();
     }
 
+    const { sound } = config;
     const seq = new Sequence();
     const N = targetTokens.length;
     const A = primMST(targetTokens, tokens.getDistance, config.fudgeFactor);
@@ -79,10 +80,10 @@ function create(token, targetTokens, config = {}) {
         }
 
         // Play shoosh sound when hit, if enabled
-        if (config.littleBoltSound?.enable && config.littleBoltSound?.file) {
+        if (sound.enabled && sound.littleBoltFile) {
             seq.sound()
-                .file(closest(config.littleBoltSound.file))
-                .volume(config.littleBoltSound.volume ?? 0.5)
+                .file(closest(sound.littleBoltFile))
+                .volume(sound.volume * sound.littleBoltVolume)
                 .delay(delayTime);
         }
     }
@@ -147,10 +148,10 @@ function create(token, targetTokens, config = {}) {
             .delay(delayTime);
 
         // 5. Thunderclap sound when hit, if enabled
-        if (config.bigBoltSound?.enable && config.bigBoltSound?.file) {
+        if (sound.enabled && sound.bigBoltFile) {
             seq.sound()
-                .file(closest(config.bigBoltSound.file))
-                .volume(config.bigBoltSound.volume ?? 0.2)
+                .file(closest(sound.bigBoltFile))
+                .volume(sound.volume * sound.bigBoltVolume)
                 .delay(delayTime);
         }
     }
