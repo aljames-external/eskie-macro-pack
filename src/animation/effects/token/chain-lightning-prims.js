@@ -37,7 +37,7 @@ async function propagateLittleBolts(nodeIndex, sourceToken, targetTokens, A, N, 
         .opacity(0.75);
 
     // Play the little bolt (non-blocking)
-    seq.play();
+    seq.play({ preload: true });
 
     // Configurable stagger delay (propagationDelay) for cascading flow
     await time.wait(propagationDelay);
@@ -105,7 +105,7 @@ async function propagateBigBolts(nodeIndex, sourceToken, targetTokens, A, N, cas
         .opacity(0.25);
 
     // Play the big strike (non-blocking)
-    seq.play();
+    seq.play({ preload: true });
 
     // If it's the primary bolt (caster to initial target), wait 800ms for it to hit.
     // Otherwise, use the configurable propagation delay.
@@ -166,7 +166,7 @@ async function create(token, targetTokens, config = {}) {
  */
 async function play(token, targetTokens, config = {}) {
     const sequence = await create(token, targetTokens, config);
-    sequence.play({ preload: true });
+    sequence.play();
 }
 
 export const chainLightningPrims = {
