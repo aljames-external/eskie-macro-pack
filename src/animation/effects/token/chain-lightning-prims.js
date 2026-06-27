@@ -169,7 +169,7 @@ async function play(token, targetTokens, config = {}) {
     sequence.play({ preload: true });
 }
 
-export const chainLightningAdjacent = {
+export const chainLightningPrims = {
     create,
     play,
     default_config: DEFAULT_CONFIG,

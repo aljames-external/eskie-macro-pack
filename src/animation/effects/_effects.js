@@ -13,8 +13,7 @@ import { burnMask } from "../mask/burn-mask.js";
 import { call } from "./token/call.js";
 import { curseOfTheWerewolf } from "./token/curse-of-the-werewolf.js";
 import { callLightning } from "./token/call-lightning.js";
-import { chainLightning } from "./token/chain-lightning.js";
-import { chainLightningAdjacent } from "./token/chain-lightning-adjacent.js";
+import { chainLightningPrims } from "./token/chain-lightning-prims.js";
 import { channelDivinityControlUndead } from "./target/channelDivinityControlUndead.js";
 import { channelDivinityDreadAspect } from "./token/channelDivinityDreadAspect.js";
 import { charmed } from "./active-effect/charmed.js";
@@ -118,8 +117,7 @@ export const effect = {
     call,
     callLightning,
     curseOfTheWerewolf,
-    chainLightning,
-    chainLightningAdjacent,
+    chainLightning: chainLightningPrims,
     hologram,
     aerodyneVehicle,
     channelDivinityControlUndead,
