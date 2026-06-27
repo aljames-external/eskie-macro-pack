@@ -8,7 +8,17 @@ import { tokens } from "../../../lib/tokens.js";
 const DEFAULT_CONFIG = {
     releaseDelay: 200,
     propagationDelay: 50,
-    fudgeFactor: 0
+    fudgeFactor: 0,
+    littleBoltSound: {
+        enable: true,
+        file: "psfx.weapon-shooshes.lightning",
+        volume: 0.5
+    },
+    bigBoltSound: {
+        enable: true,
+        file: "psfx.cantrips.thunderclap.v1",
+        volume: 0.2
+    }
 };
 
 /**
@@ -67,6 +77,14 @@ function create(token, targetTokens, config = {}) {
         if (delayTime > 0) {
             effect.delay(delayTime);
         }
+
+        // Play shoosh sound when hit, if enabled
+        if (config.littleBoltSound?.enable && config.littleBoltSound?.file) {
+            seq.sound()
+                .file(closest(config.littleBoltSound.file))
+                .volume(config.littleBoltSound.volume ?? 0.5)
+                .delay(delayTime);
+        }
     }
 
     // Phase 2: Big Bolts (primary/secondary chain lightning)
@@ -119,6 +137,22 @@ function create(token, targetTokens, config = {}) {
             .duration(4000)
             .opacity(0.25)
             .delay(delayTime);
+
+        // 4. Thunder damage effect under the token
+        seq.effect()
+            .file(closest("eskie.damage.thunder.01.lightpurple"))
+            .attachTo(currentToken)
+            .scaleToObject(1.25, { considerTokenScale: true })
+            .belowTokens()
+            .delay(delayTime);
+
+        // 5. Thunderclap sound when hit, if enabled
+        if (config.bigBoltSound?.enable && config.bigBoltSound?.file) {
+            seq.sound()
+                .file(closest(config.bigBoltSound.file))
+                .volume(config.bigBoltSound.volume ?? 0.2)
+                .delay(delayTime);
+        }
     }
 
     return seq;
