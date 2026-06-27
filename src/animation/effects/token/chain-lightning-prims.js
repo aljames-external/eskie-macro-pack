@@ -2,125 +2,20 @@
 // Adjacency Matrix Refactoring: Antigravity
 
 import { closest } from "../../../lib/filemanager.js";
-import { time } from "../../../lib/time.js";
 import { primMST } from "../../../lib/algorithms.js";
 import { tokens } from "../../../lib/tokens.js";
+import { settingsOverride } from "../../../lib/settings.js";
 
 const DEFAULT_CONFIG = {
     releaseDelay: 200,
     propagationDelay: 50,
-    fudgeFactor: 0
+    fudgeFactor: 0,
+    sound: {
+        enabled: true,
+        littleBoltVolume: 0.5,
+        bigBoltVolume: 0.2
+    }
 };
-
-/**
- * Propagates the "little bolts" (electric arcs) along the MST adjacency tree.
- */
-async function propagateLittleBolts(nodeIndex, sourceToken, targetTokens, A, N, propagationDelay) {
-    const currentToken = targetTokens[nodeIndex];
-    const children = [];
-    for (let j = 0; j < N; j++) {
-        if (A[nodeIndex][j] === 0) {
-            children.push(j);
-        }
-    }
-
-    const seq = new Sequence();
-    seq.effect()
-        .file(closest("jb2a.electric_arc.blue02"))
-        .atLocation(sourceToken)
-        .stretchTo(currentToken, { onlyX: true })
-        .duration(1000)
-        .fadeIn(250)
-        .fadeOut(750)
-        .belowTokens()
-        .animateProperty("sprite", "height", { from: -2, to: -1, duration: 200, gridUnits: true })
-        .opacity(0.75);
-
-    // Play the little bolt (non-blocking)
-    seq.play({ preload: true });
-
-    // Configurable stagger delay (propagationDelay) for cascading flow
-    await time.wait(propagationDelay);
-
-    if (children.length > 0) {
-        await Promise.all(children.map(childIndex => 
-            propagateLittleBolts(childIndex, currentToken, targetTokens, A, N, propagationDelay)
-        ));
-    } else {
-        // Let the final leaf node's arc finish fading slightly
-        await time.wait(100);
-    }
-}
-
-/**
- * Propagates the "big bolts" (primary/secondary chain lightning) along the MST adjacency tree.
- */
-async function propagateBigBolts(nodeIndex, sourceToken, targetTokens, A, N, caster, propagationDelay) {
-    const currentToken = targetTokens[nodeIndex];
-    const children = [];
-    for (let j = 0; j < N; j++) {
-        if (A[nodeIndex][j] === 0) {
-            children.push(j);
-        }
-    }
-
-    const seq = new Sequence();
-    const isPrimary = (sourceToken === caster);
-    const file = isPrimary 
-        ? closest("jb2a.chain_lightning.primary.blue")
-        : closest("jb2a.chain_lightning.secondary.blue");
-        
-    const offset = isPrimary
-        ? { offset: { x: caster.document.width * 0.25 }, gridUnits: true, local: true }
-        : { offset: { x: -0.1 }, gridUnits: true, local: true };
-
-    // 1. Big lightning bolt
-    seq.effect()
-        .file(file)
-        .atLocation(sourceToken, offset)
-        .stretchTo(currentToken)
-        .zIndex(2);
-
-    // 2. Shocking static electricity on target (from electric-door)
-    seq.effect()
-        .file(closest('jb2a.static_electricity.03.blue'))
-        .attachTo(currentToken)
-        .scaleToObject(1.25, { considerTokenScale: true })
-        .opacity(1)
-        .playbackRate(1)
-        .fadeOut(1000)
-        .randomRotation()
-        .repeats(3, 300, 300);
-
-    // 3. Shaking copy sprite representing electrocution (from electric-door)
-    seq.effect()
-        .copySprite(currentToken)
-        .spriteRotation(-(currentToken.document?.rotation ?? currentToken.rotation ?? 0))
-        .attachTo(currentToken)
-        .scaleToObject(1, { considerTokenScale: true })
-        .fadeIn(250)
-        .fadeOut(1500)
-        .loopProperty('sprite', 'position.x', { from: -0.05, to: 0.05, duration: 50, pingPong: true, gridUnits: true })
-        .duration(4000)
-        .opacity(0.25);
-
-    // Play the big strike (non-blocking)
-    seq.play({ preload: true });
-
-    // If it's the primary bolt (caster to initial target), wait 800ms for it to hit.
-    // Otherwise, use the configurable propagation delay.
-    const staggerDelay = isPrimary ? 800 : propagationDelay;
-    await time.wait(staggerDelay);
-
-    if (children.length > 0) {
-        await Promise.all(children.map(childIndex => 
-            propagateBigBolts(childIndex, currentToken, targetTokens, A, N, caster, propagationDelay)
-        ));
-    } else {
-        // Let the final strike's visual effects linger
-        await time.wait(1200);
-    }
-}
 
 /**
  * Creates the Adjacent Chain Lightning sequence effects.
@@ -129,31 +24,167 @@ async function propagateBigBolts(nodeIndex, sourceToken, targetTokens, A, N, cas
  * @param {object} config - Configuration options for the animation.
  * @returns {Sequence} The created Sequence object.
  */
-async function create(token, targetTokens, config = {}) {
+function create(token, targetTokens, config = {}) {
+    config = settingsOverride(config);
     config = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
     if (!targetTokens || targetTokens.length === 0) {
         console.warn("Chain Lightning (Adjacent): No targets provided.");
         return new Sequence();
     }
 
+    const { sound } = config;
+    const N = targetTokens.length;
+    const A = primMST(targetTokens, tokens.getDistance, config.fudgeFactor);
+
+    // 1. Build propagationLevels of levels using BFS on the MST tree structure
+    // propagationLevels = [ 
+    //   [ { parent: caster, children: [target0] } ], // Level 0
+    //   [ { parent: target0, children: [target1, target2] } ], // Level 1
+    //   ... 
+    // ]
+    const propagationLevels = [];
+    
+    // Level 0: from caster to target 0
+    propagationLevels.push([
+        { parent: token, children: [targetTokens[0]] }
+    ]);
+
+    let currentLevelNodes = [0];
+    const visited = new Set([0]);
+
+    while (true) {
+        const nextLevelGroups = [];
+        const nextLevelNodes = [];
+
+        for (const u of currentLevelNodes) {
+            const children = [];
+            for (let v = 0; v < N; v++) {
+                if (A[u][v] === 0 && !visited.has(v)) {
+                    visited.add(v);
+                    children.push(targetTokens[v]);
+                    nextLevelNodes.push(v);
+                }
+            }
+            if (children.length > 0) {
+                nextLevelGroups.push({
+                    parent: targetTokens[u],
+                    children: children
+                });
+            }
+        }
+
+        if (nextLevelGroups.length === 0) {
+            break;
+        }
+
+        propagationLevels.push(nextLevelGroups);
+        currentLevelNodes = nextLevelNodes;
+    }
+
+    // 2. Construct the Little Bolts sequence
+    const littleSeq = new Sequence();
+    for (let i = 0; i < propagationLevels.length; i++) {
+        const levelGroups = propagationLevels[i];
+        for (const group of levelGroups) {
+            const parentToken = group.parent;
+            for (const childToken of group.children) {
+                littleSeq.effect()
+                    .file(closest("jb2a.electric_arc.blue02"))
+                    .atLocation(parentToken)
+                    .stretchTo(childToken, { onlyX: true })
+                    .duration(1000)
+                    .fadeIn(250)
+                    .fadeOut(750)
+                    .belowTokens()
+                    .animateProperty("sprite", "height", { from: -2, to: -1, duration: 200, gridUnits: true })
+                    .opacity(0.75);
+            }
+        }
+        
+        if (sound.enabled) {
+            littleSeq.sound()
+                .file(closest("psfx.weapon-shooshes.lightning"))
+                .volume(sound.littleBoltVolume ?? 0.5);
+        }
+        
+        if (i < propagationLevels.length - 1) {
+            littleSeq.wait(config.propagationDelay);
+        }
+    }
+
+    // 3. Construct the Big Bolts sequence
+    const bigSeq = new Sequence();
+    bigSeq.wait(config.releaseDelay);
+    for (let i = 0; i < propagationLevels.length; i++) {
+        const levelGroups = propagationLevels[i];
+        const isPrimary = (i === 0);
+        
+        for (const group of levelGroups) {
+            const parentToken = group.parent;
+            for (const childToken of group.children) {
+                const file = isPrimary 
+                    ? closest("jb2a.chain_lightning.primary.blue")
+                    : closest("jb2a.chain_lightning.secondary.blue");
+                    
+                const offset = isPrimary
+                    ? { offset: { x: token.document.width * 0.25 }, gridUnits: true, local: true }
+                    : { offset: { x: -0.1 }, gridUnits: true, local: true };
+
+                // Big lightning bolt
+                bigSeq.effect()
+                    .file(file)
+                    .atLocation(parentToken, offset)
+                    .stretchTo(childToken)
+                    .zIndex(2);
+
+                // Shocking static electricity on target
+                bigSeq.effect()
+                    .file(closest('jb2a.static_electricity.03.blue'))
+                    .attachTo(childToken)
+                    .scaleToObject(1.25, { considerTokenScale: true })
+                    .opacity(1)
+                    .playbackRate(1)
+                    .fadeOut(1000)
+                    .randomRotation()
+                    .repeats(3, 300, 300);
+
+                // Shaking copy sprite representing electrocution
+                bigSeq.effect()
+                    .copySprite(childToken)
+                    .spriteRotation(-(childToken.document?.rotation ?? childToken.rotation ?? 0))
+                    .attachTo(childToken)
+                    .scaleToObject(1, { considerTokenScale: true })
+                    .fadeIn(250)
+                    .fadeOut(1500)
+                    .loopProperty('sprite', 'position.x', { from: -0.05, to: 0.05, duration: 50, pingPong: true, gridUnits: true })
+                    .duration(4000)
+                    .opacity(0.25);
+
+                // Thunder damage effect under the token
+                bigSeq.effect()
+                    .file(closest("eskie.damage.thunder.01.lightpurple"))
+                    .attachTo(childToken)
+                    .scaleToObject(1.25, { considerTokenScale: true })
+                    .belowTokens();
+            }
+        }
+        
+        if (sound.enabled) {
+            bigSeq.sound()
+                .file(closest("psfx.cantrips.thunderclap.v1"))
+                .volume(sound.bigBoltVolume ?? 0.2);
+        }
+        
+        if (i < propagationLevels.length - 1) {
+            const waitTime = isPrimary ? 800 : config.propagationDelay;
+            bigSeq.wait(waitTime);
+        }
+    }
+
+    // Combine both sequences to play in parallel
     const masterSequence = new Sequence();
-
-    masterSequence.thenDo(async () => {
-        const N = targetTokens.length;
-        const A = primMST(targetTokens, tokens.getDistance, config.fudgeFactor);
-
-        // Phase 1: Start little bolts propagation (non-blocking)
-        const littleBoltsPromise = propagateLittleBolts(0, token, targetTokens, A, N, config.propagationDelay);
-
-        // Wait releaseDelay from the start of the initial little bolt
-        await time.wait(config.releaseDelay);
-
-        // Phase 2: Start big bolts propagation
-        const bigBoltsPromise = propagateBigBolts(0, token, targetTokens, A, N, token, config.propagationDelay);
-
-        // Wait for both trees to fully complete before finishing the sequence
-        await Promise.all([littleBoltsPromise, bigBoltsPromise]);
-    });
+    masterSequence.addSequence(littleSeq);
+    masterSequence.addSequence(bigSeq);
 
     return masterSequence;
 }
@@ -162,10 +193,10 @@ async function create(token, targetTokens, config = {}) {
  * Plays the Adjacent Chain Lightning animation.
  * @param {Token} token - The casting token.
  * @param {Array<Token>} targetTokens - An array of target tokens.
- * @param {object} options - Options for playing the animation, including config.
+ * @param {object} config - Configuration options for the animation.
  */
-async function play(token, targetTokens, config = {}) {
-    const sequence = await create(token, targetTokens, config);
+function play(token, targetTokens, config = {}) {
+    const sequence = create(token, targetTokens, config);
     sequence.play();
 }
 
