@@ -11,14 +11,6 @@
                 "hint": "Forzar una actualización del Auto-Reconocimiento de Automated Animations."
             }
         },
-        "updateMenu": {
-            "added": "Los siguientes nuevos efectos serán añadidos a tus ajustes de Auto-Reconocimiento de Automated Animations.",
-            "custom": "Los siguientes efectos no serán añadidos debido a que ya existen desde otra fuente.",
-            "customHint": "Estos efectos serán ignorados. Para que Eskie Macro Pack se haga cargo, por favor elimínalos de Automated Animations y reenvíalos.",
-            "updated": "Los siguientes efectos serán actualizados desde una versión previa de Eskie Macro Pack.",
-            "warning": "Esto sobrescribirá cualquier animación existente de Eskie Macro Pack con el mismo nombre. No afectará a ninguna otra animación.",
-            "nothing": "¡Todas las ya animaciones de Eskie Macro Pack están actualizadas!"
-        },
         "traps": {
             "fire": {
                 "title": "Fuego"
