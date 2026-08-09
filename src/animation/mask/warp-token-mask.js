@@ -23,7 +23,7 @@ export const DEFAULT_CONFIG = {
     revealOverlay: 'eskie.texture_mask.tile_base.portal.warp.01.center.one_shot', // Mask tile texture
     rotation: 0,
     tint: undefined,
-    callback: {},                                                         // Optional callback functions for customization
+    callback: {},                                                         // Optional callback functions for customization (openingGate, persistentGate, closingGate, tokenOverlay, tokenOverlayClose)
     tileIds: undefined,
     localOnly: false,
     initiatorUserId: undefined,
@@ -88,6 +88,9 @@ async function createMaskTiles(object, config = {}) {
     const portalOverlayPath = absolutePath(tokenOverlay ?? `eskie.environment.portal.warp.01.center.one_shot.full.${color ?? 'purple'}`);
     const scaleXY = object.document.texture.scaleX;
 
+    const tokenElevation = object.document?.elevation ?? 0;
+    const tokenSort = object.document?.sort ?? 0;
+
     const revealOffset = compat.getTileOffset(object, 'reveal', maskScale);
     const revealMaskUpdatesBase = {
         "texture.src": revealOverlayPath,
@@ -103,8 +106,8 @@ async function createMaskTiles(object, config = {}) {
         "width": (widthAdjustment * object.document.width) * scaleXY * maskScale,
         "height": (widthAdjustment * object.document.height) * scaleXY * maskScale,
         "rotation": rotation,
-        "elevation": (object.document?.elevation ?? 0) + 1,
-        "sort": (object.document?.sort ?? 0) + 100
+        "elevation": tokenElevation - 0.01,
+        "sort": tokenSort - 10
     };
 
     const shapeOffset = compat.getTileOffset(object, 'shape');
@@ -117,16 +120,20 @@ async function createMaskTiles(object, config = {}) {
         "rotation": object.document.rotation,
         "width": widthAdjustment * object.document.width,
         "height": widthAdjustment * object.document.height,
+        "elevation": tokenElevation,
+        "sort": tokenSort
     };
 
     const revealMaskUpdates = foundry.utils.deepClone(revealMaskUpdatesBase);
 
     const portalOverlayUpdates = {
         ...foundry.utils.deepClone(revealMaskUpdatesBase),
-        "texture.src": portalOverlayPath
+        "texture.src": portalOverlayPath,
+        "elevation": tokenElevation - 0.01,
+        "sort": tokenSort - 10
     };
 
-    // Create all tiles in database in parallel
+    // Create all four tiles in database in parallel
     const [[objectRevealMask], [sceneRevealMask], [objectShapeMask], [portalOverlayTile]] = await Promise.all([
         socket.tile.create(revealMaskUpdatesBase),
         socket.tile.create(revealMaskUpdates),
@@ -172,7 +179,6 @@ async function createLocal(object, tileIds, animationId, config = {}) {
         { id: 'monks-active-tiles', ref: "Monk's Active Tile Triggers" }
     ]);
 
-    const maskScale = resolveScale(config);
     const {
         id,
         deleteObject,
@@ -227,8 +233,14 @@ async function createLocal(object, tileIds, animationId, config = {}) {
     let seq = new Sequence();
 
     if (mode === 'out') {
+        // =========================================================================
         // === WARP OUT ===
-        // 1. Start portal video at 0 (opening half: 0 to halfDurationSec) while token is visible
+        // Stage 1: Opening Gate (Gate opens behind token, token remains visible)
+        // Stage 2: Persistent Gate (Gate stays open behind token)
+        // Stage 3: Warp-Out Close Gate (Gate masks off the token as it closes)
+        // =========================================================================
+
+        // Stage 1: Opening Gate
         seq = seq.thenDo(async () => {
             if (portalOverlayTile?.object?.sourceElement) {
                 portalOverlayTile.object.sourceElement.currentTime = 0;
@@ -239,12 +251,12 @@ async function createLocal(object, tileIds, animationId, config = {}) {
             }
         });
 
+        if (callback.openingGate) seq = callback.openingGate(seq);
         if (callback.tokenOverlay) seq = callback.tokenOverlay(seq);
 
-        // Wait for portal to finish opening
         seq = seq.wait(halfMs);
 
-        // 2. Pause portal at open midpoint, hide real token, prepare mask videos at midpoint
+        // Stage 2: Persistent Gate (Pause gate at midpoint open state, token stays visible)
         seq = seq.thenDo(async () => {
             if (portalOverlayTile?.object?.sourceElement) {
                 portalOverlayTile.object.sourceElement.pause();
@@ -260,15 +272,16 @@ async function createLocal(object, tileIds, animationId, config = {}) {
             }
         });
 
+        if (callback.persistentGate) seq = callback.persistentGate(seq);
+
+        seq = seq.wait(actualPersistDuration);
+
+        // Stage 3: Warp-Out Close Gate (Masks off token as gate closes)
         seq = seq.animation()
             .on(object)
             .opacity(0)
             .show(false);
 
-        // Hold portal open for persistDuration
-        seq = seq.wait(actualPersistDuration);
-
-        // 3. Resume portal closing (halfDurationSec to totalDurationSec) and play closing masks
         seq = seq.thenDo(async () => {
             if (portalOverlayTile?.object?.sourceElement) {
                 portalOverlayTile.object.sourceElement.currentTime = halfDurationSec;
@@ -304,7 +317,7 @@ async function createLocal(object, tileIds, animationId, config = {}) {
                 .locally(true);
         }
 
-        // CopySprite token masked by closing mask (warped out as mask shrinks to zero)
+        // CopySprite token masked by closing mask (warped out into the closing gate)
         seq = seq.effect()
             .name(label)
             .copySprite(object)
@@ -317,20 +330,26 @@ async function createLocal(object, tileIds, animationId, config = {}) {
             .duration(halfMs)
             .locally(true);
 
+        if (callback.closingGate) seq = callback.closingGate(seq);
         if (callback.tokenOverlayClose) seq = callback.tokenOverlayClose(seq);
 
-        // Wait for closing phase to finish
         seq = seq.wait(halfMs);
 
     } else {
+        // =========================================================================
         // === WARP IN ===
-        // 1. Real token starts hidden
+        // Stage 1: Warp-In Opening Gate (Gate masks on token as it opens, revealing token)
+        // Stage 2: Persistent Gate (Gate stays open behind revealed token)
+        // Stage 3: Close Gate (Gate closes behind visible token)
+        // =========================================================================
+
+        // Real token starts hidden
         seq = seq.animation()
             .on(object)
             .opacity(0)
             .show(false);
 
-        // 2. Start portal and mask videos from 0 (opening phase: 0 to halfDurationSec)
+        // Stage 1: Warp-In Opening Gate
         seq = seq.thenDo(async () => {
             if (portalOverlayTile?.object?.sourceElement) {
                 portalOverlayTile.object.sourceElement.currentTime = 0;
@@ -367,7 +386,7 @@ async function createLocal(object, tileIds, animationId, config = {}) {
                 .locally(true);
         }
 
-        // CopySprite token masked by opening mask (revealed as mask expands)
+        // CopySprite token masked by opening mask (revealed as gate opens)
         seq = seq.effect()
             .name(label)
             .copySprite(object)
@@ -380,12 +399,12 @@ async function createLocal(object, tileIds, animationId, config = {}) {
             .duration(halfMs)
             .locally(true);
 
+        if (callback.openingGate) seq = callback.openingGate(seq);
         if (callback.tokenOverlay) seq = callback.tokenOverlay(seq);
 
-        // Wait for portal to finish opening
         seq = seq.wait(halfMs);
 
-        // 3. Pause portal at open midpoint, hide mask tiles, reveal real token
+        // Stage 2: Persistent Gate (Pause gate at open midpoint, reveal real token, hide masks)
         seq = seq.thenDo(async () => {
             if (portalOverlayTile?.object?.sourceElement) {
                 portalOverlayTile.object.sourceElement.pause();
@@ -400,10 +419,11 @@ async function createLocal(object, tileIds, animationId, config = {}) {
             .opacity(1)
             .show(true);
 
-        // Hold portal open around visible token
+        if (callback.persistentGate) seq = callback.persistentGate(seq);
+
         seq = seq.wait(actualPersistDuration);
 
-        // 4. Resume portal closing (halfDurationSec to totalDurationSec) around the visible token
+        // Stage 3: Close Gate (Gate closes behind visible token)
         seq = seq.thenDo(async () => {
             if (portalOverlayTile?.object?.sourceElement) {
                 portalOverlayTile.object.sourceElement.currentTime = halfDurationSec;
@@ -411,9 +431,9 @@ async function createLocal(object, tileIds, animationId, config = {}) {
             }
         });
 
+        if (callback.closingGate) seq = callback.closingGate(seq);
         if (callback.tokenOverlayClose) seq = callback.tokenOverlayClose(seq);
 
-        // Wait for closing phase to finish
         seq = seq.wait(halfMs);
     }
 
@@ -478,7 +498,7 @@ async function playSocketed(object, config = {}) {
 
     const animationId = foundry.utils.randomID();
 
-    // 1. Create all 4 tiles in database with identical scale factor
+    // 1. Create all four tiles in database with identical scale factor and elevation behind token
     const tiles = await createMaskTiles(object, {
         revealOverlay: revealAsset,
         tokenOverlay: overlayAsset,
