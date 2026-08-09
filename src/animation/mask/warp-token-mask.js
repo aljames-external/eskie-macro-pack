@@ -233,7 +233,12 @@ async function createLocal(object, tileIds, animationId, config = {}) {
         // Stage 3: Warp-Out Close Gate (Gate masks off the token as it closes)
         // =========================================================================
 
-        // Stage 1: Opening Gate (0 to halfMs behind token)
+        // Stage 1: Opening Gate (Gate opens behind token, token remains visible)
+        seq = seq.animation()
+            .on(object)
+            .opacity(1)
+            .show(true);
+
         seq = seq.effect()
             .name(`${label} - Gate Opening`)
             .file(tokenOverlayPath)
