@@ -101,26 +101,77 @@ flowchart TD
 
 ---
 
+### Does Sequence Ordering Determine Layering? (`seq.animation` vs. `seq.effect`)
+
+A common question when designing multi-stage visual macros is: **Does the order in which calls appear in a `Sequence` chain determine their visual layering on the canvas?**
+
+**No.** The sequence declaration order alone does **not** control layer depth across different canvas objects. Instead, layering is determined by a strict **3-tier priority hierarchy**:
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│ 1. Canvas Layer Container (.belowTokens / .aboveLighting)   │  ◄ Highest Priority
+├─────────────────────────────────────────────────────────────┤
+│ 2. Explicit Z-Index (.zIndex(number))                       │
+├─────────────────────────────────────────────────────────────┤
+│ 3. Sequence Declaration Order (within same container & z)   │  ◄ Lowest Priority
+└─────────────────────────────────────────────────────────────┘
+```
+
+#### 1. `seq.animation()` vs. `seq.effect()`
+* **`seq.animation()` does NOT create new visual layers**: It targets an *existing* canvas object (`Token`, `Tile`, `Drawing`) to animate properties like `.opacity()`, `.tint()`, or `.show()`. The object stays firmly on its native Foundry VTT canvas plane (`canvas.tokens` / `PrimaryCanvasGroup`), governed by token elevation and Foundry's `sort` index.
+* **`seq.effect()` creates new PixiJS sprites**: These sprites are inserted into Sequencer's managed display containers.
+
+#### 2. The 3-Tier Layering Priority Hierarchy
+
+1. **Canvas Layer Container (Primary Rule)**:
+   Sequencer organizes effects into distinct PixiJS display containers relative to the canvas:
+   * **`.belowTokens(true)`**: Renders *underneath* all canvas tokens (between map tiles and tokens).
+   * **Default (`.belowTokens(false)`)**: Renders *above* canvas tokens on the main Sequencer effect plane.
+   * **`.aboveLighting(true)`**: Renders *above* lighting, fog-of-war, and weather planes.
+   
+   > **Key Takeaway**: An effect with `.belowTokens(true)` will **always render behind** a token and normal Sequencer effects, even if it is defined last in the Sequence code.
+
+2. **Explicit Z-Index (`.zIndex(number)`) (Secondary Rule)**:
+   Within the *same* display container (e.g., both effects are above tokens), PixiJS sorts child sprites by their `.zIndex()`:
+   ```javascript
+   // Renders BEHIND effectB because zIndex is lower (0 < 1)
+   seq.effect()
+       .file("path/to/texture-a.webm")
+       .zIndex(0);
+
+   // Renders ON TOP of effectA because zIndex is higher
+   seq.effect()
+       .file("path/to/texture-b.webm")
+       .zIndex(1);
+   ```
+
+3. **Declaration Order (Tie-Breaker Only)**:
+   Only when two effects share the **exact same container** and the **exact same `zIndex`** does declaration order apply:
+   * Effects declared **earlier** in the sequence are appended first (rendered in the back).
+   * Effects declared **later** in the sequence are appended later (rendered in front).
+
+---
+
 ### Layer Stacking Snippet
 
 ```javascript
 let seq = new Sequence();
 
-// 1. Hide the original token
+// 1. Layer 3: Portal background (rendered BEHIND token due to .belowTokens)
+seq.effect()
+    .file("eskie.environment.portal.warp.01.center.one_shot.full.purple")
+    .attachTo(token, { bindAlpha: false, bindVisibility: false })
+    .scaleToObject(5)
+    .belowTokens() // Container Rule: Forces effect underneath tokens
+    .locally(true);
+
+// 2. Layer 4: Hide the original token on canvas.tokens layer
 seq.animation()
     .on(token)
     .opacity(0)
     .show(false);
 
-// 2. Layer 3: Portal background (behind token)
-seq.effect()
-    .file("eskie.environment.portal.warp.01.center.one_shot.full.purple")
-    .attachTo(token, { bindAlpha: false, bindVisibility: false })
-    .scaleToObject(5)
-    .belowTokens()
-    .locally(true);
-
-// 3. Layer 5: Masked token clone (renders in front of portal, dissolved by mask)
+// 3. Layer 5: Masked token clone (renders in FRONT of portal in default above-token container)
 seq.effect()
     .copySprite(token)
     .attachTo(token, { bindAlpha: false, bindVisibility: false })
@@ -128,12 +179,12 @@ seq.effect()
     .mask(objectRevealMask) // WebGL alpha video mask tile
     .locally(true);
 
-// 4. Layer 6: Surface overlay VFX (contained within token silhouette)
+// 4. Layer 6: Surface overlay VFX (contained within token silhouette, highest zIndex)
 seq.effect()
     .file("eskie.burn.token_mask.orange.no_base.fast.01")
     .attachTo(token, { bindAlpha: false, bindVisibility: false })
     .mask(objectShapeMask)  // Token silhouette stencil tile
-    .zIndex(1)
+    .zIndex(1)             // Z-Index Rule: Renders above the clone
     .locally(true);
 ```
 
