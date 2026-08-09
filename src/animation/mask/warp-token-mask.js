@@ -438,8 +438,7 @@ async function createLocal(object, tileIds, animationId, config = {}) {
     }
 
     // Common completion & cleanup handler
-    seq = seq.waitUntilFinished()
-        .thenDo(async () => {
+    seq = seq.thenDo(async () => {
             // Instantly hide tiles locally to prevent them from flickering while database deletion syncs
             if (objectRevealMask?.object) objectRevealMask.object.visible = false;
             if (sceneRevealMask?.object) sceneRevealMask.object.visible = false;
