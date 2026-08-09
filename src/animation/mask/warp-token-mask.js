@@ -38,7 +38,7 @@ export const DEFAULT_CONFIG = {
 function resolveScale(config) {
     const val = config?.scale ?? config?.portal?.scale ?? DEFAULT_CONFIG.scale ?? 1;
     const num = Number(val);
-    return Number.isFinite(num) && num > 0 ? num : 1;
+    return Number.isFinite(num) && num > 0 ? num : (DEFAULT_CONFIG.scale ?? 1);
 }
 
 /* In Foundry v14 they changed the anchor points of tiles which messes with the math for the masks
@@ -83,8 +83,9 @@ async function createMaskTiles(object, config = {}) {
     const widthAdjustment = (getDocumentName(object) === 'Token') ? canvas.grid.size : 1;
     const maskScale = resolveScale(config);
 
-    const { revealOverlay, rotation } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
+    const { revealOverlay, tokenOverlay, color, rotation } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
     const revealOverlayPath = absolutePath(revealOverlay ?? 'eskie.texture_mask.tile_base.portal.warp.01.center.one_shot');
+    const portalOverlayPath = absolutePath(tokenOverlay ?? `eskie.environment.portal.warp.01.center.one_shot.full.${color ?? 'purple'}`);
     const scaleXY = object.document.texture.scaleX;
 
     const revealOffset = compat.getTileOffset(object, 'reveal', maskScale);
@@ -102,6 +103,8 @@ async function createMaskTiles(object, config = {}) {
         "width": (widthAdjustment * object.document.width) * scaleXY * maskScale,
         "height": (widthAdjustment * object.document.height) * scaleXY * maskScale,
         "rotation": rotation,
+        "elevation": (object.document?.elevation ?? 0) + 1,
+        "sort": (object.document?.sort ?? 0) + 100
     };
 
     const shapeOffset = compat.getTileOffset(object, 'shape');
@@ -118,21 +121,28 @@ async function createMaskTiles(object, config = {}) {
 
     const revealMaskUpdates = foundry.utils.deepClone(revealMaskUpdatesBase);
 
+    const portalOverlayUpdates = {
+        ...foundry.utils.deepClone(revealMaskUpdatesBase),
+        "texture.src": portalOverlayPath
+    };
+
     // Create all tiles in database in parallel
-    const [[objectRevealMask], [sceneRevealMask], [objectShapeMask]] = await Promise.all([
+    const [[objectRevealMask], [sceneRevealMask], [objectShapeMask], [portalOverlayTile]] = await Promise.all([
         socket.tile.create(revealMaskUpdatesBase),
         socket.tile.create(revealMaskUpdates),
-        socket.tile.create(objectShapeMaskUpdates)
+        socket.tile.create(objectShapeMaskUpdates),
+        socket.tile.create(portalOverlayUpdates)
     ]);
 
-    // Wait for all three tiles to replicate to all active clients in parallel
+    // Wait for all four tiles to replicate to all active clients in parallel
     await Promise.all([
         socket.tile.sync(objectRevealMask.id),
         socket.tile.sync(sceneRevealMask.id),
-        socket.tile.sync(objectShapeMask.id)
+        socket.tile.sync(objectShapeMask.id),
+        socket.tile.sync(portalOverlayTile.id)
     ]);
 
-    return [objectRevealMask, sceneRevealMask, objectShapeMask];
+    return [objectRevealMask, sceneRevealMask, objectShapeMask, portalOverlayTile];
 }
 
 /**
@@ -167,20 +177,10 @@ async function createLocal(object, tileIds, animationId, config = {}) {
         id,
         deleteObject,
         mode,
-        color,
         persistDuration,
-        tokenOverlay,
-        revealOverlay,
-        rotation,
         tint,
         callback
     } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
-
-    let tokenOverlayPath = config.tokenOverlayPath;
-    if (!tokenOverlayPath) {
-        const overlayAsset = tokenOverlay ?? `eskie.environment.portal.warp.01.center.one_shot.full.${color ?? 'purple'}`;
-        tokenOverlayPath = absolutePath(overlayAsset);
-    }
 
     const label = `${id} - ${object.id}`;
 
@@ -194,18 +194,21 @@ async function createLocal(object, tileIds, animationId, config = {}) {
     }
     const tiles = tileIds.map(tileId => canvas.scene.tiles.get(tileId));
 
-    const [objectRevealMask, sceneRevealMask, objectShapeMask] = tiles;
-    if (!objectRevealMask || !sceneRevealMask || !objectShapeMask) {
-        return log.warn(`warpTokenMaskEffect.createLocal: Failed to resolve all three tiles. Effect aborted.`);
+    const [objectRevealMask, sceneRevealMask, objectShapeMask, portalOverlayTile] = tiles;
+    if (!objectRevealMask || !sceneRevealMask || !objectShapeMask || !portalOverlayTile) {
+        return log.warn(`warpTokenMaskEffect.createLocal: Failed to resolve all four tiles. Effect aborted.`);
     }
 
     // Wait for PIXI objects and video elements to render on this client
     function tilesRendered() {
         return objectRevealMask?.object?.sourceElement &&
             sceneRevealMask?.object?.sourceElement &&
+            portalOverlayTile?.object?.sourceElement &&
             objectShapeMask?.object?.mesh &&
             !isNaN(objectRevealMask.object.sourceElement.duration) &&
-            objectRevealMask.object.sourceElement.duration > 0;
+            objectRevealMask.object.sourceElement.duration > 0 &&
+            !isNaN(portalOverlayTile.object.sourceElement.duration) &&
+            portalOverlayTile.object.sourceElement.duration > 0;
     }
 
     try {
@@ -215,46 +218,69 @@ async function createLocal(object, tileIds, animationId, config = {}) {
         throw err;
     }
 
-    const totalDurationSec = objectRevealMask.object.sourceElement.duration || 2.0;
+    const totalDurationSec = portalOverlayTile.object.sourceElement.duration || objectRevealMask.object.sourceElement.duration || 2.0;
     const totalMs = Math.round(totalDurationSec * 1000);
     const halfDurationSec = totalDurationSec / 2;
     const halfMs = Math.round(totalMs / 2);
     const actualPersistDuration = persistDuration ?? 500;
-    const paddingXY = object.document.texture.scaleX;
-    const portalEffectScale = paddingXY * maskScale;
 
     let seq = new Sequence();
 
     if (mode === 'out') {
         // === WARP OUT ===
-        // 1. Portal opens up while the token remains visible on canvas, then persists open
-        seq = seq.effect()
-            .name(`${label} - Portal Opening`)
-            .file(tokenOverlayPath)
-            .attachTo(object, { bindAlpha: false, bindVisibility: false, bindRotation: false })
-            .scaleToObject(portalEffectScale)
-            .timeRange(0, halfMs)
-            .duration(halfMs)
-            .persist()
-            .locally(true);
+        // 1. Start portal video at 0 (opening half: 0 to halfDurationSec) while token is visible
+        seq = seq.thenDo(async () => {
+            if (portalOverlayTile?.object?.sourceElement) {
+                portalOverlayTile.object.sourceElement.currentTime = 0;
+                portalOverlayTile.object.sourceElement.play();
+            }
+            if (game.user.isGM) {
+                await portalOverlayTile.update({ alpha: 1, hidden: false, video: { autoplay: true } });
+            }
+        });
 
         if (callback.tokenOverlay) seq = callback.tokenOverlay(seq);
 
-        seq = seq.wait(halfMs + actualPersistDuration);
+        // Wait for portal to finish opening
+        seq = seq.wait(halfMs);
 
-        // 2. Hide the real token, start the closing mask and closing portal
+        // 2. Pause portal at open midpoint, hide real token, prepare mask videos at midpoint
+        seq = seq.thenDo(async () => {
+            if (portalOverlayTile?.object?.sourceElement) {
+                portalOverlayTile.object.sourceElement.pause();
+                portalOverlayTile.object.sourceElement.currentTime = halfDurationSec;
+            }
+            if (objectRevealMask?.object?.sourceElement) {
+                objectRevealMask.object.sourceElement.pause();
+                objectRevealMask.object.sourceElement.currentTime = halfDurationSec;
+            }
+            if (sceneRevealMask?.object?.sourceElement) {
+                sceneRevealMask.object.sourceElement.pause();
+                sceneRevealMask.object.sourceElement.currentTime = halfDurationSec;
+            }
+        });
+
         seq = seq.animation()
             .on(object)
             .opacity(0)
             .show(false);
 
+        // Hold portal open for persistDuration
+        seq = seq.wait(actualPersistDuration);
+
+        // 3. Resume portal closing (halfDurationSec to totalDurationSec) and play closing masks
         seq = seq.thenDo(async () => {
-            await Sequencer.EffectManager.endEffects({ name: `${label} - Portal Opening` });
+            if (portalOverlayTile?.object?.sourceElement) {
+                portalOverlayTile.object.sourceElement.currentTime = halfDurationSec;
+                portalOverlayTile.object.sourceElement.play();
+            }
             if (objectRevealMask?.object?.sourceElement) {
                 objectRevealMask.object.sourceElement.currentTime = halfDurationSec;
+                objectRevealMask.object.sourceElement.play();
             }
             if (sceneRevealMask?.object?.sourceElement) {
                 sceneRevealMask.object.sourceElement.currentTime = halfDurationSec;
+                sceneRevealMask.object.sourceElement.play();
             }
             if (game.user.isGM) {
                 return Promise.all([
@@ -291,17 +317,10 @@ async function createLocal(object, tileIds, animationId, config = {}) {
             .duration(halfMs)
             .locally(true);
 
-        // Portal closing effect (second half: halfMs to totalMs)
-        seq = seq.effect()
-            .name(label)
-            .file(tokenOverlayPath)
-            .attachTo(object, { bindAlpha: false, bindVisibility: false, bindRotation: false })
-            .scaleToObject(portalEffectScale)
-            .timeRange(halfMs, totalMs)
-            .duration(halfMs)
-            .locally(true);
-
         if (callback.tokenOverlayClose) seq = callback.tokenOverlayClose(seq);
+
+        // Wait for closing phase to finish
+        seq = seq.wait(halfMs);
 
     } else {
         // === WARP IN ===
@@ -311,16 +330,23 @@ async function createLocal(object, tileIds, animationId, config = {}) {
             .opacity(0)
             .show(false);
 
-        // 2. Reset mask videos to 0 (opening phase)
+        // 2. Start portal and mask videos from 0 (opening phase: 0 to halfDurationSec)
         seq = seq.thenDo(async () => {
+            if (portalOverlayTile?.object?.sourceElement) {
+                portalOverlayTile.object.sourceElement.currentTime = 0;
+                portalOverlayTile.object.sourceElement.play();
+            }
             if (objectRevealMask?.object?.sourceElement) {
                 objectRevealMask.object.sourceElement.currentTime = 0;
+                objectRevealMask.object.sourceElement.play();
             }
             if (sceneRevealMask?.object?.sourceElement) {
                 sceneRevealMask.object.sourceElement.currentTime = 0;
+                sceneRevealMask.object.sourceElement.play();
             }
             if (game.user.isGM) {
                 return Promise.all([
+                    portalOverlayTile.update({ alpha: 1, hidden: false, video: { autoplay: true } }),
                     sceneRevealMask.update({ alpha: 1, hidden: false, video: { autoplay: true } }),
                     objectRevealMask.update({ alpha: 1, hidden: false, video: { autoplay: true } })
                 ]);
@@ -354,49 +380,41 @@ async function createLocal(object, tileIds, animationId, config = {}) {
             .duration(halfMs)
             .locally(true);
 
-        // Portal opening effect (first half: 0 to halfMs)
-        seq = seq.effect()
-            .name(`${label} - Portal Opening`)
-            .file(tokenOverlayPath)
-            .attachTo(object, { bindAlpha: false, bindVisibility: false, bindRotation: false })
-            .scaleToObject(portalEffectScale)
-            .timeRange(0, halfMs)
-            .duration(halfMs)
-            .persist()
-            .locally(true);
-
         if (callback.tokenOverlay) seq = callback.tokenOverlay(seq);
 
+        // Wait for portal to finish opening
         seq = seq.wait(halfMs);
 
-        // 3. Make real token visible, hide mask tiles, hold portal open
+        // 3. Pause portal at open midpoint, hide mask tiles, reveal real token
+        seq = seq.thenDo(async () => {
+            if (portalOverlayTile?.object?.sourceElement) {
+                portalOverlayTile.object.sourceElement.pause();
+                portalOverlayTile.object.sourceElement.currentTime = halfDurationSec;
+            }
+            if (objectRevealMask?.object) objectRevealMask.object.visible = false;
+            if (sceneRevealMask?.object) sceneRevealMask.object.visible = false;
+        });
+
         seq = seq.animation()
             .on(object)
             .opacity(1)
             .show(true);
 
-        seq = seq.thenDo(async () => {
-            if (objectRevealMask?.object) objectRevealMask.object.visible = false;
-            if (sceneRevealMask?.object) sceneRevealMask.object.visible = false;
-        });
-
+        // Hold portal open around visible token
         seq = seq.wait(actualPersistDuration);
 
-        // 4. Portal closing effect (second half: halfMs to totalMs) around the now-visible token
+        // 4. Resume portal closing (halfDurationSec to totalDurationSec) around the visible token
         seq = seq.thenDo(async () => {
-            await Sequencer.EffectManager.endEffects({ name: `${label} - Portal Opening` });
+            if (portalOverlayTile?.object?.sourceElement) {
+                portalOverlayTile.object.sourceElement.currentTime = halfDurationSec;
+                portalOverlayTile.object.sourceElement.play();
+            }
         });
 
-        seq = seq.effect()
-            .name(label)
-            .file(tokenOverlayPath)
-            .attachTo(object, { bindAlpha: false, bindVisibility: false, bindRotation: false })
-            .scaleToObject(portalEffectScale)
-            .timeRange(halfMs, totalMs)
-            .duration(halfMs)
-            .locally(true);
-
         if (callback.tokenOverlayClose) seq = callback.tokenOverlayClose(seq);
+
+        // Wait for closing phase to finish
+        seq = seq.wait(halfMs);
     }
 
     // Common completion & cleanup handler
@@ -406,6 +424,7 @@ async function createLocal(object, tileIds, animationId, config = {}) {
             if (objectRevealMask?.object) objectRevealMask.object.visible = false;
             if (sceneRevealMask?.object) sceneRevealMask.object.visible = false;
             if (objectShapeMask?.object) objectShapeMask.object.visible = false;
+            if (portalOverlayTile?.object) portalOverlayTile.object.visible = false;
 
             // If the object is going to be deleted, hide it locally as well to prevent it from popping back
             if (deleteObject && object?.object) {
@@ -413,7 +432,6 @@ async function createLocal(object, tileIds, animationId, config = {}) {
             }
 
             await Sequencer.EffectManager.endEffects({ name: label });
-            await Sequencer.EffectManager.endEffects({ name: `${label} - Portal Opening` });
 
             // Dynamically wait until all masked effects are fully ended and removed from the renderer
             try {
@@ -460,8 +478,14 @@ async function playSocketed(object, config = {}) {
 
     const animationId = foundry.utils.randomID();
 
-    // 1. Create tiles in database with identical scale factor
-    const tiles = await createMaskTiles(object, { revealOverlay: revealAsset, rotation, scale: maskScale });
+    // 1. Create all 4 tiles in database with identical scale factor
+    const tiles = await createMaskTiles(object, {
+        revealOverlay: revealAsset,
+        tokenOverlay: overlayAsset,
+        color,
+        rotation,
+        scale: maskScale
+    });
     const tileIds = tiles.map(t => t.id);
 
     // 2. Store tile IDs on object flags as backup
@@ -584,8 +608,7 @@ async function stopLocal(object, config = {}) {
 
     return Promise.all([
         new Sequence().animation().on(object).opacity(1).show(true).play(),
-        Sequencer.EffectManager.endEffects({ name: label }),
-        Sequencer.EffectManager.endEffects({ name: `${label} - Portal Opening` })
+        Sequencer.EffectManager.endEffects({ name: label })
     ]);
 }
 
