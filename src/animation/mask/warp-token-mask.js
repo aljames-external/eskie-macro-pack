@@ -90,8 +90,8 @@ async function createMaskTiles(object, config = {}) {
     const revealOffset = compat.getTileOffset(object, 'reveal', maskScale);
     const revealMaskUpdatesBase = {
         "texture.src": revealOverlayPath,
-        "alpha": 1,
-        "hidden": false,
+        "alpha": 0,
+        "hidden": true,
         "x": revealOffset.x,
         "y": revealOffset.y,
         "video": {
@@ -275,6 +275,14 @@ async function createLocal(object, tileIds, animationId, config = {}) {
                 sceneRevealMask.object.sourceElement.currentTime = halfDurationSec;
                 sceneRevealMask.object.sourceElement.play();
             }
+            if (objectRevealMask?.object) {
+                objectRevealMask.object.alpha = 1;
+                objectRevealMask.object.visible = true;
+            }
+            if (sceneRevealMask?.object) {
+                sceneRevealMask.object.alpha = 1;
+                sceneRevealMask.object.visible = true;
+            }
         });
 
         // Background mask (closing phase)
@@ -345,6 +353,14 @@ async function createLocal(object, tileIds, animationId, config = {}) {
                 sceneRevealMask.object.sourceElement.currentTime = 0;
                 sceneRevealMask.object.sourceElement.play();
             }
+            if (objectRevealMask?.object) {
+                objectRevealMask.object.alpha = 1;
+                objectRevealMask.object.visible = true;
+            }
+            if (sceneRevealMask?.object) {
+                sceneRevealMask.object.alpha = 1;
+                sceneRevealMask.object.visible = true;
+            }
         });
 
         // Background mask (opening phase)
@@ -399,8 +415,14 @@ async function createLocal(object, tileIds, animationId, config = {}) {
             if (sceneRevealMask?.object?.sourceElement) {
                 sceneRevealMask.object.sourceElement.pause();
             }
-            if (objectRevealMask?.object) objectRevealMask.object.visible = false;
-            if (sceneRevealMask?.object) sceneRevealMask.object.visible = false;
+            if (objectRevealMask?.object) {
+                objectRevealMask.object.alpha = 0;
+                objectRevealMask.object.visible = false;
+            }
+            if (sceneRevealMask?.object) {
+                sceneRevealMask.object.alpha = 0;
+                sceneRevealMask.object.visible = false;
+            }
         });
 
         seq = seq.animation()
@@ -433,9 +455,18 @@ async function createLocal(object, tileIds, animationId, config = {}) {
     // Common completion & cleanup handler
     seq = seq.thenDo(async () => {
         // Instantly hide tiles locally to prevent them from flickering while database deletion syncs
-        if (objectRevealMask?.object) objectRevealMask.object.visible = false;
-        if (sceneRevealMask?.object) sceneRevealMask.object.visible = false;
-        if (objectShapeMask?.object) objectShapeMask.object.visible = false;
+        if (objectRevealMask?.object) {
+            objectRevealMask.object.alpha = 0;
+            objectRevealMask.object.visible = false;
+        }
+        if (sceneRevealMask?.object) {
+            sceneRevealMask.object.alpha = 0;
+            sceneRevealMask.object.visible = false;
+        }
+        if (objectShapeMask?.object) {
+            objectShapeMask.object.alpha = 0;
+            objectShapeMask.object.visible = false;
+        }
 
         // If the object is going to be deleted, hide it locally as well to prevent it from popping back
         if (deleteObject && object?.object) {
