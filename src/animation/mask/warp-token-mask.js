@@ -90,8 +90,8 @@ async function createMaskTiles(object, config = {}) {
     const revealOffset = compat.getTileOffset(object, 'reveal', maskScale);
     const revealMaskUpdatesBase = {
         "texture.src": revealOverlayPath,
-        "alpha": 0,
-        "hidden": true,
+        "alpha": 1,
+        "hidden": false,
         "x": revealOffset.x,
         "y": revealOffset.y,
         "video": {
@@ -233,7 +233,7 @@ async function createLocal(object, tileIds, animationId, config = {}) {
         // Stage 3: Warp-Out Close Gate (Gate masks off the token as it closes)
         // =========================================================================
 
-        // Stage 1: Opening Gate (Gate opens behind token, token remains visible)
+        // Stage 1: Opening Gate (0 to halfMs behind token) holding open for persistDuration
         seq = seq.animation()
             .on(object)
             .opacity(1)
@@ -246,7 +246,7 @@ async function createLocal(object, tileIds, animationId, config = {}) {
             .rotate(-rotation)
             .scaleToObject(portalEffectScale)
             .timeRange(0, halfMs)
-            .duration(halfMs)
+            .duration(halfMs + actualPersistDuration)
             .belowTokens()
             .locally(true);
 
@@ -256,17 +256,6 @@ async function createLocal(object, tileIds, animationId, config = {}) {
         seq = seq.wait(halfMs);
 
         // Stage 2: Persistent Gate (Hold midpoint open frame behind token)
-        seq = seq.effect()
-            .name(`${label} - Gate Persist`)
-            .file(tokenOverlayPath)
-            .attachTo(object, { bindAlpha: false, bindVisibility: false, bindRotation: false })
-            .rotate(-rotation)
-            .scaleToObject(portalEffectScale)
-            .timeRange(Math.max(0, halfMs - 1), halfMs)
-            .duration(actualPersistDuration)
-            .belowTokens()
-            .locally(true);
-
         if (callback.persistentGate) seq = callback.persistentGate(seq);
 
         seq = seq.wait(actualPersistDuration);
@@ -280,15 +269,11 @@ async function createLocal(object, tileIds, animationId, config = {}) {
         seq = seq.thenDo(async () => {
             if (objectRevealMask?.object?.sourceElement) {
                 objectRevealMask.object.sourceElement.currentTime = halfDurationSec;
+                objectRevealMask.object.sourceElement.play();
             }
             if (sceneRevealMask?.object?.sourceElement) {
                 sceneRevealMask.object.sourceElement.currentTime = halfDurationSec;
-            }
-            if (game.user.isGM) {
-                return Promise.all([
-                    sceneRevealMask.update({ alpha: 1, hidden: false, video: { autoplay: true } }),
-                    objectRevealMask.update({ alpha: 1, hidden: false, video: { autoplay: true } })
-                ]);
+                sceneRevealMask.object.sourceElement.play();
             }
         });
 
@@ -354,15 +339,11 @@ async function createLocal(object, tileIds, animationId, config = {}) {
         seq = seq.thenDo(async () => {
             if (objectRevealMask?.object?.sourceElement) {
                 objectRevealMask.object.sourceElement.currentTime = 0;
+                objectRevealMask.object.sourceElement.play();
             }
             if (sceneRevealMask?.object?.sourceElement) {
                 sceneRevealMask.object.sourceElement.currentTime = 0;
-            }
-            if (game.user.isGM) {
-                return Promise.all([
-                    sceneRevealMask.update({ alpha: 1, hidden: false, video: { autoplay: true } }),
-                    objectRevealMask.update({ alpha: 1, hidden: false, video: { autoplay: true } })
-                ]);
+                sceneRevealMask.object.sourceElement.play();
             }
         });
 
@@ -393,7 +374,7 @@ async function createLocal(object, tileIds, animationId, config = {}) {
             .duration(halfMs)
             .locally(true);
 
-        // Opening gate (0 to halfMs)
+        // Opening gate (0 to halfMs) holding open for persistDuration
         seq = seq.effect()
             .name(`${label} - Gate Opening`)
             .file(tokenOverlayPath)
@@ -401,7 +382,7 @@ async function createLocal(object, tileIds, animationId, config = {}) {
             .rotate(-rotation)
             .scaleToObject(portalEffectScale)
             .timeRange(0, halfMs)
-            .duration(halfMs)
+            .duration(halfMs + actualPersistDuration)
             .belowTokens()
             .locally(true);
 
@@ -410,8 +391,14 @@ async function createLocal(object, tileIds, animationId, config = {}) {
 
         seq = seq.wait(halfMs);
 
-        // Stage 2: Persistent Gate (Hold midpoint open frame behind revealed token)
+        // Stage 2: Persistent Gate (Pause mask, reveal real token)
         seq = seq.thenDo(async () => {
+            if (objectRevealMask?.object?.sourceElement) {
+                objectRevealMask.object.sourceElement.pause();
+            }
+            if (sceneRevealMask?.object?.sourceElement) {
+                sceneRevealMask.object.sourceElement.pause();
+            }
             if (objectRevealMask?.object) objectRevealMask.object.visible = false;
             if (sceneRevealMask?.object) sceneRevealMask.object.visible = false;
         });
@@ -420,17 +407,6 @@ async function createLocal(object, tileIds, animationId, config = {}) {
             .on(object)
             .opacity(1)
             .show(true);
-
-        seq = seq.effect()
-            .name(`${label} - Gate Persist`)
-            .file(tokenOverlayPath)
-            .attachTo(object, { bindAlpha: false, bindVisibility: false, bindRotation: false })
-            .rotate(-rotation)
-            .scaleToObject(portalEffectScale)
-            .timeRange(Math.max(0, halfMs - 1), halfMs)
-            .duration(actualPersistDuration)
-            .belowTokens()
-            .locally(true);
 
         if (callback.persistentGate) seq = callback.persistentGate(seq);
 
