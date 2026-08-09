@@ -5,6 +5,9 @@ const DEFAULT_CONFIG = {
     deleteObject: false,
     color: 'purple',
     scale: 1,
+    portal: {
+        scale: undefined
+    },
     persistDuration: 500,
     rotation: 0,
     tint: undefined,
@@ -13,42 +16,42 @@ const DEFAULT_CONFIG = {
 
 async function create(object, config = {}) {
     const mergedConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
-    return warpTokenMaskEffect.create(object, { ...mergedConfig, mode: 'out' });
+    return warpTokenMaskEffect.create(object, { ...mergedConfig, ...config, mode: 'out' });
 }
 
 async function play(object, config = {}) {
     const mergedConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
-    return warpTokenMaskEffect.play(object, { ...mergedConfig, mode: 'out' });
+    return warpTokenMaskEffect.play(object, { ...mergedConfig, ...config, mode: 'out' });
 }
 
 async function stop(object, config = {}) {
     const mergedConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
-    return warpTokenMaskEffect.play(object, { ...mergedConfig, mode: 'in' });
+    return warpTokenMaskEffect.play(object, { ...mergedConfig, ...config, mode: 'in' });
 }
 
 async function clean(object, config = {}) {
     const mergedConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
-    return warpTokenMaskEffect.stop(object, mergedConfig);
+    return warpTokenMaskEffect.stop(object, { ...mergedConfig, ...config });
 }
 
 async function createWarpOut(object, config = {}) {
     const mergedConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
-    return warpTokenMaskEffect.create(object, { ...mergedConfig, mode: 'out' });
+    return warpTokenMaskEffect.create(object, { ...mergedConfig, ...config, mode: 'out' });
 }
 
 async function playWarpOut(object, config = {}) {
     const mergedConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
-    return warpTokenMaskEffect.play(object, { ...mergedConfig, mode: 'out' });
+    return warpTokenMaskEffect.play(object, { ...mergedConfig, ...config, mode: 'out' });
 }
 
 async function createWarpIn(object, config = {}) {
     const mergedConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
-    return warpTokenMaskEffect.create(object, { ...mergedConfig, mode: 'in' });
+    return warpTokenMaskEffect.create(object, { ...mergedConfig, ...config, mode: 'in' });
 }
 
 async function playWarpIn(object, config = {}) {
     const mergedConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
-    return warpTokenMaskEffect.play(object, { ...mergedConfig, mode: 'in' });
+    return warpTokenMaskEffect.play(object, { ...mergedConfig, ...config, mode: 'in' });
 }
 
 export const warpMask = {

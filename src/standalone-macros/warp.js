@@ -12,19 +12,25 @@ const hasActiveMask = Sequencer.EffectManager.getEffects({ name: label }).length
 
 const isWarpedOut = isHidden || hasActiveMask;
 
+const config = {
+    color: "purple", // "purple", "red", "white"
+    scale: 1,        // Scale multiplier for portal and mask (e.g. 1, 1.5, 2)
+    deleteObject: false
+};
+
 if (typeof eskie !== "undefined" && eskie.mask?.warp) {
     if (isWarpedOut) {
-        await eskie.mask.warp.stop(token, { color: "purple" });
+        await eskie.mask.warp.stop(token, config);
     } else {
-        await eskie.mask.warp.play(token, { color: "purple", deleteObject: false });
+        await eskie.mask.warp.play(token, config);
     }
 } else {
     const macroApi = game.modules.get("eskie-macros")?.api;
     if (macroApi?.mask?.warp) {
         if (isWarpedOut) {
-            await macroApi.mask.warp.stop(token, { color: "purple" });
+            await macroApi.mask.warp.stop(token, config);
         } else {
-            await macroApi.mask.warp.play(token, { color: "purple", deleteObject: false });
+            await macroApi.mask.warp.play(token, config);
         }
     } else {
         ui.notifications.error("Eskie Macro Pack warp mask module is not loaded.");
