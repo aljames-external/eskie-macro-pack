@@ -3,6 +3,7 @@ import { log } from '../../lib/logger.js';
 import { socket, socketlib } from "../socketlib.js";
 import { object as objectAttachment } from "../../lib/object.js";
 import { tokenMaskEffect, tokenMaskTracker, playLocal, stopLocal } from "../../animation/mask/token-mask.js";
+import { warpTokenMaskEffect, playLocal as playWarpLocal, stopLocal as stopWarpLocal } from "../../animation/mask/warp-token-mask.js";
 import { tile } from "./tile.js";
 
 /**
@@ -17,7 +18,7 @@ async function playTokenMaskLocal(tokenId, tileIds, initiatorUserId, config = {}
         animationId: config.animationId
     });
 
-    const object = canvas.tokens.get(tokenId) || canvas.tiles.get(tokenId);
+    const object = canvas.tokens.get(tokenId) ?? canvas.tiles.get(tokenId);
     if (!object) {
         log.warn(`playTokenMaskLocal | Object ${tokenId} not found on this client!`);
         // Report completion immediately to not block the initiator
@@ -76,7 +77,7 @@ async function cleanUpTokenMask(tokenId, animationId, tileIds, deleteObject) {
     
     log.debug(`cleanUpTokenMask | Cleaning up database for object ${tokenId} (Session: ${animationId}). Delete object: ${deleteObject}`);
     
-    const object = canvas.tokens.get(tokenId) || canvas.tiles.get(tokenId);
+    const object = canvas.tokens.get(tokenId) ?? canvas.tiles.get(tokenId);
     if (object) {
         // Resolve tiles and detach them in the database
         const tiles = tileIds ? tileIds.map(id => canvas.scene.tiles.get(id)).filter(t => t) : [];
@@ -107,9 +108,54 @@ async function cleanUpTokenMask(tokenId, animationId, tileIds, deleteObject) {
  */
 async function playTokenMaskGM(tokenId, config = {}) {
     if (!game.user.isGM) return;
-    const object = canvas.tokens.get(tokenId) || canvas.tiles.get(tokenId);
+    const object = canvas.tokens.get(tokenId) ?? canvas.tiles.get(tokenId);
     if (!object) return;
     return tokenMaskEffect.play(object, config);
+}
+
+/**
+ * Socketlib handler to execute local warp mask sequence rendering on a client.
+ */
+async function playWarpTokenMaskLocal(tokenId, tileIds, initiatorUserId, config = {}) {
+    log.debug(`playWarpTokenMaskLocal | Received socket call:`, {
+        tokenId,
+        tileIds,
+        initiatorUserId,
+        currentUser: game.user.name,
+        animationId: config.animationId
+    });
+
+    const object = canvas.tokens.get(tokenId) ?? canvas.tiles.get(tokenId);
+    if (!object) {
+        log.warn(`playWarpTokenMaskLocal | Object ${tokenId} not found on this client!`);
+        await socketlib.executeForUsers('tokenMaskClientDone', [initiatorUserId], tokenId, game.user.id, config.animationId);
+        return;
+    }
+
+    try {
+        if (config.toggleOff) {
+            await stopWarpLocal(object, config);
+            return;
+        }
+
+        await playWarpLocal(object, tileIds, config.animationId, {
+            ...config,
+            initiatorUserId
+        });
+    } catch (err) {
+        log.error("playWarpTokenMaskLocal | Error playing local warp mask animation:", err);
+        await socketlib.executeForUsers('tokenMaskClientDone', [initiatorUserId], object.id, game.user.id, config.animationId);
+    }
+}
+
+/**
+ * Socketlib handler to execute coordinated warp token mask playback as GM.
+ */
+async function playWarpTokenMaskGM(tokenId, config = {}) {
+    if (!game.user.isGM) return;
+    const object = canvas.tokens.get(tokenId) ?? canvas.tiles.get(tokenId);
+    if (!object) return;
+    return warpTokenMaskEffect.play(object, config);
 }
 
 export const tokenMaskSockets = {
@@ -117,4 +163,6 @@ export const tokenMaskSockets = {
     tokenMaskClientDone,
     cleanUpTokenMask,
     playTokenMaskGM,
+    playWarpTokenMaskLocal,
+    playWarpTokenMaskGM,
 };

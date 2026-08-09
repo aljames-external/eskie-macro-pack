@@ -106,6 +106,7 @@ import { viciousMockery } from "./target/vicious-mockery.js";
 import { vortexWarp } from "./target/vortex-warp.js";
 import { wings } from "./token/wings.js";
 import { saoDeath } from "../mask/sao-death.js";
+import { warpMask } from "../mask/warp-mask.js";
 
 export const effect = {
     animateDead,
@@ -212,10 +213,12 @@ export const effect = {
         shatter: warn.deprecation(shatterMask, 'eskie.effect.tokenMask.shatter', 'eskie.mask.shatter', 'January 1, 2028'),
         tear: warn.deprecation(tearMask, 'eskie.effect.tokenMask.tear', 'eskie.mask.tear', 'January 1, 2028'),
         smoke: warn.deprecation(smokeMask, 'eskie.effect.tokenMask.smoke', 'eskie.mask.smoke', 'January 1, 2028'),
+        warp: warn.deprecation(warpMask, 'eskie.effect.tokenMask.warp', 'eskie.mask.warp', 'January 1, 2028'),
     },
     trueStrike,
     viciousMockery,
     vortexWarp,
+    warpMask,
     wings,
     wingsV2: warn.deprecation(wings, 'eskie.effect.wingsV2', 'eskie.effect.wings', 'January 1, 2028'),
     swordArtOnlineDeath: warn.deprecation(saoDeath, 'eskie.effect.swordArtOnlineDeath', 'eskie.mask.saoDeath', 'January 1, 2028'),

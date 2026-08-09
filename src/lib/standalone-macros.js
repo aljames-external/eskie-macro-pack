@@ -122,6 +122,7 @@ const KNOWN_STANDALONE_MACROS = [
     'vicious-mockery.js',
     'vn-dialog.js',
     'vortex-warp.js',
+    'warp.js',
     'wings.js'
 ];
 
