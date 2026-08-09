@@ -14,7 +14,7 @@ export const DEFAULT_CONFIG = {
     deleteObject: false,
     mode: 'out',                                                           // 'out' (warp out/disappear) or 'in' (warp in/appear)
     color: 'purple',                                                      // 'purple', 'red', 'white'
-    scale: 1,                                                             // Scale multiplier of the portal effect & mask relative to token
+    scale: 5,                                                             // Scale multiplier of the portal effect & mask relative to token
     portal: {
         scale: undefined
     },
