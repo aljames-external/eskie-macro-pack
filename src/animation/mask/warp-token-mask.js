@@ -19,8 +19,8 @@ export const DEFAULT_CONFIG = {
         scale: undefined
     },
     persistDuration: 500,                                                 // Duration (ms) the portal persists open in the middle
-    tokenOverlay: undefined,                                              // Portal overlay path/key (defaults to eskie.environment.portal.warp.01.center.loop.full.<color>)
-    revealOverlay: 'eskie.texture_mask.tile_base.portal.warp.01.center.loop', // Mask tile texture
+    tokenOverlay: undefined,                                              // Portal overlay path/key (defaults to eskie.environment.portal.warp.01.center.one_shot.full.<color>)
+    revealOverlay: 'eskie.texture_mask.tile_base.portal.warp.01.center.one_shot', // Mask tile texture
     rotation: 0,
     tint: undefined,
     callback: {},                                                         // Optional callback functions for customization
@@ -84,7 +84,7 @@ async function createMaskTiles(object, config = {}) {
     const maskScale = resolveScale(config);
 
     const { revealOverlay, rotation } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
-    const revealOverlayPath = absolutePath(revealOverlay ?? 'eskie.texture_mask.tile_base.portal.warp.01.center.loop');
+    const revealOverlayPath = absolutePath(revealOverlay ?? 'eskie.texture_mask.tile_base.portal.warp.01.center.one_shot');
     const scaleXY = object.document.texture.scaleX;
 
     const revealOffset = compat.getTileOffset(object, 'reveal', maskScale);
@@ -178,7 +178,7 @@ async function createLocal(object, tileIds, animationId, config = {}) {
 
     let tokenOverlayPath = config.tokenOverlayPath;
     if (!tokenOverlayPath) {
-        const overlayAsset = tokenOverlay ?? `eskie.environment.portal.warp.01.center.loop.full.${color ?? 'purple'}`;
+        const overlayAsset = tokenOverlay ?? `eskie.environment.portal.warp.01.center.one_shot.full.${color ?? 'purple'}`;
         tokenOverlayPath = absolutePath(overlayAsset);
     }
 
@@ -452,8 +452,8 @@ async function playSocketed(object, config = {}) {
         tint
     } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
 
-    const overlayAsset = tokenOverlay ?? `eskie.environment.portal.warp.01.center.loop.full.${color ?? 'purple'}`;
-    const revealAsset = revealOverlay ?? 'eskie.texture_mask.tile_base.portal.warp.01.center.loop';
+    const overlayAsset = tokenOverlay ?? `eskie.environment.portal.warp.01.center.one_shot.full.${color ?? 'purple'}`;
+    const revealAsset = revealOverlay ?? 'eskie.texture_mask.tile_base.portal.warp.01.center.one_shot';
 
     const tokenOverlayPath = absolutePath(overlayAsset);
     const revealOverlayPath = absolutePath(revealAsset);
