@@ -215,12 +215,9 @@ async function createLocal(object, tileIds, animationId, config = {}) {
         throw err;
     }
 
-    // Reset mask video clocks to 0
-    objectRevealMask.object.sourceElement.currentTime = 0;
-    sceneRevealMask.object.sourceElement.currentTime = 0;
-
     const totalDurationSec = objectRevealMask.object.sourceElement.duration || 2.0;
     const totalMs = Math.round(totalDurationSec * 1000);
+    const halfDurationSec = totalDurationSec / 2;
     const halfMs = Math.round(totalMs / 2);
     const actualPersistDuration = persistDuration ?? 500;
     const paddingXY = object.document.texture.scaleX;
@@ -231,35 +228,79 @@ async function createLocal(object, tileIds, animationId, config = {}) {
     if (mode === 'out') {
         // =========================================================================
         // === WARP OUT ===
-        // 1. Hide real token immediately
-        // 2. Token copy created and masked with objectRevealMask (persisted)
-        // 3. Background mask created with sceneRevealMask (persisted, belowTokens)
-        // 4. Portal opens behind token with persist (belowTokens)
-        // 5. Persist holds open for persistDuration
-        // 6. End persisted effects, allowing portal and mask to close naturally
+        // Stage 1: Opening Gate (Gate opens behind token, token remains visible)
+        // Stage 2: Persistent Gate (Gate holds open behind token)
+        // Stage 3: Warp-Out Close Gate (Real token hides, masked clone shrinks into closing gate)
         // =========================================================================
 
-        // Hide real token
+        // Ensure token starts at opacity 1
+        seq = seq.animation()
+            .on(object)
+            .opacity(1)
+            .show(true);
+
+        // Stage 1: Opening Gate (plays 0 to halfMs behind token, holds open for persistDuration)
+        seq = seq.effect()
+            .name(`${label} - Gate Opening`)
+            .file(tokenOverlayPath)
+            .attachTo(object, { bindAlpha: false, bindVisibility: false, bindRotation: false })
+            .rotate(-rotation)
+            .scaleToObject(portalEffectScale)
+            .timeRange(0, halfMs)
+            .duration(halfMs + actualPersistDuration)
+            .belowTokens()
+            .locally(true);
+
+        if (callback.openingGate) seq = callback.openingGate(seq);
+        if (callback.tokenOverlay) seq = callback.tokenOverlay(seq);
+
+        // Wait for opening half
+        seq = seq.wait(halfMs);
+
+        // Stage 2: Persistent Gate (Hold open behind token)
+        if (callback.persistentGate) seq = callback.persistentGate(seq);
+
+        seq = seq.wait(actualPersistDuration);
+
+        // Stage 3: Warp-Out Close Gate (Hide real token, masked token clone closes down with gate)
         seq = seq.animation()
             .on(object)
             .opacity(0)
             .show(false);
 
-        // Background mask
+        // Set mask video to midpoint and activate
+        seq = seq.thenDo(async () => {
+            if (objectRevealMask?.object?.sourceElement) {
+                objectRevealMask.object.sourceElement.currentTime = halfDurationSec;
+                objectRevealMask.object.sourceElement.play();
+            }
+            if (sceneRevealMask?.object?.sourceElement) {
+                sceneRevealMask.object.sourceElement.currentTime = halfDurationSec;
+                sceneRevealMask.object.sourceElement.play();
+            }
+            if (game.user.isGM) {
+                return Promise.all([
+                    sceneRevealMask.update({ alpha: 1, hidden: false, video: { autoplay: true } }),
+                    objectRevealMask.update({ alpha: 1, hidden: false, video: { autoplay: true } })
+                ]);
+            }
+        });
+
+        // Background mask (closing phase)
         if (canvas.scene.background?.src) {
             seq = seq.effect()
                 .name(label)
                 .file(canvas.scene.background.src)
                 .atLocation({ x: canvas.dimensions.width / 2, y: canvas.dimensions.height / 2 })
                 .size({ width: canvas.scene.width / canvas.grid.size, height: canvas.scene.height / canvas.grid.size }, { gridUnits: true })
-                .persist()
+                .duration(halfMs)
                 .belowTokens()
                 .mask(sceneRevealMask)
                 .spriteOffset({ x: -canvas.scene.background.offsetX, y: -canvas.scene.background.offsetY })
                 .locally(true);
         }
 
-        // Token copy masked by reveal mask (persisted)
+        // Token copy masked by closing mask (shrinks away into the closing gate)
         seq = seq.effect()
             .name(label)
             .copySprite(object)
@@ -269,63 +310,32 @@ async function createLocal(object, tileIds, animationId, config = {}) {
             .attachTo(object, { bindAlpha: false, bindVisibility: false, bindRotation: true })
             .scaleToObject(1, { considerTokenScale: true })
             .mask(objectRevealMask)
-            .persist()
+            .duration(halfMs)
             .locally(true);
 
-        // Portal overlay effect persisted behind token
+        // Closing gate (plays halfMs to totalMs, closing naturally)
         seq = seq.effect()
-            .name(label)
+            .name(`${label} - Gate Closing`)
             .file(tokenOverlayPath)
             .attachTo(object, { bindAlpha: false, bindVisibility: false, bindRotation: false })
             .rotate(-rotation)
             .scaleToObject(portalEffectScale)
+            .timeRange(halfMs, totalMs)
+            .duration(halfMs)
             .belowTokens()
-            .persist()
             .locally(true);
-
-        if (callback.openingGate) seq = callback.openingGate(seq);
-        if (callback.tokenOverlay) seq = callback.tokenOverlay(seq);
-
-        // Start mask video playback locally
-        seq = seq.thenDo(async () => {
-            if (objectRevealMask?.object?.sourceElement) {
-                objectRevealMask.object.sourceElement.currentTime = 0;
-                objectRevealMask.object.sourceElement.play();
-            }
-            if (sceneRevealMask?.object?.sourceElement) {
-                sceneRevealMask.object.sourceElement.currentTime = 0;
-                sceneRevealMask.object.sourceElement.play();
-            }
-        });
-
-        // Opening gate runs to midpoint (token is fully revealed through opening mask)
-        seq = seq.wait(halfMs);
-
-        if (callback.persistentGate) seq = callback.persistentGate(seq);
-
-        // Hold open for persistDuration
-        seq = seq.wait(actualPersistDuration);
-
-        // End persisted Sequencer effects, causing portal and mask to close naturally
-        seq = seq.thenDo(async () => {
-            await Sequencer.EffectManager.endEffects({ name: label });
-        });
 
         if (callback.closingGate) seq = callback.closingGate(seq);
         if (callback.tokenOverlayClose) seq = callback.tokenOverlayClose(seq);
 
-        // Wait for natural closing outro to complete
         seq = seq.wait(halfMs);
 
     } else {
         // =========================================================================
         // === WARP IN ===
-        // 1. Real token starts hidden
-        // 2. Background mask created with sceneRevealMask (persisted, belowTokens)
-        // 3. Token copy created and masked with objectRevealMask (persisted)
-        // 4. Portal opens behind token with persist (belowTokens)
-        // 5. At midpoint, real token is revealed and persisted portal stays open
-        // 6. End persisted effects so portal closes naturally behind visible token
+        // Stage 1: Warp-In Opening Gate (Gate and mask open from 0 to halfMs, revealing token clone)
+        // Stage 2: Persistent Gate (Real token is revealed, gate holds open behind token)
+        // Stage 3: Close Gate (Gate closes naturally behind visible token from halfMs to totalMs)
         // =========================================================================
 
         // Real token starts hidden
@@ -334,48 +344,7 @@ async function createLocal(object, tileIds, animationId, config = {}) {
             .opacity(0)
             .show(false);
 
-        // Background mask
-        if (canvas.scene.background?.src) {
-            seq = seq.effect()
-                .name(label)
-                .file(canvas.scene.background.src)
-                .atLocation({ x: canvas.dimensions.width / 2, y: canvas.dimensions.height / 2 })
-                .size({ width: canvas.scene.width / canvas.grid.size, height: canvas.scene.height / canvas.grid.size }, { gridUnits: true })
-                .persist()
-                .belowTokens()
-                .mask(sceneRevealMask)
-                .spriteOffset({ x: -canvas.scene.background.offsetX, y: -canvas.scene.background.offsetY })
-                .locally(true);
-        }
-
-        // Token copy masked by reveal mask (persisted)
-        seq = seq.effect()
-            .name(label)
-            .copySprite(object)
-            .spriteRotation(-object.document.rotation);
-        if (tint && tint !== 'none') seq = seq.tint(tint);
-        seq = seq
-            .attachTo(object, { bindAlpha: false, bindVisibility: false, bindRotation: true })
-            .scaleToObject(1, { considerTokenScale: true })
-            .mask(objectRevealMask)
-            .persist()
-            .locally(true);
-
-        // Portal overlay effect persisted behind token
-        seq = seq.effect()
-            .name(label)
-            .file(tokenOverlayPath)
-            .attachTo(object, { bindAlpha: false, bindVisibility: false, bindRotation: false })
-            .rotate(-rotation)
-            .scaleToObject(portalEffectScale)
-            .belowTokens()
-            .persist()
-            .locally(true);
-
-        if (callback.openingGate) seq = callback.openingGate(seq);
-        if (callback.tokenOverlay) seq = callback.tokenOverlay(seq);
-
-        // Start mask video playback locally
+        // Set mask video to 0 and activate
         seq = seq.thenDo(async () => {
             if (objectRevealMask?.object?.sourceElement) {
                 objectRevealMask.object.sourceElement.currentTime = 0;
@@ -385,12 +354,76 @@ async function createLocal(object, tileIds, animationId, config = {}) {
                 sceneRevealMask.object.sourceElement.currentTime = 0;
                 sceneRevealMask.object.sourceElement.play();
             }
+            if (game.user.isGM) {
+                return Promise.all([
+                    sceneRevealMask.update({ alpha: 1, hidden: false, video: { autoplay: true } }),
+                    objectRevealMask.update({ alpha: 1, hidden: false, video: { autoplay: true } })
+                ]);
+            }
         });
 
-        // Opening gate runs to midpoint, revealing token copy
+        // Background mask (opening phase)
+        if (canvas.scene.background?.src) {
+            seq = seq.effect()
+                .name(label)
+                .file(canvas.scene.background.src)
+                .atLocation({ x: canvas.dimensions.width / 2, y: canvas.dimensions.height / 2 })
+                .size({ width: canvas.scene.width / canvas.grid.size, height: canvas.scene.height / canvas.grid.size }, { gridUnits: true })
+                .duration(halfMs)
+                .belowTokens()
+                .mask(sceneRevealMask)
+                .spriteOffset({ x: -canvas.scene.background.offsetX, y: -canvas.scene.background.offsetY })
+                .locally(true);
+        }
+
+        // Token copy masked by opening mask (revealed as mask opens)
+        seq = seq.effect()
+            .name(label)
+            .copySprite(object)
+            .spriteRotation(-object.document.rotation);
+        if (tint && tint !== 'none') seq = seq.tint(tint);
+        seq = seq
+            .attachTo(object, { bindAlpha: false, bindVisibility: false, bindRotation: true })
+            .scaleToObject(1, { considerTokenScale: true })
+            .mask(objectRevealMask)
+            .duration(halfMs)
+            .locally(true);
+
+        // Opening gate (plays 0 to halfMs, holds open for persistDuration)
+        seq = seq.effect()
+            .name(`${label} - Gate Opening`)
+            .file(tokenOverlayPath)
+            .attachTo(object, { bindAlpha: false, bindVisibility: false, bindRotation: false })
+            .rotate(-rotation)
+            .scaleToObject(portalEffectScale)
+            .timeRange(0, halfMs)
+            .duration(halfMs + actualPersistDuration)
+            .belowTokens()
+            .locally(true);
+
+        if (callback.openingGate) seq = callback.openingGate(seq);
+        if (callback.tokenOverlay) seq = callback.tokenOverlay(seq);
+
         seq = seq.wait(halfMs);
 
-        // Reveal real token at open midpoint
+        // Stage 2: Persistent Gate (Pause mask, reveal real token on canvas)
+        seq = seq.thenDo(async () => {
+            if (objectRevealMask?.object?.sourceElement) {
+                objectRevealMask.object.sourceElement.pause();
+            }
+            if (sceneRevealMask?.object?.sourceElement) {
+                sceneRevealMask.object.sourceElement.pause();
+            }
+            if (objectRevealMask?.object) {
+                objectRevealMask.object.alpha = 0;
+                objectRevealMask.object.visible = false;
+            }
+            if (sceneRevealMask?.object) {
+                sceneRevealMask.object.alpha = 0;
+                sceneRevealMask.object.visible = false;
+            }
+        });
+
         seq = seq.animation()
             .on(object)
             .opacity(1)
@@ -398,18 +431,23 @@ async function createLocal(object, tileIds, animationId, config = {}) {
 
         if (callback.persistentGate) seq = callback.persistentGate(seq);
 
-        // Hold open for persistDuration
         seq = seq.wait(actualPersistDuration);
 
-        // End persisted Sequencer effects, causing portal to close naturally behind visible token
-        seq = seq.thenDo(async () => {
-            await Sequencer.EffectManager.endEffects({ name: label });
-        });
+        // Stage 3: Close Gate (Gate plays halfMs to totalMs, closing naturally behind visible token)
+        seq = seq.effect()
+            .name(`${label} - Gate Closing`)
+            .file(tokenOverlayPath)
+            .attachTo(object, { bindAlpha: false, bindVisibility: false, bindRotation: false })
+            .rotate(-rotation)
+            .scaleToObject(portalEffectScale)
+            .timeRange(halfMs, totalMs)
+            .duration(halfMs)
+            .belowTokens()
+            .locally(true);
 
         if (callback.closingGate) seq = callback.closingGate(seq);
         if (callback.tokenOverlayClose) seq = callback.tokenOverlayClose(seq);
 
-        // Wait for natural closing outro to complete
         seq = seq.wait(halfMs);
     }
 
