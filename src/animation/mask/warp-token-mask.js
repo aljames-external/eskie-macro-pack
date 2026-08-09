@@ -231,18 +231,19 @@ async function createLocal(object, tileIds, animationId, config = {}) {
     if (mode === 'out') {
         // =========================================================================
         // === WARP OUT ===
-        // 1. Token copy created and masked with persist
-        // 2. Background mask created with persist
-        // 3. Portal opens behind token with persist
-        // 4. Token stays visible, then hides; persist holds open
-        // 5. Remove persist so effects close naturally
+        // 1. Hide real token immediately
+        // 2. Token copy created and masked with objectRevealMask (persisted)
+        // 3. Background mask created with sceneRevealMask (persisted, belowTokens)
+        // 4. Portal opens behind token with persist (belowTokens)
+        // 5. Persist holds open for persistDuration
+        // 6. End persisted effects, allowing portal and mask to close naturally
         // =========================================================================
 
-        // Ensure token starts at opacity 1
+        // Hide real token
         seq = seq.animation()
             .on(object)
-            .opacity(1)
-            .show(true);
+            .opacity(0)
+            .show(false);
 
         // Background mask
         if (canvas.scene.background?.src) {
@@ -285,7 +286,7 @@ async function createLocal(object, tileIds, animationId, config = {}) {
         if (callback.openingGate) seq = callback.openingGate(seq);
         if (callback.tokenOverlay) seq = callback.tokenOverlay(seq);
 
-        // Start mask video playback on GM sync
+        // Start mask video playback locally
         seq = seq.thenDo(async () => {
             if (objectRevealMask?.object?.sourceElement) {
                 objectRevealMask.object.sourceElement.currentTime = 0;
@@ -295,29 +296,17 @@ async function createLocal(object, tileIds, animationId, config = {}) {
                 sceneRevealMask.object.sourceElement.currentTime = 0;
                 sceneRevealMask.object.sourceElement.play();
             }
-            if (game.user.isGM) {
-                return Promise.all([
-                    sceneRevealMask.update({ alpha: 1, hidden: false, video: { autoplay: true } }),
-                    objectRevealMask.update({ alpha: 1, hidden: false, video: { autoplay: true } })
-                ]);
-            }
         });
 
-        // Opening gate runs to midpoint
+        // Opening gate runs to midpoint (token is fully revealed through opening mask)
         seq = seq.wait(halfMs);
-
-        // Hide real token as portal reaches full open state
-        seq = seq.animation()
-            .on(object)
-            .opacity(0)
-            .show(false);
 
         if (callback.persistentGate) seq = callback.persistentGate(seq);
 
         // Hold open for persistDuration
         seq = seq.wait(actualPersistDuration);
 
-        // End persisted Sequencer effects, causing them to close naturally
+        // End persisted Sequencer effects, causing portal and mask to close naturally
         seq = seq.thenDo(async () => {
             await Sequencer.EffectManager.endEffects({ name: label });
         });
@@ -332,10 +321,11 @@ async function createLocal(object, tileIds, animationId, config = {}) {
         // =========================================================================
         // === WARP IN ===
         // 1. Real token starts hidden
-        // 2. Token copy created and masked with persist
-        // 3. Portal opens behind token with persist
-        // 4. Real token is revealed at midpoint; persist holds open
-        // 5. Remove persist so portal closes naturally behind visible token
+        // 2. Background mask created with sceneRevealMask (persisted, belowTokens)
+        // 3. Token copy created and masked with objectRevealMask (persisted)
+        // 4. Portal opens behind token with persist (belowTokens)
+        // 5. At midpoint, real token is revealed and persisted portal stays open
+        // 6. End persisted effects so portal closes naturally behind visible token
         // =========================================================================
 
         // Real token starts hidden
@@ -385,7 +375,7 @@ async function createLocal(object, tileIds, animationId, config = {}) {
         if (callback.openingGate) seq = callback.openingGate(seq);
         if (callback.tokenOverlay) seq = callback.tokenOverlay(seq);
 
-        // Start mask video playback on GM sync
+        // Start mask video playback locally
         seq = seq.thenDo(async () => {
             if (objectRevealMask?.object?.sourceElement) {
                 objectRevealMask.object.sourceElement.currentTime = 0;
@@ -395,15 +385,9 @@ async function createLocal(object, tileIds, animationId, config = {}) {
                 sceneRevealMask.object.sourceElement.currentTime = 0;
                 sceneRevealMask.object.sourceElement.play();
             }
-            if (game.user.isGM) {
-                return Promise.all([
-                    sceneRevealMask.update({ alpha: 1, hidden: false, video: { autoplay: true } }),
-                    objectRevealMask.update({ alpha: 1, hidden: false, video: { autoplay: true } })
-                ]);
-            }
         });
 
-        // Opening gate runs to midpoint, revealing token
+        // Opening gate runs to midpoint, revealing token copy
         seq = seq.wait(halfMs);
 
         // Reveal real token at open midpoint
