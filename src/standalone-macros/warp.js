@@ -14,7 +14,6 @@ const isWarpedOut = isHidden || hasActiveMask;
 
 const config = {
     color: "purple", // "purple", "red", "white"
-    scale: 1,        // Scale multiplier for portal and mask (e.g. 1, 1.5, 2)
     deleteObject: false
 };
 

@@ -1,18 +1,6 @@
 import { warpTokenMaskEffect } from "./warp-token-mask.js";
 
-const DEFAULT_CONFIG = {
-    id: 'WarpTokenMask',
-    deleteObject: false,
-    color: 'purple',
-    scale: 1,
-    portal: {
-        scale: undefined
-    },
-    persistDuration: 500,
-    rotation: 0,
-    tint: undefined,
-    callback: {}
-};
+const DEFAULT_CONFIG = warpTokenMaskEffect.default_config;
 
 async function create(object, config = {}) {
     const mergedConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
