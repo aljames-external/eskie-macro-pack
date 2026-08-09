@@ -392,10 +392,10 @@ async function createLocal(object, tileIds, animationId, config = {}) {
             // Instantly hide tiles locally to prevent them from flickering while database deletion syncs
             if (objectRevealMask?.object) objectRevealMask.object.visible = false;
             if (sceneRevealMask?.object) sceneRevealMask.object.visible = false;
-            if (objectShapeMask?.object) objectShapeMask?.object?.visible = false;
+            if (objectShapeMask?.object) objectShapeMask.object.visible = false;
 
             // If the object is going to be deleted, hide it locally as well to prevent it from popping back
-            if (deleteObject && object.object) {
+            if (deleteObject && object?.object) {
                 object.object.visible = false;
             }
 
