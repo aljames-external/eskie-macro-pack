@@ -4,7 +4,7 @@ const DEFAULT_CONFIG = {
     id: 'WarpTokenMask',
     deleteObject: false,
     color: 'purple',
-    scale: 2.5,
+    scale: 1,
     persistDuration: 500,
     rotation: 0,
     tint: undefined,

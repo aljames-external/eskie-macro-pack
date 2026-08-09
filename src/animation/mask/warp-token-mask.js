@@ -14,7 +14,7 @@ export const DEFAULT_CONFIG = {
     deleteObject: false,
     mode: 'out',                                                           // 'out' (warp out/disappear) or 'in' (warp in/appear)
     color: 'purple',                                                      // 'purple', 'red', 'white'
-    scale: 2.5,                                                           // Scale of the portal effect relative to token
+    scale: 1,                                                             // Scale of the portal effect & mask relative to token
     persistDuration: 500,                                                 // Duration (ms) the portal persists open in the middle
     tokenOverlay: undefined,                                              // Portal overlay path/key (defaults to eskie.environment.portal.warp.01.center.loop.full.<color>)
     revealOverlay: 'eskie.texture_mask.tile_base.portal.warp.01.center.loop', // Mask tile texture
@@ -32,13 +32,14 @@ export const DEFAULT_CONFIG = {
 /* In Foundry v14 they changed the anchor points of tiles which messes with the math for the masks
  * This function returns the correct offset for the tile based on the Foundry version and the object type (Token or Tile)
  */
-function getRevealOffset(object) {
+function getRevealOffset(object, scale = 1) {
     const updatedTiles = foundry.utils.isNewerVersion(game.version, "14");
     const widthAdjustment = (getDocumentName(object) === 'Token') ? canvas.grid.size : 1;
     const scaleXY = object.document.texture.scaleX;
+    const totalScale = scaleXY * scale;
     const legacyOffset = {
-        x: object.x - (widthAdjustment * object.document.width * (scaleXY - 1) / 2),
-        y: object.y - (widthAdjustment * object.document.height * (scaleXY - 1) / 2)
+        x: object.x - (widthAdjustment * object.document.width * (totalScale - 1) / 2),
+        y: object.y - (widthAdjustment * object.document.height * (totalScale - 1) / 2)
     };
     return updatedTiles ? object.center : legacyOffset;
 }
@@ -52,10 +53,10 @@ function getShapeOffset(object) {
     return updatedTiles ? object.center : legacyOffset;
 }
 
-function getTileOffset(object, type) {
+function getTileOffset(object, type, scale = 1) {
     switch (type) {
         case 'reveal':
-            return getRevealOffset(object);
+            return getRevealOffset(object, scale);
         case 'shape':
             return getShapeOffset(object);
         default:
@@ -69,11 +70,12 @@ const compat = { getTileOffset };
 async function createMaskTiles(object, config = {}) {
     const widthAdjustment = (getDocumentName(object) === 'Token') ? canvas.grid.size : 1;
 
-    const { revealOverlay, rotation } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
+    const { revealOverlay, rotation, scale } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
     const revealOverlayPath = absolutePath(revealOverlay ?? 'eskie.texture_mask.tile_base.portal.warp.01.center.loop');
     const scaleXY = object.document.texture.scaleX;
+    const maskScale = scale ?? 1;
 
-    const revealOffset = compat.getTileOffset(object, 'reveal');
+    const revealOffset = compat.getTileOffset(object, 'reveal', maskScale);
     const revealMaskUpdatesBase = {
         "texture.src": revealOverlayPath,
         "alpha": 0,
@@ -85,8 +87,8 @@ async function createMaskTiles(object, config = {}) {
             loop: false,
             volume: 0
         },
-        "width": (widthAdjustment * object.document.width) * scaleXY,
-        "height": (widthAdjustment * object.document.height) * scaleXY,
+        "width": (widthAdjustment * object.document.width) * scaleXY * maskScale,
+        "height": (widthAdjustment * object.document.height) * scaleXY * maskScale,
         "rotation": rotation,
     };
 
@@ -206,7 +208,7 @@ async function createLocal(object, tileIds, animationId, config = {}) {
     const halfDurationSec = totalDurationSec / 2;
     const halfMs = Math.round(totalMs / 2);
     const actualPersistDuration = persistDuration ?? 500;
-    const portalScale = scale ?? 2.5;
+    const maskScale = scale ?? 1;
 
     let seq = new Sequence();
 
@@ -217,7 +219,7 @@ async function createLocal(object, tileIds, animationId, config = {}) {
             .name(`${label} - Portal Opening`)
             .file(tokenOverlayPath)
             .attachTo(object, { bindAlpha: false, bindVisibility: false, bindRotation: false })
-            .scaleToObject(portalScale)
+            .scaleToObject(maskScale, { considerTokenScale: true })
             .timeRange(0, halfMs)
             .duration(halfMs)
             .persist()
@@ -281,7 +283,7 @@ async function createLocal(object, tileIds, animationId, config = {}) {
             .name(label)
             .file(tokenOverlayPath)
             .attachTo(object, { bindAlpha: false, bindVisibility: false, bindRotation: false })
-            .scaleToObject(portalScale)
+            .scaleToObject(maskScale, { considerTokenScale: true })
             .timeRange(halfMs, totalMs)
             .duration(halfMs)
             .locally(true);
@@ -344,7 +346,7 @@ async function createLocal(object, tileIds, animationId, config = {}) {
             .name(`${label} - Portal Opening`)
             .file(tokenOverlayPath)
             .attachTo(object, { bindAlpha: false, bindVisibility: false, bindRotation: false })
-            .scaleToObject(portalScale)
+            .scaleToObject(maskScale, { considerTokenScale: true })
             .timeRange(0, halfMs)
             .duration(halfMs)
             .persist()
@@ -376,7 +378,7 @@ async function createLocal(object, tileIds, animationId, config = {}) {
             .name(label)
             .file(tokenOverlayPath)
             .attachTo(object, { bindAlpha: false, bindVisibility: false, bindRotation: false })
-            .scaleToObject(portalScale)
+            .scaleToObject(maskScale, { considerTokenScale: true })
             .timeRange(halfMs, totalMs)
             .duration(halfMs)
             .locally(true);
@@ -390,7 +392,7 @@ async function createLocal(object, tileIds, animationId, config = {}) {
             // Instantly hide tiles locally to prevent them from flickering while database deletion syncs
             if (objectRevealMask?.object) objectRevealMask.object.visible = false;
             if (sceneRevealMask?.object) sceneRevealMask.object.visible = false;
-            if (objectShapeMask?.object) objectShapeMask.object.visible = false;
+            if (objectShapeMask?.object) objectShapeMask?.object?.visible = false;
 
             // If the object is going to be deleted, hide it locally as well to prevent it from popping back
             if (deleteObject && object.object) {
@@ -445,8 +447,8 @@ async function playSocketed(object, config = {}) {
 
     const animationId = foundry.utils.randomID();
 
-    // 1. Create tiles in database
-    const tiles = await createMaskTiles(object, { revealOverlay: revealAsset, rotation });
+    // 1. Create tiles in database with identical scale factor
+    const tiles = await createMaskTiles(object, { revealOverlay: revealAsset, rotation, scale });
     const tileIds = tiles.map(t => t.id);
 
     // 2. Store tile IDs on object flags as backup
