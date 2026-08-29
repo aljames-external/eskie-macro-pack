@@ -247,4 +247,18 @@ export class FoundryCurrentAdapter extends BaseFoundryAdapter {
             offsetY: Number(rawBg?.offsetY ?? 0)
         };
     }
+
+    /**
+     * Format a document update payload to delete/remove a specific property key.
+     * In Foundry V14+, formats using foundry.data.operators.ForcedDeletion.
+     *
+     * @param {string} path Dot-delimited parent property path (e.g. "flags.eskie-macros.token-masks")
+     * @param {string} keyId The property key to delete
+     * @returns {Record<string, *>} Update dictionary
+     */
+    formatDeletionUpdate(path, keyId) {
+        const fullKey = path ? `${path}.${keyId}` : keyId;
+        const operator = foundry.data?.operators?.ForcedDeletion;
+        return { [fullKey]: operator };
+    }
 }

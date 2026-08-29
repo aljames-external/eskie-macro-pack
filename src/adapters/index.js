@@ -263,6 +263,10 @@ export class Adapter {
         return this.foundry.detachPlaceableElements(elements, target);
     }
 
+    formatDeletionUpdate(path, keyId) {
+        return this.foundry.formatDeletionUpdate(path, keyId);
+    }
+
     /* -------------------------------------------- */
     /*  System Layer Delegates                      */
     /* -------------------------------------------- */

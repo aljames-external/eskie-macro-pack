@@ -95,9 +95,9 @@ async function cleanUpTokenMask(tokenId, animationId, tileIds, deleteObject) {
             await object.document.delete();
         } else if (animationId) {
             // Remove only this specific animationId session's flag
-            await object.document.update({
-                [`flags.eskie-macros.token-masks.-=${animationId}`]: null
-            });
+            await object.document.update(
+                adapter.formatDeletionUpdate('flags.eskie-macros.token-masks', animationId)
+            );
         }
     }
 }

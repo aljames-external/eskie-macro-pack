@@ -898,4 +898,17 @@ export class BaseFoundryAdapter {
             { id: 'multi-token-edit', ref: "Baileywiki Mass Edit" }
         ]);
     }
+
+    /**
+     * Format a document update payload to delete/remove a specific property key.
+     * In Foundry V12/V13, formats using legacy "-=<keyId>" deletion syntax.
+     *
+     * @param {string} path Dot-delimited parent property path (e.g. "flags.eskie-macros.token-masks")
+     * @param {string} keyId The property key to delete
+     * @returns {Record<string, *>} Update dictionary
+     */
+    formatDeletionUpdate(path, keyId) {
+        const fullKey = path ? `${path}.-=${keyId}` : `-=${keyId}`;
+        return { [fullKey]: null };
+    }
 }

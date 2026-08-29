@@ -52,6 +52,11 @@ globalThis.CONST = {
 };
 
 globalThis.foundry = {
+    data: {
+        operators: {
+            ForcedDeletion: Symbol('ForcedDeletion')
+        }
+    },
     applications: {
         api: {
             ApplicationV2: class ApplicationV2 {

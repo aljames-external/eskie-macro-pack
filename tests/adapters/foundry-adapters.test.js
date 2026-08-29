@@ -451,6 +451,45 @@ test('BaseFoundryAdapter and UnifiedAdapter abstract all utility operations clea
     assert.equal(id.length, 16);
 });
 
+test('formatDeletionUpdate contracts across BaseFoundryAdapter (V12/V13 legacy -=) and FoundryCurrentAdapter (V14+ ForcedDeletion)', () => {
+    const bfa = new BaseFoundryAdapter();
+    const v14 = new FoundryCurrentAdapter();
+
+    // V12/V13 BaseFoundryAdapter formats legacy -= deletion syntax
+    assert.deepEqual(
+        bfa.formatDeletionUpdate('flags.eskie-macros.token-masks', 'anim-123'),
+        { 'flags.eskie-macros.token-masks.-=anim-123': null }
+    );
+    assert.deepEqual(
+        bfa.formatDeletionUpdate('', 'anim-123'),
+        { '-=anim-123': null }
+    );
+
+    // V14+ FoundryCurrentAdapter formats modern ForcedDeletion operator
+    assert.deepEqual(
+        v14.formatDeletionUpdate('flags.eskie-macros.token-masks', 'anim-123'),
+        { 'flags.eskie-macros.token-masks.anim-123': foundry.data.operators.ForcedDeletion }
+    );
+    assert.deepEqual(
+        v14.formatDeletionUpdate('', 'anim-123'),
+        { 'anim-123': foundry.data.operators.ForcedDeletion }
+    );
+
+    // Unified adapter delegation
+    adapter.foundry = v14;
+    assert.deepEqual(
+        adapter.formatDeletionUpdate('flags.eskie-macros.token-masks', 'anim-123'),
+        { 'flags.eskie-macros.token-masks.anim-123': foundry.data.operators.ForcedDeletion }
+    );
+
+    adapter.foundry = bfa;
+    assert.deepEqual(
+        adapter.formatDeletionUpdate('flags.eskie-macros.token-masks', 'anim-123'),
+        { 'flags.eskie-macros.token-masks.-=anim-123': null }
+    );
+});
+
+
 
 
 
