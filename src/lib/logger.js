@@ -4,11 +4,7 @@ export const VERBOSITY_LEVELS = Object.freeze({
     error: 1,
     warn: 2,
     info: 3,
-    debug: 4,
-    1: 1,
-    2: 2,
-    3: 3,
-    4: 4
+    debug: 4
 });
 
 export const GROUP_STYLES = Object.freeze({
@@ -82,7 +78,7 @@ export class Logger {
     /**
      * Dynamically update the cached verbosity level.
      * Called by the settings onChange callback.
-     * @param {'error'|'warn'|'info'|'debug'|number} level - The new verbosity level key or numeric value.
+     * @param {'error'|'warn'|'info'|'debug'} level - The new verbosity level key.
      * @returns {void}
      */
     setVerbosity(level) {
