@@ -1,5 +1,6 @@
 import { dependency } from './dependency.js';
-import { log } from './logger.js';
+import { log, notify } from './logger.js';
+import { localize } from './utils.js';
 
 /**
  * Traverses the Sequencer database to find the best-fit path for a given set of categories.
@@ -11,12 +12,17 @@ import { log } from './logger.js';
 function bestFit(modulePrefix, ...categories) {
     let diverged = false;
     let currentPath = modulePrefix;
-    let originalPath = `${modulePrefix}.${categories.join('.')}`;
+    const originalPath = `${modulePrefix}.${categories.join('.')}`;
     let remainingOptions = Sequencer.Database.getPathsUnder(currentPath);
     let divergenceOptions = '';
 
+    /**
+     * Checks whether a path component is a handlebars-style mustache template token.
+     * @param {string} component - The path component to inspect.
+     * @returns {boolean} True if the component is enclosed in mustache braces, false otherwise.
+     */
     function isMustache(component) {
-        return component.startsWith('{{') && component.endsWith('}}');
+        return Boolean(component?.startsWith?.('{{') && component?.endsWith?.('}}'));
     }
 
     // Traverse the categories that the user has provided
@@ -31,9 +37,10 @@ function bestFit(modulePrefix, ...categories) {
                 diverged = true;
                 divergenceOptions = remainingOptions.join(', ');
             }
-            currentPath += `.${remainingOptions[0]}`;
+            const bestOption = remainingOptions[0] ?? '';
+            currentPath += `.${bestOption}`;
             remainingOptions = Sequencer.Database.getPathsUnder(currentPath);
-            categories.shift(); // Remove the used category and continue (try to match as best we can)
+            categories.shift(); // Remove the missing category and continue with primary default option
             continue;
         }
 
@@ -42,10 +49,7 @@ function bestFit(modulePrefix, ...categories) {
     }
 
     if (diverged) {
-        let msg = `EMP  | Filemanager closest path diverged from requested path.`;
-        msg += `\n\tRequested: ${originalPath}`;
-        msg += `\n\tResolved as: ${currentPath}`;
-        msg += `\n\tAvailable options at divergence: ${divergenceOptions}`;
+        const msg = `Filemanager closest path diverged from requested path. Requested: ${originalPath} -> Resolved as: ${currentPath} (available: ${divergenceOptions})`;
         log.warn(msg);
     }
     return currentPath;
@@ -54,18 +58,18 @@ function bestFit(modulePrefix, ...categories) {
 /**
  * Finds the closest matching file path in the Sequencer database, handling different module prefixes and versions (e.g., free vs. patreon).
  * @param {string} path - The path to the file, using dot notation (e.g., 'jb2a.fireball.blue').
- * @returns {string} The resolved file path.
+ * @returns {string|undefined} The resolved file path, or undefined if no path categories exist.
  */
 export function closest(path) {
-    if (typeof path !== 'string' || !path) return '';
+    if (typeof path !== 'string' || !path.trim()) return undefined;
 
     // Support http:// and https:// addresses
     // Support direct filepaths
     if (path.includes('/')) return path;
 
     // Support Sequencer Database paths (. seperated)
-    let categories = path.split('.');
-    if (categories.length === 0) return;
+    const categories = path.split('.');
+    if (categories.length === 0) return undefined;
     let isPatreonUser = false;
     let isFreeUser = false;
     let modulePrefix = categories.shift();
@@ -74,10 +78,11 @@ export function closest(path) {
         // Sounds
         case 'psfx':
             dependency.someRequired([{ id: 'psfx-patreon', ref: 'PSFX-Patreon' }, { id: 'psfx', ref: "PSFX - Peri's Sound Effects" }]);
-            isPatreonUser = dependency.isActivated({ id: 'psfx-patreon', ref: 'PSFX-Patreon' });
-            isFreeUser = dependency.isActivated({ id: 'psfx', ref: "PSFX - Peri's Sound Effects" });
-            if (isPatreonUser && isFreeUser)
-                ui.notifications.warn('Both PSFX Patreon and Free are activated, both modules use the path `psfx.` to prefix files! This will cause conflicts! Recommend disabling / uninstalling the free version.');
+            isPatreonUser = Boolean(dependency.isActivated({ id: 'psfx-patreon', ref: 'PSFX-Patreon' }));
+            isFreeUser = Boolean(dependency.isActivated({ id: 'psfx', ref: "PSFX - Peri's Sound Effects" }));
+            if (isPatreonUser && isFreeUser) {
+                notify.warn(localize("EMP.Conflicts.PSFX", "Both PSFX Patreon and Free are activated, both modules use the path `psfx.` to prefix files! This will cause conflicts! Recommend disabling / uninstalling the free version."));
+            }
             modulePrefix = 'psfx';
             break;
         case 'psfx-ambience':
@@ -88,28 +93,32 @@ export function closest(path) {
         case 'eskie':
         case 'eskie-free':
             dependency.someRequired([{ id: 'eskie-effects', ref: 'Eskie Effects' }, { id: 'eskie-effects-free', ref: 'Eskie Effects Free' }]);
-            isPatreonUser = dependency.isActivated({ id: 'eskie-effects', ref: 'Eskie Effects' });
-            modulePrefix = (isPatreonUser) ? `eskie` : `eskie-free`;
+            isPatreonUser = Boolean(dependency.isActivated({ id: 'eskie-effects', ref: 'Eskie Effects' }));
+            modulePrefix = isPatreonUser ? 'eskie' : 'eskie-free';
             break;
         case 'jb2a':
             dependency.someRequired([{ id: 'jb2a_patreon', ref: 'JB2A Patreon' }, { id: 'JB2A_DnD5e', ref: 'JB2A Free' }]);
-            isFreeUser = dependency.isActivated({ id: 'JB2A_DnD5e' });
-            isPatreonUser = dependency.isActivated({ id: 'jb2a_patreon' });
-            if (isPatreonUser && isFreeUser)
-                ui.notifications.warn('Both JB2A Patreon and Free are activated, both modules use the path `jb2a.` to prefix files. This will cause conflicts! Recommend disabling / uninstalling the free version.');
-            modulePrefix = `jb2a`;
+            isFreeUser = Boolean(dependency.isActivated({ id: 'JB2A_DnD5e' }));
+            isPatreonUser = Boolean(dependency.isActivated({ id: 'jb2a_patreon' }));
+            if (isPatreonUser && isFreeUser) {
+                notify.warn(localize("EMP.Conflicts.JB2A", "Both JB2A Patreon and Free are activated, both modules use the path `jb2a.` to prefix files. This will cause conflicts! Recommend disabling / uninstalling the free version."));
+            }
+            modulePrefix = 'jb2a';
             break;
         case 'blfx':
             dependency.someRequired([{ id: 'boss-loot-assets-premium', ref: 'Boss Loot Assets Premium' }, { id: 'boss-loot-assets-free', ref: 'Boss Loot Assets Free' }]);
-            isPatreonUser = dependency.isActivated({ id: 'boss-loot-assets-premium' });
-            isFreeUser = dependency.isActivated({ id: 'boss-loot-assets-free' });
-            if (isPatreonUser && isFreeUser)
-                ui.notifications.warn('Both Boss Loot Assets Premium and Free are activated, both modules use the path `blfx.` to prefix files. This will cause conflicts! Recommend disabling / uninstalling the free version.');
-            modulePrefix = `blfx`;
+            isPatreonUser = Boolean(dependency.isActivated({ id: 'boss-loot-assets-premium' }));
+            isFreeUser = Boolean(dependency.isActivated({ id: 'boss-loot-assets-free' }));
+            if (isPatreonUser && isFreeUser) {
+                notify.warn(localize("EMP.Conflicts.BLFX", "Both Boss Loot Assets Premium and Free are activated, both modules use the path `blfx.` to prefix files. This will cause conflicts! Recommend disabling / uninstalling the free version."));
+            }
+            modulePrefix = 'blfx';
             break;
     }
 
-    return bestFit(modulePrefix, ...categories);
+    const closestReturn = bestFit(modulePrefix, ...categories);
+    log.debug(`Returning ${closestReturn} as filepath`);
+    return closestReturn;
 }
 
 /**
@@ -118,18 +127,26 @@ export function closest(path) {
  * @returns {string|undefined} The absolute file path, or undefined if empty.
  */
 export function absolutePath(configPath) {
-    if (!configPath) return undefined;
+    if (typeof configPath !== 'string' || !configPath.trim()) return undefined;
     const resolvedConfig = closest(configPath);
+    if (!resolvedConfig) return resolvedConfig;
     try {
         const entry = Sequencer.Database.getEntry(resolvedConfig, { softFail: true });
-        return (typeof entry === 'string') ? entry : (entry?.file ?? entry?.files?.[0] ?? resolvedConfig);
+        if (typeof entry === 'string') return entry;
+        if (entry?.file) return entry.file;
+        if (entry?.files?.[0]) return entry.files[0];
+        if (entry?.path) return entry.path;
+        return resolvedConfig;
     } catch (e) {
         log.debug(`filemanager | Failed to resolve Sequencer entry for: ${resolvedConfig}`, e);
         return resolvedConfig;
     }
 }
 
+/**
+ * File manager utility object containing path resolution methods.
+ */
 export const file = {
     closest,
-    absolutePath,
-}
+    absolutePath
+};

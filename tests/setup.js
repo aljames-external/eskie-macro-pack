@@ -15,6 +15,24 @@ globalThis.adapter = undefined;
 globalThis.Sequencer = {
     EffectManager: {
         endEffects: () => {}
+    },
+    Database: {
+        getEntry(path) {
+            if (!path || String(path).includes('invalid')) return null;
+            return { path };
+        },
+        entryExists(path) {
+            const str = String(path);
+            return str === 'jb2a.crosshair.01.white' || str.includes('.white');
+        },
+        getPathsUnder(path) {
+            const str = String(path);
+            if (str.includes('invalid')) return [];
+            if (str.startsWith('eskie') || str.startsWith('jb2a') || str.startsWith('psfx') || str.startsWith('blfx')) {
+                return ['crosshair', 'circle', 'rectangle', 'ray', 'cone', 'square', 'fantasy_01', 'thin', 'white', 'blue', 'green', 'yellow', 'red', 'orange', 'purple', 'no_base', 'radius_10ft', 'radius_20ft', 'radius_30ft', 'radius_60ft', '05x05ft', '10x05ft', '10x10ft', '20x10ft', '20x20ft', '40x20ft', '01', '02', 'full'];
+            }
+            return [];
+        }
     }
 };
 
