@@ -467,7 +467,7 @@ async function play(
         await startSequence?.play();
 
         const result = await adapter.buttonDialog({
-            title: 'Ritual Summon Hell',
+            title: `Ritual Summon Hell - ${label}`,
             buttons: [{ label: 'SUMMON!', value: '1' }]
         });
 

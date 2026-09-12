@@ -530,10 +530,9 @@ test('ritualSummonHell.stop cleans up lights and effects', async () => {
 });
 
 test('ritualSummonHell.play interactive prompts button dialog and runs climax on confirmation', async () => {
-    let buttonDialogCalled = false;
+    let buttonDialogTitles = [];
     adapter.buttonDialog = async (data) => {
-        buttonDialogCalled = true;
-        assert.equal(data.title, 'Ritual Summon Hell');
+        buttonDialogTitles.push(data.title);
         return '1';
     };
 
@@ -547,7 +546,10 @@ test('ritualSummonHell.play interactive prompts button dialog and runs climax on
 
     const playResult = await summon.ritualSummonHell.play(mockCaster, mockSummon, { interactive: true });
     assert.ok(playResult, 'Interactive play must succeed when user confirms');
-    assert.equal(buttonDialogCalled, true, 'adapter.buttonDialog must be called');
+    assert.equal(buttonDialogTitles[0], 'Ritual Summon Hell - Warlock');
+
+    await summon.ritualSummonHell.play(mockCaster, mockSummon, { interactive: true, label: 'Infernal Gate' });
+    assert.equal(buttonDialogTitles[1], 'Ritual Summon Hell - Infernal Gate');
 });
 
 test('ritualSummonHell names effects with - ${label}, supports custom label & No Caster fallback, and clean() ends all', async () => {
