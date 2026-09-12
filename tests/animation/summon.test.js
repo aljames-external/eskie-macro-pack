@@ -533,10 +533,10 @@ test('ritualSummonHell.stop cleans up lights and effects', async () => {
     }
 });
 
-test('ritualSummonHell.play interactive prompts button dialog and runs climax on confirmation', async () => {
-    let buttonDialogTitles = [];
+test('ritualSummonHell.play interactive prompts button dialog with SUMMON! and Cancel buttons, running climax on confirmation', async () => {
+    let buttonDialogData = [];
     adapter.buttonDialog = async (data) => {
-        buttonDialogTitles.push(data.title);
+        buttonDialogData.push(data);
         return '1';
     };
 
@@ -550,10 +550,77 @@ test('ritualSummonHell.play interactive prompts button dialog and runs climax on
 
     const playResult = await summon.ritualSummonHell.play(mockCaster, mockSummon, { interactive: true });
     assert.ok(playResult, 'Interactive play must succeed when user confirms');
-    assert.equal(buttonDialogTitles[0], 'Ritual Summon Hell - Warlock');
+    assert.equal(buttonDialogData[0].title, 'Ritual Summon Hell - Warlock');
+    assert.deepEqual(buttonDialogData[0].buttons, [
+        { label: 'SUMMON!', value: '1' },
+        { label: 'Cancel', value: '0' }
+    ]);
 
     await summon.ritualSummonHell.play(mockCaster, mockSummon, { interactive: true, label: 'Infernal Gate' });
-    assert.equal(buttonDialogTitles[1], 'Ritual Summon Hell - Infernal Gate');
+    assert.equal(buttonDialogData[1].title, 'Ritual Summon Hell - Infernal Gate');
+});
+
+test('ritualSummonHell.play interactive ends fires, removes red glow, and cleans up when cancelled via Cancel or X', async () => {
+    const origEndEffects = Sequencer.EffectManager.endEffects;
+    let endedEffects = [];
+    Sequencer.EffectManager.endEffects = (opts) => {
+        endedEffects.push(opts.name);
+    };
+
+    let deletedLightIds = [];
+    let deletedTokenIds = [];
+    const origScene = canvas.scene;
+
+    // Simulate Foundry Collection where lights is an iterable Map
+    const lightsMap = new Map([
+        ['light-hell-1', { id: 'light-hell-1', flags: { 'eskie-macro-pack': { ritualSummonHell: true, label: 'Warlock' } } }],
+        ['light-other', { id: 'light-other', flags: {} }]
+    ]);
+
+    canvas.scene = {
+        lights: lightsMap,
+        deleteEmbeddedDocuments: async (type, ids) => {
+            if (type === 'AmbientLight') deletedLightIds.push(...ids);
+            if (type === 'Token') deletedTokenIds.push(...ids);
+            return ids;
+        },
+        createEmbeddedDocuments: async (_type, docs) => docs
+    };
+
+    const mockCaster = { id: 'caster-1', name: 'Warlock', document: { rotation: 0 }, center: { x: 100, y: 100 } };
+    const mockSummon = {
+        id: 'summon-demon-1',
+        name: 'Pit Fiend',
+        document: { width: 2, height: 2, rotation: 0, texture: { src: 'icons/pitfiend.png', scaleX: 1 } },
+        center: { x: 300, y: 300 }
+    };
+
+    try {
+        // 1. Cancel via 'Cancel' button ('0')
+        adapter.buttonDialog = async () => '0';
+        endedEffects.length = 0;
+        deletedLightIds.length = 0;
+
+        const resultCancel = await summon.ritualSummonHell.play(mockCaster, mockSummon, { interactive: true });
+        assert.equal(resultCancel, null, 'Play must return null on cancel');
+        assert.ok(endedEffects.includes('Summoning Flames - Warlock'), 'Fires must go out on cancel');
+        assert.ok(endedEffects.includes('Summoning Circle - Warlock'), 'Circle must end on cancel');
+        assert.ok(endedEffects.includes('Summoning Core - Warlock'), 'Core must end on cancel');
+        assert.deepEqual(deletedLightIds, ['light-hell-1'], 'Red glow ambient lights must be removed on cancel');
+
+        // 2. Cancel via dialog 'X' / Escape (false)
+        adapter.buttonDialog = async () => false;
+        endedEffects.length = 0;
+        deletedLightIds.length = 0;
+
+        const resultX = await summon.ritualSummonHell.play(mockCaster, mockSummon, { interactive: true });
+        assert.equal(resultX, null, 'Play must return null on dialog X close');
+        assert.ok(endedEffects.includes('Summoning Flames - Warlock'), 'Fires must go out on X close');
+        assert.deepEqual(deletedLightIds, ['light-hell-1'], 'Red glow ambient lights must be removed on X close');
+    } finally {
+        Sequencer.EffectManager.endEffects = origEndEffects;
+        canvas.scene = origScene;
+    }
 });
 
 test('ritualSummonHell names effects with - ${label}, supports custom label & No Caster fallback, and clean() ends all', async () => {

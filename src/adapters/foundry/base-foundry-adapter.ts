@@ -680,6 +680,22 @@ export class BaseFoundryAdapter {
     }
 
     /**
+     * Retrieves all AmbientLight documents on the scene.
+     * Normalizes across Foundry Collection, Map, or Array structures.
+     * @param {any} [scene=canvas?.scene] Target scene
+     * @returns {any[]} Array of AmbientLight documents
+     */
+    getSceneLights(scene: any = canvas?.scene): any[] {
+        if (!scene) return [];
+        const lightsCollection = scene.lights;
+        if (!lightsCollection) return [];
+        if (lightsCollection.contents) return lightsCollection.contents;
+        if (typeof lightsCollection.values === 'function') return Array.from(lightsCollection.values());
+        if (Array.isArray(lightsCollection)) return lightsCollection;
+        return [];
+    }
+
+    /**
      * Retrieve the grid size in pixels for the current scene.
      * @param {Scene|null} [scene=canvas?.scene] Target scene
      * @returns {number} Grid size in pixels (default 100)

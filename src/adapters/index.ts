@@ -267,6 +267,10 @@ class Adapter {
         return this.foundry.getSceneDimensions(scene);
     }
 
+    getSceneLights(scene = canvas?.scene) {
+        return this.foundry.getSceneLights(scene);
+    }
+
     getGridSize(scene = canvas?.scene) {
         return this.foundry.getGridSize(scene);
     }
