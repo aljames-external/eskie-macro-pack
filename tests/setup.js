@@ -155,7 +155,13 @@ globalThis.foundry = {
             },
             DialogV2: class DialogV2 {
                 static async wait(options = {}) {
-                    return options.buttons?.[0]?.action ?? false;
+                    const defaultBtn = options.buttons?.find(b => b.default)
+                        ?? options.buttons?.find(b => {
+                            const val = String(b.action ?? b.label ?? '').toLowerCase();
+                            return val !== '0' && val !== 'cancel';
+                        })
+                        ?? options.buttons?.[0];
+                    return defaultBtn?.action ?? false;
                 }
             }
         },

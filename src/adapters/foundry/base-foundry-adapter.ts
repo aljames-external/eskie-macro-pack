@@ -138,7 +138,12 @@ export class BaseFoundryAdapter {
         };
         const nonCancelButtons = rawButtons.filter((btn: any) => !isCancel(btn));
         const cancelButtons = rawButtons.filter((btn: any) => isCancel(btn));
-        const orderedButtons = [...nonCancelButtons, ...cancelButtons];
+
+        // In Foundry VTT ApplicationV2 DialogV2, .form-footer uses flex-direction: row-reverse.
+        // Array items are rendered from right to left (index 0 appears on the far right).
+        // To guarantee Cancel appears on the visual right and primary actions appear on the visual left:
+        // cancel buttons are placed first (index 0 -> visual right), followed by actions (visual left).
+        const orderedButtons = [...cancelButtons, ...nonCancelButtons];
 
         const buttons = orderedButtons.map((btn: any) => ({
             label: btn.label,
@@ -146,36 +151,12 @@ export class BaseFoundryAdapter {
             default: Boolean(btn.default)
         }));
 
-        const userRender = (opt as any).render;
-        const render = (event: any, html: any) => {
-            const el = (typeof HTMLElement !== 'undefined' && html instanceof HTMLElement) ? html : (html?.[0] ?? html);
-            const footer = el?.querySelector?.('footer.form-footer') ?? el?.querySelector?.('.form-footer');
-            if (footer?.style) {
-                footer.style.setProperty('flex-direction', 'row', 'important');
-            }
-            const buttons = el?.querySelectorAll?.('footer.form-footer > button, .form-footer > button');
-            if (buttons) {
-                buttons.forEach((btn: any) => {
-                    if (btn?.style) btn.style.setProperty('flex', '1', 'important');
-                });
-            }
-            if (typeof userRender === 'function') {
-                userRender(event, html);
-            }
-        };
-
-        const rawContent = (buttonData.content ?? (opt as any).content) ? String(buttonData.content ?? (opt as any).content) : '';
-        const styleTag = '<style>footer.form-footer, .form-footer { flex-direction: row !important; } footer.form-footer > button, .form-footer > button { flex: 1 !important; } .dialog-content:has(> style:only-child) { display: none !important; margin: 0 !important; padding: 0 !important; min-height: 0 !important; }</style>';
-        const content = rawContent ? `${rawContent}\n${styleTag}` : styleTag;
-
         const result = await dialogCls.wait({
             window: { title: buttonData.title ?? 'Choose an Option' },
-            content,
             buttons,
             rejectClose: false,
-            ...opt,
-            classes: [...new Set(['standard-form', 'emp-button-dialog', ...((opt as any).classes ?? [])])],
-            render
+            content: buttonData.content,
+            ...opt
         });
 
         if (result === null || result === undefined) return false;

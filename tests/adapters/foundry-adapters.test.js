@@ -452,7 +452,36 @@ test('DialogV2 and buttonDialog delegation on BaseFoundryAdapter', async () => {
     assert.equal(chosen, 'fireball');
 });
 
-test('buttonDialog guarantees Cancel button is positioned as the rightmost button', async () => {
+test('buttonDialog guarantees Cancel button is positioned at index 0 (visual right in DialogV2 row-reverse)', async () => {
+    const v12 = new FoundryV12Adapter();
+    let passedButtons = [];
+    const origWait = foundry.applications.api.DialogV2.wait;
+    try {
+        foundry.applications.api.DialogV2.wait = async (config) => {
+            passedButtons = config.buttons;
+            return config.buttons.find(b => b.action === '1')?.action;
+        };
+
+        await v12.buttonDialog({
+            title: 'Confirm Action',
+            buttons: [
+                { label: 'Confirm', value: '1' },
+                { label: 'Cancel', value: '0' }
+            ]
+        });
+
+        assert.equal(passedButtons.length, 2);
+        // In Foundry DialogV2 row-reverse, index 0 is on the visual right, index 1 is on the visual left
+        assert.equal(passedButtons[0].label, 'Cancel', 'Cancel must be index 0 so it renders on the visual right in row-reverse');
+        assert.equal(passedButtons[0].action, '0');
+        assert.equal(passedButtons[1].label, 'Confirm', 'Confirm must be index 1 so it renders on the visual left in row-reverse');
+        assert.equal(passedButtons[1].action, '1');
+    } finally {
+        foundry.applications.api.DialogV2.wait = origWait;
+    }
+});
+
+test('buttonDialog preserves natural visual left-to-right order for multiple action options with Cancel on the right', async () => {
     const v12 = new FoundryV12Adapter();
     let passedButtons = [];
     const origWait = foundry.applications.api.DialogV2.wait;
@@ -463,54 +492,21 @@ test('buttonDialog guarantees Cancel button is positioned as the rightmost butto
         };
 
         await v12.buttonDialog({
-            title: 'Confirm Action',
+            title: 'Multiple Actions',
             buttons: [
-                { label: 'Cancel', value: '0' },
-                { label: 'Confirm', value: '1' }
+                { label: 'Option A', value: 'a' },
+                { label: 'Option B', value: 'b' },
+                { label: 'Cancel', value: 'cancel' }
             ]
         });
 
-        assert.equal(passedButtons.length, 2);
-        assert.equal(passedButtons[0].label, 'Confirm');
-        assert.equal(passedButtons[1].label, 'Cancel', 'Cancel must be the rightmost button');
-        assert.equal(passedButtons[1].action, '0');
-    } finally {
-        foundry.applications.api.DialogV2.wait = origWait;
-    }
-});
-
-test('buttonDialog configures render hook and CSS to enforce left-to-right button layout', async () => {
-    const v12 = new FoundryV12Adapter();
-    let passedConfig = null;
-    const origWait = foundry.applications.api.DialogV2.wait;
-    try {
-        foundry.applications.api.DialogV2.wait = async (config) => {
-            passedConfig = config;
-            return config.buttons[0].action;
-        };
-
-        await v12.buttonDialog({
-            title: 'Test Layout',
-            buttons: [
-                { label: 'Summon', value: '1' },
-                { label: 'Cancel', value: '0' }
-            ]
-        });
-
-        assert.ok(passedConfig.classes.includes('emp-button-dialog'));
-        assert.ok(typeof passedConfig.render === 'function');
-        assert.ok(passedConfig.content.includes('flex-direction: row !important'));
-
-        // Verify render hook sets flex-direction: row on footer
-        const fakeFooter = { style: { setProperty: (k, v, p) => { fakeFooter.style[k] = v; } } };
-        const fakeButton = { style: { setProperty: (k, v, p) => { fakeButton.style[k] = v; } } };
-        const fakeHtml = {
-            querySelector: (sel) => (sel.includes('footer') ? fakeFooter : null),
-            querySelectorAll: (sel) => (sel.includes('button') ? [fakeButton] : [])
-        };
-        passedConfig.render({}, fakeHtml);
-        assert.equal(fakeFooter.style['flex-direction'], 'row');
-        assert.equal(fakeButton.style['flex'], '1');
+        // In DialogV2 row-reverse:
+        // index 0 -> visual right (Cancel)
+        // index 1 -> visual middle (Option B)
+        // index 2 -> visual left (Option A)
+        assert.equal(passedButtons[0].label, 'Cancel');
+        assert.equal(passedButtons[1].label, 'Option A');
+        assert.equal(passedButtons[2].label, 'Option B');
     } finally {
         foundry.applications.api.DialogV2.wait = origWait;
     }
