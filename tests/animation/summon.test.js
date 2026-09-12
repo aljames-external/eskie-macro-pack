@@ -533,7 +533,7 @@ test('ritualSummonHell.stop cleans up lights and effects', async () => {
     }
 });
 
-test('ritualSummonHell.play interactive prompts button dialog with SUMMON! and Cancel buttons, running climax on confirmation', async () => {
+test('ritualSummonHell.play interactive prompts button dialog with Summon and Cancel buttons, running climax on confirmation', async () => {
     let buttonDialogData = [];
     adapter.buttonDialog = async (data) => {
         buttonDialogData.push(data);
@@ -552,7 +552,7 @@ test('ritualSummonHell.play interactive prompts button dialog with SUMMON! and C
     assert.ok(playResult, 'Interactive play must succeed when user confirms');
     assert.equal(buttonDialogData[0].title, 'Ritual Summon Hell - Warlock');
     assert.deepEqual(buttonDialogData[0].buttons, [
-        { label: 'SUMMON!', value: '1' },
+        { label: 'Summon', value: '1' },
         { label: 'Cancel', value: '0' }
     ]);
 
@@ -719,8 +719,8 @@ test('ritualSummonHell names effects with - ${label}, supports custom label & No
         adapter.buttonDialog = async () => '1';
         await summon.ritualSummonHell.play(mockCaster, mockSummon, { interactive: true });
 
-        assert.ok(endedEffects.includes('Summoning Flames - Warlock'), 'Interactive climax must end Summoning Flames - Warlock upon SUMMON! confirmation');
-        assert.ok(endedEffects.includes('Summoning Core - Warlock'), 'Interactive climax must end Summoning Core - Warlock upon SUMMON! confirmation');
+        assert.ok(endedEffects.includes('Summoning Flames - Warlock'), 'Interactive climax must end Summoning Flames - Warlock upon Summon confirmation');
+        assert.ok(endedEffects.includes('Summoning Core - Warlock'), 'Interactive climax must end Summoning Core - Warlock upon Summon confirmation');
 
         // 3. Custom configurable label (e.g. "Summon Animation")
         effectsCreated.length = 0;

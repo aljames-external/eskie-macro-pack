@@ -412,7 +412,7 @@ async function create(
 /**
  * Plays the Ritual Summon Hell sequence.
  * In interactive mode (interactive: true), plays the summoning circle preparation,
- * shows a button dialog ("SUMMON!"), and on confirmation executes the climax sequence.
+ * shows a button dialog ("Summon"), and on confirmation executes the climax sequence.
  * In non-interactive mode (default), plays the full ritual from start to finish.
  *
  * @param {Token} token Caster token
@@ -450,7 +450,7 @@ async function play(
         const result = await adapter.buttonDialog({
             title: `Ritual Summon Hell - ${label}`,
             buttons: [
-                { label: 'SUMMON!', value: '1' },
+                { label: 'Summon', value: '1' },
                 { label: 'Cancel', value: '0' }
             ]
         });
