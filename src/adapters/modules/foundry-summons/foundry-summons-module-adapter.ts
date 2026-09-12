@@ -4,6 +4,7 @@ import { log } from "../../../lib/logger.js";
 export interface FoundrySummonsPickOptions {
     uuid?: string;
     actor?: Actor | string | null;
+    location?: { x: number; y: number } | null;
     crosshairParameters?: Record<string, unknown>;
     crosshairCallbacks?: Record<string, unknown>;
     tokenData?: Record<string, unknown>;
@@ -63,11 +64,51 @@ export class FoundrySummonsModuleAdapter extends BaseModuleAdapter {
     }
 
     /**
+     * Spawns a token onto the canvas at a specific location without interactive crosshairs.
+     * @param {{ x: number; y: number }} location Canvas coordinates
+     * @param {FoundrySummonsPickOptions} options Configuration options
+     * @returns {Promise<Token | null>}
+     */
+    async spawnAtLocation(location: { x: number; y: number }, options: FoundrySummonsPickOptions = {}): Promise<Token | null> {
+        if (!canvas.scene) return null;
+
+        let actor: Actor | null = null;
+        if (options.actor && typeof options.actor !== 'string' && 'getTokenDocument' in options.actor) {
+            actor = options.actor as Actor;
+        } else {
+            const uuid = options.uuid ?? (typeof options.actor === 'string' ? options.actor : null);
+            if (uuid) {
+                actor = (game.actors?.get?.(uuid) ?? game.actors?.getName?.(uuid) ?? (typeof fromUuid !== 'undefined' ? await fromUuid(uuid) : null)) as Actor | null;
+            }
+        }
+
+        if (!actor) {
+            log.warn("FoundrySummonsModuleAdapter.spawnAtLocation | Could not resolve actor.");
+            return null;
+        }
+
+        const tokenData: Record<string, unknown> = {
+            ...(options.tokenData ?? options.updates ?? {}),
+            x: location.x,
+            y: location.y
+        };
+
+        const tokenDoc = await actor.getTokenDocument(tokenData);
+        const [createdDoc] = await (canvas.scene as any).createEmbeddedDocuments('Token', [tokenDoc.toObject()]);
+        return createdDoc.object as Token;
+    }
+
+    /**
      * Spawns or picks a token onto the canvas via Foundry Summons.
+     * If a location is provided, places the token directly at that location.
      * @param {FoundrySummonsPickOptions} options Configuration options for foundrySummons.pick
      * @returns {Promise<Token | null>} The created Token placeable or null
      */
     async pick(options: FoundrySummonsPickOptions = {}): Promise<Token | null> {
+        if (options.location) {
+            return this.spawnAtLocation(options.location, options);
+        }
+
         if (!this.isActive()) {
             log.warn("FoundrySummonsModuleAdapter.pick | Foundry Summons module is not active.");
             ui.notifications.warn("This macro requires the Foundry Summons module to be active.");
@@ -107,11 +148,14 @@ export class FoundrySummonsModuleAdapter extends BaseModuleAdapter {
     }
 
     /**
-     * Alias for pick.
+     * Spawns a token onto the canvas via direct location placement or Foundry Summons.
      * @param {FoundrySummonsPickOptions} options Configuration options
      * @returns {Promise<Token | null>}
      */
     async spawn(options: FoundrySummonsPickOptions = {}): Promise<Token | null> {
+        if (options.location) {
+            return this.spawnAtLocation(options.location, options);
+        }
         return this.pick(options);
     }
 

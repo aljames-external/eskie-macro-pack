@@ -70,28 +70,16 @@ async function summon(
         ...summonConfig.tokenData
     };
 
-    const location = summonConfig.location;
-    if (location) {
-        if (!canvas.scene) return null;
-
-        const tokenDoc = await actor.getTokenDocument({
-            x: location.x,
-            y: location.y,
-            ...tokenData
-        });
-        const [createdDoc] = await (canvas.scene as any).createEmbeddedDocuments('Token', [tokenDoc.toObject()]);
-        return createdDoc.object as Token;
-    }
-
-    const pickOptions: Record<string, unknown> = {
+    const spawnOptions: Record<string, unknown> = {
         crosshairParameters: summonConfig.crosshairParameters ?? DEFAULT_CONFIG.crosshairParameters,
         ...summonConfig,
+        actor,
         tokenData,
         uuid: actor.uuid,
         drawPing: summonConfig.drawPing ?? false
     };
 
-    return adapter.summons.pick(pickOptions);
+    return adapter.summons.spawn(spawnOptions);
 }
 
 /**

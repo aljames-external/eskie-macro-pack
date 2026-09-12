@@ -81,7 +81,7 @@ test('FoundrySummonsModuleAdapter.pick delegates to api.pick and unwraps result 
     assert.deepEqual(passedOptions.crosshairParameters, { t: 'circle', distance: 2.5 });
 });
 
-test('FoundrySummonsModuleAdapter.spawn is an alias to pick', async () => {
+test('FoundrySummonsModuleAdapter.spawn delegates to pick when location is omitted', async () => {
     const mockTokenPlaceable = { id: 'token-summon-2', name: 'Spawned Token' };
     const mockApi = {
         pick: async () => mockTokenPlaceable
@@ -91,6 +91,44 @@ test('FoundrySummonsModuleAdapter.spawn is an alias to pick', async () => {
 
     const result = await fsAdapter.spawn({ uuid: 'Actor.123' });
     assert.equal(result, mockTokenPlaceable);
+});
+
+test('FoundrySummonsModuleAdapter.spawn delegates to spawnAtLocation when location is provided', async () => {
+    let createdData = null;
+    const mockTokenDoc = {
+        id: 'tok-1',
+        toObject: () => ({ id: 'tok-1', name: 'Direct Token' }),
+        object: { id: 'tok-1', name: 'Direct Token' }
+    };
+    const mockActor = {
+        id: 'act-1',
+        uuid: 'Actor.act1',
+        getTokenDocument: async (data) => {
+            createdData = data;
+            return mockTokenDoc;
+        }
+    };
+
+    const origScene = canvas.scene;
+    canvas.scene = {
+        createEmbeddedDocuments: async (_type, docs) => [{ ...docs[0], object: mockTokenDoc.object }]
+    };
+
+    try {
+        const fsAdapter = new FoundrySummonsModuleAdapter();
+        const result = await fsAdapter.spawn({
+            actor: mockActor,
+            location: { x: 300, y: 400 },
+            tokenData: { alpha: 0 }
+        });
+
+        assert.equal(result, mockTokenDoc.object);
+        assert.equal(createdData.x, 300);
+        assert.equal(createdData.y, 400);
+        assert.equal(createdData.alpha, 0);
+    } finally {
+        canvas.scene = origScene;
+    }
 });
 
 test('FoundrySummonsModuleAdapter.openMenu invokes SummonMenu.start when available', () => {
