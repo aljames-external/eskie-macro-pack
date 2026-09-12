@@ -479,6 +479,43 @@ test('buttonDialog guarantees Cancel button is positioned as the rightmost butto
     }
 });
 
+test('buttonDialog configures render hook and CSS to enforce left-to-right button layout', async () => {
+    const v12 = new FoundryV12Adapter();
+    let passedConfig = null;
+    const origWait = foundry.applications.api.DialogV2.wait;
+    try {
+        foundry.applications.api.DialogV2.wait = async (config) => {
+            passedConfig = config;
+            return config.buttons[0].action;
+        };
+
+        await v12.buttonDialog({
+            title: 'Test Layout',
+            buttons: [
+                { label: 'Summon', value: '1' },
+                { label: 'Cancel', value: '0' }
+            ]
+        });
+
+        assert.ok(passedConfig.classes.includes('emp-button-dialog'));
+        assert.ok(typeof passedConfig.render === 'function');
+        assert.ok(passedConfig.content.includes('flex-direction: row !important'));
+
+        // Verify render hook sets flex-direction: row on footer
+        const fakeFooter = { style: { setProperty: (k, v, p) => { fakeFooter.style[k] = v; } } };
+        const fakeButton = { style: { setProperty: (k, v, p) => { fakeButton.style[k] = v; } } };
+        const fakeHtml = {
+            querySelector: (sel) => (sel.includes('footer') ? fakeFooter : null),
+            querySelectorAll: (sel) => (sel.includes('button') ? [fakeButton] : [])
+        };
+        passedConfig.render({}, fakeHtml);
+        assert.equal(fakeFooter.style['flex-direction'], 'row');
+        assert.equal(fakeButton.style['flex'], '1');
+    } finally {
+        foundry.applications.api.DialogV2.wait = origWait;
+    }
+});
+
 test('getDocumentName, isDocumentOfType, and getPlaceable resolution', () => {
     const v12 = new FoundryV12Adapter();
 
