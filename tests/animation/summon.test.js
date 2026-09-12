@@ -527,6 +527,7 @@ test('ritualSummonHell.stop cleans up lights, tags, and effects', async () => {
 
         assert.ok(endedEffects.includes('Summoning Core'));
         assert.ok(endedEffects.includes('Summoning Circle'));
+        assert.ok(endedEffects.includes('Summoning Flames'));
         assert.deepEqual(deletedLightIds, ['light-1']);
         assert.equal(removedTag, 'Pre Summon');
     } finally {
@@ -553,6 +554,120 @@ test('ritualSummonHell.play interactive prompts button dialog and runs climax on
     const playResult = await summon.ritualSummonHell.play(mockCaster, mockSummon, { interactive: true });
     assert.ok(playResult, 'Interactive play must succeed when user confirms');
     assert.equal(buttonDialogCalled, true, 'adapter.buttonDialog must be called');
+});
+
+test('ritualSummonHell names jb2a.flames.01 as Summoning Flames and ends it in climax (interactive & non-interactive)', async () => {
+    let endedEffects = [];
+    const origEndEffects = Sequencer.EffectManager.endEffects;
+    Sequencer.EffectManager.endEffects = (opts) => {
+        endedEffects.push(opts.name);
+    };
+
+    const origSequence = globalThis.Sequence;
+    const effectsCreated = [];
+    const thenDoCallbacks = [];
+
+    class TestMockSequence {
+        constructor() {
+            let currentEffect = null;
+            const handler = {
+                get(_t, prop) {
+                    if (prop === 'effect') {
+                        currentEffect = {};
+                        effectsCreated.push(currentEffect);
+                        return () => proxy;
+                    }
+                    if (prop === 'name') {
+                        return (name) => {
+                            if (currentEffect) currentEffect.name = name;
+                            return proxy;
+                        };
+                    }
+                    if (prop === 'file') {
+                        return (file) => {
+                            if (currentEffect) currentEffect.file = file;
+                            return proxy;
+                        };
+                    }
+                    if (prop === 'thenDo') {
+                        return (fn) => {
+                            thenDoCallbacks.push(fn);
+                            return proxy;
+                        };
+                    }
+                    if (prop === 'play') {
+                        return async () => {
+                            for (const fn of thenDoCallbacks) {
+                                await fn();
+                            }
+                            return proxy;
+                        };
+                    }
+                    if (prop === 'then') return undefined;
+                    return (..._args) => proxy;
+                }
+            };
+            const proxy = new Proxy(this, handler);
+            return proxy;
+        }
+    }
+
+    const origCreateDocs = canvas.scene?.createEmbeddedDocuments;
+    const origDeleteDocs = canvas.scene?.deleteEmbeddedDocuments;
+    if (canvas.scene) {
+        canvas.scene.createEmbeddedDocuments = async (_type, docs) => docs;
+        canvas.scene.deleteEmbeddedDocuments = async () => [];
+    }
+
+    const origTagger = globalThis.Tagger;
+    globalThis.Tagger = {
+        hasTags: () => false,
+        addTags: async () => {},
+        removeTags: async () => {}
+    };
+
+    globalThis.Sequence = TestMockSequence;
+    try {
+        const mockCaster = { id: 'c1', name: 'Warlock', document: { rotation: 0 }, center: { x: 100, y: 100 } };
+        const mockSummon = {
+            id: 's1',
+            name: 'Pit Fiend',
+            document: { width: 2, height: 2, rotation: 0, texture: { src: 'icons/pitfiend.png', scaleX: 1 } },
+            center: { x: 300, y: 300 }
+        };
+
+        // 1. Non-Interactive Mode
+        effectsCreated.length = 0;
+        thenDoCallbacks.length = 0;
+        endedEffects.length = 0;
+
+        await summon.ritualSummonHell.play(mockCaster, mockSummon, { interactive: false });
+
+        const flameEffect = effectsCreated.find(e => e.name === 'Summoning Flames');
+        assert.ok(flameEffect, 'jb2a.flames.01 effect must be assigned name Summoning Flames');
+
+        assert.ok(endedEffects.includes('Summoning Flames'), 'Non-interactive climax must end Summoning Flames');
+        assert.ok(endedEffects.includes('Summoning Core'), 'Non-interactive climax must end Summoning Core');
+
+        // 2. Interactive Mode
+        effectsCreated.length = 0;
+        thenDoCallbacks.length = 0;
+        endedEffects.length = 0;
+
+        adapter.buttonDialog = async () => '1';
+        await summon.ritualSummonHell.play(mockCaster, mockSummon, { interactive: true });
+
+        assert.ok(endedEffects.includes('Summoning Flames'), 'Interactive climax must end Summoning Flames upon SUMMON! confirmation');
+        assert.ok(endedEffects.includes('Summoning Core'), 'Interactive climax must end Summoning Core upon SUMMON! confirmation');
+    } finally {
+        Sequencer.EffectManager.endEffects = origEndEffects;
+        globalThis.Sequence = origSequence;
+        globalThis.Tagger = origTagger;
+        if (canvas.scene) {
+            canvas.scene.createEmbeddedDocuments = origCreateDocs;
+            canvas.scene.deleteEmbeddedDocuments = origDeleteDocs;
+        }
+    }
 });
 
 test('all new summon modules are registered in autorec with token type', () => {

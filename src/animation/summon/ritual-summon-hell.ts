@@ -121,6 +121,7 @@ function buildClimax(
     seq
         .thenDo(function() {
             Sequencer.EffectManager.endEffects({ name: 'Summoning Core' });
+            Sequencer.EffectManager.endEffects({ name: 'Summoning Flames' });
             if (game.modules.get('tagger')?.active) {
                 Tagger.removeTags(targetToken, 'Pre Summon');
             }
@@ -336,7 +337,7 @@ async function create(
                 .zIndex(1)
 
             .effect()
-                .name('Summoning Circle')
+                .name('Summoning Flames')
                 .atLocation(sumPos[e])
                 .file(closest('jb2a.flames.01.orange'))
                 .size(1.75, { gridUnits: true })
@@ -507,6 +508,7 @@ async function stop(token: Token, summonTarget?: Token | Actor, config: RitualSu
     const target = summonTarget ?? token;
     Sequencer.EffectManager.endEffects({ name: 'Summoning Core' });
     Sequencer.EffectManager.endEffects({ name: 'Summoning Circle' });
+    Sequencer.EffectManager.endEffects({ name: 'Summoning Flames' });
 
     if (canvas.scene) {
         const ambientLights = (canvas.scene as any).lights ?? [];
