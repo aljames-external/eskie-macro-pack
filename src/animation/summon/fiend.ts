@@ -20,6 +20,7 @@ export interface FiendSummonSoundConfig {
 
 export interface FiendSummonConfig extends SummonConfig {
     id?: string;
+    color?: string;
     summonConfig?: FiendSummonOptions;
     sound?: FiendSummonSoundConfig;
     crosshairParameters?: Record<string, unknown>;
@@ -28,6 +29,7 @@ export interface FiendSummonConfig extends SummonConfig {
 
 export const DEFAULT_CONFIG: FiendSummonConfig = {
     id: 'fiend',
+    color: 'dark_red',
     summonConfig: {},
     sound: {
         circle: { ...DEFAULT_SOUND_CONFIG },
@@ -87,6 +89,7 @@ async function create(
 
     let targetToken: Token;
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, settingsOverride(config));
+    const color = mConfig.color ?? 'dark_red';
 
     if (adapter.isToken(summonTarget)) {
         targetToken = summonTarget;
@@ -127,7 +130,7 @@ async function create(
 
         .effect()
             .name(`${targetToken.name} Summon Fiend`)
-            .file(closest('jb2a.impact.ground_crack.02.dark_red'))
+            .file(closest(`jb2a.impact.ground_crack.02.${color}`))
             .atLocation(targetToken)
             .opacity(1)
             .randomRotation()
@@ -247,4 +250,4 @@ export const fiend: SummonModule<FiendSummonConfig> = {
     default_config: DEFAULT_CONFIG
 };
 
-adapter.autorec.register('summonFiend', 'token', 'eskie.summon.fiend', DEFAULT_CONFIG, '0.0.2', 'Summon Fiend');
+adapter.autorec.register('summonFiend', 'token', 'eskie.summon.fiend', DEFAULT_CONFIG, '0.0.3', 'Summon Fiend');

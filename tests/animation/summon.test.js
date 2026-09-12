@@ -356,6 +356,9 @@ test('all new summon modules have required API methods and valid default_config'
         } else {
             assert.equal(config.id, undefined, 'ritualSummonHell must not define unused id');
         }
+        if (id === 'ritualSummonHell' || id === 'fiend') {
+            assert.equal(config.color, 'dark_red', `${id}.color must default to dark_red`);
+        }
         assert.ok(config.sound, `${id}.sound config must exist`);
         if (id === 'ritualSummonHell') {
             assert.ok(config.sound.circle, 'ritualSummonHell.sound.circle must exist');
@@ -784,7 +787,8 @@ test('all new summon modules are registered in autorec with token type', () => {
     for (const { label, macro } of expectedRegistrations) {
         const entry = ontokenEntries.find(e => e.label === label);
         assert.ok(entry, `${label} must be registered in AA menu`);
-        assert.equal(entry.metaData.version, '0.0.2');
+        const expectedVersion = (label === 'Ritual Summon Hell' || label === 'Summon Fiend') ? '0.0.3' : '0.0.2';
+        assert.equal(entry.metaData.version, expectedVersion, `${label} version must match expected`);
         assert.ok(entry.macro.args.includes(macro), `Macro args must contain unquoted ${macro}`);
     }
 });
@@ -874,5 +878,59 @@ test('all new summon modules dispatch phased sounds at key points with correct d
         assert.equal(airAppear.calls.find(c => c.method === 'delay')?.args[0], 1200);
     } finally {
         globalThis.Sequence = origSequence;
+    }
+});
+
+test('ritualSummonHell and fiend default color to dark_red and support custom color override', async () => {
+    assert.equal(summon.ritualSummonHell.default_config.color, 'dark_red');
+    assert.equal(summon.fiend.default_config.color, 'dark_red');
+
+    const filesPassed = [];
+    const origSequence = globalThis.Sequence;
+    globalThis.Sequence = class MockFileSeq {
+        constructor() {
+            const handler = {
+                get(_t, prop) {
+                    if (prop === 'file') {
+                        return (filePath) => {
+                            filesPassed.push(filePath);
+                            return proxy;
+                        };
+                    }
+                    if (prop === 'then') return undefined;
+                    return (..._args) => proxy;
+                }
+            };
+            const proxy = new Proxy(this, handler);
+            return proxy;
+        }
+    };
+
+    const origGetPathsUnder = Sequencer.Database.getPathsUnder;
+    const mockOptions = {
+        includes: () => true,
+        length: 1,
+        0: ''
+    };
+    Sequencer.Database.getPathsUnder = () => mockOptions;
+
+    try {
+        const mockToken = { id: 't1', name: 'Mage', document: { rotation: 0, texture: { src: 'icon.png', scaleX: 1 } }, center: { x: 100, y: 100 } };
+
+        // 1. ritualSummonHell with custom color 'blue'
+        filesPassed.length = 0;
+        await summon.ritualSummonHell.create(mockToken, undefined, { color: 'blue', interactive: false });
+        assert.ok(filesPassed.some(f => f.includes('circle.02.conjuration.complete.blue')), 'Must use custom color in circle asset');
+        assert.ok(filesPassed.some(f => f.includes('sphere_of_annihilation.600px.blue')), 'Must use custom color in sphere asset');
+        assert.ok(filesPassed.some(f => f.includes('ground_cracks.blue.01')), 'Must use custom color in ground cracks asset');
+        assert.ok(filesPassed.some(f => f.includes('impact.ground_crack.blue.01')), 'Must use custom color in ground crack impact asset');
+
+        // 2. fiend with custom color 'green'
+        filesPassed.length = 0;
+        await summon.fiend.create(mockToken, undefined, { color: 'green' });
+        assert.ok(filesPassed.some(f => f.includes('impact.ground_crack.02.green')), 'Must use custom color in fiend ground crack asset');
+    } finally {
+        globalThis.Sequence = origSequence;
+        Sequencer.Database.getPathsUnder = origGetPathsUnder;
     }
 });

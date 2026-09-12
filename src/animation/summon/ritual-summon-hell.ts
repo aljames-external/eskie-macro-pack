@@ -20,6 +20,7 @@ export interface RitualSummonHellSoundConfig {
 
 export interface RitualSummonHellConfig extends SummonConfig {
     label?: string;
+    color?: string;
     summonConfig?: RitualSummonHellSummonOptions;
     interactive?: boolean;
     sound?: RitualSummonHellSoundConfig;
@@ -28,6 +29,7 @@ export interface RitualSummonHellConfig extends SummonConfig {
 }
 
 export const DEFAULT_CONFIG: RitualSummonHellConfig = {
+    color: 'dark_red',
     summonConfig: {},
     interactive: false,
     sound: {
@@ -96,7 +98,8 @@ function buildClimax(
     tokenWidth: number,
     sequence?: any,
     soundConfig?: RitualSummonHellSoundConfig,
-    label: string = 'No Caster'
+    label: string = 'No Caster',
+    color: string = 'dark_red'
 ): any {
     const seq = sequence ?? new Sequence();
     applySound(seq, soundConfig?.climax);
@@ -112,7 +115,7 @@ function buildClimax(
         .effect()
             .name(`Summoning Core - ${label}`)
             .atLocation(sumPos[0])
-            .file(closest('jb2a.impact.ground_crack.dark_red.01'))
+            .file(closest(`jb2a.impact.ground_crack.${color}.01`))
             .belowTokens()
             .size(3.5 + tokenWidth, { gridUnits: true })
             .zIndex(0.1)
@@ -121,7 +124,7 @@ function buildClimax(
             .delay(500)
             .name(`Summoning Circle - ${label}`)
             .atLocation(sumPos[0])
-            .file(closest('jb2a.ground_cracks.dark_red.01'))
+            .file(closest(`jb2a.ground_cracks.${color}.01`))
             .belowTokens()
             .fadeIn(1000)
             .size(3.5 + tokenWidth, { gridUnits: true })
@@ -143,7 +146,7 @@ function buildClimax(
         .effect()
             .name(`Summoning Core - ${label}`)
             .atLocation(sumPos[0])
-            .file(closest('jb2a.sphere_of_annihilation.600px.dark_red'))
+            .file(closest(`jb2a.sphere_of_annihilation.600px.${color}`))
             .belowTokens()
             .size(1.5, { gridUnits: true })
             .animateProperty('sprite', 'width', { from: 1.5, to: 1.5 + tokenWidth, duration: 500, gridUnits: true, ease: 'easeOutCubic' })
@@ -230,6 +233,7 @@ async function create(
     let targetToken: Token;
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, settingsOverride(config));
     const label = mConfig.label ?? token?.name ?? 'No Caster';
+    const color = mConfig.color ?? 'dark_red';
 
     if (adapter.isToken(summonTarget)) {
         targetToken = summonTarget;
@@ -289,7 +293,7 @@ async function create(
         .effect()
             .name(`Summoning Circle - ${label}`)
             .atLocation(sumPos[0])
-            .file(closest('jb2a.magic_signs.circle.02.conjuration.complete.dark_red'))
+            .file(closest(`jb2a.magic_signs.circle.02.conjuration.complete.${color}`))
             .size(6, { gridUnits: true })
             .fadeIn(600)
             .opacity(1)
@@ -370,7 +374,7 @@ async function create(
             .delay(250)
             .name(`Summoning Core - ${label}`)
             .atLocation(sumPos[0])
-            .file(closest('jb2a.sphere_of_annihilation.600px.dark_red'))
+            .file(closest(`jb2a.sphere_of_annihilation.600px.${color}`))
             .belowTokens()
             .size(1.5, { gridUnits: true })
             .scaleIn(0, 500, { ease: 'easeOutCubic' })
@@ -403,7 +407,7 @@ async function create(
     // If not in interactive mode, chain the climax directly after a dramatic wait
     if (!mConfig.interactive) {
         sequence.wait(2000);
-        buildClimax(targetToken, sumPos, tokenWidth, sequence, sound, label);
+        buildClimax(targetToken, sumPos, tokenWidth, sequence, sound, label, color);
     }
 
     return sequence;
@@ -463,7 +467,8 @@ async function play(
                 y: center.y + offset.y * gridSize
             }));
             const { widthUnits } = adapter.getTokenDimensions(targetToken);
-            const climaxSeq = buildClimax(targetToken, sumPos, widthUnits, undefined, mConfig.sound, label);
+            const color = mConfig.color ?? 'dark_red';
+            const climaxSeq = buildClimax(targetToken, sumPos, widthUnits, undefined, mConfig.sound, label, color);
             return climaxSeq.play();
         } else {
             Sequencer.EffectManager.endEffects({ name: `Summoning Core - ${label}` });
@@ -575,4 +580,4 @@ export const ritualSummonHell: SummonModule<RitualSummonHellConfig> = {
     default_config: DEFAULT_CONFIG
 };
 
-adapter.autorec.register('ritualSummonHell', 'token', 'eskie.summon.ritualSummonHell', DEFAULT_CONFIG, '0.0.2', 'Ritual Summon Hell');
+adapter.autorec.register('ritualSummonHell', 'token', 'eskie.summon.ritualSummonHell', DEFAULT_CONFIG, '0.0.3', 'Ritual Summon Hell');
