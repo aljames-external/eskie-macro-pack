@@ -800,14 +800,6 @@ test('all new summon modules dispatch phased sounds at key points with correct d
         const airAppear = recordedSounds.find(r => r.calls.some(c => c.args?.[0] === 'audio/air-appear.mp3'));
         assert.ok(airAppear);
         assert.equal(airAppear.calls.find(c => c.method === 'delay')?.args[0], 1200);
-
-        // Test flat sound backward compatibility
-        recordedSounds.length = 0;
-        await summon.fire.create(mockCaster, mockTarget, {
-            sound: { enable: true, file: 'audio/legacy-fire.mp3' }
-        });
-        assert.ok(recordedSounds.length >= 1, 'fire summon must support flat sound fallback');
-        assert.equal(recordedSounds[0].calls.find(c => c.method === 'file')?.args[0], 'audio/legacy-fire.mp3');
     } finally {
         globalThis.Sequence = origSequence;
     }

@@ -21,7 +21,7 @@ export interface FireSummonSoundConfig {
 export interface FireSummonConfig extends SummonConfig {
     id?: string;
     summonConfig?: FireSummonOptions;
-    sound?: SoundConfig | FireSummonSoundConfig;
+    sound?: FireSummonSoundConfig;
     crosshairParameters?: Record<string, unknown>;
     [key: string]: unknown;
 }
@@ -116,12 +116,8 @@ async function create(
 
     const { sound } = mConfig;
     const sequence = new Sequence();
-    const soundObj = sound as FireSummonSoundConfig;
-    const isFlatSound = sound?.enable !== undefined || typeof (sound as any)?.file === 'string';
-    applySound(sequence, isFlatSound ? sound : soundObj?.circle);
-    if (!isFlatSound) {
-        applySound(sequence, soundObj?.appear, 1200);
-    }
+    applySound(sequence, sound?.circle);
+    applySound(sequence, sound?.appear, 1200);
 
     const targetTexture = targetToken.document?.texture?.src ?? '';
     const scaleX = targetToken.document?.texture?.scaleX ?? 1;

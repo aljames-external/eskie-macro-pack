@@ -40,7 +40,7 @@ export interface TokensOfTheDepartedConfig extends SummonConfig {
     tint?: string;
     changeLight?: boolean;
     light?: TokensOfTheDepartedLightConfig;
-    sound?: SoundConfig | TokensOfTheDepartedSoundConfig;
+    sound?: TokensOfTheDepartedSoundConfig;
     crosshairParameters?: Record<string, unknown>;
     tokenData?: Record<string, unknown>;
     [key: string]: unknown;
@@ -162,12 +162,8 @@ async function create(
 
     const { sound, tint } = mConfig;
     const sequence = new Sequence();
-    const soundObj = sound as TokensOfTheDepartedSoundConfig;
-    const isFlatSound = sound?.enable !== undefined || typeof (sound as any)?.file === 'string';
-    applySound(sequence, isFlatSound ? sound : soundObj?.launch);
-    if (!isFlatSound) {
-        applySound(sequence, soundObj?.manifest, casterToken ? 1000 : 0);
-    }
+    applySound(sequence, sound?.launch);
+    applySound(sequence, sound?.manifest, casterToken ? 1000 : 0);
 
     const effectTint = tint ?? '#58feb0';
     const targetRotation = adapter.getTokenRotation(targetToken);

@@ -46,11 +46,8 @@ async function createCast(source: Token, config: any = {}, options: any = {}) {
 
     const sourceWidth = adapter.getTokenDimensions(source).widthUnits;
     let sequence = new Sequence();
-    const isFlatSound = sound?.enable !== undefined || typeof sound?.file === 'string';
-    applySound(sequence, isFlatSound ? sound : sound?.cast);
-    if (!isFlatSound) {
-        applySound(sequence, sound?.stream, 1700);
-    }
+    applySound(sequence, sound?.cast);
+    applySound(sequence, sound?.stream, 1700);
     sequence = sequence
         .effect()
         .file(closest('jb2a.markers.bubble.02.complete.green'))

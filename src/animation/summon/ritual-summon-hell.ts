@@ -22,7 +22,7 @@ export interface RitualSummonHellConfig extends SummonConfig {
     label?: string;
     summonConfig?: RitualSummonHellSummonOptions;
     interactive?: boolean;
-    sound?: SoundConfig | RitualSummonHellSoundConfig;
+    sound?: RitualSummonHellSoundConfig;
     crosshairParameters?: Record<string, unknown>;
     [key: string]: unknown;
 }
@@ -111,12 +111,11 @@ function buildClimax(
     sumPos: { x: number; y: number }[],
     tokenWidth: number,
     sequence?: any,
-    soundConfig?: any,
+    soundConfig?: RitualSummonHellSoundConfig,
     label: string = 'No Caster'
 ): any {
     const seq = sequence ?? new Sequence();
-    const soundObj = soundConfig as RitualSummonHellSoundConfig;
-    applySound(seq, soundObj?.climax ?? (soundConfig?.enable !== undefined ? soundConfig : null));
+    applySound(seq, soundConfig?.climax);
 
     seq
         .thenDo(function() {
@@ -260,13 +259,9 @@ async function create(
 
     const { sound } = mConfig;
     const sequence = new Sequence();
-    const soundObj = sound as RitualSummonHellSoundConfig;
-    const isFlatSound = sound?.enable !== undefined || typeof (sound as any)?.file === 'string';
-    applySound(sequence, isFlatSound ? sound : soundObj?.circle);
-    if (!isFlatSound) {
-        applySound(sequence, soundObj?.candles, 2500);
-        applySound(sequence, soundObj?.charge, 3750);
-    }
+    applySound(sequence, sound?.circle);
+    applySound(sequence, sound?.candles, 2500);
+    applySound(sequence, sound?.charge, 3750);
 
     const center = adapter.getCenter(targetToken);
     const gridSize = adapter.getGridSize();
