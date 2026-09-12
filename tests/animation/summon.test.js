@@ -419,6 +419,7 @@ test('ritualSummonHell builds non-interactive sequence and creates lights with c
 
     let copySpriteCalledWith = null;
     let fromCalled = false;
+    let capturedSpriteRotation = null;
     const origSequence = globalThis.Sequence;
     globalThis.Sequence = class MockClimaxSequence {
         constructor() {
@@ -427,6 +428,12 @@ test('ritualSummonHell builds non-interactive sequence and creates lights with c
                     if (prop === 'copySprite') {
                         return (tok) => {
                             copySpriteCalledWith = tok;
+                            return proxy;
+                        };
+                    }
+                    if (prop === 'spriteRotation') {
+                        return (rot) => {
+                            capturedSpriteRotation = rot;
                             return proxy;
                         };
                     }
@@ -450,7 +457,7 @@ test('ritualSummonHell builds non-interactive sequence and creates lights with c
         const mockToken = {
             id: 'tok-hell-1',
             name: 'Fiend Token',
-            document: { width: 2, height: 2, rotation: 0, texture: { src: 'icons/demon.png', scaleX: 1 } },
+            document: { width: 2, height: 2, rotation: 90, texture: { src: 'icons/demon.png', scaleX: 1 } },
             center: { x: 500, y: 500 }
         };
 
@@ -458,6 +465,7 @@ test('ritualSummonHell builds non-interactive sequence and creates lights with c
         assert.ok(seq, 'ritualSummonHell.create must return a Sequence');
         assert.equal(fromCalled, false, '.from must not be called');
         assert.equal(copySpriteCalledWith, mockToken, '.copySprite must be called with targetToken');
+        assert.equal(capturedSpriteRotation, -90, '.spriteRotation must be -90 for a 90 degree rotated summon token');
     } finally {
         globalThis.Sequence = origSequence;
     }

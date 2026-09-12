@@ -429,5 +429,62 @@ test('all active-effect modules export standard interfaces and sound configurati
     assert.ok(strengthBeforeDeath.default_config.sound, 'strengthBeforeDeath DEFAULT_CONFIG must have sound');
 });
 
+test('tashasCausticBrew uses copySprite and applies counter token rotation', async () => {
+    let copySpriteCalledWith = null;
+    let capturedSpriteRotation = null;
+    let fromCalled = false;
+    const origSequence = globalThis.Sequence;
+    globalThis.Sequence = class MockCausticSequence {
+        constructor() {
+            const handler = {
+                get(_t, prop) {
+                    if (prop === 'copySprite') {
+                        return (tok) => {
+                            copySpriteCalledWith = tok;
+                            return proxy;
+                        };
+                    }
+                    if (prop === 'spriteRotation') {
+                        return (rot) => {
+                            capturedSpriteRotation = rot;
+                            return proxy;
+                        };
+                    }
+                    if (prop === 'from') {
+                        return () => {
+                            fromCalled = true;
+                            throw new Error('Sequence.effect().from is not a function');
+                        };
+                    }
+                    if (prop === 'play') return async () => proxy;
+                    if (prop === 'then') return undefined;
+                    return (..._args) => proxy;
+                }
+            };
+            const proxy = new Proxy(this, handler);
+            return proxy;
+        }
+    };
 
+    game.modules.set('jb2a_patreon', { id: 'jb2a_patreon', active: true });
+    game.modules.set('eskie-effects', { id: 'eskie-effects', active: true });
+    try {
+        const mockCaster = { id: 'c1', name: 'Wizard', document: { rotation: 0, width: 1 }, center: { x: 100, y: 100 } };
+        const mockTarget = {
+            id: 't1',
+            name: 'Goblin',
+            document: { width: 1, rotation: 45, texture: { scaleX: 1 } },
+            center: { x: 200, y: 200 }
+        };
 
+        const seq = await effect.tashasCausticBrew.target.create(mockCaster, { targets: [mockTarget] });
+        assert.ok(seq, 'tashasCausticBrew.create must return a Sequence');
+        assert.equal(fromCalled, false, '.from must not be called');
+        assert.equal(copySpriteCalledWith, mockTarget, '.copySprite must be called with target');
+        assert.equal(capturedSpriteRotation, -45, '.spriteRotation must be -45 for a 45 degree rotated target');
+    } finally {
+        globalThis.Sequence = origSequence;
+        game.modules.delete('jb2a_patreon');
+        game.modules.delete('eskie-effects');
+    }
+});

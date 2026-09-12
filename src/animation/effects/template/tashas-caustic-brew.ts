@@ -114,6 +114,7 @@ async function createTarget(source: Token, config: any = {}, options: any = {}) 
         const targetWidth = adapter.getTokenDimensions(target).widthUnits;
         const targetName = target.name;
         const targetScaleX = target.document.texture.scaleX ?? 1;
+        const targetRotation = adapter.getTokenRotation(target);
 
         let targetSeq = new Sequence()
             .wait(2200)
@@ -121,6 +122,7 @@ async function createTarget(source: Token, config: any = {}, options: any = {}) 
             .effect()
             .delay(200)
             .copySprite(target)
+            .spriteRotation(-targetRotation)
             .attachTo(target)
             .fadeIn(200)
             .fadeOut(500)

@@ -141,13 +141,15 @@ for (let target of targets) {
     const targetWidth = target.document?.width ?? target.width ?? 1;
     const targetName = target.document?.name ?? target.name ?? "Target";
     const targetScaleX = target.document?.texture?.scaleX ?? 1;
+    const targetRotation = target.document?.rotation ?? target.rotation ?? 0;
 
     let targetSeq = new Sequence()
         .wait(2200)
 
         .effect()
         .delay(200)
-        .from(target)
+        .copySprite(target)
+        .spriteRotation(-targetRotation)
         .attachTo(target)
         .fadeIn(200)
         .fadeOut(500)
