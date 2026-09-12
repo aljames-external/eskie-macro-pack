@@ -12,10 +12,16 @@ export interface NatureSummonOptions extends SummonOptions {
     light?: Record<string, unknown>;
 }
 
+export interface NatureSummonSoundConfig {
+    circle?: SoundConfig;
+    appear?: SoundConfig;
+    [key: string]: unknown;
+}
+
 export interface NatureSummonConfig extends SummonConfig {
     id?: string;
     summonConfig?: NatureSummonOptions;
-    sound?: SoundConfig;
+    sound?: SoundConfig | NatureSummonSoundConfig;
     crosshairParameters?: Record<string, unknown>;
     [key: string]: unknown;
 }
@@ -23,7 +29,10 @@ export interface NatureSummonConfig extends SummonConfig {
 export const DEFAULT_CONFIG: NatureSummonConfig = {
     id: 'nature',
     summonConfig: {},
-    sound: { ...DEFAULT_SOUND_CONFIG },
+    sound: {
+        circle: { ...DEFAULT_SOUND_CONFIG },
+        appear: { ...DEFAULT_SOUND_CONFIG, delay: 1400 }
+    },
     crosshairParameters: {
         t: 'circle',
         distance: 2.5,
@@ -107,7 +116,12 @@ async function create(
 
     const { sound } = mConfig;
     const sequence = new Sequence();
-    applySound(sequence, sound);
+    const soundObj = sound as NatureSummonSoundConfig;
+    const isFlatSound = sound?.enable !== undefined || typeof (sound as any)?.file === 'string';
+    applySound(sequence, isFlatSound ? sound : soundObj?.circle);
+    if (!isFlatSound) {
+        applySound(sequence, soundObj?.appear, 1400);
+    }
 
     sequence
         .effect()
@@ -227,4 +241,4 @@ export const nature: SummonModule<NatureSummonConfig> = {
     default_config: DEFAULT_CONFIG
 };
 
-adapter.autorec.register('summonNature', 'token', 'eskie.summon.nature', DEFAULT_CONFIG, '0.0.1', 'Summon Nature');
+adapter.autorec.register('summonNature', 'token', 'eskie.summon.nature', DEFAULT_CONFIG, '0.0.2', 'Summon Nature');

@@ -12,10 +12,16 @@ export interface FiendSummonOptions extends SummonOptions {
     light?: Record<string, unknown>;
 }
 
+export interface FiendSummonSoundConfig {
+    circle?: SoundConfig;
+    appear?: SoundConfig;
+    [key: string]: unknown;
+}
+
 export interface FiendSummonConfig extends SummonConfig {
     id?: string;
     summonConfig?: FiendSummonOptions;
-    sound?: SoundConfig;
+    sound?: SoundConfig | FiendSummonSoundConfig;
     crosshairParameters?: Record<string, unknown>;
     [key: string]: unknown;
 }
@@ -23,7 +29,10 @@ export interface FiendSummonConfig extends SummonConfig {
 export const DEFAULT_CONFIG: FiendSummonConfig = {
     id: 'fiend',
     summonConfig: {},
-    sound: { ...DEFAULT_SOUND_CONFIG },
+    sound: {
+        circle: { ...DEFAULT_SOUND_CONFIG },
+        appear: { ...DEFAULT_SOUND_CONFIG, delay: 1200 }
+    },
     crosshairParameters: {
         t: 'circle',
         distance: 2.5,
@@ -107,7 +116,12 @@ async function create(
 
     const { sound } = mConfig;
     const sequence = new Sequence();
-    applySound(sequence, sound);
+    const soundObj = sound as FiendSummonSoundConfig;
+    const isFlatSound = sound?.enable !== undefined || typeof (sound as any)?.file === 'string';
+    applySound(sequence, isFlatSound ? sound : soundObj?.circle);
+    if (!isFlatSound) {
+        applySound(sequence, soundObj?.appear, 1200);
+    }
 
     const targetTexture = targetToken.document?.texture?.src ?? '';
     const scaleX = targetToken.document?.texture?.scaleX ?? 1;
@@ -253,4 +267,4 @@ export const fiend: SummonModule<FiendSummonConfig> = {
     default_config: DEFAULT_CONFIG
 };
 
-adapter.autorec.register('summonFiend', 'token', 'eskie.summon.fiend', DEFAULT_CONFIG, '0.0.1', 'Summon Fiend');
+adapter.autorec.register('summonFiend', 'token', 'eskie.summon.fiend', DEFAULT_CONFIG, '0.0.2', 'Summon Fiend');

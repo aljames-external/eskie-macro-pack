@@ -29,7 +29,11 @@ test('tokensOfTheDeparted has required API methods and valid default_config', ()
     assert.ok(config.light, 'light config must exist');
     assert.equal(config.light.color, '#58feb0');
     assert.ok(config.sound, 'sound config must exist');
-    assert.equal(typeof config.sound.enable, 'boolean', 'sound.enable must be boolean');
+    assert.ok(config.sound.launch, 'sound.launch must exist');
+    assert.equal(typeof config.sound.launch.enable, 'boolean', 'sound.launch.enable must be boolean');
+    assert.ok(config.sound.manifest, 'sound.manifest must exist');
+    assert.equal(typeof config.sound.manifest.enable, 'boolean', 'sound.manifest.enable must be boolean');
+    assert.equal(config.sound.manifest.delay, 1000, 'sound.manifest default delay must be 1000');
     assert.ok(config.crosshairParameters, 'crosshairParameters must exist');
     assert.equal(config.crosshairParameters.t, 'circle');
 });
@@ -301,7 +305,7 @@ test('tokensOfTheDeparted is registered in autorec', () => {
     const entry = ontokenEntries.find(e => e.label === 'Tokens of the Departed');
 
     assert.ok(entry, 'tokensOfTheDeparted must be registered in AA menu');
-    assert.equal(entry.metaData.version, '0.0.4');
+    assert.equal(entry.metaData.version, '0.0.5');
     assert.ok(entry.macro.args.includes('eskie.summon.tokensOfTheDeparted'), 'Macro args must contain unquoted eskie.summon.tokensOfTheDeparted');
 });
 
@@ -345,7 +349,25 @@ test('all new summon modules have required API methods and valid default_config'
         assert.ok(config, `${id}.default_config must exist`);
         assert.equal(config.id, id);
         assert.ok(config.sound, `${id}.sound config must exist`);
-        assert.equal(typeof config.sound.enable, 'boolean', `${id}.sound.enable must be boolean`);
+        if (id === 'ritualSummonHell') {
+            assert.ok(config.sound.circle, 'ritualSummonHell.sound.circle must exist');
+            assert.equal(typeof config.sound.circle.enable, 'boolean');
+            assert.ok(config.sound.candles, 'ritualSummonHell.sound.candles must exist');
+            assert.equal(typeof config.sound.candles.enable, 'boolean');
+            assert.equal(config.sound.candles.delay, 2500);
+            assert.ok(config.sound.charge, 'ritualSummonHell.sound.charge must exist');
+            assert.equal(typeof config.sound.charge.enable, 'boolean');
+            assert.equal(config.sound.charge.delay, 3750);
+            assert.ok(config.sound.climax, 'ritualSummonHell.sound.climax must exist');
+            assert.equal(typeof config.sound.climax.enable, 'boolean');
+        } else {
+            assert.ok(config.sound.circle, `${id}.sound.circle must exist`);
+            assert.equal(typeof config.sound.circle.enable, 'boolean', `${id}.sound.circle.enable must be boolean`);
+            assert.ok(config.sound.appear, `${id}.sound.appear must exist`);
+            assert.equal(typeof config.sound.appear.enable, 'boolean', `${id}.sound.appear.enable must be boolean`);
+            const expectedDelay = id === 'nature' ? 1400 : 1200;
+            assert.equal(config.sound.appear.delay, expectedDelay, `${id}.sound.appear.delay must be ${expectedDelay}`);
+        }
         assert.ok(config.crosshairParameters, `${id}.crosshairParameters must exist`);
     }
 });
@@ -554,7 +576,103 @@ test('all new summon modules are registered in autorec with token type', () => {
     for (const { label, macro } of expectedRegistrations) {
         const entry = ontokenEntries.find(e => e.label === label);
         assert.ok(entry, `${label} must be registered in AA menu`);
-        assert.equal(entry.metaData.version, '0.0.1');
+        assert.equal(entry.metaData.version, '0.0.2');
         assert.ok(entry.macro.args.includes(macro), `Macro args must contain unquoted ${macro}`);
+    }
+});
+
+test('all new summon modules dispatch phased sounds at key points with correct delays', async () => {
+    const origSequence = globalThis.Sequence;
+    const recordedSounds = [];
+
+    class MockSoundSequence {
+        constructor() {
+            const self = this;
+            const handler = {
+                get(_t, prop) {
+                    if (prop === 'sound') {
+                        return () => {
+                            const callRecord = { calls: [] };
+                            recordedSounds.push(callRecord);
+                            const sndHandler = {
+                                get(_st, sprop) {
+                                    return (...args) => {
+                                        callRecord.calls.push({ method: sprop, args });
+                                        return sndProxy;
+                                    };
+                                }
+                            };
+                            const sndProxy = new Proxy({}, sndHandler);
+                            return sndProxy;
+                        };
+                    }
+                    if (prop === 'play') return async () => self;
+                    if (prop === 'then') return undefined;
+                    return (..._args) => selfProxy;
+                }
+            };
+            const selfProxy = new Proxy(this, handler);
+            return selfProxy;
+        }
+    }
+
+    globalThis.Sequence = MockSoundSequence;
+    try {
+        const mockCaster = { id: 'c1', name: 'Caster', document: { rotation: 0 }, center: { x: 100, y: 100 } };
+        const mockTarget = { id: 't1', name: 'Target', document: { rotation: 0, texture: { src: 'test.png' } }, center: { x: 200, y: 200 } };
+
+        // Test tokensOfTheDeparted phased sounds
+        recordedSounds.length = 0;
+        await summon.tokensOfTheDeparted.create(mockCaster, mockTarget, {
+            sound: {
+                launch: { enable: true, file: 'audio/launch.mp3' },
+                manifest: { enable: true, file: 'audio/manifest.mp3', delay: 1000 }
+            }
+        });
+        assert.equal(recordedSounds.length, 2, 'tokensOfTheDeparted must attach 2 sounds');
+        assert.equal(recordedSounds[0].calls.find(c => c.method === 'file')?.args[0], 'audio/launch.mp3');
+        assert.equal(recordedSounds[1].calls.find(c => c.method === 'file')?.args[0], 'audio/manifest.mp3');
+        assert.equal(recordedSounds[1].calls.find(c => c.method === 'delay')?.args[0], 1000);
+
+        // Test ritualSummonHell phased sounds in create
+        recordedSounds.length = 0;
+        await summon.ritualSummonHell.create(mockCaster, mockTarget, {
+            sound: {
+                circle: { enable: true, file: 'audio/circle.mp3' },
+                candles: { enable: true, file: 'audio/candles.mp3', delay: 2500 },
+                charge: { enable: true, file: 'audio/charge.mp3', delay: 3750 },
+                climax: { enable: true, file: 'audio/climax.mp3' }
+            }
+        });
+        assert.equal(recordedSounds.length, 4, 'ritualSummonHell must attach circle, candles, charge, and climax sounds');
+        const candleSound = recordedSounds.find(r => r.calls.some(c => c.args?.[0] === 'audio/candles.mp3'));
+        assert.ok(candleSound);
+        assert.equal(candleSound.calls.find(c => c.method === 'delay')?.args[0], 2500);
+        const chargeSound = recordedSounds.find(r => r.calls.some(c => c.args?.[0] === 'audio/charge.mp3'));
+        assert.ok(chargeSound);
+        assert.equal(chargeSound.calls.find(c => c.method === 'delay')?.args[0], 3750);
+
+        // Test air elemental phased sounds
+        recordedSounds.length = 0;
+        await summon.air.create(mockCaster, mockTarget, {
+            sound: {
+                circle: { enable: true, file: 'audio/air-circle.mp3' },
+                appear: { enable: true, file: 'audio/air-appear.mp3', delay: 1200 }
+            }
+        });
+        assert.equal(recordedSounds.length, 2, 'air summon must attach circle and appear sounds');
+        const airAppear = recordedSounds.find(r => r.calls.some(c => c.args?.[0] === 'audio/air-appear.mp3'));
+        assert.ok(airAppear);
+        assert.equal(airAppear.calls.find(c => c.method === 'delay')?.args[0], 1200);
+
+        // Test flat sound backward compatibility
+        recordedSounds.length = 0;
+        await summon.fire.create(mockCaster, mockTarget, {
+            sound: { enable: true, file: 'audio/legacy-fire.mp3' }
+        });
+        assert.ok(recordedSounds.length >= 1, 'fire summon must support flat sound fallback');
+        assert.equal(recordedSounds[0].calls.find(c => c.method === 'file')?.args[0], 'audio/legacy-fire.mp3');
+    } finally {
+        globalThis.Sequence = origSequence;
     }
 });

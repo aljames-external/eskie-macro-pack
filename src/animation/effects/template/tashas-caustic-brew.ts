@@ -19,7 +19,8 @@ const DEFAULT_CONFIG_CAST = {
     targets: [],
     sound: {
         cast: { ...DEFAULT_SOUND_CONFIG },
-        burn: { ...DEFAULT_SOUND_CONFIG }
+        stream: { ...DEFAULT_SOUND_CONFIG, delay: 1700 },
+        burn: { ...DEFAULT_SOUND_CONFIG, delay: 2400 }
     }
 };
 
@@ -45,7 +46,11 @@ async function createCast(source: Token, config: any = {}, options: any = {}) {
 
     const sourceWidth = adapter.getTokenDimensions(source).widthUnits;
     let sequence = new Sequence();
-    applySound(sequence, sound.cast);
+    const isFlatSound = sound?.enable !== undefined || typeof sound?.file === 'string';
+    applySound(sequence, isFlatSound ? sound : sound?.cast);
+    if (!isFlatSound) {
+        applySound(sequence, sound?.stream, 1700);
+    }
     sequence = sequence
         .effect()
         .file(closest('jb2a.markers.bubble.02.complete.green'))
@@ -106,7 +111,7 @@ async function createTarget(source: Token, config: any = {}, options: any = {}) 
     if (options?.type === "aefx") return;
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG_CAST, config);
     let sequence = new Sequence();
-    applySound(sequence, mConfig.sound.burn);
+    applySound(sequence, mConfig.sound?.burn, 2400);
 
     let targets = mConfig.targets?.length ? mConfig.targets : Array.from(game.user?.targets ?? []);
 
@@ -285,4 +290,4 @@ export const tashasCausticBrew = {
     default_config: DEFAULT_CONFIG_CAST,
 };
 
-adapter.autorec.register("tashasCausticBrew", "template", "eskie.effect.tashasCausticBrew", DEFAULT_CONFIG_CAST, '0.1.1', "Tasha's Caustic Brew");
+adapter.autorec.register("tashasCausticBrew", "template", "eskie.effect.tashasCausticBrew", DEFAULT_CONFIG_CAST, '0.1.2', "Tasha's Caustic Brew");

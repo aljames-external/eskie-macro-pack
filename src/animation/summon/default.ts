@@ -12,10 +12,16 @@ export interface DefaultSummonOptions extends SummonOptions {
     light?: Record<string, unknown>;
 }
 
+export interface DefaultSummonSoundConfig {
+    circle?: SoundConfig;
+    appear?: SoundConfig;
+    [key: string]: unknown;
+}
+
 export interface DefaultSummonConfig extends SummonConfig {
     id?: string;
     summonConfig?: DefaultSummonOptions;
-    sound?: SoundConfig;
+    sound?: SoundConfig | DefaultSummonSoundConfig;
     crosshairParameters?: Record<string, unknown>;
     [key: string]: unknown;
 }
@@ -23,7 +29,10 @@ export interface DefaultSummonConfig extends SummonConfig {
 export const DEFAULT_CONFIG: DefaultSummonConfig = {
     id: 'default',
     summonConfig: {},
-    sound: { ...DEFAULT_SOUND_CONFIG },
+    sound: {
+        circle: { ...DEFAULT_SOUND_CONFIG },
+        appear: { ...DEFAULT_SOUND_CONFIG, delay: 1200 }
+    },
     crosshairParameters: {
         t: 'circle',
         distance: 2.5,
@@ -107,7 +116,12 @@ async function create(
 
     const { sound } = mConfig;
     const sequence = new Sequence();
-    applySound(sequence, sound);
+    const soundObj = sound as DefaultSummonSoundConfig;
+    const isFlatSound = sound?.enable !== undefined || typeof (sound as any)?.file === 'string';
+    applySound(sequence, isFlatSound ? sound : soundObj?.circle);
+    if (!isFlatSound) {
+        applySound(sequence, soundObj?.appear, 1200);
+    }
 
     const targetTexture = targetToken.document?.texture?.src ?? '';
     const scaleX = targetToken.document?.texture?.scaleX ?? 1;
@@ -245,4 +259,4 @@ export const defaultSummon: SummonModule<DefaultSummonConfig> = {
 
 export default defaultSummon;
 
-adapter.autorec.register('summonDefault', 'token', 'eskie.summon.defaultSummon', DEFAULT_CONFIG, '0.0.1', 'Summon Default');
+adapter.autorec.register('summonDefault', 'token', 'eskie.summon.defaultSummon', DEFAULT_CONFIG, '0.0.2', 'Summon Default');

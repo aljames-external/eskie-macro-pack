@@ -10,11 +10,19 @@ export interface RitualSummonHellSummonOptions extends SummonOptions {
     interactive?: boolean;
 }
 
+export interface RitualSummonHellSoundConfig {
+    circle?: SoundConfig;
+    candles?: SoundConfig;
+    charge?: SoundConfig;
+    climax?: SoundConfig;
+    [key: string]: unknown;
+}
+
 export interface RitualSummonHellConfig extends SummonConfig {
     id?: string;
     summonConfig?: RitualSummonHellSummonOptions;
     interactive?: boolean;
-    sound?: SoundConfig;
+    sound?: SoundConfig | RitualSummonHellSoundConfig;
     crosshairParameters?: Record<string, unknown>;
     [key: string]: unknown;
 }
@@ -23,7 +31,12 @@ export const DEFAULT_CONFIG: RitualSummonHellConfig = {
     id: 'ritualSummonHell',
     summonConfig: {},
     interactive: false,
-    sound: { ...DEFAULT_SOUND_CONFIG },
+    sound: {
+        circle: { ...DEFAULT_SOUND_CONFIG },
+        candles: { ...DEFAULT_SOUND_CONFIG, delay: 2500 },
+        charge: { ...DEFAULT_SOUND_CONFIG, delay: 3750 },
+        climax: { ...DEFAULT_SOUND_CONFIG }
+    },
     crosshairParameters: {
         t: 'circle',
         distance: 2.5,
@@ -94,8 +107,16 @@ async function summon(
  * @param {Sequence} [sequence] Optional Sequence to append to
  * @returns {Sequence}
  */
-function buildClimax(targetToken: Token, sumPos: { x: number; y: number }[], tokenWidth: number, sequence?: any): any {
+function buildClimax(
+    targetToken: Token,
+    sumPos: { x: number; y: number }[],
+    tokenWidth: number,
+    sequence?: any,
+    soundConfig?: any
+): any {
     const seq = sequence ?? new Sequence();
+    const soundObj = soundConfig as RitualSummonHellSoundConfig;
+    applySound(seq, soundObj?.climax ?? (soundConfig?.enable !== undefined ? soundConfig : null));
 
     seq
         .thenDo(function() {
@@ -240,7 +261,13 @@ async function create(
 
     const { sound } = mConfig;
     const sequence = new Sequence();
-    applySound(sequence, sound);
+    const soundObj = sound as RitualSummonHellSoundConfig;
+    const isFlatSound = sound?.enable !== undefined || typeof (sound as any)?.file === 'string';
+    applySound(sequence, isFlatSound ? sound : soundObj?.circle);
+    if (!isFlatSound) {
+        applySound(sequence, soundObj?.candles, 2500);
+        applySound(sequence, soundObj?.charge, 3750);
+    }
 
     const center = adapter.getCenter(targetToken);
     const gridSize = adapter.getGridSize();
@@ -403,7 +430,7 @@ async function create(
     // If not in interactive mode, chain the climax directly after a dramatic wait
     if (!mConfig.interactive) {
         sequence.wait(2000);
-        buildClimax(targetToken, sumPos, tokenWidth, sequence);
+        buildClimax(targetToken, sumPos, tokenWidth, sequence, sound);
     }
 
     return sequence;
@@ -457,7 +484,7 @@ async function play(
                 y: center.y + offset.y * gridSize
             }));
             const { widthUnits } = adapter.getTokenDimensions(targetToken);
-            const climaxSeq = buildClimax(targetToken, sumPos, widthUnits);
+            const climaxSeq = buildClimax(targetToken, sumPos, widthUnits, undefined, mConfig.sound);
             return climaxSeq.play();
         } else {
             await stop(token, targetToken, mConfig);
@@ -508,4 +535,4 @@ export const ritualSummonHell: SummonModule<RitualSummonHellConfig> = {
     default_config: DEFAULT_CONFIG
 };
 
-adapter.autorec.register('ritualSummonHell', 'token', 'eskie.summon.ritualSummonHell', DEFAULT_CONFIG, '0.0.1', 'Ritual Summon Hell');
+adapter.autorec.register('ritualSummonHell', 'token', 'eskie.summon.ritualSummonHell', DEFAULT_CONFIG, '0.0.2', 'Ritual Summon Hell');

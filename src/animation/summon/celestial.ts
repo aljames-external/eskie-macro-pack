@@ -12,10 +12,16 @@ export interface CelestialSummonOptions extends SummonOptions {
     light?: Record<string, unknown>;
 }
 
+export interface CelestialSummonSoundConfig {
+    circle?: SoundConfig;
+    appear?: SoundConfig;
+    [key: string]: unknown;
+}
+
 export interface CelestialSummonConfig extends SummonConfig {
     id?: string;
     summonConfig?: CelestialSummonOptions;
-    sound?: SoundConfig;
+    sound?: SoundConfig | CelestialSummonSoundConfig;
     crosshairParameters?: Record<string, unknown>;
     [key: string]: unknown;
 }
@@ -23,7 +29,10 @@ export interface CelestialSummonConfig extends SummonConfig {
 export const DEFAULT_CONFIG: CelestialSummonConfig = {
     id: 'celestial',
     summonConfig: {},
-    sound: { ...DEFAULT_SOUND_CONFIG },
+    sound: {
+        circle: { ...DEFAULT_SOUND_CONFIG },
+        appear: { ...DEFAULT_SOUND_CONFIG, delay: 1200 }
+    },
     crosshairParameters: {
         t: 'circle',
         distance: 2.5,
@@ -107,7 +116,12 @@ async function create(
 
     const { sound } = mConfig;
     const sequence = new Sequence();
-    applySound(sequence, sound);
+    const soundObj = sound as CelestialSummonSoundConfig;
+    const isFlatSound = sound?.enable !== undefined || typeof (sound as any)?.file === 'string';
+    applySound(sequence, isFlatSound ? sound : soundObj?.circle);
+    if (!isFlatSound) {
+        applySound(sequence, soundObj?.appear, 1200);
+    }
 
     const targetTexture = targetToken.document?.texture?.src ?? '';
     const scaleX = targetToken.document?.texture?.scaleX ?? 1;
@@ -254,4 +268,4 @@ export const celestial: SummonModule<CelestialSummonConfig> = {
     default_config: DEFAULT_CONFIG
 };
 
-adapter.autorec.register('summonCelestial', 'token', 'eskie.summon.celestial', DEFAULT_CONFIG, '0.0.1', 'Summon Celestial');
+adapter.autorec.register('summonCelestial', 'token', 'eskie.summon.celestial', DEFAULT_CONFIG, '0.0.2', 'Summon Celestial');

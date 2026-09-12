@@ -62,7 +62,7 @@ export interface SummonOptions {
 export interface SummonConfig {
     id?: string;
     summonConfig?: SummonOptions;
-    sound?: SoundConfig;
+    sound?: SoundConfig | Record<string, any>;
     [key: string]: unknown;
 }
 

@@ -12,10 +12,16 @@ export interface FuturisticSummonOptions extends SummonOptions {
     light?: Record<string, unknown>;
 }
 
+export interface FuturisticSummonSoundConfig {
+    circle?: SoundConfig;
+    appear?: SoundConfig;
+    [key: string]: unknown;
+}
+
 export interface FuturisticSummonConfig extends SummonConfig {
     id?: string;
     summonConfig?: FuturisticSummonOptions;
-    sound?: SoundConfig;
+    sound?: SoundConfig | FuturisticSummonSoundConfig;
     crosshairParameters?: Record<string, unknown>;
     [key: string]: unknown;
 }
@@ -23,7 +29,10 @@ export interface FuturisticSummonConfig extends SummonConfig {
 export const DEFAULT_CONFIG: FuturisticSummonConfig = {
     id: 'futuristic',
     summonConfig: {},
-    sound: { ...DEFAULT_SOUND_CONFIG },
+    sound: {
+        circle: { ...DEFAULT_SOUND_CONFIG },
+        appear: { ...DEFAULT_SOUND_CONFIG, delay: 1200 }
+    },
     crosshairParameters: {
         t: 'circle',
         distance: 2.5,
@@ -107,7 +116,12 @@ async function create(
 
     const { sound } = mConfig;
     const sequence = new Sequence();
-    applySound(sequence, sound);
+    const soundObj = sound as FuturisticSummonSoundConfig;
+    const isFlatSound = sound?.enable !== undefined || typeof (sound as any)?.file === 'string';
+    applySound(sequence, isFlatSound ? sound : soundObj?.circle);
+    if (!isFlatSound) {
+        applySound(sequence, soundObj?.appear, 1200);
+    }
 
     const targetTexture = targetToken.document?.texture?.src ?? '';
     const scaleX = targetToken.document?.texture?.scaleX ?? 1;
@@ -263,4 +277,4 @@ export const futuristic: SummonModule<FuturisticSummonConfig> = {
     default_config: DEFAULT_CONFIG
 };
 
-adapter.autorec.register('summonFuturistic', 'token', 'eskie.summon.futuristic', DEFAULT_CONFIG, '0.0.1', 'Summon Futuristic');
+adapter.autorec.register('summonFuturistic', 'token', 'eskie.summon.futuristic', DEFAULT_CONFIG, '0.0.2', 'Summon Futuristic');

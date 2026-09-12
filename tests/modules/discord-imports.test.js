@@ -7,6 +7,7 @@ import vm from 'node:vm';
 import { fileURLToPath } from 'node:url';
 
 import { effect } from '../../src/animation/effects/index.js';
+import { adapter } from '../../src/adapters/index.js';
 import { KNOWN_STANDALONE_MACROS } from '../../src/lib/standalone-macros.js';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -487,4 +488,22 @@ test('tashasCausticBrew uses copySprite and applies counter token rotation', asy
         game.modules.delete('jb2a_patreon');
         game.modules.delete('eskie-effects');
     }
+});
+
+test('tashasCausticBrew DEFAULT_CONFIG defines phased sound sections and registers at 0.1.2', async () => {
+    const config = effect.tashasCausticBrew.default_config;
+    assert.ok(config.sound, 'sound config must exist');
+    assert.ok(config.sound.cast, 'cast sound must exist');
+    assert.equal(typeof config.sound.cast.enable, 'boolean');
+    assert.ok(config.sound.stream, 'stream sound must exist');
+    assert.equal(typeof config.sound.stream.enable, 'boolean');
+    assert.equal(config.sound.stream.delay, 1700);
+    assert.ok(config.sound.burn, 'burn sound must exist');
+    assert.equal(typeof config.sound.burn.enable, 'boolean');
+    assert.equal(config.sound.burn.delay, 2400);
+
+    const aaMenu = adapter.autorec.aa.menu;
+    const entry = aaMenu.templatefx.find(e => e.label === "Tasha's Caustic Brew");
+    assert.ok(entry, "Tasha's Caustic Brew must be in template menu");
+    assert.equal(entry.metaData.version, '0.1.2', 'autorec version must be 0.1.2');
 });

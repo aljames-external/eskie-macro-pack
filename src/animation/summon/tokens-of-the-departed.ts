@@ -28,13 +28,19 @@ export interface TokensOfTheDepartedSummonOptions extends SummonOptions {
     tint?: string;
 }
 
+export interface TokensOfTheDepartedSoundConfig {
+    launch?: SoundConfig;
+    manifest?: SoundConfig;
+    [key: string]: unknown;
+}
+
 export interface TokensOfTheDepartedConfig extends SummonConfig {
     id?: string;
     summonConfig?: TokensOfTheDepartedSummonOptions;
     tint?: string;
     changeLight?: boolean;
     light?: TokensOfTheDepartedLightConfig;
-    sound?: SoundConfig;
+    sound?: SoundConfig | TokensOfTheDepartedSoundConfig;
     crosshairParameters?: Record<string, unknown>;
     tokenData?: Record<string, unknown>;
     [key: string]: unknown;
@@ -56,7 +62,10 @@ export const DEFAULT_CONFIG: TokensOfTheDepartedConfig = {
         contrast: 0,
         shadows: 0
     },
-    sound: { ...DEFAULT_SOUND_CONFIG },
+    sound: {
+        launch: { ...DEFAULT_SOUND_CONFIG },
+        manifest: { ...DEFAULT_SOUND_CONFIG, delay: 1000 }
+    },
     crosshairParameters: {
         t: 'circle',
         distance: 2.5,
@@ -153,7 +162,12 @@ async function create(
 
     const { sound, tint } = mConfig;
     const sequence = new Sequence();
-    applySound(sequence, sound);
+    const soundObj = sound as TokensOfTheDepartedSoundConfig;
+    const isFlatSound = sound?.enable !== undefined || typeof (sound as any)?.file === 'string';
+    applySound(sequence, isFlatSound ? sound : soundObj?.launch);
+    if (!isFlatSound) {
+        applySound(sequence, soundObj?.manifest, casterToken ? 1000 : 0);
+    }
 
     const effectTint = tint ?? '#58feb0';
     const targetRotation = adapter.getTokenRotation(targetToken);
@@ -269,6 +283,6 @@ export const tokensOfTheDeparted: SummonModule<TokensOfTheDepartedConfig> = {
     default_config: DEFAULT_CONFIG
 };
 
-adapter.autorec.register('tokensOfTheDeparted', 'token', 'eskie.summon.tokensOfTheDeparted', DEFAULT_CONFIG, '0.0.4', 'Tokens of the Departed');
+adapter.autorec.register('tokensOfTheDeparted', 'token', 'eskie.summon.tokensOfTheDeparted', DEFAULT_CONFIG, '0.0.5', 'Tokens of the Departed');
 
 
