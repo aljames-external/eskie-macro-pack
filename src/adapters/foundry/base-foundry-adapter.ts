@@ -139,23 +139,64 @@ export class BaseFoundryAdapter {
         const nonCancelButtons = rawButtons.filter((btn: any) => !isCancel(btn));
         const cancelButtons = rawButtons.filter((btn: any) => isCancel(btn));
 
-        // In Foundry VTT ApplicationV2 DialogV2, .form-footer uses flex-direction: row-reverse.
-        // Array items are rendered from right to left (index 0 appears on the far right).
-        // To guarantee Cancel appears on the visual right and primary actions appear on the visual left:
-        // cancel buttons are placed first (index 0 -> visual right), followed by actions (visual left).
-        const orderedButtons = [...cancelButtons, ...nonCancelButtons];
+        // Guarantee Cancel appears on the visual right and primary actions appear on the visual left.
+        // Primary actions are ordered first (index 0 -> visual left), followed by Cancel at the end.
+        const orderedButtons = [...nonCancelButtons, ...cancelButtons];
 
-        const buttons = orderedButtons.map((btn: any) => ({
+        const buttons = orderedButtons.map((btn: any, idx: number) => ({
             label: btn.label,
             action: String(btn.value),
-            default: Boolean(btn.default)
+            default: Boolean(btn.default),
+            style: {
+                order: isCancel(btn) ? '999' : String(idx + 1),
+                ...(btn.style ?? {})
+            }
         }));
 
+        const userRender = (opt as any).render;
+        const render = (arg1: any, arg2: any) => {
+            const root =
+                arg2?.element ??
+                arg1?.element ??
+                (arg2 instanceof HTMLElement ? arg2 : null) ??
+                (arg1 instanceof HTMLElement ? arg1 : null) ??
+                (arg2?.[0] instanceof HTMLElement ? arg2[0] : null) ??
+                (arg1?.[0] instanceof HTMLElement ? arg1[0] : null);
+            if (root) {
+                const footer = root.querySelector('footer.form-footer') ?? root.querySelector('footer');
+                if (footer) {
+                    footer.style.setProperty('display', 'flex', 'important');
+                    footer.style.setProperty('flex-direction', 'row', 'important');
+                    const allButtons = Array.from(footer.querySelectorAll('button')) as HTMLElement[];
+                    for (const btn of allButtons) {
+                        btn.style.setProperty('flex', '1', 'important');
+                    }
+                    const cancelBtn = allButtons.find((b: HTMLElement) => {
+                        const act = b.getAttribute('data-action')?.toLowerCase();
+                        const txt = b.textContent?.trim().toLowerCase();
+                        return act === '0' || act === 'cancel' || act === 'false' || txt === 'cancel';
+                    });
+                    if (cancelBtn) {
+                        footer.appendChild(cancelBtn);
+                    }
+                }
+            }
+            if (typeof userRender === 'function') {
+                userRender(arg1, arg2);
+            }
+        };
+
         const result = await dialogCls.wait({
-            window: { title: buttonData.title ?? 'Choose an Option' },
+            window: {
+                title: buttonData.title ?? 'Choose an Option',
+                ...((opt as any).window ?? {}),
+                classes: [...new Set(['standard-form', 'emp-button-dialog', ...((opt as any).window?.classes ?? [])])]
+            },
+            classes: [...new Set(['standard-form', 'emp-button-dialog', ...((opt as any).classes ?? [])])],
             buttons,
             rejectClose: false,
             content: buttonData.content,
+            render,
             ...opt
         });
 

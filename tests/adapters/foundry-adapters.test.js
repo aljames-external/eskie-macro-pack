@@ -452,7 +452,7 @@ test('DialogV2 and buttonDialog delegation on BaseFoundryAdapter', async () => {
     assert.equal(chosen, 'fireball');
 });
 
-test('buttonDialog guarantees Cancel button is positioned at index 0 (visual right in DialogV2 row-reverse)', async () => {
+test('buttonDialog guarantees Cancel button is positioned as the rightmost button (last in array, flex order 999)', async () => {
     const v12 = new FoundryV12Adapter();
     let passedButtons = [];
     const origWait = foundry.applications.api.DialogV2.wait;
@@ -465,17 +465,18 @@ test('buttonDialog guarantees Cancel button is positioned at index 0 (visual rig
         await v12.buttonDialog({
             title: 'Confirm Action',
             buttons: [
-                { label: 'Confirm', value: '1' },
-                { label: 'Cancel', value: '0' }
+                { label: 'Cancel', value: '0' },
+                { label: 'Confirm', value: '1' }
             ]
         });
 
         assert.equal(passedButtons.length, 2);
-        // In Foundry DialogV2 row-reverse, index 0 is on the visual right, index 1 is on the visual left
-        assert.equal(passedButtons[0].label, 'Cancel', 'Cancel must be index 0 so it renders on the visual right in row-reverse');
-        assert.equal(passedButtons[0].action, '0');
-        assert.equal(passedButtons[1].label, 'Confirm', 'Confirm must be index 1 so it renders on the visual left in row-reverse');
-        assert.equal(passedButtons[1].action, '1');
+        assert.equal(passedButtons[0].label, 'Confirm', 'Confirm must be first (visual left)');
+        assert.equal(passedButtons[0].action, '1');
+        assert.equal(passedButtons[0].style?.order, '1');
+        assert.equal(passedButtons[1].label, 'Cancel', 'Cancel must be last (visual right)');
+        assert.equal(passedButtons[1].action, '0');
+        assert.equal(passedButtons[1].style?.order, '999');
     } finally {
         foundry.applications.api.DialogV2.wait = origWait;
     }
@@ -484,29 +485,53 @@ test('buttonDialog guarantees Cancel button is positioned at index 0 (visual rig
 test('buttonDialog preserves natural visual left-to-right order for multiple action options with Cancel on the right', async () => {
     const v12 = new FoundryV12Adapter();
     let passedButtons = [];
+    let passedConfig = null;
     const origWait = foundry.applications.api.DialogV2.wait;
     try {
         foundry.applications.api.DialogV2.wait = async (config) => {
             passedButtons = config.buttons;
+            passedConfig = config;
             return config.buttons[0].action;
         };
 
         await v12.buttonDialog({
             title: 'Multiple Actions',
             buttons: [
+                { label: 'Cancel', value: 'cancel' },
                 { label: 'Option A', value: 'a' },
-                { label: 'Option B', value: 'b' },
-                { label: 'Cancel', value: 'cancel' }
+                { label: 'Option B', value: 'b' }
             ]
         });
 
-        // In DialogV2 row-reverse:
-        // index 0 -> visual right (Cancel)
-        // index 1 -> visual middle (Option B)
-        // index 2 -> visual left (Option A)
-        assert.equal(passedButtons[0].label, 'Cancel');
-        assert.equal(passedButtons[1].label, 'Option A');
-        assert.equal(passedButtons[2].label, 'Option B');
+        assert.equal(passedButtons[0].label, 'Option A');
+        assert.equal(passedButtons[0].style?.order, '1');
+        assert.equal(passedButtons[1].label, 'Option B');
+        assert.equal(passedButtons[1].style?.order, '2');
+        assert.equal(passedButtons[2].label, 'Cancel');
+        assert.equal(passedButtons[2].style?.order, '999');
+
+        // Verify classes and render hook
+        assert.ok(passedConfig.classes.includes('emp-button-dialog'));
+        assert.ok(typeof passedConfig.render === 'function');
+
+        // Test render hook DOM operations
+        const appended = [];
+        const fakeFooter = {
+            style: { setProperty: (k, v) => { fakeFooter.style[k] = v; } },
+            querySelectorAll: () => [
+                { getAttribute: () => 'a', textContent: 'Option A', style: { setProperty: (k, v) => {} } },
+                { getAttribute: () => 'b', textContent: 'Option B', style: { setProperty: (k, v) => {} } },
+                { getAttribute: () => 'cancel', textContent: 'Cancel', style: { setProperty: (k, v) => {} } }
+            ],
+            appendChild: (el) => appended.push(el)
+        };
+        const fakeRoot = {
+            querySelector: (sel) => (sel.includes('footer') ? fakeFooter : null)
+        };
+        passedConfig.render({}, { element: fakeRoot });
+        assert.equal(fakeFooter.style['flex-direction'], 'row');
+        assert.equal(appended.length, 1);
+        assert.equal(appended[0].textContent, 'Cancel');
     } finally {
         foundry.applications.api.DialogV2.wait = origWait;
     }

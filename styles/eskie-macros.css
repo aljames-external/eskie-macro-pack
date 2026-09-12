@@ -46,6 +46,22 @@
     margin: 4px 0 !important;
 }
 
+/* Natural left-to-right layout for buttonDialog (primary left, cancel right) */
+.emp-button-dialog footer.form-footer,
+.emp-button-dialog .form-footer,
+.emp-button-dialog footer,
+dialog.emp-button-dialog footer,
+.dialog-v2.emp-button-dialog footer {
+    display: flex !important;
+    flex-direction: row !important;
+}
+
+.emp-button-dialog footer.form-footer > button,
+.emp-button-dialog .form-footer > button,
+.emp-button-dialog footer > button {
+    flex: 1 !important;
+}
+
 /* ============================================================================
    WORLD SCRIPTS CONFIGURATION MENU STYLES
    ============================================================================ */
