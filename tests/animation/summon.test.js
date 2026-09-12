@@ -560,7 +560,7 @@ test('ritualSummonHell.play interactive prompts button dialog with Summon and Ca
     assert.equal(buttonDialogData[1].title, 'Ritual Summon Hell - Infernal Gate');
 });
 
-test('ritualSummonHell.play interactive ends fires, removes red glow, and cleans up when cancelled via Cancel or X', async () => {
+test('ritualSummonHell.play interactive ends fires, removes red glow, and preserves circle and smoke when cancelled via Cancel or X', async () => {
     const origEndEffects = Sequencer.EffectManager.endEffects;
     let endedEffects = [];
     Sequencer.EffectManager.endEffects = (opts) => {
@@ -604,7 +604,7 @@ test('ritualSummonHell.play interactive ends fires, removes red glow, and cleans
         const resultCancel = await summon.ritualSummonHell.play(mockCaster, mockSummon, { interactive: true });
         assert.equal(resultCancel, null, 'Play must return null on cancel');
         assert.ok(endedEffects.includes('Summoning Flames - Warlock'), 'Fires must go out on cancel');
-        assert.ok(endedEffects.includes('Summoning Circle - Warlock'), 'Circle must end on cancel');
+        assert.equal(endedEffects.includes('Summoning Circle - Warlock'), false, 'Circle and smoke must remain running on cancel');
         assert.ok(endedEffects.includes('Summoning Core - Warlock'), 'Core must end on cancel');
         assert.deepEqual(deletedLightIds, ['light-hell-1'], 'Red glow ambient lights must be removed on cancel');
 
@@ -616,6 +616,7 @@ test('ritualSummonHell.play interactive ends fires, removes red glow, and cleans
         const resultX = await summon.ritualSummonHell.play(mockCaster, mockSummon, { interactive: true });
         assert.equal(resultX, null, 'Play must return null on dialog X close');
         assert.ok(endedEffects.includes('Summoning Flames - Warlock'), 'Fires must go out on X close');
+        assert.equal(endedEffects.includes('Summoning Circle - Warlock'), false, 'Circle and smoke must remain running on X close');
         assert.deepEqual(deletedLightIds, ['light-hell-1'], 'Red glow ambient lights must be removed on X close');
     } finally {
         Sequencer.EffectManager.endEffects = origEndEffects;

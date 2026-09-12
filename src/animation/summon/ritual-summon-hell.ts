@@ -466,7 +466,10 @@ async function play(
             const climaxSeq = buildClimax(targetToken, sumPos, widthUnits, undefined, mConfig.sound, label);
             return climaxSeq.play();
         } else {
-            await stop(token, targetToken, mConfig);
+            Sequencer.EffectManager.endEffects({ name: `Summoning Core - ${label}` });
+            Sequencer.EffectManager.endEffects({ name: `Summoning Flames - ${label}` });
+            await removeAmbientLights(label);
+
             if (isSpawned && targetToken) {
                 const doc = targetToken.document ?? targetToken;
                 if (doc && 'delete' in doc && typeof (doc as any).delete === 'function') {
@@ -474,6 +477,13 @@ async function play(
                 } else if (canvas.scene) {
                     await (canvas.scene as any).deleteEmbeddedDocuments?.('Token', [targetToken.id]);
                 }
+            } else if (targetToken && adapter.isToken(targetToken)) {
+                await new Sequence()
+                    .animation()
+                        .on(targetToken)
+                        .show()
+                        .opacity(1)
+                    .play();
             }
             return null;
         }
@@ -481,6 +491,29 @@ async function play(
 
     const sequence = await create(token, summonTarget, mConfig);
     return sequence?.play();
+}
+
+/**
+ * Removes ambient lights created by the ritual summon hell animation.
+ *
+ * @param {string} [label] Optional label to target specific ritual lights
+ * @returns {Promise<void>}
+ */
+async function removeAmbientLights(label?: string): Promise<void> {
+    if (!canvas.scene) return;
+    const ambientLights = adapter.getSceneLights();
+    const deleteIds: string[] = [];
+    for (const light of ambientLights) {
+        const empFlag = light.flags?.['eskie-macro-pack']?.ritualSummonHell;
+        const lightLabel = light.flags?.['eskie-macro-pack']?.label;
+        const matchesLabel = !label || !lightLabel || lightLabel === label;
+        if (Boolean(empFlag) && matchesLabel) {
+            deleteIds.push(light.id);
+        }
+    }
+    if (deleteIds.length > 0) {
+        await (canvas.scene as any).deleteEmbeddedDocuments('AmbientLight', deleteIds);
+    }
 }
 
 /**
@@ -510,21 +543,7 @@ async function stop(
     Sequencer.EffectManager.endEffects({ name: `Summoning Circle - ${label}` });
     Sequencer.EffectManager.endEffects({ name: `Summoning Flames - ${label}` });
 
-    if (canvas.scene) {
-        const ambientLights = adapter.getSceneLights();
-        const deleteIds: string[] = [];
-        for (const light of ambientLights) {
-            const empFlag = light.flags?.['eskie-macro-pack']?.ritualSummonHell;
-            const lightLabel = light.flags?.['eskie-macro-pack']?.label;
-            const hasEmpFlag = Boolean(empFlag) && (!lightLabel || lightLabel === label);
-            if (hasEmpFlag) {
-                deleteIds.push(light.id);
-            }
-        }
-        if (deleteIds.length > 0) {
-            await (canvas.scene as any).deleteEmbeddedDocuments('AmbientLight', deleteIds);
-        }
-    }
+    await removeAmbientLights(label);
 
     if (target && adapter.isToken(target)) {
         await new Sequence()
@@ -545,19 +564,7 @@ async function clean(): Promise<void> {
     Sequencer.EffectManager.endEffects({ name: 'Summoning Circle*' });
     Sequencer.EffectManager.endEffects({ name: 'Summoning Flames*' });
 
-    if (canvas.scene) {
-        const ambientLights = adapter.getSceneLights();
-        const deleteIds: string[] = [];
-        for (const light of ambientLights) {
-            const hasEmpFlag = Boolean(light.flags?.['eskie-macro-pack']?.ritualSummonHell);
-            if (hasEmpFlag) {
-                deleteIds.push(light.id);
-            }
-        }
-        if (deleteIds.length > 0) {
-            await (canvas.scene as any).deleteEmbeddedDocuments('AmbientLight', deleteIds);
-        }
-    }
+    await removeAmbientLights();
 }
 
 export const ritualSummonHell: SummonModule<RitualSummonHellConfig> = {
