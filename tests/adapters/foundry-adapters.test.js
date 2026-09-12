@@ -452,6 +452,33 @@ test('DialogV2 and buttonDialog delegation on BaseFoundryAdapter', async () => {
     assert.equal(chosen, 'fireball');
 });
 
+test('buttonDialog guarantees Cancel button is positioned as the rightmost button', async () => {
+    const v12 = new FoundryV12Adapter();
+    let passedButtons = [];
+    const origWait = foundry.applications.api.DialogV2.wait;
+    try {
+        foundry.applications.api.DialogV2.wait = async (config) => {
+            passedButtons = config.buttons;
+            return config.buttons[0].action;
+        };
+
+        await v12.buttonDialog({
+            title: 'Confirm Action',
+            buttons: [
+                { label: 'Cancel', value: '0' },
+                { label: 'Confirm', value: '1' }
+            ]
+        });
+
+        assert.equal(passedButtons.length, 2);
+        assert.equal(passedButtons[0].label, 'Confirm');
+        assert.equal(passedButtons[1].label, 'Cancel', 'Cancel must be the rightmost button');
+        assert.equal(passedButtons[1].action, '0');
+    } finally {
+        foundry.applications.api.DialogV2.wait = origWait;
+    }
+});
+
 test('getDocumentName, isDocumentOfType, and getPlaceable resolution', () => {
     const v12 = new FoundryV12Adapter();
 

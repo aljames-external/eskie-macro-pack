@@ -130,10 +130,20 @@ export class BaseFoundryAdapter {
             throw new Error("DialogV2 is not available in the current Foundry environment.");
         }
         const opt = this.mergeObject({ position: { width: 300 } }, options, { inplace: false });
-        const buttons = (buttonData.buttons ?? []).map((btn: any) => ({
+        const rawButtons = buttonData.buttons ?? [];
+        const isCancel = (btn: any) => {
+            const label = String(btn?.label ?? '').trim().toLowerCase();
+            const val = String(btn?.value ?? '').trim().toLowerCase();
+            return label === 'cancel' || val === 'cancel';
+        };
+        const nonCancelButtons = rawButtons.filter((btn: any) => !isCancel(btn));
+        const cancelButtons = rawButtons.filter((btn: any) => isCancel(btn));
+        const orderedButtons = [...nonCancelButtons, ...cancelButtons];
+
+        const buttons = orderedButtons.map((btn: any) => ({
             label: btn.label,
             action: String(btn.value),
-            default: false
+            default: Boolean(btn.default)
         }));
 
         const result = await dialogCls.wait({
