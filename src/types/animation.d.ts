@@ -70,6 +70,7 @@ export interface SummonModule<TConfig extends SummonConfig = SummonConfig> {
     create: (token: Token, summonTarget?: Token | Actor, config?: TConfig) => Promise<any>;
     play: (token: Token, summonTarget: Token | Actor, config?: TConfig) => Promise<any>;
     stop?: (token: Token, summonTarget?: Token | Actor, config?: TConfig) => Promise<void>;
+    clean?: () => Promise<void>;
     default_config: TConfig;
 }
 

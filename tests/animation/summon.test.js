@@ -525,9 +525,9 @@ test('ritualSummonHell.stop cleans up lights, tags, and effects', async () => {
         const mockTarget = { id: 'target-1', name: 'Fiend' };
         await summon.ritualSummonHell.stop(mockTarget);
 
-        assert.ok(endedEffects.includes('Summoning Core'));
-        assert.ok(endedEffects.includes('Summoning Circle'));
-        assert.ok(endedEffects.includes('Summoning Flames'));
+        assert.ok(endedEffects.includes('Summoning Core - Fiend'));
+        assert.ok(endedEffects.includes('Summoning Circle - Fiend'));
+        assert.ok(endedEffects.includes('Summoning Flames - Fiend'));
         assert.deepEqual(deletedLightIds, ['light-1']);
         assert.equal(removedTag, 'Pre Summon');
     } finally {
@@ -556,7 +556,7 @@ test('ritualSummonHell.play interactive prompts button dialog and runs climax on
     assert.equal(buttonDialogCalled, true, 'adapter.buttonDialog must be called');
 });
 
-test('ritualSummonHell names jb2a.flames.01 as Summoning Flames and ends it in climax (interactive & non-interactive)', async () => {
+test('ritualSummonHell names effects with - ${label}, supports custom label & No Caster fallback, and clean() ends all', async () => {
     let endedEffects = [];
     const origEndEffects = Sequencer.EffectManager.endEffects;
     Sequencer.EffectManager.endEffects = (opts) => {
@@ -636,20 +636,22 @@ test('ritualSummonHell names jb2a.flames.01 as Summoning Flames and ends it in c
             center: { x: 300, y: 300 }
         };
 
-        // 1. Non-Interactive Mode
+        // 1. Non-Interactive Mode (default caster name label)
         effectsCreated.length = 0;
         thenDoCallbacks.length = 0;
         endedEffects.length = 0;
 
         await summon.ritualSummonHell.play(mockCaster, mockSummon, { interactive: false });
 
-        const flameEffect = effectsCreated.find(e => e.name === 'Summoning Flames');
-        assert.ok(flameEffect, 'jb2a.flames.01 effect must be assigned name Summoning Flames');
+        const flameEffect = effectsCreated.find(e => e.name === 'Summoning Flames - Warlock');
+        assert.ok(flameEffect, 'jb2a.flames.01 effect must be assigned name Summoning Flames - Warlock');
+        assert.ok(effectsCreated.some(e => e.name === 'Summoning Circle - Warlock'));
+        assert.ok(effectsCreated.some(e => e.name === 'Summoning Core - Warlock'));
 
-        assert.ok(endedEffects.includes('Summoning Flames'), 'Non-interactive climax must end Summoning Flames');
-        assert.ok(endedEffects.includes('Summoning Core'), 'Non-interactive climax must end Summoning Core');
+        assert.ok(endedEffects.includes('Summoning Flames - Warlock'), 'Non-interactive climax must end Summoning Flames - Warlock');
+        assert.ok(endedEffects.includes('Summoning Core - Warlock'), 'Non-interactive climax must end Summoning Core - Warlock');
 
-        // 2. Interactive Mode
+        // 2. Interactive Mode (default caster name label)
         effectsCreated.length = 0;
         thenDoCallbacks.length = 0;
         endedEffects.length = 0;
@@ -657,8 +659,39 @@ test('ritualSummonHell names jb2a.flames.01 as Summoning Flames and ends it in c
         adapter.buttonDialog = async () => '1';
         await summon.ritualSummonHell.play(mockCaster, mockSummon, { interactive: true });
 
-        assert.ok(endedEffects.includes('Summoning Flames'), 'Interactive climax must end Summoning Flames upon SUMMON! confirmation');
-        assert.ok(endedEffects.includes('Summoning Core'), 'Interactive climax must end Summoning Core upon SUMMON! confirmation');
+        assert.ok(endedEffects.includes('Summoning Flames - Warlock'), 'Interactive climax must end Summoning Flames - Warlock upon SUMMON! confirmation');
+        assert.ok(endedEffects.includes('Summoning Core - Warlock'), 'Interactive climax must end Summoning Core - Warlock upon SUMMON! confirmation');
+
+        // 3. Custom configurable label (e.g. "Summon Animation")
+        effectsCreated.length = 0;
+        thenDoCallbacks.length = 0;
+        endedEffects.length = 0;
+
+        await summon.ritualSummonHell.play(mockCaster, mockSummon, { label: 'Summon Animation', interactive: false });
+
+        assert.ok(effectsCreated.some(e => e.name === 'Summoning Flames - Summon Animation'));
+        assert.ok(endedEffects.includes('Summoning Flames - Summon Animation'));
+        assert.ok(endedEffects.includes('Summoning Core - Summon Animation'));
+
+        // 4. Fallback to "No Caster" when token has no name
+        effectsCreated.length = 0;
+        thenDoCallbacks.length = 0;
+        endedEffects.length = 0;
+
+        const mockCasterNoName = { id: 'c-anon', document: { rotation: 0 }, center: { x: 100, y: 100 } };
+        await summon.ritualSummonHell.play(mockCasterNoName, mockSummon, { interactive: false });
+
+        assert.ok(effectsCreated.some(e => e.name === 'Summoning Flames - No Caster'));
+        assert.ok(endedEffects.includes('Summoning Flames - No Caster'));
+        assert.ok(endedEffects.includes('Summoning Core - No Caster'));
+
+        // 5. clean() function removes all animations from all labels
+        endedEffects.length = 0;
+        await summon.ritualSummonHell.clean();
+
+        assert.ok(endedEffects.includes('Summoning Core*'), 'clean() must end Summoning Core* across all labels');
+        assert.ok(endedEffects.includes('Summoning Circle*'), 'clean() must end Summoning Circle* across all labels');
+        assert.ok(endedEffects.includes('Summoning Flames*'), 'clean() must end Summoning Flames* across all labels');
     } finally {
         Sequencer.EffectManager.endEffects = origEndEffects;
         globalThis.Sequence = origSequence;

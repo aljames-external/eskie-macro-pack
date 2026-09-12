@@ -20,6 +20,7 @@ export interface RitualSummonHellSoundConfig {
 
 export interface RitualSummonHellConfig extends SummonConfig {
     id?: string;
+    label?: string;
     summonConfig?: RitualSummonHellSummonOptions;
     interactive?: boolean;
     sound?: SoundConfig | RitualSummonHellSoundConfig;
@@ -112,7 +113,8 @@ function buildClimax(
     sumPos: { x: number; y: number }[],
     tokenWidth: number,
     sequence?: any,
-    soundConfig?: any
+    soundConfig?: any,
+    label: string = 'No Caster'
 ): any {
     const seq = sequence ?? new Sequence();
     const soundObj = soundConfig as RitualSummonHellSoundConfig;
@@ -120,8 +122,8 @@ function buildClimax(
 
     seq
         .thenDo(function() {
-            Sequencer.EffectManager.endEffects({ name: 'Summoning Core' });
-            Sequencer.EffectManager.endEffects({ name: 'Summoning Flames' });
+            Sequencer.EffectManager.endEffects({ name: `Summoning Core - ${label}` });
+            Sequencer.EffectManager.endEffects({ name: `Summoning Flames - ${label}` });
             if (game.modules.get('tagger')?.active) {
                 Tagger.removeTags(targetToken, 'Pre Summon');
             }
@@ -130,7 +132,7 @@ function buildClimax(
         .shake({ duration: 2500, fadeOutDuration: 1000, strength: 5, rotation: false })
 
         .effect()
-            .name('Summoning Core')
+            .name(`Summoning Core - ${label}`)
             .atLocation(sumPos[0])
             .file(closest('jb2a.impact.ground_crack.dark_red.01'))
             .belowTokens()
@@ -139,7 +141,7 @@ function buildClimax(
 
         .effect()
             .delay(500)
-            .name('Summoning Circle')
+            .name(`Summoning Circle - ${label}`)
             .atLocation(sumPos[0])
             .file(closest('jb2a.ground_cracks.dark_red.01'))
             .belowTokens()
@@ -149,7 +151,7 @@ function buildClimax(
             .zIndex(0.2)
 
         .effect()
-            .name('Summoning Circle')
+            .name(`Summoning Circle - ${label}`)
             .file(closest('jb2a.fire_ring.500px.red'))
             .atLocation(targetToken)
             .filter('ColorMatrix', { brightness: 0 })
@@ -161,7 +163,7 @@ function buildClimax(
             .repeats(4, 450, 450)
 
         .effect()
-            .name('Summoning Core')
+            .name(`Summoning Core - ${label}`)
             .atLocation(sumPos[0])
             .file(closest('jb2a.sphere_of_annihilation.600px.dark_red'))
             .belowTokens()
@@ -175,7 +177,7 @@ function buildClimax(
     for (let u = 1; u < 6; u++) {
         seq
             .effect()
-                .name('Summoning Circle')
+                .name(`Summoning Circle - ${label}`)
                 .atLocation(sumPos[u], { offset: { y: -1.15 }, gridUnits: true })
                 .file(closest('jb2a.flames.02.orange'))
                 .size(1.75, { gridUnits: true })
@@ -186,7 +188,7 @@ function buildClimax(
                 .zIndex(1)
 
             .effect()
-                .name('Summoning Circle')
+                .name(`Summoning Circle - ${label}`)
                 .file(closest('jb2a.particles.outward.orange.01.03'))
                 .atLocation(sumPos[u], { offset: { y: -0.75 }, gridUnits: true })
                 .scale(0.2)
@@ -204,7 +206,7 @@ function buildClimax(
 
     seq
         .effect()
-            .name('Summoning Core')
+            .name(`Summoning Core - ${label}`)
             .copySprite(targetToken)
             .spriteRotation(-targetRotation)
             .atLocation(targetToken)
@@ -216,7 +218,7 @@ function buildClimax(
             .zIndex(2.1)
 
         .effect()
-            .name('Summoning Core')
+            .name(`Summoning Core - ${label}`)
             .file(closest('jb2a.impact.fire'))
             .atLocation(targetToken, { offset: { y: -0.5 * tokenWidth }, gridUnits: true })
             .filter('ColorMatrix', { brightness: 0 })
@@ -249,6 +251,7 @@ async function create(
 
     let targetToken: Token;
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, settingsOverride(config));
+    const label = mConfig.label ?? token?.name ?? 'No Caster';
 
     if (adapter.isToken(summonTarget)) {
         targetToken = summonTarget;
@@ -294,7 +297,7 @@ async function create(
             shadows: 0.3
         },
         flags: {
-            'eskie-macro-pack': { ritualSummonHell: true },
+            'eskie-macro-pack': { ritualSummonHell: true, label },
             tagger: { tags: ['Summon Light'] }
         }
     };
@@ -314,7 +317,7 @@ async function create(
             .hide()
 
         .effect()
-            .name('Summoning Circle')
+            .name(`Summoning Circle - ${label}`)
             .atLocation(sumPos[0])
             .file(closest('jb2a.magic_signs.circle.02.conjuration.complete.dark_red'))
             .size(6, { gridUnits: true })
@@ -330,14 +333,14 @@ async function create(
     for (let e = 1; e < 6; e++) {
         sequence
             .effect()
-                .name('Summoning Circle')
+                .name(`Summoning Circle - ${label}`)
                 .atLocation(sumPos[e])
                 .file(closest('jb2a.impact.010.orange'))
                 .size(2, { gridUnits: true })
                 .zIndex(1)
 
             .effect()
-                .name('Summoning Flames')
+                .name(`Summoning Flames - ${label}`)
                 .atLocation(sumPos[e])
                 .file(closest('jb2a.flames.01.orange'))
                 .size(1.75, { gridUnits: true })
@@ -349,7 +352,7 @@ async function create(
                 .persist()
 
             .effect()
-                .name('Summoning Circle')
+                .name(`Summoning Circle - ${label}`)
                 .delay(1100, 1750)
                 .atLocation(sumPos[e], { offset: { x: 0, y: -0.7 }, gridUnits: true })
                 .file(closest('eskie.smoke.05.white'))
@@ -385,7 +388,7 @@ async function create(
                             shadows: 0.3
                         },
                         flags: {
-                            'eskie-macro-pack': { ritualSummonHell: true },
+                            'eskie-macro-pack': { ritualSummonHell: true, label },
                             tagger: { tags: ['Summon Light'] }
                         }
                     });
@@ -396,7 +399,7 @@ async function create(
 
         .effect()
             .delay(250)
-            .name('Summoning Core')
+            .name(`Summoning Core - ${label}`)
             .atLocation(sumPos[0])
             .file(closest('jb2a.sphere_of_annihilation.600px.dark_red'))
             .belowTokens()
@@ -408,7 +411,7 @@ async function create(
         .wait(1000)
 
         .effect()
-            .name('Summoning Core')
+            .name(`Summoning Core - ${label}`)
             .atLocation(targetToken)
             .file(closest('jb2a.markers.light_orb.complete.yellow'))
             .filter('ColorMatrix', { hue: -10, saturate: 1 })
@@ -418,7 +421,7 @@ async function create(
             .persist()
 
         .effect()
-            .name('Summoning Core')
+            .name(`Summoning Core - ${label}`)
             .delay(1000)
             .atLocation(targetToken)
             .file(closest('jb2a.shield_themed.above.fire.03.orange'))
@@ -431,7 +434,7 @@ async function create(
     // If not in interactive mode, chain the climax directly after a dramatic wait
     if (!mConfig.interactive) {
         sequence.wait(2000);
-        buildClimax(targetToken, sumPos, tokenWidth, sequence, sound);
+        buildClimax(targetToken, sumPos, tokenWidth, sequence, sound, label);
     }
 
     return sequence;
@@ -456,6 +459,7 @@ async function play(
     if (!token || !summonTarget) return null;
 
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, settingsOverride(config));
+    const label = mConfig.label ?? token?.name ?? 'No Caster';
 
     if (mConfig.interactive) {
         let targetToken: Token;
@@ -485,7 +489,7 @@ async function play(
                 y: center.y + offset.y * gridSize
             }));
             const { widthUnits } = adapter.getTokenDimensions(targetToken);
-            const climaxSeq = buildClimax(targetToken, sumPos, widthUnits, undefined, mConfig.sound);
+            const climaxSeq = buildClimax(targetToken, sumPos, widthUnits, undefined, mConfig.sound, label);
             return climaxSeq.play();
         } else {
             await stop(token, targetToken, mConfig);
@@ -499,16 +503,61 @@ async function play(
 
 /**
  * Stops persistent visual effects, ambient lights, and tags associated with the ritual.
- * @param {Token} token Caster token
+ * If a token or config.label is provided, stops effects specifically for that label.
+ * If neither is provided, delegates to clean() to remove all ritual animations.
+ *
+ * @param {Token} [token] Caster or target token
  * @param {Token | Actor} [summonTarget] Summoned token or actor
  * @param {RitualSummonHellConfig} [config={}] Configuration options
  * @returns {Promise<void>}
  */
-async function stop(token: Token, summonTarget?: Token | Actor, config: RitualSummonHellConfig = {}): Promise<void> {
+async function stop(
+    token?: Token,
+    summonTarget?: Token | Actor,
+    config: RitualSummonHellConfig = {}
+): Promise<void> {
+    if (!token && !summonTarget && !config.label) {
+        return clean();
+    }
+
     const target = summonTarget ?? token;
-    Sequencer.EffectManager.endEffects({ name: 'Summoning Core' });
-    Sequencer.EffectManager.endEffects({ name: 'Summoning Circle' });
-    Sequencer.EffectManager.endEffects({ name: 'Summoning Flames' });
+    const mConfig = adapter.mergeObject(DEFAULT_CONFIG, settingsOverride(config));
+    const label = mConfig.label ?? token?.name ?? 'No Caster';
+
+    Sequencer.EffectManager.endEffects({ name: `Summoning Core - ${label}` });
+    Sequencer.EffectManager.endEffects({ name: `Summoning Circle - ${label}` });
+    Sequencer.EffectManager.endEffects({ name: `Summoning Flames - ${label}` });
+
+    if (canvas.scene) {
+        const ambientLights = (canvas.scene as any).lights ?? [];
+        const deleteIds: string[] = [];
+        for (const light of ambientLights) {
+            const empFlag = light.flags?.['eskie-macro-pack']?.ritualSummonHell;
+            const lightLabel = light.flags?.['eskie-macro-pack']?.label;
+            const hasEmpFlag = Boolean(empFlag) && (!lightLabel || lightLabel === label);
+            const hasTag = game.modules.get('tagger')?.active && Tagger.hasTags(light, 'Summon Light') && (!lightLabel || lightLabel === label);
+            if (hasEmpFlag || hasTag) {
+                deleteIds.push(light.id);
+            }
+        }
+        if (deleteIds.length > 0) {
+            await (canvas.scene as any).deleteEmbeddedDocuments('AmbientLight', deleteIds);
+        }
+    }
+
+    if (target && game.modules.get('tagger')?.active && Tagger.removeTags) {
+        await Tagger.removeTags(target, 'Pre Summon');
+    }
+}
+
+/**
+ * Removes all Ritual Summon Hell animations across all labels, ambient lights, and pre-summon tags.
+ * @returns {Promise<void>}
+ */
+async function clean(): Promise<void> {
+    Sequencer.EffectManager.endEffects({ name: 'Summoning Core*' });
+    Sequencer.EffectManager.endEffects({ name: 'Summoning Circle*' });
+    Sequencer.EffectManager.endEffects({ name: 'Summoning Flames*' });
 
     if (canvas.scene) {
         const ambientLights = (canvas.scene as any).lights ?? [];
@@ -525,8 +574,11 @@ async function stop(token: Token, summonTarget?: Token | Actor, config: RitualSu
         }
     }
 
-    if (target && game.modules.get('tagger')?.active && Tagger.removeTags) {
-        await Tagger.removeTags(target, 'Pre Summon');
+    if (game.modules.get('tagger')?.active && Tagger.removeTags) {
+        const taggedTokens = typeof Tagger.getByTag === 'function' ? Tagger.getByTag('Pre Summon') : [];
+        for (const tok of taggedTokens) {
+            await Tagger.removeTags(tok, 'Pre Summon');
+        }
     }
 }
 
@@ -534,7 +586,10 @@ export const ritualSummonHell: SummonModule<RitualSummonHellConfig> = {
     create,
     play,
     stop,
+    clean,
     default_config: DEFAULT_CONFIG
 };
+
+export { clean };
 
 adapter.autorec.register('ritualSummonHell', 'token', 'eskie.summon.ritualSummonHell', DEFAULT_CONFIG, '0.0.2', 'Ritual Summon Hell');
