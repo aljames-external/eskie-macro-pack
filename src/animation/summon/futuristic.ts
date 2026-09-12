@@ -62,17 +62,13 @@ async function summon(
     if (location) {
         if (!canvas.scene) return null;
 
-        const tokenDocData = await actor.getTokenDocument({
+        const tokenDoc = await actor.getTokenDocument({
             x: location.x,
             y: location.y,
             ...tokenData
         });
-        const tokenDataObj = 'toObject' in tokenDocData && typeof tokenDocData.toObject === 'function'
-            ? tokenDocData.toObject()
-            : tokenDocData;
-        const created = await (canvas.scene as any).createEmbeddedDocuments('Token', [tokenDataObj]);
-        const firstCreated = Array.isArray(created) ? created[0] : created;
-        return (firstCreated?.object ?? adapter.getPlaceable(firstCreated?.id)) as Token;
+        const [createdDoc] = await (canvas.scene as any).createEmbeddedDocuments('Token', [tokenDoc.toObject()]);
+        return createdDoc.object as Token;
     }
 
     const pickOptions: Record<string, unknown> = {

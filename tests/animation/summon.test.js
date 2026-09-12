@@ -278,7 +278,11 @@ test('tokensOfTheDeparted.create places token directly when location is provided
         documentName: 'Actor',
         getTokenDocument: async (data) => {
             createdTokenData = data;
-            return { id: 'tok-doc-1', ...data, object: { id: 'tok-doc-1', name: 'Ghost', document: data, center: { x: data.x, y: data.y } } };
+            return {
+                id: 'tok-doc-1',
+                ...data,
+                toObject: () => ({ id: 'tok-doc-1', ...data })
+            };
         }
     };
 
@@ -287,7 +291,7 @@ test('tokensOfTheDeparted.create places token directly when location is provided
     canvas.scene = {
         createEmbeddedDocuments: async (_type, docs) => {
             mockSceneTokens.push(...docs);
-            return docs;
+            return docs.map(d => ({ ...d, object: { id: d.id ?? 'tok-doc-1', name: 'Ghost', document: d, center: { x: d.x, y: d.y } } }));
         }
     };
 
