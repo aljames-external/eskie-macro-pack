@@ -588,6 +588,4 @@ export const ritualSummonHell: SummonModule<RitualSummonHellConfig> = {
     default_config: DEFAULT_CONFIG
 };
 
-export { clean };
-
 adapter.autorec.register('ritualSummonHell', 'token', 'eskie.summon.ritualSummonHell', DEFAULT_CONFIG, '0.0.2', 'Ritual Summon Hell');
