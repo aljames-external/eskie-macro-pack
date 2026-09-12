@@ -120,7 +120,7 @@ async function createTarget(source: Token, config: any = {}, options: any = {}) 
 
             .effect()
             .delay(200)
-            .from(target)
+            .copySprite(target)
             .attachTo(target)
             .fadeIn(200)
             .fadeOut(500)

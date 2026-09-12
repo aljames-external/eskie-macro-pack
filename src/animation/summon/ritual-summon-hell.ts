@@ -178,10 +178,13 @@ function buildClimax(targetToken: Token, sumPos: { x: number; y: number }[], tok
                 .zIndex(1.1);
     }
 
+    const targetRotation = adapter.getTokenRotation(targetToken);
+
     seq
         .effect()
             .name('Summoning Core')
-            .from(targetToken)
+            .copySprite(targetToken)
+            .spriteRotation(-targetRotation)
             .atLocation(targetToken)
             .scaleIn(0, 500, { ease: 'easeOutCubic' })
             .filter('ColorMatrix', { brightness: 0 })

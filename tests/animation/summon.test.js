@@ -407,7 +407,7 @@ test('all new summon modules summon token and build sequence when Actor is provi
     }
 });
 
-test('ritualSummonHell builds non-interactive sequence and creates lights', async () => {
+test('ritualSummonHell builds non-interactive sequence and creates lights with copySprite', async () => {
     const createdLights = [];
     canvas.scene = {
         createEmbeddedDocuments: async (type, docs) => {
@@ -417,15 +417,50 @@ test('ritualSummonHell builds non-interactive sequence and creates lights', asyn
         deleteEmbeddedDocuments: async () => []
     };
 
-    const mockToken = {
-        id: 'tok-hell-1',
-        name: 'Fiend Token',
-        document: { width: 2, height: 2, rotation: 0, texture: { src: 'icons/demon.png', scaleX: 1 } },
-        center: { x: 500, y: 500 }
+    let copySpriteCalledWith = null;
+    let fromCalled = false;
+    const origSequence = globalThis.Sequence;
+    globalThis.Sequence = class MockClimaxSequence {
+        constructor() {
+            const handler = {
+                get(_t, prop) {
+                    if (prop === 'copySprite') {
+                        return (tok) => {
+                            copySpriteCalledWith = tok;
+                            return proxy;
+                        };
+                    }
+                    if (prop === 'from') {
+                        return () => {
+                            fromCalled = true;
+                            throw new Error('Sequence.effect().from is not a function');
+                        };
+                    }
+                    if (prop === 'play') return async () => proxy;
+                    if (prop === 'then') return undefined;
+                    return (..._args) => proxy;
+                }
+            };
+            const proxy = new Proxy(this, handler);
+            return proxy;
+        }
     };
 
-    const seq = await summon.ritualSummonHell.create(mockToken, undefined, { interactive: false });
-    assert.ok(seq, 'ritualSummonHell.create must return a Sequence');
+    try {
+        const mockToken = {
+            id: 'tok-hell-1',
+            name: 'Fiend Token',
+            document: { width: 2, height: 2, rotation: 0, texture: { src: 'icons/demon.png', scaleX: 1 } },
+            center: { x: 500, y: 500 }
+        };
+
+        const seq = await summon.ritualSummonHell.create(mockToken, undefined, { interactive: false });
+        assert.ok(seq, 'ritualSummonHell.create must return a Sequence');
+        assert.equal(fromCalled, false, '.from must not be called');
+        assert.equal(copySpriteCalledWith, mockToken, '.copySprite must be called with targetToken');
+    } finally {
+        globalThis.Sequence = origSequence;
+    }
 });
 
 test('ritualSummonHell.stop cleans up lights, tags, and effects', async () => {
