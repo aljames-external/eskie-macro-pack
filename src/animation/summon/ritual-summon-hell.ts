@@ -19,7 +19,6 @@ export interface RitualSummonHellSoundConfig {
 }
 
 export interface RitualSummonHellConfig extends SummonConfig {
-    id?: string;
     label?: string;
     summonConfig?: RitualSummonHellSummonOptions;
     interactive?: boolean;
@@ -29,7 +28,6 @@ export interface RitualSummonHellConfig extends SummonConfig {
 }
 
 export const DEFAULT_CONFIG: RitualSummonHellConfig = {
-    id: 'ritualSummonHell',
     summonConfig: {},
     interactive: false,
     sound: {

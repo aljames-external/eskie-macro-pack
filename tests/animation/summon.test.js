@@ -347,7 +347,11 @@ test('all new summon modules have required API methods and valid default_config'
 
         const config = mod.default_config;
         assert.ok(config, `${id}.default_config must exist`);
-        assert.equal(config.id, id);
+        if (id !== 'ritualSummonHell') {
+            assert.equal(config.id, id);
+        } else {
+            assert.equal(config.id, undefined, 'ritualSummonHell must not define unused id');
+        }
         assert.ok(config.sound, `${id}.sound config must exist`);
         if (id === 'ritualSummonHell') {
             assert.ok(config.sound.circle, 'ritualSummonHell.sound.circle must exist');
