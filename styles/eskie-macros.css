@@ -52,14 +52,14 @@
 .emp-button-dialog footer,
 dialog.emp-button-dialog footer,
 .dialog-v2.emp-button-dialog footer {
-    display: flex !important;
-    flex-direction: row !important;
+    display: flex;
+    flex-direction: row;
 }
 
 .emp-button-dialog footer.form-footer > button,
 .emp-button-dialog .form-footer > button,
 .emp-button-dialog footer > button {
-    flex: 1 !important;
+    flex: 1;
 }
 
 /* ============================================================================

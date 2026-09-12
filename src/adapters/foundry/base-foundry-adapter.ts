@@ -165,11 +165,11 @@ export class BaseFoundryAdapter {
             if (root) {
                 const footer = root.querySelector('footer.form-footer') ?? root.querySelector('footer');
                 if (footer) {
-                    footer.style.setProperty('display', 'flex', 'important');
-                    footer.style.setProperty('flex-direction', 'row', 'important');
+                    footer.style.display = 'flex';
+                    footer.style.flexDirection = 'row';
                     const allButtons = Array.from(footer.querySelectorAll('button')) as HTMLElement[];
                     for (const btn of allButtons) {
-                        btn.style.setProperty('flex', '1', 'important');
+                        btn.style.flex = '1';
                     }
                     const cancelBtn = allButtons.find((b: HTMLElement) => {
                         const act = b.getAttribute('data-action')?.toLowerCase();

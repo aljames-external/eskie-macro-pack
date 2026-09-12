@@ -516,20 +516,21 @@ test('buttonDialog preserves natural visual left-to-right order for multiple act
 
         // Test render hook DOM operations
         const appended = [];
+        const fakeButtonA = { getAttribute: () => 'a', textContent: 'Option A', style: {} };
+        const fakeButtonB = { getAttribute: () => 'b', textContent: 'Option B', style: {} };
+        const fakeButtonCancel = { getAttribute: () => 'cancel', textContent: 'Cancel', style: {} };
         const fakeFooter = {
-            style: { setProperty: (k, v) => { fakeFooter.style[k] = v; } },
-            querySelectorAll: () => [
-                { getAttribute: () => 'a', textContent: 'Option A', style: { setProperty: (k, v) => {} } },
-                { getAttribute: () => 'b', textContent: 'Option B', style: { setProperty: (k, v) => {} } },
-                { getAttribute: () => 'cancel', textContent: 'Cancel', style: { setProperty: (k, v) => {} } }
-            ],
+            style: {},
+            querySelectorAll: () => [fakeButtonA, fakeButtonB, fakeButtonCancel],
             appendChild: (el) => appended.push(el)
         };
         const fakeRoot = {
             querySelector: (sel) => (sel.includes('footer') ? fakeFooter : null)
         };
         passedConfig.render({}, { element: fakeRoot });
-        assert.equal(fakeFooter.style['flex-direction'], 'row');
+        assert.equal(fakeFooter.style.display, 'flex');
+        assert.equal(fakeFooter.style.flexDirection, 'row');
+        assert.equal(fakeButtonA.style.flex, '1');
         assert.equal(appended.length, 1);
         assert.equal(appended[0].textContent, 'Cancel');
     } finally {
