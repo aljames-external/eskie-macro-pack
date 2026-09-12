@@ -122,9 +122,6 @@ function buildClimax(
         .thenDo(function() {
             Sequencer.EffectManager.endEffects({ name: `Summoning Core - ${label}` });
             Sequencer.EffectManager.endEffects({ name: `Summoning Flames - ${label}` });
-            if (game.modules.get('tagger')?.active) {
-                Tagger.removeTags(targetToken, 'Pre Summon');
-            }
         })
         .canvasPan()
         .shake({ duration: 2500, fadeOutDuration: 1000, strength: 5, rotation: false })
@@ -295,8 +292,7 @@ async function create(
             shadows: 0.3
         },
         flags: {
-            'eskie-macro-pack': { ritualSummonHell: true, label },
-            tagger: { tags: ['Summon Light'] }
+            'eskie-macro-pack': { ritualSummonHell: true, label }
         }
     };
 
@@ -304,9 +300,6 @@ async function create(
         .thenDo(async function() {
             if (canvas.scene) {
                 await (canvas.scene as any).createEmbeddedDocuments('AmbientLight', [centerLightData]);
-            }
-            if (game.modules.get('tagger')?.active) {
-                await Tagger.addTags(targetToken, 'Pre Summon');
             }
         })
         .animation()
@@ -386,8 +379,7 @@ async function create(
                             shadows: 0.3
                         },
                         flags: {
-                            'eskie-macro-pack': { ritualSummonHell: true, label },
-                            tagger: { tags: ['Summon Light'] }
+                            'eskie-macro-pack': { ritualSummonHell: true, label }
                         }
                     });
                 }
@@ -500,7 +492,7 @@ async function play(
 }
 
 /**
- * Stops persistent visual effects, ambient lights, and tags associated with the ritual.
+ * Stops persistent visual effects and ambient lights associated with the ritual.
  * If a token or config.label is provided, stops effects specifically for that label.
  * If neither is provided, delegates to clean() to remove all ritual animations.
  *
@@ -533,8 +525,7 @@ async function stop(
             const empFlag = light.flags?.['eskie-macro-pack']?.ritualSummonHell;
             const lightLabel = light.flags?.['eskie-macro-pack']?.label;
             const hasEmpFlag = Boolean(empFlag) && (!lightLabel || lightLabel === label);
-            const hasTag = game.modules.get('tagger')?.active && Tagger.hasTags(light, 'Summon Light') && (!lightLabel || lightLabel === label);
-            if (hasEmpFlag || hasTag) {
+            if (hasEmpFlag) {
                 deleteIds.push(light.id);
             }
         }
@@ -542,14 +533,10 @@ async function stop(
             await (canvas.scene as any).deleteEmbeddedDocuments('AmbientLight', deleteIds);
         }
     }
-
-    if (target && game.modules.get('tagger')?.active && Tagger.removeTags) {
-        await Tagger.removeTags(target, 'Pre Summon');
-    }
 }
 
 /**
- * Removes all Ritual Summon Hell animations across all labels, ambient lights, and pre-summon tags.
+ * Removes all Ritual Summon Hell animations across all labels and ambient lights.
  * @returns {Promise<void>}
  */
 async function clean(): Promise<void> {
@@ -562,20 +549,12 @@ async function clean(): Promise<void> {
         const deleteIds: string[] = [];
         for (const light of ambientLights) {
             const hasEmpFlag = Boolean(light.flags?.['eskie-macro-pack']?.ritualSummonHell);
-            const hasTag = game.modules.get('tagger')?.active && Tagger.hasTags(light, 'Summon Light');
-            if (hasEmpFlag || hasTag) {
+            if (hasEmpFlag) {
                 deleteIds.push(light.id);
             }
         }
         if (deleteIds.length > 0) {
             await (canvas.scene as any).deleteEmbeddedDocuments('AmbientLight', deleteIds);
-        }
-    }
-
-    if (game.modules.get('tagger')?.active && Tagger.removeTags) {
-        const taggedTokens = typeof Tagger.getByTag === 'function' ? Tagger.getByTag('Pre Summon') : [];
-        for (const tok of taggedTokens) {
-            await Tagger.removeTags(tok, 'Pre Summon');
         }
     }
 }

@@ -497,7 +497,7 @@ test('ritualSummonHell builds non-interactive sequence and creates lights with c
     }
 });
 
-test('ritualSummonHell.stop cleans up lights, tags, and effects', async () => {
+test('ritualSummonHell.stop cleans up lights and effects', async () => {
     let deletedLightIds = [];
     canvas.scene = {
         lights: [
@@ -509,15 +509,6 @@ test('ritualSummonHell.stop cleans up lights, tags, and effects', async () => {
             return ids;
         }
     };
-
-    let removedTag = null;
-    globalThis.Tagger = {
-        hasTags: () => false,
-        removeTags: async (_target, tag) => {
-            removedTag = tag;
-        }
-    };
-    game.modules.set('tagger', { id: 'tagger', active: true });
 
     let endedEffects = [];
     const origEndEffects = Sequencer.EffectManager.endEffects;
@@ -533,7 +524,6 @@ test('ritualSummonHell.stop cleans up lights, tags, and effects', async () => {
         assert.ok(endedEffects.includes('Summoning Circle - Fiend'));
         assert.ok(endedEffects.includes('Summoning Flames - Fiend'));
         assert.deepEqual(deletedLightIds, ['light-1']);
-        assert.equal(removedTag, 'Pre Summon');
     } finally {
         Sequencer.EffectManager.endEffects = origEndEffects;
     }
@@ -623,13 +613,6 @@ test('ritualSummonHell names effects with - ${label}, supports custom label & No
         canvas.scene.deleteEmbeddedDocuments = async () => [];
     }
 
-    const origTagger = globalThis.Tagger;
-    globalThis.Tagger = {
-        hasTags: () => false,
-        addTags: async () => {},
-        removeTags: async () => {}
-    };
-
     globalThis.Sequence = TestMockSequence;
     try {
         const mockCaster = { id: 'c1', name: 'Warlock', document: { rotation: 0 }, center: { x: 100, y: 100 } };
@@ -699,7 +682,6 @@ test('ritualSummonHell names effects with - ${label}, supports custom label & No
     } finally {
         Sequencer.EffectManager.endEffects = origEndEffects;
         globalThis.Sequence = origSequence;
-        globalThis.Tagger = origTagger;
         if (canvas.scene) {
             canvas.scene.createEmbeddedDocuments = origCreateDocs;
             canvas.scene.deleteEmbeddedDocuments = origDeleteDocs;
