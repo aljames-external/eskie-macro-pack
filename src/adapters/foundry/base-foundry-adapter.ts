@@ -962,6 +962,11 @@ export class BaseFoundryAdapter {
         if (isRegion) {
             return this.getRegionBounds(target).center;
         }
+        const isTile = this.isDocumentOfType(target, 'Tile') || doc.documentName === 'Tile' || Boolean(doc.texture && !doc.shapes);
+        if (isTile) {
+            const tileObj = target.document ? target : { document: target };
+            return this.getTileBounds(tileObj as any).center;
+        }
         const gridSize = this.getGridSize();
         const width = (doc.width ?? 1) * gridSize;
         const height = (doc.height ?? 1) * gridSize;
@@ -1381,9 +1386,24 @@ export class BaseFoundryAdapter {
         }
         const doc = region.document ? region.document : region;
         const placeable = region.document ? region : (region.object ? region.object : region);
-        const center = placeable?.center ?? doc.center;
+        const shapes = doc.shapes?.contents ?? doc.shapes ?? placeable?.shapes ?? [];
+        const shapeList = Array.isArray(shapes) ? shapes : (shapes.values ? Array.from(shapes.values()) : []);
+        const shape = shapeList[0] ?? null;
+        const shapeCenter = shape?.center ?? (shape && typeof shape.x === 'number' && typeof shape.y === 'number' ? { x: shape.x + (shape.width ?? 0) / 2, y: shape.y + (shape.height ?? 0) / 2 } : null);
+        const center = placeable?.center ?? doc.center ?? shapeCenter;
         if (center && typeof center.x === 'number' && typeof center.y === 'number') {
-            return { minX: center.x, maxX: center.x, minY: center.y, maxY: center.y, center: { x: center.x, y: center.y }, width: 0, height: 0, anchor: { x: 0.5, y: 0.5 } };
+            const width = shape?.width ?? 0;
+            const height = shape?.height ?? 0;
+            return {
+                minX: center.x - width / 2,
+                maxX: center.x + width / 2,
+                minY: center.y - height / 2,
+                maxY: center.y + height / 2,
+                center: { x: center.x, y: center.y },
+                width,
+                height,
+                anchor: { x: 0.5, y: 0.5 }
+            };
         }
         return {
             minX: 0,
@@ -1603,5 +1623,102 @@ export class BaseFoundryAdapter {
         }
 
         return false;
+    }
+
+    /**
+     * Constructs a Token-compatible proxy object from a Tile, Region, or Document.
+     * Stands in for a caster token in animation routines (e.g. template or targeted spells fired from traps).
+     *
+     * @param {PlaceableObject|Document|null} placeable Origin Tile, Region, or Token
+     * @param {{ x: number, y: number }|null} [targetLocation=null] Optional destination coordinates to orient rotation towards
+     * @returns {CasterProxy|Token|null}
+     */
+    createCasterProxy(placeable: any, targetLocation: { x: number; y: number } | null = null): any {
+        if (!placeable) return null;
+
+        const isToken = this.isDocumentOfType(placeable, 'Token') || placeable.documentName === 'Token';
+        if (isToken) {
+            return placeable.object ?? placeable;
+        }
+
+        const doc = placeable.document ? placeable.document : placeable;
+        const center = this.getCenter(placeable) ?? { x: doc.x ?? 0, y: doc.y ?? 0 };
+        const gridSize = this.getGridSize();
+
+        const isRegion = doc.documentName === 'Region' || Boolean(doc.shapes) || Boolean(placeable.shapes);
+        const isTile = this.isDocumentOfType(placeable, 'Tile') || doc.documentName === 'Tile' || Boolean(doc.texture && !doc.shapes);
+
+        let widthUnits = 1;
+        let heightUnits = 1;
+        let widthPx = gridSize;
+        let heightPx = gridSize;
+
+        if (isRegion) {
+            const bounds = this.getRegionBounds(placeable);
+            widthPx = bounds.width;
+            heightPx = bounds.height;
+            widthUnits = Math.max(1, widthPx / gridSize);
+            heightUnits = Math.max(1, heightPx / gridSize);
+        } else if (isTile) {
+            widthPx = doc.width ?? placeable.w ?? gridSize;
+            heightPx = doc.height ?? placeable.h ?? gridSize;
+            widthUnits = Math.max(1, widthPx / gridSize);
+            heightUnits = Math.max(1, heightPx / gridSize);
+        } else {
+            widthUnits = doc.width ?? 1;
+            heightUnits = doc.height ?? 1;
+            widthPx = placeable.w ?? (widthUnits * gridSize);
+            heightPx = placeable.h ?? (heightUnits * gridSize);
+        }
+
+        let rotation = doc.rotation ?? placeable.rotation ?? 0;
+        if (targetLocation && typeof targetLocation.x === 'number' && typeof targetLocation.y === 'number') {
+            const dx = targetLocation.x - center.x;
+            const dy = targetLocation.y - center.y;
+            if (Math.hypot(dx, dy) >= 1) {
+                rotation = (Math.atan2(dy, dx) * 180) / Math.PI;
+            }
+        }
+
+        const name = doc.name ?? placeable.name ?? 'Trap Origin';
+        const id = doc.id ?? placeable.id ?? 'trap-origin';
+        const uuid = doc.uuid ?? placeable.uuid ?? `TrapOrigin.${id}`;
+        const textureSrc = doc.texture?.src ?? placeable.texture?.src ?? '';
+        const scaleX = doc.texture?.scaleX ?? 1;
+        const scaleY = doc.texture?.scaleY ?? 1;
+
+        return {
+            id,
+            _id: id,
+            name,
+            center,
+            x: doc.x ?? (center.x - widthPx / 2),
+            y: doc.y ?? (center.y - heightPx / 2),
+            w: widthPx,
+            h: heightPx,
+            rotation,
+            document: {
+                id,
+                _id: id,
+                uuid,
+                name,
+                x: doc.x ?? (center.x - widthPx / 2),
+                y: doc.y ?? (center.y - heightPx / 2),
+                width: widthUnits,
+                height: heightUnits,
+                rotation,
+                elevation: doc.elevation ?? placeable.elevation ?? 0,
+                texture: {
+                    src: textureSrc,
+                    scaleX,
+                    scaleY,
+                },
+                update: async (data: any) => doc.update?.(data) ?? placeable.update?.(data),
+                getFlag: (scope: string, key: string) => doc.getFlag?.(scope, key),
+                setFlag: (scope: string, key: string, val: any) => doc.setFlag?.(scope, key, val),
+            },
+            actor: null,
+            object: placeable.object ?? placeable,
+        };
     }
 }

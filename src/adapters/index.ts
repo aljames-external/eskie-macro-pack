@@ -431,6 +431,23 @@ class Adapter {
         return this.foundry.isTokenInOrMovingIntoPlaceable(token, placeable, context);
     }
 
+    createCasterProxy(placeable: any, targetLocation: { x: number; y: number } | null = null): any {
+        return this.foundry.createCasterProxy(placeable, targetLocation);
+    }
+
+    executeTrapEffectHandler: ((...args: any[]) => Promise<any>) | null = null;
+
+    async executeTrapEffect(animation: any, originPlaceable: any, targetPlaceable: any = null, targets: Token[] = [], config: Record<string, any> = {}): Promise<any> {
+        if (this.executeTrapEffectHandler) {
+            return this.executeTrapEffectHandler(animation, originPlaceable, targetPlaceable, targets, config);
+        }
+        throw new Error('Adapter.executeTrapEffect handler not registered');
+    }
+
+    async playEffectAsTrap(animation: any, originPlaceable: any, targetPlaceable: any = null, targets: Token[] = [], config: Record<string, any> = {}): Promise<any> {
+        return this.executeTrapEffect(animation, originPlaceable, targetPlaceable, targets, config);
+    }
+
     /* -------------------------------------------- */
     /*  System Layer Delegates                      */
     /* -------------------------------------------- */

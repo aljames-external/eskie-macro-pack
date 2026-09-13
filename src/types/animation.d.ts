@@ -33,6 +33,40 @@ export interface TrapConfig {
 export type ConcreteToken = Token;
 export type ConcreteTile = Tile;
 
+export interface CasterProxy {
+    id: string;
+    _id: string;
+    name: string;
+    center: { x: number; y: number };
+    x: number;
+    y: number;
+    w: number;
+    h: number;
+    rotation: number;
+    document: {
+        id: string;
+        _id: string;
+        uuid: string;
+        name: string;
+        x: number;
+        y: number;
+        width: number;
+        height: number;
+        rotation: number;
+        elevation: number;
+        texture: {
+            src: string;
+            scaleX: number;
+            scaleY: number;
+        };
+        update: (data: any) => Promise<any>;
+        getFlag: (scope: string, key: string) => any;
+        setFlag: (scope: string, key: string, val: any) => Promise<any>;
+    };
+    actor: null;
+    object: any;
+}
+
 export interface AnimationEffectModule<TConfig = Record<string, unknown>> {
     create: (target: Token, config?: TConfig) => Promise<any>;
     play: (target: Token, config?: TConfig) => Promise<any>;

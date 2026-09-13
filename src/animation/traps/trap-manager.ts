@@ -1,7 +1,7 @@
 import { adapter } from '../../adapters/index.js';
 import { matt } from '../utils/matt-tiles.js';
 import { MODULE_ID } from '../../lib/constants.js';
-import { notify } from '../../lib/logger.js';
+import { log, notify } from '../../lib/logger.js';
 import { localize, format } from '../../lib/utils.js';
 
 /**
@@ -19,7 +19,8 @@ export async function setupRegionTrap(animation: string, config: Record<string, 
 
     const pathParts = animation.split('.');
     const trapKey = pathParts[pathParts.length - 1];
-    const tileCount = config.tileCount ?? 2;
+    const isEskieTrap = animation.startsWith('eskie.traps.');
+    const tileCount = config.tileCount ?? (isEskieTrap ? 2 : 3);
 
     // Step 1: Prompt user to select trigger regions
     const step1Title = localize(
@@ -221,8 +222,9 @@ if (animPlaceables.length === 0) return;
 
 // Execute the trap animation for all launcher placeables simultaneously
 const animPromises = animPlaceables.map(placeable => {
-    let targets = adapter.getTokensInPlaceable(placeable);
-    const isTarget = adapter.isTokenInOrMovingIntoPlaceable(token, placeable, {
+    const trapZone = ${targetId ? 'targetPlaceable ?? placeable' : 'placeable'};
+    let targets = adapter.getTokensInPlaceable(trapZone);
+    const isTarget = adapter.isTokenInOrMovingIntoPlaceable(token, trapZone, {
         triggerRegionId: event.region?.id,
         movement: event.data?.movement ?? (event.data?.segments ? { segments: event.data.segments } : null)
     });
@@ -231,7 +233,10 @@ const animPromises = animPlaceables.map(placeable => {
         targets.push(token);
     }
 
-    return ${animation}.play(placeable, targets, ${optionsStr});
+    ${isEskieTrap
+        ? `return ${animation}.play(placeable, targets, ${optionsStr});`
+        : `return adapter.executeTrapEffect('${animation}', placeable, ${targetId ? 'targetPlaceable' : 'null'}, targets, ${optionsStr});`
+    }
 });
 ${tileIds.length > 0 ? `
 // Trigger any linked external MATT tiles concurrently
@@ -306,3 +311,127 @@ export async function setupTrap(animation: string, config: Record<string, any> =
 
     return setupRegionTrap(animation, config);
 }
+
+/**
+ * Constructs a Token-compatible proxy object from a Tile, Region, or Document.
+ * Stands in for a caster token in animation routines (e.g. template or targeted spells fired from traps).
+ *
+ * @param {PlaceableObject|Document|null} placeable Origin Tile, Region, or Token
+ * @param {{ x: number, y: number }|null} [targetLocation=null] Optional destination coordinates to orient rotation towards
+ * @returns {CasterProxy|Token|null}
+ */
+export function createCasterProxy(placeable: any, targetLocation: { x: number; y: number } | null = null): any {
+    return adapter.createCasterProxy(placeable, targetLocation);
+}
+
+/**
+ * Executes an animation effect as a trap.
+ * Origin placeable stands in for the caster, firing towards the trap target placeable / target tokens.
+ * Supports template effects (e.g. Fireball, Lightning Bolt), targeted effects (e.g. Disintegrate, Guiding Bolt),
+ * and standard trap modules (e.g. Fire, Spike, Projectile).
+ *
+ * @param {string|object|Function} animation Global animation path (e.g. 'eskie.effect.fireball') or effect module
+ * @param {PlaceableObject|Document|string} originPlaceable Origin Tile or Region placeable standing in for the caster
+ * @param {PlaceableObject|Document|string|null} [targetPlaceable=null] Trap target Tile or Region landing zone
+ * @param {Token[]} [targets=[]] Target tokens within or entering the trap placeable
+ * @param {Record<string, any>} [config={}] Configuration options
+ * @returns {Promise<any>}
+ */
+export async function executeTrapEffect(
+    animation: any,
+    originPlaceable: any,
+    targetPlaceable: any = null,
+    targets: Token[] = [],
+    config: Record<string, any> = {}
+): Promise<any> {
+    const origin = typeof originPlaceable === 'string' ? adapter.getPlaceable(originPlaceable) : originPlaceable;
+    const target = typeof targetPlaceable === 'string' ? adapter.getPlaceable(targetPlaceable) : targetPlaceable;
+
+    if (!origin) {
+        log.warn('executeTrapEffect | Origin placeable is missing or invalid.');
+        return null;
+    }
+
+    let effectObj: any = animation;
+    let animationPath = '';
+    if (typeof animation === 'string') {
+        animationPath = animation;
+        effectObj = adapter.getProperty(globalThis, animation);
+        if (!effectObj) {
+            effectObj = adapter.getProperty(globalThis, `eskie.effect.${animation}`)
+                ?? adapter.getProperty(globalThis, `eskie.traps.${animation}`);
+        }
+    }
+
+    if (!effectObj) {
+        log.error(`executeTrapEffect | Animation "${animation}" could not be resolved.`);
+        return null;
+    }
+
+    const targetLocation = config.targetLocation
+        ? adapter.getTargetLocation(config.targetLocation)
+        : (target ? adapter.getTargetLocation(target) : null);
+
+    const casterProxy = adapter.createCasterProxy(origin, targetLocation);
+
+    let resolvedTargets = Array.isArray(targets) ? [...targets] : [];
+    if (resolvedTargets.length === 0) {
+        const trapZone = target ?? origin;
+        resolvedTargets = adapter.getTokensInPlaceable(trapZone);
+    }
+
+    const explicitType = config.type;
+    const isTrapModule = explicitType === 'trap'
+        || Boolean(effectObj.setup)
+        || animationPath.includes('.traps.');
+
+    const isTemplateEffect = explicitType === 'template'
+        || animationPath.includes('.template.')
+        || animationPath.includes('templatefx')
+        || Boolean(effectObj.default_config && ('radius' in effectObj.default_config || 'template' in effectObj.default_config || ('distance' in effectObj.default_config && !('pushDistance' in effectObj.default_config))));
+
+    if (isTrapModule) {
+        const trapConfig = { ...config };
+        if (targetLocation && !trapConfig.targetLocation) {
+            trapConfig.targetLocation = targetLocation;
+        }
+        const playFn = effectObj.play ?? effectObj;
+        return playFn(origin, resolvedTargets, trapConfig);
+    }
+
+    if (isTemplateEffect) {
+        const templateConfig = {
+            ...config,
+            template: config.template ?? target ?? origin,
+            targetLocation,
+        };
+        const playFn = effectObj.play ?? effectObj;
+        return playFn(casterProxy, templateConfig);
+    }
+
+    const playFn = effectObj.play ?? effectObj;
+    const targetConfig = {
+        ...config,
+        targetLocation,
+    };
+
+    if (resolvedTargets.length > 0) {
+        const fnStr = typeof playFn === 'function' ? playFn.toString() : '';
+        const acceptsArray = /\(\s*[^,)]+\s*,\s*targets\b/.test(fnStr);
+        if (acceptsArray) {
+            return playFn(casterProxy, resolvedTargets, targetConfig);
+        }
+        return Promise.all(resolvedTargets.map(targetToken => playFn(casterProxy, targetToken, targetConfig)));
+    }
+
+    if (target) {
+        const targetProxy = adapter.createCasterProxy(target);
+        return playFn(casterProxy, targetProxy, targetConfig);
+    }
+
+    return null;
+}
+
+export const playEffectAsTrap = executeTrapEffect;
+
+adapter.executeTrapEffectHandler = executeTrapEffect;

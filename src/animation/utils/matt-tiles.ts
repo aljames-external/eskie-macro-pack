@@ -240,12 +240,13 @@ if (animation) {
     promises.push((async () => {
         try {
             const trap = adapter.getProperty(globalThis, animation);
+            ${targetTileId ? 'const trapPlaceable = targetTile ?? tilePlaceable;' : ''}
             // Collect all tokens contained within / overlapping this trap tile via adapter
-            let targets = adapter.getTokensInTile(tilePlaceable);
+            let targets = adapter.getTokensInTile(${targetTileId ? 'trapPlaceable' : 'tilePlaceable'});
 
             // Include activating token only if it is currently in or moving into this trap tile
             const activatingTarget = token?.object ? token.object : token;
-            const isTarget = activatingTarget && adapter.isTokenInOrMovingIntoPlaceable(activatingTarget, tilePlaceable, {
+            const isTarget = activatingTarget && adapter.isTokenInOrMovingIntoPlaceable(activatingTarget, ${targetTileId ? 'trapPlaceable' : 'tilePlaceable'}, {
                 triggerTileIds
             });
 
@@ -254,7 +255,10 @@ if (animation) {
             }
 
             // Play the trap animation with the contained tokens as targets
-            await trap.play(tilePlaceable, targets, { ...${JSON.stringify(trapConfig)}${targetTileId ? ', targetLocation' : ''} });
+            ${animation.startsWith('eskie.traps.')
+                ? `await trap.play(tilePlaceable, targets, { ...${JSON.stringify(trapConfig)}${targetTileId ? ', targetLocation' : ''} });`
+                : `await adapter.executeTrapEffect(animation, tilePlaceable, ${targetTileId ? 'targetTile' : 'null'}, targets, { ...${JSON.stringify(trapConfig)}${targetTileId ? ', targetLocation' : ''} });`
+            }
         } catch (err) {
             console.error('Eskie Macro Pack | Failed to play trap animation "' + animation + '" on tile "' + tile.id + '":', err);
             throw err;

@@ -140,6 +140,20 @@ export class FoundryV12Adapter extends BaseFoundryAdapter {
 
         const doc = template.document ? template.document : template;
         const placeable = template.object ? template.object : (template.document ? template : null);
+
+        const isTile = this.isDocumentOfType(template, 'Tile') || doc?.documentName === 'Tile' || Boolean(doc?.texture && !doc?.shapes);
+        if (isTile) {
+            const center = this.getCenter(template);
+            const token = config.token ?? config.sourceToken;
+            const tokenCenter = token ? this.getCenter(token) : null;
+            let primary = tokenCenter ?? { x: doc.x ?? 0, y: doc.y ?? 0 };
+            let secondary = center;
+            if (tokenCenter && Math.hypot(secondary.x - primary.x, secondary.y - primary.y) < 1) {
+                secondary = { x: primary.x + this.getGridSize(), y: primary.y };
+            }
+            return this.resolveDistinctPositions([primary, secondary, center], config, template);
+        }
+
         const farpoint = placeable?.ray?.B ?? doc?.ray?.B ?? template.ray?.B;
 
         let primary = {
