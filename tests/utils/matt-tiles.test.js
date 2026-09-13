@@ -551,4 +551,53 @@ test('matt.trap.setup respects custom trigger string (e.g. door)', async () => {
     assert.equal(doorUpdate['flags.monks-active-tiles.trigger'], 'door', 'Custom trigger string should be set on the tile');
 });
 
+test('matt.trap.setup overrides pre-existing enter trigger on trap tile to manual', async () => {
+    const updatedTiles = new Map();
+    globalThis.game.user = { isGM: true, id: 'gm-user-1' };
+    globalThis.game.modules.set('monks-active-tiles', { id: 'monks-active-tiles', active: true });
+
+    const triggerTileDoc = {
+        id: 'tile-trig-pre',
+        flags: { 'monks-active-tiles': { trigger: 'enter' } },
+        getFlag: (scope, key) => (scope === 'monks-active-tiles' && key === 'trigger' ? 'enter' : null),
+        update: async (data) => {
+            updatedTiles.set('tile-trig-pre', data);
+            return triggerTileDoc;
+        }
+    };
+    const trapTileDoc = {
+        id: 'tile-trap-pre',
+        flags: { 'monks-active-tiles': { trigger: 'enter' } },
+        getFlag: (scope, key) => (scope === 'monks-active-tiles' && key === 'trigger' ? 'enter' : null),
+        update: async (data) => {
+            updatedTiles.set('tile-trap-pre', data);
+            return trapTileDoc;
+        }
+    };
+
+    globalThis.canvas.tiles = {
+        controlled: [{ document: triggerTileDoc, id: 'tile-trig-pre' }],
+        get: (id) => (id === 'tile-trig-pre' ? { document: triggerTileDoc, id } : id === 'tile-trap-pre' ? { document: trapTileDoc, id } : null)
+    };
+
+    let step = 0;
+    adapter.buttonDialog = async () => {
+        step++;
+        if (step === 2) {
+            globalThis.canvas.tiles.controlled = [{ document: trapTileDoc, id: 'tile-trap-pre' }];
+        }
+        return 'continue';
+    };
+
+    await matt.trap.setup('eskie.traps.spike', { tileCount: 2 });
+
+    const trigUpdate = updatedTiles.get('tile-trig-pre');
+    assert.ok(trigUpdate);
+    assert.equal(trigUpdate['flags.monks-active-tiles.trigger'], 'enter', 'Trigger tile should have enter trigger');
+
+    const trapUpdate = updatedTiles.get('tile-trap-pre');
+    assert.ok(trapUpdate);
+    assert.equal(trapUpdate['flags.monks-active-tiles.trigger'], 'manual', 'Trap tile must be set to manual even if previously enter');
+});
+
 

@@ -277,7 +277,7 @@ await Promise.all(promises);
 
         const resolvedTrigger = isTrigger
             ? configuredTrigger
-            : (tileDoc.getFlag?.('monks-active-tiles', 'trigger') ?? 'manual');
+            : 'manual';
 
         const existingActions = tileDoc.getFlag?.('monks-active-tiles', 'actions') ?? [];
         const newAction = {
