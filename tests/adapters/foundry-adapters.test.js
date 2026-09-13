@@ -202,6 +202,40 @@ test('Tile offset calculations: V12/V13 top-left origin math vs V14+ centered or
     assert.deepEqual(v14.getTokensInTile(v14BottomRightTile).map(t => t.id), ['t-in']);
 });
 
+test('adapter.isTokenInOrMovingIntoPlaceable: evaluates containment and movement into tiles and regions', () => {
+    const tile = { id: 'trap-tile-1', x: 200, y: 200, width: 200, height: 200, document: { id: 'trap-tile-1', x: 200, y: 200, width: 200, height: 200 } };
+    canvas.grid.size = 100;
+
+    // Token inside the tile
+    const tokenInside = { id: 'tok-in', x: 250, y: 250, w: 100, h: 100, document: { id: 'tok-in', x: 250, y: 250, width: 1, height: 1 } };
+    assert.equal(adapter.isTokenInOrMovingIntoPlaceable(tokenInside, tile), true);
+
+    // Token outside the tile with no movement context
+    const tokenOutside = { id: 'tok-out', x: 50, y: 50, w: 100, h: 100, document: { id: 'tok-out', x: 50, y: 50, width: 1, height: 1 } };
+    assert.equal(adapter.isTokenInOrMovingIntoPlaceable(tokenOutside, tile), false);
+
+    // Token on separate trigger tile is NOT in trap tile
+    assert.equal(adapter.isTokenInOrMovingIntoPlaceable(tokenOutside, tile, { triggerTileIds: ['trig-tile-1'] }), false);
+
+    // Trap tile IS the trigger tile
+    assert.equal(adapter.isTokenInOrMovingIntoPlaceable(tokenOutside, tile, { triggerTileIds: ['trap-tile-1'] }), true);
+
+    // Trigger region matches trap placeable
+    assert.equal(adapter.isTokenInOrMovingIntoPlaceable(tokenOutside, tile, { triggerRegionId: 'trap-tile-1' }), true);
+
+    // Token moving into trap tile via destination
+    assert.equal(adapter.isTokenInOrMovingIntoPlaceable(tokenOutside, tile, { movement: { destination: { x: 250, y: 250 } } }), true);
+
+    // Token moving into trap tile via waypoints
+    assert.equal(adapter.isTokenInOrMovingIntoPlaceable(tokenOutside, tile, { movement: { waypoints: [{ x: 50, y: 50 }, { x: 250, y: 250 }] } }), true);
+
+    // Token moving into trap tile via segments
+    assert.equal(adapter.isTokenInOrMovingIntoPlaceable(tokenOutside, tile, { movement: { segments: [{ ray: { B: { x: 250, y: 250 } } }] } }), true);
+
+    // Token moving away from trap tile
+    assert.equal(adapter.isTokenInOrMovingIntoPlaceable(tokenOutside, tile, { movement: { destination: { x: 10, y: 10 } } }), false);
+});
+
 test('Template position extraction: V12/V13 MeasuredTemplate vs V14+ Region shapes', () => {
     // V12 MeasuredTemplate
     const v12 = new FoundryV12Adapter();

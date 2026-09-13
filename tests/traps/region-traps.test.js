@@ -157,8 +157,32 @@ test('setupRegionTrap: configures RegionDocument flags and creates executeScript
 
     assert.equal(spikePlayed, true, 'Generated region behavior script must directly invoke eskie.traps.spike.play()');
     assert.equal(passedTile.id, 'tile-visual-10');
+    assert.equal(passedTargets.length, 0, 'Activating token only on trigger region must not be targeted');
+
+    // Verify activating token IS targeted when moving into the trap placeable
+    spikePlayed = false;
+    passedTargets = null;
+    await scriptFn({
+        region: triggerRegionDoc,
+        data: {
+            token: { id: 'act-tok-10', object: { id: 'act-tok-10', name: 'Adventurer' } },
+            movement: { destination: { x: 0, y: 0 } }
+        }
+    });
+    assert.equal(spikePlayed, true);
     assert.equal(passedTargets.length, 1);
-    assert.equal(passedTargets[0].id, 'act-tok-10');
+    assert.equal(passedTargets[0].id, 'act-tok-10', 'Activating token moving into trap tile must be targeted');
+
+    // Verify activating token IS targeted when trigger region IS the trap region
+    spikePlayed = false;
+    passedTargets = null;
+    await scriptFn({
+        region: { id: 'tile-visual-10' },
+        data: { token: { id: 'act-tok-10', object: { id: 'act-tok-10', name: 'Adventurer' } } }
+    });
+    assert.equal(spikePlayed, true);
+    assert.equal(passedTargets.length, 1);
+    assert.equal(passedTargets[0].id, 'act-tok-10', 'Activating token entering trap region must be targeted');
 
     // Verify early abort when event.data.token is missing
     spikePlayed = false;
@@ -631,4 +655,124 @@ test('setupRegionTrap: appends new executeScript RegionBehavior without overwrit
     assert.ok(createdBehaviors[0].system.source.includes('eskie.traps.fire.play(placeable, targets,'));
     assert.ok(createdBehaviors[0].system.source.includes('await Promise.all(animPromises);'));
     assert.equal(updatedData, null, 'No region document flags should be updated');
+});
+
+test('setupRegionTrap: targets only tokens currently or moving into trap placeables, ignoring tokens only on trigger regions', async () => {
+    globalThis.game.user = { isGM: true };
+    globalThis.game.release = { generation: 14 };
+    const { FoundryV14Adapter } = await import('../../src/adapters/foundry/foundry-v14-adapter.js');
+    adapter.foundry = new FoundryV14Adapter(adapter);
+
+    let createdBehaviorData = null;
+    const triggerRegionDoc = {
+        id: 'reg-trig-plate',
+        documentName: 'Region',
+        behaviors: [],
+        update: async () => triggerRegionDoc,
+        createEmbeddedDocuments: async (_type, [data]) => {
+            createdBehaviorData = data;
+            return [{ id: 'beh-plate', ...data }];
+        }
+    };
+
+    const spikeTrapTile = {
+        id: 'tile-spike-trap',
+        documentName: 'Tile',
+        x: 500,
+        y: 500,
+        width: 100,
+        height: 100,
+        document: { id: 'tile-spike-trap', x: 500, y: 500, width: 100, height: 100 }
+    };
+
+    globalThis.canvas.regions = {
+        controlled: [{ document: triggerRegionDoc, id: 'reg-trig-plate' }]
+    };
+    globalThis.canvas.tiles = {
+        controlled: [],
+        get: (id) => (id === 'tile-spike-trap' ? spikeTrapTile : null)
+    };
+
+    let step = 0;
+    adapter.buttonDialog = async () => {
+        step++;
+        if (step === 2) {
+            globalThis.canvas.tiles.controlled = [{ document: spikeTrapTile.document, id: 'tile-spike-trap' }];
+        }
+        return 'continue';
+    };
+
+    await setupRegionTrap('eskie.traps.spike', { tileCount: 2 });
+    assert.ok(createdBehaviorData);
+
+    let spikePlayed = false;
+    let receivedTargets = [];
+    globalThis.eskie = {
+        traps: {
+            spike: {
+                play: async (_tile, targets) => {
+                    spikePlayed = true;
+                    receivedTargets = targets;
+                }
+            }
+        }
+    };
+
+    // Token "Alice" activates the pressure plate (at 100, 100, not in spike trap)
+    const tokenAlice = {
+        id: 'tok-alice',
+        x: 100,
+        y: 100,
+        document: { id: 'tok-alice', x: 100, y: 100 }
+    };
+
+    // Token "Bob" is standing on the spike trap (at 500, 500)
+    const tokenBob = {
+        id: 'tok-bob',
+        x: 500,
+        y: 500,
+        w: 100,
+        h: 100,
+        document: { id: 'tok-bob', x: 500, y: 500, width: 1, height: 1 }
+    };
+
+    globalThis.canvas.tokens = {
+        placeables: [tokenAlice, tokenBob],
+        get: (id) => (id === 'tok-alice' ? tokenAlice : (id === 'tok-bob' ? tokenBob : null))
+    };
+    globalThis.canvas.grid = { size: 100 };
+
+    const AsyncFunction = Object.getPrototypeOf(async function(){}).constructor;
+    const scriptFn = new AsyncFunction('event', createdBehaviorData.system.source);
+
+    // Alice triggers the pressure plate without moving into the spike trap
+    await scriptFn({
+        region: triggerRegionDoc,
+        data: { token: { id: 'tok-alice', object: tokenAlice } }
+    });
+
+    assert.equal(spikePlayed, true);
+    assert.equal(receivedTargets.length, 1, 'Only Bob currently in the trap tile should be targeted');
+    assert.equal(receivedTargets[0].id, 'tok-bob', 'Bob must be targeted, Alice on trigger region must not bleed');
+
+    // Alice moves directly into the spike trap
+    spikePlayed = false;
+    receivedTargets = [];
+    await scriptFn({
+        region: triggerRegionDoc,
+        data: {
+            token: { id: 'tok-alice', object: tokenAlice },
+            movement: { destination: { x: 500, y: 500 } }
+        }
+    });
+
+    assert.equal(spikePlayed, true);
+    assert.equal(receivedTargets.length, 2, 'Both Alice (moving into trap) and Bob (currently in trap) must be targeted');
+    assert.ok(receivedTargets.some(t => t.id === 'tok-alice'));
+    assert.ok(receivedTargets.some(t => t.id === 'tok-bob'));
+
+    delete globalThis.eskie;
+    const { FoundryV12Adapter } = await import('../../src/adapters/foundry/foundry-v12-adapter.js');
+    adapter.foundry = new FoundryV12Adapter(adapter);
+    globalThis.game.release = { generation: 12 };
 });

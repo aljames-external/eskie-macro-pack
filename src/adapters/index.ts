@@ -427,6 +427,10 @@ class Adapter {
         return this.foundry.getTargetLocation(target);
     }
 
+    isTokenInOrMovingIntoPlaceable(token: any, placeable: any, context: Record<string, any> = {}): boolean {
+        return this.foundry.isTokenInOrMovingIntoPlaceable(token, placeable, context);
+    }
+
     /* -------------------------------------------- */
     /*  System Layer Delegates                      */
     /* -------------------------------------------- */

@@ -243,15 +243,14 @@ if (animation) {
             // Collect all tokens contained within / overlapping this trap tile via adapter
             let targets = adapter.getTokensInTile(tilePlaceable);
 
-            // If this trap tile is also a trigger tile for this command, ensure the activating token is included
-            const isTriggerTile = triggerTileIds.includes(tile.id);
+            // Include activating token only if it is currently in or moving into this trap tile
             const activatingTarget = token?.object ? token.object : token;
-            if (isTriggerTile && token) {
-                if (!targets.some(t => t.id === token.id)) {
-                    targets.push(activatingTarget);
-                }
-            } else if (targets.length === 0 && token) {
-                targets = [activatingTarget];
+            const isTarget = activatingTarget && adapter.isTokenInOrMovingIntoPlaceable(activatingTarget, tilePlaceable, {
+                triggerTileIds
+            });
+
+            if (isTarget && activatingTarget.id && !targets.some(t => t.id === activatingTarget.id)) {
+                targets.push(activatingTarget);
             }
 
             // Play the trap animation with the contained tokens as targets

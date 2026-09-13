@@ -1525,4 +1525,83 @@ export class BaseFoundryAdapter {
         }
         return this.getCenter(target);
     }
+
+    /**
+     * Determines whether a token is currently contained within or moving into a target placeable (Tile or Region).
+     *
+     * @param {PlaceableObject|Document|null} token Target token placeable or document
+     * @param {PlaceableObject|Document|null} placeable Target trap placeable (Tile or Region)
+     * @param {object} [context={}] Trigger and movement context options
+     * @param {string} [context.triggerRegionId] ID of the triggering region that fired the event
+     * @param {string[]} [context.triggerTileIds] IDs of configured trigger tiles
+     * @param {object} [context.movement] Movement data object containing destination, waypoints, or segments
+     * @returns {boolean}
+     */
+    isTokenInOrMovingIntoPlaceable(token: any, placeable: any, context: Record<string, any> = {}): boolean {
+        if (!token || !placeable) return false;
+
+        const placeableDoc = placeable.document ? placeable.document : placeable;
+        const placeableId = placeableDoc.id ?? placeable.id;
+
+        // 1. Check if placeable IS the triggering placeable (the token entered/triggered this placeable directly)
+        if (context.triggerRegionId && placeableId === context.triggerRegionId) {
+            return true;
+        }
+        if (context.triggerTileIds && Array.isArray(context.triggerTileIds) && context.triggerTileIds.includes(placeableId)) {
+            return true;
+        }
+
+        // 2. Check if token is currently contained inside placeable via active placeable query
+        const tokenId = token.id ?? token.document?.id;
+        const tokensInPlaceable = this.getTokensInPlaceable(placeable);
+        if (tokenId && tokensInPlaceable.some((t: any) => t.id === tokenId || t.document?.id === tokenId)) {
+            return true;
+        }
+
+        // 3. Check if token's current coordinates are contained within placeable bounds
+        const hasCoords = typeof token.x === 'number'
+            || typeof token.document?.x === 'number'
+            || Boolean(token.center)
+            || Boolean(token.document?.center);
+        if (hasCoords) {
+            const center = this.getCenter(token);
+            if (center && this.containsPoint(placeable, center)) {
+                return true;
+            }
+            // Also check token bounding box overlap with placeable bounds
+            const tokenDoc = token.document ? token.document : token;
+            const gridSize = this.getGridSize();
+            const width = (tokenDoc.width ?? token.w ?? 1) * (typeof tokenDoc.width === 'number' ? gridSize : 1);
+            const height = (tokenDoc.height ?? token.h ?? 1) * (typeof tokenDoc.height === 'number' ? gridSize : 1);
+            const tokenX = tokenDoc.x ?? token.x;
+            const tokenY = tokenDoc.y ?? token.y;
+            if (typeof tokenX === 'number' && typeof tokenY === 'number') {
+                const { minX, maxX, minY, maxY } = this.getBounds(placeable);
+                const overlaps = !(tokenX + width <= minX || tokenX >= maxX || tokenY + height <= minY || tokenY >= maxY);
+                if (overlaps) return true;
+            }
+        }
+
+        // 4. Check if token's movement path or destination enters/intersects placeable
+        const movement = context.movement;
+        if (movement) {
+            if (movement.destination && this.containsPoint(placeable, movement.destination)) {
+                return true;
+            }
+            const waypoints = movement.pending?.waypoints ?? movement.waypoints;
+            if (Array.isArray(waypoints) && waypoints.some((wp: any) => this.containsPoint(placeable, wp))) {
+                return true;
+            }
+            const segments = movement.segments;
+            if (Array.isArray(segments)) {
+                const hitsSegment = segments.some((seg: any) => {
+                    const pt = seg.ray?.B ?? seg.to ?? seg.target;
+                    return pt && this.containsPoint(placeable, pt);
+                });
+                if (hitsSegment) return true;
+            }
+        }
+
+        return false;
+    }
 }

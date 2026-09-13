@@ -222,10 +222,13 @@ if (animPlaceables.length === 0) return;
 // Execute the trap animation for all launcher placeables simultaneously
 const animPromises = animPlaceables.map(placeable => {
     let targets = adapter.getTokensInPlaceable(placeable);
-    if (token.id && !targets.some(t => t.id === token.id)) {
+    const isTarget = adapter.isTokenInOrMovingIntoPlaceable(token, placeable, {
+        triggerRegionId: event.region?.id,
+        movement: event.data?.movement ?? (event.data?.segments ? { segments: event.data.segments } : null)
+    });
+
+    if (isTarget && token.id && !targets.some(t => t.id === token.id)) {
         targets.push(token);
-    } else if (targets.length === 0) {
-        targets = [token];
     }
 
     return ${animation}.play(placeable, targets, ${optionsStr});

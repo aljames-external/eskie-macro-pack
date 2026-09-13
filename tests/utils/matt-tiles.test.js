@@ -149,6 +149,17 @@ test('matt.trap.setup configures trigger tiles to manually activate trap tiles a
     assert.equal(playTargets.length, 1, 'Only tokens contained within the trap tile should be targeted');
     assert.equal(playTargets[0].id, 'tok-inside', 'Contained token should be the target');
     assert.equal(playConfig.targetTile, undefined, 'Trap without target tile should not receive targetTile');
+
+    // When no tokens are in the trap tile and the activating token is only on the trigger tile, it must not be targeted
+    playCalled = false;
+    playTargets = [];
+    globalThis.canvas.tokens = {
+        placeables: [],
+        get: () => null
+    };
+    await trapExecFn(mockActivatingToken, mockTrapTileDoc, globalThis.canvas);
+    assert.equal(playCalled, true, 'Trap play should still trigger');
+    assert.equal(playTargets.length, 0, 'Activating token only on trigger tile must not be targeted on separate trap tile');
 });
 
 test('matt.trap.setup correctly handles when the trigger tile is the trap tile (single tile)', async () => {
