@@ -6,7 +6,6 @@ import {
     createCasterProxy,
     executeTrapEffect,
     playEffectAsTrap,
-    setupRegionTrap,
     setupTrap
 } from '../../src/animation/traps/trap-manager.js';
 import { MODULE_ID } from '../../src/lib/constants.js';
@@ -247,7 +246,7 @@ test('executeTrapEffect: targeted animation with 0 tokens fires at landing place
     assert.deepEqual(capturedTarget.center, { x: 550, y: 550 });
 });
 
-test('setupRegionTrap: generates script invoking adapter.executeTrapEffect for spell effects', async () => {
+test('setupTrap: generates script invoking adapter.executeTrapEffect for spell effects in region mode', async () => {
     globalThis.game.user = { isGM: true };
     globalThis.game.release = { generation: 14 };
     const { FoundryV14Adapter } = await import('../../src/adapters/foundry/foundry-v14-adapter.js');
@@ -301,7 +300,7 @@ test('setupRegionTrap: generates script invoking adapter.executeTrapEffect for s
         return 'continue';
     };
 
-    const setupResult = await setupRegionTrap('eskie.effect.fireball');
+    const setupResult = await setupTrap('eskie.effect.fireball', { mode: 'region' });
     assert.ok(setupResult);
     assert.equal(setupResult.triggerRegions.length, 1);
     assert.equal(setupResult.originElements.length, 1);

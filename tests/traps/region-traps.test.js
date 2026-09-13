@@ -3,8 +3,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { adapter } from '../../src/adapters/index.js';
 import {
-    setupTrap,
-    setupRegionTrap
+    setupTrap
 } from '../../src/animation/traps/trap-manager.js';
 import { MODULE_ID } from '../../src/lib/constants.js';
 import { log } from '../../src/lib/logger.js';
@@ -72,27 +71,23 @@ test('setupTrap: routes dynamically based on generation and MATT availability', 
     globalThis.game.release = { generation: 12 };
 });
 
-test('setupRegionTrap: configures RegionDocument flags and creates executeScript RegionBehavior', async () => {
+test('setupTrap: configures RegionDocument flags and creates executeScript RegionBehavior in region mode', async () => {
     globalThis.game.user = { isGM: true };
     globalThis.game.release = { generation: 14 };
     const { FoundryV12Adapter } = await import('../../src/adapters/foundry/foundry-v12-adapter.js');
     const { FoundryV14Adapter } = await import('../../src/adapters/foundry/foundry-v14-adapter.js');
     adapter.foundry = new FoundryV14Adapter(adapter);
 
-    const updatedFlags = [];
     let createdBehaviorData = null;
-
     const triggerRegionDoc = {
-        id: 'region-trig-10',
+        id: 'region-trig-1',
         documentName: 'Region',
         behaviors: [],
-        update: async (data) => {
-            updatedFlags.push(data);
-            return triggerRegionDoc;
-        },
+        flags: {},
+        update: async () => triggerRegionDoc,
         createEmbeddedDocuments: async (type, [data]) => {
             createdBehaviorData = data;
-            return [{ id: 'beh-10', ...data }];
+            return [{ id: 'beh-1', ...data }];
         }
     };
 
@@ -103,13 +98,14 @@ test('setupRegionTrap: configures RegionDocument flags and creates executeScript
     };
 
     globalThis.canvas.regions = {
-        controlled: [{ document: triggerRegionDoc, id: 'region-trig-10' }]
+        controlled: [{ document: triggerRegionDoc, id: 'region-trig-1' }]
     };
     globalThis.canvas.tiles = {
         controlled: [],
         get: (id) => (id === 'tile-visual-10' ? { document: visualTileDoc, id } : null)
     };
 
+    // Simulate multi-step dialog selection: Step 1 trigger region, Step 2 visual tile
     let step = 0;
     adapter.buttonDialog = async () => {
         step++;
@@ -120,7 +116,7 @@ test('setupRegionTrap: configures RegionDocument flags and creates executeScript
         return 'continue';
     };
 
-    const setupResult = await setupRegionTrap('eskie.traps.spike', { tileCount: 2 });
+    const setupResult = await setupTrap('eskie.traps.spike', { mode: 'region', tileCount: 2 });
     assert.equal(setupResult.triggerRegions.length, 1);
     assert.equal(setupResult.originElements.length, 1);
 
@@ -195,7 +191,7 @@ test('setupRegionTrap: configures RegionDocument flags and creates executeScript
     globalThis.game.release = { generation: 12 };
 });
 
-test('setupRegionTrap: enforces tile requirement when requiresTile is true', async () => {
+test('setupTrap: enforces tile requirement when requiresTile is true in region mode', async () => {
     globalThis.game.user = { isGM: true };
     globalThis.game.release = { generation: 14 };
     const { FoundryV12Adapter } = await import('../../src/adapters/foundry/foundry-v12-adapter.js');
@@ -221,7 +217,7 @@ test('setupRegionTrap: enforces tile requirement when requiresTile is true', asy
 
     adapter.buttonDialog = async () => 'continue';
 
-    const result = await setupRegionTrap('eskie.traps.floodingRoom', { tileCount: 2, requiresTile: true });
+    const result = await setupTrap('eskie.traps.floodingRoom', { mode: 'region', tileCount: 2, requiresTile: true });
     log._flushQueues();
     assert.equal(warned, true, 'Must warn user when required tile is missing');
     assert.equal(result, undefined, 'Must abort setup when required tile is missing');
@@ -230,7 +226,7 @@ test('setupRegionTrap: enforces tile requirement when requiresTile is true', asy
     globalThis.game.release = { generation: 12 };
 });
 
-test('setupRegionTrap: tileCount === 1 bypasses step 2 and uses trigger region as origin', async () => {
+test('setupTrap: tileCount === 1 bypasses step 2 and uses trigger region as origin in region mode', async () => {
     globalThis.game.user = { isGM: true };
     globalThis.game.release = { generation: 14 };
     const { FoundryV12Adapter } = await import('../../src/adapters/foundry/foundry-v12-adapter.js');
@@ -256,7 +252,7 @@ test('setupRegionTrap: tileCount === 1 bypasses step 2 and uses trigger region a
         return 'continue';
     };
 
-    const result = await setupRegionTrap('eskie.traps.electricDoor', { tileCount: 1 });
+    const result = await setupTrap('eskie.traps.electricDoor', { mode: 'region', tileCount: 1 });
     assert.equal(dialogCount, 1, 'Only Step 1 prompt should be shown for tileCount === 1');
     assert.equal(result.triggerRegions.length, 1);
     assert.equal(result.originElements.length, 1);
@@ -266,7 +262,7 @@ test('setupRegionTrap: tileCount === 1 bypasses step 2 and uses trigger region a
     globalThis.game.release = { generation: 12 };
 });
 
-test('setupRegionTrap: tileCount === 3 embeds targetLocation in generated script', async () => {
+test('setupTrap: tileCount === 3 embeds targetLocation in generated script in region mode', async () => {
     globalThis.game.user = { isGM: true };
     globalThis.game.release = { generation: 14 };
     const { FoundryV12Adapter } = await import('../../src/adapters/foundry/foundry-v12-adapter.js');
@@ -323,7 +319,7 @@ test('setupRegionTrap: tileCount === 3 embeds targetLocation in generated script
         return 'continue';
     };
 
-    const result = await setupRegionTrap('eskie.traps.fire', { tileCount: 3 });
+    const result = await setupTrap('eskie.traps.fire', { mode: 'region', tileCount: 3 });
     assert.equal(result.triggerRegions.length, 1);
     assert.equal(result.originElements[0].id, 'reg-launch-fire');
     assert.equal(result.targetElements[0].id, 'reg-target-fire');
@@ -371,7 +367,7 @@ test('setupRegionTrap: tileCount === 3 embeds targetLocation in generated script
     globalThis.game.release = { generation: 12 };
 });
 
-test('setupRegionTrap: multiple trap regions fire simultaneously via Promise.all', async () => {
+test('setupTrap: multiple trap regions fire simultaneously via Promise.all in region mode', async () => {
     globalThis.game.user = { isGM: true };
     globalThis.game.release = { generation: 14 };
     const { FoundryV12Adapter } = await import('../../src/adapters/foundry/foundry-v12-adapter.js');
@@ -420,7 +416,7 @@ test('setupRegionTrap: multiple trap regions fire simultaneously via Promise.all
         return 'continue';
     };
 
-    const result = await setupRegionTrap('eskie.traps.spike', { tileCount: 2 });
+    const result = await setupTrap('eskie.traps.spike', { mode: 'region', tileCount: 2 });
     assert.equal(result.originElements.length, 3);
 
     assert.ok(createdBehaviorData.system.source.includes('const animPromises = animPlaceables.map('));
@@ -587,7 +583,7 @@ test('Fire trap resolves distinct center coordinates for 3-region setups and gua
     }
 });
 
-test('setupRegionTrap: appends new executeScript RegionBehavior without overwriting existing behaviors', async () => {
+test('setupTrap: appends new executeScript RegionBehavior without overwriting existing behaviors in region mode', async () => {
     globalThis.game.user = { isGM: true };
     globalThis.game.release = { generation: 14 };
     const { FoundryV14Adapter } = await import('../../src/adapters/foundry/foundry-v14-adapter.js');
@@ -646,7 +642,7 @@ test('setupRegionTrap: appends new executeScript RegionBehavior without overwrit
         return triggerRegionDoc;
     };
 
-    const setupResult = await setupRegionTrap('eskie.traps.fire', { tileCount: 2 });
+    const setupResult = await setupTrap('eskie.traps.fire', { mode: 'region', tileCount: 2 });
     assert.ok(setupResult);
 
     assert.equal(createdBehaviors.length, 1, 'A new RegionBehavior must be created/appended');
@@ -657,7 +653,7 @@ test('setupRegionTrap: appends new executeScript RegionBehavior without overwrit
     assert.equal(updatedData, null, 'No region document flags should be updated');
 });
 
-test('setupRegionTrap: targets only tokens currently or moving into trap placeables, ignoring tokens only on trigger regions', async () => {
+test('setupTrap: targets only tokens currently or moving into trap placeables, ignoring tokens only on trigger regions in region mode', async () => {
     globalThis.game.user = { isGM: true };
     globalThis.game.release = { generation: 14 };
     const { FoundryV14Adapter } = await import('../../src/adapters/foundry/foundry-v14-adapter.js');
@@ -702,7 +698,7 @@ test('setupRegionTrap: targets only tokens currently or moving into trap placeab
         return 'continue';
     };
 
-    await setupRegionTrap('eskie.traps.spike', { tileCount: 2 });
+    await setupTrap('eskie.traps.spike', { mode: 'region', tileCount: 2 });
     assert.ok(createdBehaviorData);
 
     let spikePlayed = false;

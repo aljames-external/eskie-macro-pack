@@ -12,7 +12,7 @@ import { localize, format } from '../../lib/utils.js';
  * @param {object} [config={}] Setup configuration options
  * @returns {Promise<{ triggerRegions: RegionDocument[], originElements: PlaceableObject[], targetElements: PlaceableObject[] }|void>}
  */
-export async function setupRegionTrap(animation: string, config: Record<string, any> = {}): Promise<{ triggerRegions: any[], originElements: any[], targetElements: any[] } | void> {
+async function setupRegion(animation: string, config: Record<string, any> = {}): Promise<{ triggerRegions: any[], originElements: any[], targetElements: any[] } | void> {
     if (!game.user?.isGM) {
         return notify.error(localize('EMP.traps.setup.onlyGm'));
     }
@@ -309,7 +309,7 @@ export async function setupTrap(animation: string, config: Record<string, any> =
         return matt.trap.setup(animation, config);
     }
 
-    return setupRegionTrap(animation, config);
+    return setupRegion(animation, config);
 }
 
 /**

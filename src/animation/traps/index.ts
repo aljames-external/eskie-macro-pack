@@ -1,6 +1,6 @@
 import { adapter } from '../../adapters/index.js';
 import { localize, format } from '../../lib/utils.js';
-import { setupTrap, setupRegionTrap, executeTrapEffect, playEffectAsTrap, createCasterProxy } from './trap-manager.js';
+import { setupTrap, executeTrapEffect, playEffectAsTrap, createCasterProxy } from './trap-manager.js';
 
 import { bullRushStatue } from './bull-rush-statue.js';
 import { electricDoor } from './electric-door.js';
@@ -13,7 +13,7 @@ import { projectile } from './projectile.js';
 import { rollingBoulder } from './rolling-boulder.js';
 import { spike } from './spike.js';
 
-const NON_TRAP_KEYS = new Set(['setup', 'setupTrap', 'setupRegionTrap', 'executeTrapEffect', 'playEffectAsTrap', 'createCasterProxy']);
+const NON_TRAP_KEYS = new Set(['setup', 'setupTrap', 'executeTrapEffect', 'playEffectAsTrap', 'createCasterProxy']);
 
 // High level setup function to select between different traps to configure
 async function setup (config: Record<string, unknown> = {}): Promise<any> {
@@ -62,7 +62,6 @@ export const traps = {
 
     setup,
     setupTrap,
-    setupRegionTrap,
     executeTrapEffect,
     playEffectAsTrap,
     createCasterProxy,
