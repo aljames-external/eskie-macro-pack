@@ -45,32 +45,43 @@ async function create(token: Token, config: any = {}) {
     const cfg = {
         radius,
         label: 'Fireball',
-        icon: token.document.texture.src ?? ''
+        icon: token.document?.texture?.src ?? ''
     };
     let [primary, secondary, center] = await templatelib.getPosition(template, cfg);
     if (!primary && !center) return null;
-    const targetPos = center ?? primary;
+    const rawCenter = center ?? primary;
+
+    const targetEntity = config.target ?? config.targets?.[0] ?? template;
+    const targetPos = adapter.createTargetProxy(targetEntity, { center: rawCenter, minUnits: 1 });
 
     const tokenWidth = adapter.getTokenDimensions(token).widthUnits;
     const tokenOffset = (tokenWidth - 1) / 2;
+
+    const rawName = typeof token?.name === 'string' ? token.name.trim() : '';
+    const tokenName = rawName.length > 0 ? rawName : 'Fireball';
+    const castingEffectName = `Casting ${tokenName}`;
+
+    // Clean up any lingering casting tint from prior runs
+    Sequencer.EffectManager.endEffects({ name: castingEffectName });
+    Sequencer.EffectManager.endEffects({ name: 'Casting Trap Origin' });
+    Sequencer.EffectManager.endEffects({ name: 'Casting ' });
 
     const sequence = new Sequence();
     const bg = adapter.getSceneBackground(canvas?.scene);
     const sceneDimensions = adapter.getSceneDimensions(canvas?.scene);
     const sceneCenter = adapter.getSceneCenter(canvas?.scene);
-    const tokenName = token.name;
 
     if (tintMap && bg?.src) {
         sequence
             .effect()
-                .name(`Casting ${tokenName}`)
+                .name(castingEffectName)
                 .file(bg.src)
                 .filter('ColorMatrix', { saturate: 1, brightness: 0.6 })
                 .atLocation(sceneCenter)
                 .size({ width: sceneDimensions.width / sceneDimensions.size, height: sceneDimensions.height / sceneDimensions.size }, { gridUnits: true })
-                .persist()
+                .duration(5000)
                 .fadeIn(2000)
-                .fadeOut(3000)
+                .fadeOut(2000)
                 .filter('ColorMatrix', { brightness: 0 })
                 .belowTokens()
                 .opacity(0.5)
@@ -206,7 +217,11 @@ async function create(token: Token, config: any = {}) {
     }
 
     sequence.thenDo(function() {
+        Sequencer.EffectManager.endEffects({ name: castingEffectName });
         Sequencer.EffectManager.endEffects({ name: `Casting ${tokenName}` });
+        Sequencer.EffectManager.endEffects({ name: 'Casting Trap Origin' });
+        Sequencer.EffectManager.endEffects({ name: 'Casting ' });
+        Sequencer.EffectManager.endEffects({ name: 'Casting *' });
     });
 
     return sequence;
@@ -217,8 +232,13 @@ async function play(token: Token, config: any = {}) {
     if (sequence) return sequence.play({ preload: true });
 }
 
-function stop(token: Token) {
-    Sequencer.EffectManager.endEffects({ name: `Casting ${token.name}` });
+function stop(token?: Token) {
+    const rawName = typeof token?.name === 'string' ? token.name.trim() : '';
+    const tokenName = rawName.length > 0 ? rawName : 'Fireball';
+    Sequencer.EffectManager.endEffects({ name: `Casting ${tokenName}` });
+    Sequencer.EffectManager.endEffects({ name: 'Casting Trap Origin' });
+    Sequencer.EffectManager.endEffects({ name: 'Casting ' });
+    Sequencer.EffectManager.endEffects({ name: 'Casting *' });
 }
 
 export const fireball = {

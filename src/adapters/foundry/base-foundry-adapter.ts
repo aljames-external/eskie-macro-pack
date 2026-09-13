@@ -1680,7 +1680,9 @@ export class BaseFoundryAdapter {
             }
         }
 
-        const name = doc.name ?? placeable.name ?? 'Trap Origin';
+        const docName = typeof doc.name === 'string' && doc.name.trim().length > 0 ? doc.name.trim() : null;
+        const placeableName = typeof placeable.name === 'string' && placeable.name.trim().length > 0 ? placeable.name.trim() : null;
+        const name = docName ?? placeableName ?? 'Trap Origin';
         const id = doc.id ?? placeable.id ?? 'trap-origin';
         const uuid = doc.uuid ?? placeable.uuid ?? `TrapOrigin.${id}`;
         const textureSrc = doc.texture?.src ?? placeable.texture?.src ?? '';
@@ -1719,6 +1721,104 @@ export class BaseFoundryAdapter {
             },
             actor: null,
             object: placeable.object ?? placeable,
+        };
+    }
+
+    /**
+     * Creates a lightweight Token-like proxy object for animation effect targets,
+     * ensuring at minimum a 1x1 token scale contract.
+     *
+     * @param {PlaceableObject|Document|object|null} target Target Token, Tile, Region, or coordinate
+     * @param {object} [options={}] Optional configuration
+     * @param {{ x: number, y: number }|null} [options.center=null] Center coordinates override
+     * @param {number} [options.minUnits=1] Minimum width/height in grid units (default 1)
+     * @returns {object}
+     */
+    createTargetProxy(target: any, options: { center?: { x: number; y: number } | null; minUnits?: number } = {}): any {
+        const minUnits = options.minUnits ?? 1;
+        const gridSize = this.getGridSize();
+
+        let center = options.center ?? (target ? this.getCenter(target) : null);
+        if (!center && target && typeof target.x === 'number' && typeof target.y === 'number') {
+            center = { x: target.x, y: target.y };
+        }
+        if (!center) {
+            center = { x: 0, y: 0 };
+        }
+
+        let widthUnits = minUnits;
+        let heightUnits = minUnits;
+
+        if (target) {
+            const isToken = this.isDocumentOfType(target, 'Token') || target.documentName === 'Token' || Boolean(target.actor);
+            const isTile = this.isDocumentOfType(target, 'Tile') || target.documentName === 'Tile' || target.document?.documentName === 'Tile';
+            const isRegion = target.documentName === 'Region' || target.document?.documentName === 'Region' || Boolean(target.shapes) || Boolean(target.document?.shapes);
+
+            if (isToken) {
+                const tokenDims = this.getTokenDimensions(target);
+                widthUnits = Math.max(minUnits, tokenDims.widthUnits);
+                heightUnits = Math.max(minUnits, tokenDims.heightUnits);
+            } else if (isRegion) {
+                const bounds = this.getRegionBounds(target);
+                widthUnits = Math.max(minUnits, bounds.width / gridSize);
+                heightUnits = Math.max(minUnits, bounds.height / gridSize);
+            } else if (isTile) {
+                const doc = target.document ? target.document : target;
+                const widthPx = doc.width ?? target.w ?? gridSize;
+                const heightPx = doc.height ?? target.h ?? gridSize;
+                widthUnits = Math.max(minUnits, widthPx / gridSize);
+                heightUnits = Math.max(minUnits, heightPx / gridSize);
+            } else if (target.document) {
+                const doc = target.document;
+                const width = doc.width ?? target.w ?? 1;
+                const height = doc.height ?? target.h ?? 1;
+                widthUnits = Math.max(minUnits, typeof width === 'number' && width > 10 ? width / gridSize : width);
+                heightUnits = Math.max(minUnits, typeof height === 'number' && height > 10 ? height / gridSize : height);
+            }
+        }
+
+        const widthPx = widthUnits * gridSize;
+        const heightPx = heightUnits * gridSize;
+
+        const doc = target?.document ? target.document : target;
+        const docName = typeof doc?.name === 'string' && doc.name.trim().length > 0 ? doc.name.trim() : null;
+        const targetName = typeof target?.name === 'string' && target.name.trim().length > 0 ? target.name.trim() : null;
+        const name = docName ?? targetName ?? 'Target';
+        const id = doc?.id ?? target?.id ?? 'target-proxy';
+        const uuid = doc?.uuid ?? target?.uuid ?? `TargetProxy.${id}`;
+
+        return {
+            id,
+            _id: id,
+            name,
+            center,
+            x: center.x - widthPx / 2,
+            y: center.y - heightPx / 2,
+            w: widthPx,
+            h: heightPx,
+            rotation: doc?.rotation ?? target?.rotation ?? 0,
+            document: {
+                id,
+                _id: id,
+                uuid,
+                name,
+                x: center.x - widthPx / 2,
+                y: center.y - heightPx / 2,
+                width: widthUnits,
+                height: heightUnits,
+                rotation: doc?.rotation ?? target?.rotation ?? 0,
+                elevation: doc?.elevation ?? target?.elevation ?? 0,
+                texture: {
+                    src: doc?.texture?.src ?? target?.texture?.src ?? '',
+                    scaleX: 1,
+                    scaleY: 1,
+                },
+                update: async (data: any) => doc?.update?.(data) ?? target?.update?.(data),
+                getFlag: (scope: string, key: string) => doc?.getFlag?.(scope, key),
+                setFlag: (scope: string, key: string, val: any) => doc?.setFlag?.(scope, key, val),
+            },
+            actor: target?.actor ?? null,
+            object: target?.object ?? target,
         };
     }
 }

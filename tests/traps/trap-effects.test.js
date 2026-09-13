@@ -657,3 +657,170 @@ test('fireball: passes string bg.src to Sequence.file rather than raw background
     globalThis.Sequence = originalSequence;
 });
 
+test('adapter.createTargetProxy: ensures at minimum the scale of a 1x1 token', async () => {
+    const { adapter } = await import('../../src/adapters/index.js');
+
+    // 1. Raw coordinate { x: 500, y: 500 }
+    const coordProxy = adapter.createTargetProxy({ x: 500, y: 500 });
+    assert.equal(coordProxy.document.width, 1, 'Coordinate target must default to minimum 1 unit width');
+    assert.equal(coordProxy.document.height, 1, 'Coordinate target must default to minimum 1 unit height');
+    assert.ok(coordProxy.w >= 100, 'Coordinate target pixel width must be at least 1 grid unit');
+    assert.equal(coordProxy.center.x, 500);
+    assert.equal(coordProxy.center.y, 500);
+
+    // 2. Tiny token (0.5 x 0.5)
+    const tinyToken = {
+        name: 'Tiny Imp',
+        w: 50,
+        h: 50,
+        center: { x: 200, y: 200 },
+        document: {
+            width: 0.5,
+            height: 0.5,
+            texture: { scaleX: 1, scaleY: 1 }
+        },
+        actor: {}
+    };
+    const tinyProxy = adapter.createTargetProxy(tinyToken);
+    assert.equal(tinyProxy.document.width, 1, 'Tiny token must be clamped to minimum 1 unit width');
+    assert.equal(tinyProxy.document.height, 1, 'Tiny token must be clamped to minimum 1 unit height');
+    assert.ok(tinyProxy.w >= 100, 'Tiny token pixel width must be at least 1 grid unit');
+
+    // 3. Large token (2 x 2)
+    const largeToken = {
+        name: 'Large Ogre',
+        w: 200,
+        h: 200,
+        center: { x: 300, y: 300 },
+        document: {
+            width: 2,
+            height: 2,
+            texture: { scaleX: 1, scaleY: 1 }
+        },
+        actor: {}
+    };
+    const largeProxy = adapter.createTargetProxy(largeToken);
+    assert.equal(largeProxy.document.width, 2, 'Large token scale must be preserved');
+    assert.equal(largeProxy.document.height, 2, 'Large token scale must be preserved');
+    assert.ok(largeProxy.w >= 200, 'Large token pixel width must reflect 2 grid units');
+
+    // 4. Trap Tile (300px x 300px on 100px grid = 3x3)
+    const trapTile = {
+        w: 300,
+        h: 300,
+        center: { x: 400, y: 400 },
+        document: {
+            documentName: 'Tile',
+            width: 300,
+            height: 300,
+        }
+    };
+    const tileProxy = adapter.createTargetProxy(trapTile);
+    assert.equal(tileProxy.document.width, 3, 'Trap tile scale must be computed from tile dimensions');
+    assert.ok(tileProxy.w >= 300, 'Trap tile pixel width must match tile dimensions');
+});
+
+test('fireball: ensures explosion target has at minimum 1x1 token scale and cleans up screen darkness', async () => {
+    const { fireball } = await import('../../src/animation/effects/template/fireball.js');
+
+    const locations = [];
+    const durations = [];
+    let endedEffects = [];
+
+    const originalEndEffects = globalThis.Sequencer.EffectManager.endEffects;
+    globalThis.Sequencer.EffectManager.endEffects = (filter) => {
+        endedEffects.push(filter);
+    };
+
+    const originalSequence = globalThis.Sequence;
+    globalThis.Sequence = class MockSequence {
+        constructor() {
+            const handler = {
+                get(_t, prop) {
+                    if (prop === 'play') return async () => proxy;
+                    if (prop === 'atLocation') {
+                        return (loc) => {
+                            locations.push(loc);
+                            return proxy;
+                        };
+                    }
+                    if (prop === 'duration') {
+                        return (ms) => {
+                            durations.push(ms);
+                            return proxy;
+                        };
+                    }
+                    if (prop === 'thenDo') {
+                        return (fn) => {
+                            fn();
+                            return proxy;
+                        };
+                    }
+                    if (prop === 'then') return undefined;
+                    return (..._args) => proxy;
+                }
+            };
+            const proxy = new Proxy(this, handler);
+            return proxy;
+        }
+    };
+
+    const mockToken = {
+        name: 'Trap Origin',
+        document: {
+            texture: { src: 'token.png' }
+        }
+    };
+
+    // Target is a 0.5x0.5 token in the trap
+    const mockTinyTarget = {
+        name: 'Tiny Rat',
+        w: 50,
+        h: 50,
+        center: { x: 300, y: 300 },
+        document: {
+            width: 0.5,
+            height: 0.5,
+            texture: { src: 'rat.png' }
+        },
+        actor: {}
+    };
+
+    const seq = await fireball.create(mockToken, {
+        template: mockTinyTarget,
+        target: mockTinyTarget,
+        tintMap: true,
+        sound: {
+            beam: { enable: false },
+            cast: { enable: false },
+            explosion: { enable: false }
+        }
+    });
+
+    assert.ok(seq, 'Sequence should be created');
+
+    // 1. Target scale check: all target locations with documents must have at least 1 unit width
+    const targetLocationsWithDoc = locations.filter(loc => loc?.document?.width !== undefined);
+    assert.ok(targetLocationsWithDoc.length > 0, 'Must have target locations with document');
+    for (const loc of targetLocationsWithDoc) {
+        assert.ok(loc.document.width >= 1, `Target location width must be >= 1, got: ${loc.document.width}`);
+        assert.ok(loc.w >= 100, `Target location pixel width must be >= 100, got: ${loc.w}`);
+    }
+
+    // 2. Screen darkness check: screen tint effect must specify a finite duration (not infinite persist)
+    assert.ok(durations.includes(5000), 'Screen tint must specify a finite duration (e.g. 5000ms)');
+
+    // 3. Screen darkness cleanup in thenDo
+    const endedNames = endedEffects.map(e => e.name);
+    assert.ok(endedNames.some(n => n.includes('Casting')), 'Must call endEffects on Casting effect names');
+
+    // 4. fireball.stop cleanup check
+    endedEffects = [];
+    fireball.stop(mockToken);
+    assert.ok(endedEffects.some(e => e.name.includes('Casting')), 'stop() must clean up Casting effects');
+
+    globalThis.Sequence = originalSequence;
+    globalThis.Sequencer.EffectManager.endEffects = originalEndEffects;
+});
+
+

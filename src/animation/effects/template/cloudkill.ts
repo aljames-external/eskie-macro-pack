@@ -23,29 +23,40 @@ async function create(token: Token, config: any = {}) {
     const cfg = {
         radius,
         label: 'Cloudkill',
-        icon: token.document.texture.src ?? ''
+        icon: token.document?.texture?.src ?? ''
     };
     let [primary, secondary, center] = await templatelib.getPosition(template, cfg);
     if (!primary && !center) return null;
-    const targetPos = center ?? primary;
+    const rawCenter = center ?? primary;
+
+    const targetEntity = config.target ?? config.targets?.[0] ?? template;
+    const targetPos = adapter.createTargetProxy(targetEntity, { center: rawCenter, minUnits: 1 });
+
+    const rawName = typeof token?.name === 'string' ? token.name.trim() : '';
+    const tokenName = rawName.length > 0 ? rawName : 'Cloudkill';
+    const castingEffectName = `Casting ${tokenName}`;
+
+    // Clean up any lingering casting tint from prior runs
+    Sequencer.EffectManager.endEffects({ name: castingEffectName });
+    Sequencer.EffectManager.endEffects({ name: 'Casting Trap Origin' });
+    Sequencer.EffectManager.endEffects({ name: 'Casting ' });
 
     const sequence = new Sequence();
     applySound(sequence, sound);
     const bg = adapter.getSceneBackground(canvas?.scene);
     const sceneDimensions = adapter.getSceneDimensions(canvas?.scene);
     const sceneCenter = adapter.getSceneCenter(canvas?.scene);
-    const tokenName = token.name;
 
     if (tintMap && bg?.src) {
         sequence
             .effect()
-                .name(`Casting ${tokenName}`)
+                .name(castingEffectName)
                 .file(bg.src)
                 .atLocation(sceneCenter)
                 .size({ width: sceneDimensions.width / sceneDimensions.size, height: sceneDimensions.height / sceneDimensions.size }, { gridUnits: true })
-                .persist()
+                .duration(5000)
                 .fadeIn(1000, { ease: 'easeOutCubic' })
-                .fadeOut(3000)
+                .fadeOut(2000)
                 .filter('ColorMatrix', { brightness: 0 })
                 .belowTokens()
                 .opacity(0.5)
@@ -98,7 +109,11 @@ async function create(token: Token, config: any = {}) {
         .wait(5000)
 
         .thenDo(function() {
+            Sequencer.EffectManager.endEffects({ name: castingEffectName });
             Sequencer.EffectManager.endEffects({ name: `Casting ${tokenName}` });
+            Sequencer.EffectManager.endEffects({ name: 'Casting Trap Origin' });
+            Sequencer.EffectManager.endEffects({ name: 'Casting ' });
+            Sequencer.EffectManager.endEffects({ name: 'Casting *' });
         });
 
     return sequence;
@@ -109,9 +124,14 @@ async function play(token: Token, config: any = {}) {
     if (sequence) return sequence.play({ preload: true });
 }
 
-function stop(token: Token) {
-    Sequencer.EffectManager.endEffects({ name: `Cloudkill ${token.name}` });
-    Sequencer.EffectManager.endEffects({ name: `Casting ${token.name}` });
+function stop(token?: Token) {
+    const rawName = typeof token?.name === 'string' ? token.name.trim() : '';
+    const tokenName = rawName.length > 0 ? rawName : 'Cloudkill';
+    Sequencer.EffectManager.endEffects({ name: `Cloudkill ${tokenName}` });
+    Sequencer.EffectManager.endEffects({ name: `Casting ${tokenName}` });
+    Sequencer.EffectManager.endEffects({ name: 'Casting Trap Origin' });
+    Sequencer.EffectManager.endEffects({ name: 'Casting ' });
+    Sequencer.EffectManager.endEffects({ name: 'Casting *' });
 }
 
 export const cloudkill = {

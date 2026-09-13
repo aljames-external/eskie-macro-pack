@@ -435,6 +435,10 @@ class Adapter {
         return this.foundry.createCasterProxy(placeable, targetLocation);
     }
 
+    createTargetProxy(target: any, options: { center?: { x: number; y: number } | null; minUnits?: number } = {}): any {
+        return this.foundry.createTargetProxy(target, options);
+    }
+
     executeTrapEffectHandler: ((...args: any[]) => Promise<any>) | null = null;
 
     async executeTrapEffect(animation: any, originPlaceable: any, targetPlaceable: any = null, targets: Token[] = [], config: Record<string, any> = {}): Promise<any> {

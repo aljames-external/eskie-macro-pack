@@ -404,6 +404,8 @@ export async function executeTrapEffect(
             ...config,
             template: config.template ?? target ?? origin,
             targetLocation,
+            target: config.target ?? target,
+            targets: config.targets ?? resolvedTargets,
         };
         const playFn = effectObj.play ?? effectObj;
         return playFn(casterProxy, templateConfig);
