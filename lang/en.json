@@ -361,7 +361,8 @@
                 "pitfall": "Pitfall",
                 "projectile": "Projectile",
                 "rollingBoulder": "Rolling Boulder",
-                "spike": "Spike"
+                "spike": "Spike",
+                "customEffect": "Spell / Animation Effect"
             },
             "common": {
                 "continue": "Continue",
@@ -370,6 +371,8 @@
             "setup": {
                 "chooseTrapTitle": "Trap Setup: Choose Trap",
                 "chooseTrapContent": "<p>Choose a trap to configure and set up on the canvas.</p>",
+                "customEffectTitle": "Trap Setup: Spell / Animation Effect",
+                "customEffectPrompt": "Enter the spell or animation effect path (e.g. fireball, lightningBolt, disintegrate):",
                 "noTrapChosen": "No trap chosen. Trap setup cancelled.",
                 "noSetupMethod": "Trap \"{name}\" has no setup configuration method.",
                 "onlyGm": "Only a GM can setup traps.",

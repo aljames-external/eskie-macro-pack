@@ -485,3 +485,73 @@ test('matt.trap.setup: configures adapter.executeTrapEffect for spell effects', 
         'MATT action code must call adapter.executeTrapEffect for non-eskie-traps'
     );
 });
+
+test('traps.setup: direct string invocation or config.animation routes to setupTrap', async () => {
+    const { traps } = await import('../../src/animation/traps/index.js');
+
+    assert.equal(traps.setupTrap, undefined, 'setupTrap should not be exported on public traps namespace');
+
+    // Test direct string animation call
+    let calledAnimation = null;
+    let calledConfig = null;
+    const { matt } = await import('../../src/animation/utils/matt-tiles.js');
+    const originalMattSetup = matt.trap.setup;
+    matt.trap.setup = async (anim, cfg) => {
+        calledAnimation = anim;
+        calledConfig = cfg;
+        return { success: true };
+    };
+
+    globalThis.game.release = { generation: 12 };
+    globalThis.game.user = { isGM: true };
+
+    await traps.setup('eskie.effect.fireball', { customOption: true });
+    assert.equal(calledAnimation, 'eskie.effect.fireball');
+    assert.equal(calledConfig.customOption, true);
+
+    // Test config with animation property
+    calledAnimation = null;
+    calledConfig = null;
+    await traps.setup({ animation: 'eskie.effect.lightningBolt', speed: 500 });
+    assert.equal(calledAnimation, 'eskie.effect.lightningBolt');
+    assert.equal(calledConfig.speed, 500);
+
+    matt.trap.setup = originalMattSetup;
+});
+
+test('traps.setup: interactive dialog includes Spell / Animation Effect option', async () => {
+    const { traps } = await import('../../src/animation/traps/index.js');
+
+    let passedButtons = null;
+    adapter.buttonDialog = async (data) => {
+        passedButtons = data.buttons;
+        return 'customEffect';
+    };
+
+    const dialogCls = adapter.foundry.DialogV2 ?? globalThis.foundry?.applications?.api?.DialogV2;
+    const originalPrompt = dialogCls.prompt;
+    dialogCls.prompt = async () => 'disintegrate';
+
+    let calledAnimation = null;
+    const { matt } = await import('../../src/animation/utils/matt-tiles.js');
+    const originalMattSetup = matt.trap.setup;
+    matt.trap.setup = async (anim) => {
+        calledAnimation = anim;
+        return { success: true };
+    };
+
+    globalThis.game.release = { generation: 12 };
+    globalThis.game.user = { isGM: true };
+
+    await traps.setup();
+
+    assert.ok(passedButtons);
+    const customEffectBtn = passedButtons.find(b => b.value === 'customEffect');
+    assert.ok(customEffectBtn, 'Must include customEffect option in setup dialog');
+    assert.equal(customEffectBtn.label, 'Spell / Animation Effect');
+    assert.equal(calledAnimation, 'eskie.effect.disintegrate', 'Must resolve and execute custom effect');
+
+    dialogCls.prompt = originalPrompt;
+    matt.trap.setup = originalMattSetup;
+});
+
