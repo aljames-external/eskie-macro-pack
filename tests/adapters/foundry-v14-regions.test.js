@@ -2,6 +2,7 @@ import '../setup.js';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { FoundryV12Adapter } from '../../src/adapters/foundry/foundry-v12-adapter.js';
+import { FoundryV13Adapter } from '../../src/adapters/foundry/foundry-v13-adapter.js';
 import { FoundryV14Adapter } from '../../src/adapters/foundry/foundry-v14-adapter.js';
 
 test('FoundryV14Adapter: supportsRegionBehaviors and NOP isolation in V12', () => {
@@ -157,7 +158,7 @@ test('FoundryV14Adapter: getTokensInRegion extracts placeables directly from Reg
     assert.deepEqual(v14.getTokensInRegion(emptyRegion), []);
 });
 
-test('FoundryV14Adapter: containsPoint leverages Region#testPoint for exact non-square geometry', () => {
+test('FoundryV14Adapter: containsPoint leverages Region#testPoint for exact non-square geometry (legacy fallback)', () => {
     const v14 = new FoundryV14Adapter();
 
     let testedPoint = null;
@@ -175,6 +176,40 @@ test('FoundryV14Adapter: containsPoint leverages Region#testPoint for exact non-
     assert.equal(v14.containsPoint(regionDoc, { x: 150, y: 150 }), true);
     assert.deepEqual(testedPoint, { x: 150, y: 150 });
     assert.equal(v14.containsPoint(regionDoc, { x: 300, y: 300 }), false);
+});
+
+test('FoundryV13Adapter & FoundryV14Adapter: containsPoint leverages modern RegionDocument#testPoint(point: ElevatedPoint)', () => {
+    const v13 = new FoundryV13Adapter();
+    const v14 = new FoundryV14Adapter();
+
+    for (const adapterInstance of [v13, v14]) {
+        let testedPoint = null;
+        let placeableCalled = false;
+        const regionDoc = {
+            documentName: 'Region',
+            testPoint: (pt) => {
+                testedPoint = pt;
+                return pt.x === 200 && pt.y === 200;
+            },
+            object: {
+                testPoint: () => {
+                    placeableCalled = true;
+                    return false;
+                }
+            }
+        };
+
+        assert.equal(adapterInstance.containsPoint(regionDoc, { x: 200, y: 200 }), true);
+        assert.deepEqual(testedPoint, { x: 200, y: 200, elevation: 0 }, 'RegionDocument#testPoint must receive ElevatedPoint');
+        assert.equal(placeableCalled, false, 'Must not call deprecated Region#testPoint on placeable when RegionDocument#testPoint exists');
+
+        // Test with explicit elevation
+        assert.equal(adapterInstance.containsPoint(regionDoc, { x: 200, y: 200, elevation: 15 }), true);
+        assert.deepEqual(testedPoint, { x: 200, y: 200, elevation: 15 });
+
+        // Test non-matching point
+        assert.equal(adapterInstance.containsPoint(regionDoc, { x: 500, y: 500 }), false);
+    }
 });
 
 test('FoundryV14Adapter: createRegionBehavior and formatRegionBehaviorData contracts', async () => {

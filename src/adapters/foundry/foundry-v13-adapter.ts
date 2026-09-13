@@ -88,4 +88,34 @@ export class FoundryV13Adapter extends FoundryV12Adapter {
     override async loadTemplates(paths: string[]): Promise<Function[]> {
         return foundry.applications.handlebars.loadTemplates(paths);
     }
+
+    /**
+     * Test whether a 2D/3D point is contained within a placeable or document on Foundry V13+.
+     * Leverages native RegionDocument#testPoint(point: ElevatedPoint) for exact polygonal containment.
+     * Note: Region#testPoint was deprecated in Version 13 in favor of RegionDocument#testPoint.
+     * @override
+     * @param {PlaceableObject|Document|null} object Target placeable or document
+     * @param {{ x: number, y: number, elevation?: number }} point Point coordinates
+     * @returns {boolean}
+     */
+    override containsPoint(object: any, point: any): boolean {
+        if (!object || !point) return false;
+        const doc = object.document ? object.document : object;
+        const isRegion = doc.documentName === 'Region' || Boolean(doc.shapes) || Boolean(object.shapes);
+        if (isRegion) {
+            const elevatedPoint = point.elevation !== undefined
+                ? point
+                : (typeof point.x === 'number' && typeof point.y === 'number' ? { ...point, elevation: 0 } : point);
+
+            if (typeof doc.testPoint === 'function') {
+                return Boolean(doc.testPoint(elevatedPoint));
+            }
+
+            const placeable = object.object ?? doc.object ?? object;
+            if (typeof placeable?.testPoint === 'function') {
+                return Boolean(placeable.testPoint(point, point.elevation));
+            }
+        }
+        return super.containsPoint(object, point);
+    }
 }

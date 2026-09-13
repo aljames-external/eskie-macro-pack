@@ -465,24 +465,4 @@ export class FoundryV14Adapter extends FoundryV13Adapter {
         }
         return null;
     }
-
-    /**
-     * Test whether a 2D point is contained within a placeable or document on Foundry V14+.
-     * Leverages native Region#testPoint for exact polygonal containment if available.
-     * @override
-     * @param {PlaceableObject|Document|null} object Target placeable or document
-     * @param {{ x: number, y: number }} point Point coordinates
-     * @returns {boolean}
-     */
-    override containsPoint(object: any, point: any): boolean {
-        if (!object || !point) return false;
-        const doc = object.document ? object.document : object;
-        const isRegion = doc.documentName === 'Region' || Boolean(doc.shapes) || Boolean(object.shapes);
-        if (isRegion) {
-            const placeable = object.object ?? doc.object ?? object;
-            const testResult = placeable?.testPoint?.(point);
-            if (testResult !== undefined) return Boolean(testResult);
-        }
-        return super.containsPoint(object, point);
-    }
 }
