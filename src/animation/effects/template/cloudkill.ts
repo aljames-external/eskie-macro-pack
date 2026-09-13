@@ -31,16 +31,16 @@ async function create(token: Token, config: any = {}) {
 
     const sequence = new Sequence();
     applySound(sequence, sound);
-    const bgSrc = adapter.getSceneBackground(canvas?.scene);
+    const bg = adapter.getSceneBackground(canvas?.scene);
     const sceneDimensions = adapter.getSceneDimensions(canvas?.scene);
     const sceneCenter = adapter.getSceneCenter(canvas?.scene);
     const tokenName = token.name;
 
-    if (tintMap && bgSrc) {
+    if (tintMap && bg?.src) {
         sequence
             .effect()
                 .name(`Casting ${tokenName}`)
-                .file(bgSrc)
+                .file(bg.src)
                 .atLocation(sceneCenter)
                 .size({ width: sceneDimensions.width / sceneDimensions.size, height: sceneDimensions.height / sceneDimensions.size }, { gridUnits: true })
                 .persist()
@@ -48,7 +48,8 @@ async function create(token: Token, config: any = {}) {
                 .fadeOut(3000)
                 .filter('ColorMatrix', { brightness: 0 })
                 .belowTokens()
-                .opacity(0.5);
+                .opacity(0.5)
+                .spriteOffset({ x: -bg.offsetX, y: -bg.offsetY });
     }
 
     sequence

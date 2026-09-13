@@ -555,3 +555,105 @@ test('traps.setup: interactive dialog includes Spell / Animation Effect option',
     matt.trap.setup = originalMattSetup;
 });
 
+test('traps.setup: normalizes shorthand and prefix variations', async () => {
+    const { traps } = await import('../../src/animation/traps/index.js');
+
+    let calledAnimation = null;
+    const { matt } = await import('../../src/animation/utils/matt-tiles.js');
+    const originalMattSetup = matt.trap.setup;
+    matt.trap.setup = async (anim) => {
+        calledAnimation = anim;
+        return { success: true };
+    };
+
+    globalThis.game.release = { generation: 12 };
+    globalThis.game.user = { isGM: true };
+
+    // Shorthand "fireball" -> "eskie.effect.fireball"
+    await traps.setup('fireball');
+    assert.equal(calledAnimation, 'eskie.effect.fireball');
+
+    // Prefix "effect.lightningBolt" -> "eskie.effect.lightningBolt"
+    await traps.setup('effect.lightningBolt');
+    assert.equal(calledAnimation, 'eskie.effect.lightningBolt');
+
+    // Prefix "traps.fire" -> "eskie.traps.fire"
+    await traps.setup('traps.fire');
+    assert.equal(calledAnimation, 'eskie.traps.fire');
+
+    // Full path "eskie.effect.fireball" -> "eskie.effect.fireball"
+    await traps.setup('eskie.effect.fireball');
+    assert.equal(calledAnimation, 'eskie.effect.fireball');
+
+    matt.trap.setup = originalMattSetup;
+});
+
+test('fireball: passes string bg.src to Sequence.file rather than raw background object', async () => {
+    const { fireball } = await import('../../src/animation/effects/template/fireball.js');
+
+    const fileCalls = [];
+    const originalSequence = globalThis.Sequence;
+    globalThis.Sequence = class MockSequence {
+        constructor() {
+            const handler = {
+                get(_t, prop) {
+                    if (prop === 'play') return async () => proxy;
+                    if (prop === 'file') {
+                        return (filePath) => {
+                            fileCalls.push(filePath);
+                            return proxy;
+                        };
+                    }
+                    if (prop === 'then') return undefined;
+                    return (..._args) => proxy;
+                }
+            };
+            const proxy = new Proxy(this, handler);
+            return proxy;
+        }
+    };
+
+    const mockToken = {
+        name: 'Caster Token',
+        document: {
+            texture: { src: 'token.png' }
+        }
+    };
+
+    const mockTemplate = {
+        x: 200,
+        y: 200,
+        document: { x: 200, y: 200 }
+    };
+
+    globalThis.game.modules.set('psfx-patreon', { id: 'psfx-patreon', active: true });
+    globalThis.game.modules.set('jb2a_patreon', { id: 'jb2a_patreon', active: true });
+    globalThis.game.modules.set('eskie-effects', { id: 'eskie-effects', active: true });
+    globalThis.game.modules.set('blfx', { id: 'blfx', active: true });
+
+    // Ensure scene background returns object { src: 'background.png', offsetX: 0, offsetY: 0 }
+    globalThis.canvas.scene = {
+        background: { src: 'background.png', offsetX: 10, offsetY: 20 },
+        width: 2000,
+        height: 2000
+    };
+
+    await fireball.create(mockToken, {
+        template: mockTemplate,
+        tintMap: true,
+        sound: {
+            beam: { enable: false },
+            cast: { enable: false },
+            explosion: { enable: false }
+        }
+    });
+
+    assert.ok(fileCalls.length > 0, 'Sequence must register effect files');
+    for (const f of fileCalls) {
+        assert.equal(typeof f, 'string', `Every file argument must be a string, got ${typeof f}: ${JSON.stringify(f)}`);
+    }
+    assert.ok(fileCalls.includes('background.png'), 'Must include scene background src as a string');
+
+    globalThis.Sequence = originalSequence;
+});
+

@@ -15,6 +15,13 @@ import { spike } from './spike.js';
 
 const NON_TRAP_KEYS = new Set(['setup', 'executeTrapEffect', 'playEffectAsTrap', 'createCasterProxy']);
 
+function normalizeAnimationPath(path: string): string {
+    const trimmed = path.trim();
+    if (trimmed.startsWith('eskie.')) return trimmed;
+    if (trimmed.startsWith('effect.') || trimmed.startsWith('traps.')) return `eskie.${trimmed}`;
+    return `eskie.effect.${trimmed}`;
+}
+
 // High level setup function to select between different traps to configure
 async function setup(
     animationOrConfig: string | Record<string, unknown> = {},
@@ -22,7 +29,7 @@ async function setup(
 ): Promise<any> {
     // 1. Direct invocation with an animation string: eskie.traps.setup('eskie.effect.fireball', config)
     if (typeof animationOrConfig === 'string') {
-        return setupTrap(animationOrConfig, config);
+        return setupTrap(normalizeAnimationPath(animationOrConfig), config);
     }
 
     // 2. Direct invocation with config containing animation or effect: eskie.traps.setup({ animation: 'eskie.effect.fireball' })
@@ -32,11 +39,11 @@ async function setup(
 
     if (resolvedConfig.animation && typeof resolvedConfig.animation === 'string') {
         const { animation, ...trapOptions } = resolvedConfig;
-        return setupTrap(animation, trapOptions);
+        return setupTrap(normalizeAnimationPath(animation), trapOptions);
     }
     if (resolvedConfig.effect && typeof resolvedConfig.effect === 'string') {
         const { effect, ...trapOptions } = resolvedConfig;
-        return setupTrap(effect, trapOptions);
+        return setupTrap(normalizeAnimationPath(effect), trapOptions);
     }
 
     // 3. Interactive selection dialog
@@ -92,10 +99,7 @@ async function setup(
             return;
         }
 
-        const resolvedAnimation = chosenAnimation.startsWith('eskie.')
-            ? chosenAnimation
-            : `eskie.effect.${chosenAnimation}`;
-        return setupTrap(resolvedAnimation, resolvedConfig);
+        return setupTrap(normalizeAnimationPath(chosenAnimation), resolvedConfig);
     }
 
     const trap = (traps as Record<string, any>)[chosenTrapKey as string];
