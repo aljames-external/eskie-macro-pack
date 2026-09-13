@@ -373,6 +373,7 @@
                 "chooseTrapContent": "<p>Choose a trap to configure and set up on the canvas.</p>",
                 "customEffectTitle": "Trap Setup: Spell / Animation Effect",
                 "customEffectPrompt": "Enter the spell or animation effect path (e.g. fireball, lightningBolt, disintegrate):",
+                "customEffectDisclaimer": "Note: Not all effects have been tested as traps.",
                 "noTrapChosen": "No trap chosen. Trap setup cancelled.",
                 "noSetupMethod": "Trap \"{name}\" has no setup configuration method.",
                 "onlyGm": "Only a GM can setup traps.",

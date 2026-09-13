@@ -82,7 +82,7 @@ async function setup(
         if (dialogCls?.prompt) {
             chosenAnimation = await dialogCls.prompt({
                 window: { title: localize('EMP.traps.setup.customEffectTitle', 'Trap Setup: Spell / Animation Effect') },
-                content: `<p>${localize('EMP.traps.setup.customEffectPrompt', 'Enter the spell or animation effect path (e.g. fireball, lightningBolt, disintegrate):')}</p><div class="form-group"><input type="text" name="effectPath" autofocus style="width: 100%;" placeholder="fireball" /></div>`,
+                content: `<p>${localize('EMP.traps.setup.customEffectPrompt', 'Enter the spell or animation effect path (e.g. fireball, lightningBolt, disintegrate):')}</p><p class="hint" style="font-style: italic; opacity: 0.85; margin: 4px 0 8px 0;">${localize('EMP.traps.setup.customEffectDisclaimer', 'Note: Not all effects have been tested as traps.')}</p><div class="form-group"><input type="text" name="effectPath" autofocus style="width: 100%;" placeholder="fireball" /></div>`,
                 ok: {
                     label: localize('EMP.traps.common.continue', 'Continue'),
                     callback: (_event: any, button: any) => {

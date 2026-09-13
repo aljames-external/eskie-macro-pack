@@ -530,7 +530,11 @@ test('traps.setup: interactive dialog includes Spell / Animation Effect option',
 
     const dialogCls = adapter.foundry.DialogV2 ?? globalThis.foundry?.applications?.api?.DialogV2;
     const originalPrompt = dialogCls.prompt;
-    dialogCls.prompt = async () => 'disintegrate';
+    let capturedPromptOptions = null;
+    dialogCls.prompt = async (options) => {
+        capturedPromptOptions = options;
+        return 'disintegrate';
+    };
 
     let calledAnimation = null;
     const { matt } = await import('../../src/animation/utils/matt-tiles.js');
@@ -550,6 +554,12 @@ test('traps.setup: interactive dialog includes Spell / Animation Effect option',
     assert.ok(customEffectBtn, 'Must include customEffect option in setup dialog');
     assert.equal(customEffectBtn.label, 'Spell / Animation Effect');
     assert.equal(calledAnimation, 'eskie.effect.disintegrate', 'Must resolve and execute custom effect');
+    assert.ok(capturedPromptOptions, 'Must have opened prompt dialog');
+    assert.ok(
+        capturedPromptOptions.content.includes('Not all effects have been tested as traps') ||
+        capturedPromptOptions.content.includes('not all effects have been tested as traps'),
+        'Prompt content must include disclaimer that not all effects have been tested as traps'
+    );
 
     dialogCls.prompt = originalPrompt;
     matt.trap.setup = originalMattSetup;
