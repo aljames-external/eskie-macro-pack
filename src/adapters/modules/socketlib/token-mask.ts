@@ -79,22 +79,8 @@ async function cleanUpTokenMask(tokenId: any, animationId: any, tileIds: any, de
     }
     
     log.debug(`cleanUpTokenMask | Cleaning up database for object ${tokenId} (Session: ${animationId}). Delete object: ${deleteObject}`);
-    
-    const object = adapter.getPlaceable(tokenId);
-    if (object) {
-        // ALWAYS resolve tiles and detach them in the database BEFORE deleting tiles!
-        // This prevents Mass Edit / Token Attacher from deleting attached parent tokens!
-        const tiles = tileIds ? tileIds.map((id: string) => (canvas as any).scene?.tiles?.get(id)).filter(Boolean) : [];
-        if (tiles.length > 0) {
-            try {
-                await adapter.detachPlaceableElements(tiles, object);
-            } catch (err) {
-                log.warn(`cleanUpTokenMask | Error detaching elements from ${tokenId}:`, err);
-            }
-        }
-    }
 
-    // Always delete the tiles after detaching them from target object
+    // Direct tile destruction: tile.destroy automatically detaches each tile before deletion
     if (tileIds && tileIds.length > 0) {
         try {
             await Promise.all(tileIds.map((tileId: any) => tile.destroy(tileId)));
@@ -103,6 +89,7 @@ async function cleanUpTokenMask(tokenId: any, animationId: any, tileIds: any, de
         }
     }
 
+    const object = adapter.getPlaceable(tokenId);
     if (object) {
         const doc = object.document ?? object;
         if (deleteObject) {
