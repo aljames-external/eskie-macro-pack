@@ -57,11 +57,15 @@ async function tokenMaskClientDone(tokenId: any, userId: any, animationId: any) 
         if (allCompleted) {
             log.debug(`tokenMaskClientDone | All clients reported completion for session ${animationId}! Triggering database cleanup...`);
             
-            // Clean up using the GM-level cleanup
-            await cleanUpTokenMask(tokenId, animationId, tracker.tileIds, tracker.deleteObject);
-            
-            // Resolve the initiator's promise
-            tracker.resolve();
+            try {
+                // Clean up using the GM-level cleanup
+                await cleanUpTokenMask(tokenId, animationId, tracker.tileIds, tracker.deleteObject);
+            } catch (err) {
+                log.error(`tokenMaskClientDone | Error during cleanUpTokenMask for session ${animationId}:`, err);
+            } finally {
+                // Guarantee the initiator's promise is resolved to clear safety timeout
+                tracker.resolve();
+            }
         }
     }
 }
@@ -78,26 +82,41 @@ async function cleanUpTokenMask(tokenId: any, animationId: any, tileIds: any, de
     
     const object = adapter.getPlaceable(tokenId);
     if (object) {
-        // Resolve tiles and detach them in the database
+        // ALWAYS resolve tiles and detach them in the database BEFORE deleting tiles!
+        // This prevents Mass Edit / Token Attacher from deleting attached parent tokens!
         const tiles = tileIds ? tileIds.map((id: string) => (canvas as any).scene?.tiles?.get(id)).filter(Boolean) : [];
         if (tiles.length > 0) {
-            await adapter.detachPlaceableElements(tiles, object);
+            try {
+                await adapter.detachPlaceableElements(tiles, object);
+            } catch (err) {
+                log.warn(`cleanUpTokenMask | Error detaching elements from ${tokenId}:`, err);
+            }
         }
     }
 
-    // Always delete the tiles, even if the target object was already deleted
+    // Always delete the tiles after detaching them from target object
     if (tileIds && tileIds.length > 0) {
-        await Promise.all(tileIds.map((tileId: any) => tile.destroy(tileId)));
+        try {
+            await Promise.all(tileIds.map((tileId: any) => tile.destroy(tileId)));
+        } catch (err) {
+            log.warn(`cleanUpTokenMask | Error deleting temporary tiles for session ${animationId}:`, err);
+        }
     }
 
     if (object) {
+        const doc = object.document ?? object;
         if (deleteObject) {
-            await object.document.delete();
-        } else if (animationId) {
-            // Remove only this specific animationId session's flag
-            await object.document.update(
-                adapter.formatDeletionUpdate('flags.eskie-macros.token-masks', animationId)
-            );
+            try {
+                await doc.delete();
+            } catch (err) {
+                log.warn(`cleanUpTokenMask | Error deleting target object ${tokenId}:`, err);
+            }
+        } else if (animationId && typeof doc.unsetFlag === 'function') {
+            try {
+                await doc.unsetFlag('eskie-macros', `token-masks.${animationId}`);
+            } catch (err) {
+                log.warn(`cleanUpTokenMask | Error unsetting flag for session ${animationId}:`, err);
+            }
         }
     }
 }

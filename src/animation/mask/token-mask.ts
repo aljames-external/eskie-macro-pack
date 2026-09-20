@@ -175,12 +175,14 @@ async function createLocal(object: any, tileIds: string[], animationId: string, 
             .locally(true);
     }
 
-    // Token/Tile clone
-    seq = seq.animation()
-        .delay(250)
-        .on(object)
-        .opacity(0)
-        .show(false);
+    // Token/Tile clone (only hide original token if it is being deleted / disintegrated)
+    if (deleteObject) {
+        seq = seq.animation()
+            .delay(250)
+            .on(object)
+            .opacity(0)
+            .show(false);
+    }
 
     seq = seq.effect()
         .name(label)
@@ -210,9 +212,10 @@ async function createLocal(object: any, tileIds: string[], animationId: string, 
         })
 
         .effect()
+        .name(label)
         .file(tokenOverlayPath)
         .attachTo(object, { bindAlpha: false, bindVisibility: false, bindRotation: false })
-        .mask(objectShapeMask)
+        .mask(objectRevealMask)
         .rotate(-rotation)
         .scaleToObject(paddingXY)
         .zIndex(1);
@@ -222,12 +225,14 @@ async function createLocal(object: any, tileIds: string[], animationId: string, 
     seq = seq.waitUntilFinished()
         .thenDo(async () => {
             // Instantly hide tiles locally to prevent them from flickering while database deletion syncs
-            if (objectRevealMask.object) objectRevealMask.object.visible = false;
-            if (sceneRevealMask.object) sceneRevealMask.object.visible = false;
-            if (objectShapeMask.object) objectShapeMask.object.visible = false;
+            [objectRevealMask, sceneRevealMask].forEach(tileDoc => {
+                if (tileDoc?.object) {
+                    tileDoc.object.visible = false;
+                }
+            });
 
             // If the object is going to be deleted, hide it locally as well to prevent it from popping back
-            if (deleteObject && object.object) {
+            if (deleteObject && object?.object) {
                 object.object.visible = false;
             }
 
@@ -303,10 +308,7 @@ async function playSocketed(object: any, config: any = {}) {
     const tiles = await createMaskTiles(object, { revealOverlay, rotation });
     const tileIds = tiles.map(t => t.id);
 
-    // 2. Store tile IDs on the object flags as a backup
-    await socket.object.edit(object.id, { [`flags.eskie-macros.token-masks.${animationId}`]: tileIds });
-
-    // 3. Attach tiles to object
+    // 2. Attach tiles to object
     await adapter.attachPlaceableElements(tiles, object);
 
     // 4. Set up the tracking promise for all active users
