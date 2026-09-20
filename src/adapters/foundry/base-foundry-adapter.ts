@@ -1317,30 +1317,41 @@ export class BaseFoundryAdapter {
      * @param {PlaceableObject} target Target Token or Tile placeable
      * @returns {Promise<unknown>}
      */
-    async detachPlaceableElements(elements: any, target: any) {
-        const isTile = this.isDocumentOfType(target, 'Tile');
+    async detachPlaceableElements(elements: any, target: any = null) {
+        const elemArray = Array.isArray(elements) ? elements : [elements].filter(Boolean);
+        if (elemArray.length === 0) return null;
+
+        let resolvedTarget = target;
+        if (!resolvedTarget && elemArray[0]) {
+            const firstDoc = elemArray[0].document ? elemArray[0].document : elemArray[0];
+            const attachedParentId = firstDoc?.getFlag?.('token-attacher', 'parent')
+                ?? firstDoc?.flags?.['token-attacher']?.parent
+                ?? firstDoc?.getFlag?.('multi-token-edit', 'parent')
+                ?? firstDoc?.flags?.['multi-token-edit']?.parent;
+            if (attachedParentId) {
+                resolvedTarget = this.getPlaceable(attachedParentId);
+            }
+        }
+
+        const isTile = resolvedTarget ? this.isDocumentOfType(resolvedTarget, 'Tile') : false;
 
         if (isTile) {
-            dependency.required([
-                { id: 'multi-token-edit', ref: "Baileywiki Mass Edit" }
-            ]);
-            if (this.massEdit?.removeLinks) return this.massEdit.removeLinks(elements, target);
+            if (dependency.isActivated({ id: 'multi-token-edit', ref: "Baileywiki Mass Edit" })) {
+                if (this.massEdit?.removeLinks) return this.massEdit.removeLinks(elemArray, resolvedTarget);
+            }
             return null;
         }
 
         // Default Token behavior
         if (dependency.isActivated({ id: 'token-attacher', ref: "Token Attacher" })) {
             if (this.tokenAttacher?.detachElementsFromToken) {
-                return this.tokenAttacher.detachElementsFromToken(elements, target, true);
+                return this.tokenAttacher.detachElementsFromToken(elemArray, resolvedTarget, true);
             }
         } else if (dependency.isActivated({ id: 'multi-token-edit', ref: "Baileywiki Mass Edit" })) {
-            if (this.massEdit?.removeLinks) return this.massEdit.removeLinks(elements, target);
+            if (this.massEdit?.removeLinks) return this.massEdit.removeLinks(elemArray, resolvedTarget);
         }
 
-        dependency.someRequired([
-            { id: 'token-attacher', ref: "Token Attacher" },
-            { id: 'multi-token-edit', ref: "Baileywiki Mass Edit" }
-        ]);
+        return null;
     }
 
     /**

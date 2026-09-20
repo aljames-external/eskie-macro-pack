@@ -110,12 +110,29 @@ async function createTile(updates: any = {}) {
 
 /**
  * Deletes multiple tile documents. To be registered in socketlib.
+ * Attempts to detach tiles from attached parent placeables before deletion unless options.detach === false.
  * @param {string[]} ids - An array of IDs of the tiles to delete.
+ * @param {object} [options={}] - Options object: { detach?: boolean }
  * @returns {Promise<TileDocument[]>} An array containing the deleted tile documents.
  */
-async function destroyTiles(ids: any) {
+async function destroyTiles(ids: any, options: any = {}) {
     if (!canvas.scene) return [];
-    return canvas.scene.deleteEmbeddedDocuments("Tile", ids);
+    const tileIds = [ids].flat().filter(Boolean);
+    if (tileIds.length === 0) return [];
+
+    const shouldDetach = options?.detach !== false;
+    if (shouldDetach) {
+        const tiles = tileIds.map((id: string) => (canvas as any).scene?.tiles?.get(id)).filter(Boolean);
+        if (tiles.length > 0) {
+            try {
+                await adapter.detachPlaceableElements(tiles, null);
+            } catch (err) {
+                log.warn(`destroyTiles | Error detaching tiles before deletion:`, err);
+            }
+        }
+    }
+
+    return canvas.scene.deleteEmbeddedDocuments("Tile", tileIds);
 }
 
 export const tileSockets = {
@@ -150,13 +167,16 @@ async function create(updates: any = {}) {
 
 /**
  * Deletes tiles, executing as GM if the user is not a GM.
+ * Attempts to detach tiles before deletion by default unless options.detach === false.
  * @param {string|string[]} id - The ID of the tile to delete, or an array of IDs.
+ * @param {object} [options={ detach: true }] - Deletion options object.
  * @returns {Promise<TileDocument[]>} An array containing the deleted tile document.
  */
-async function destroy(id: any) {
-    const ids = [id].flat();
-    if (game.user.isGM) return destroyTiles(ids);
-    return socketlib.executeAsGM("destroyTiles", ids);
+async function destroy(id: any, options: any = {}) {
+    const ids = [id].flat().filter(Boolean);
+    if (ids.length === 0) return [];
+    if (game.user.isGM) return destroyTiles(ids, options);
+    return socketlib.executeAsGM("destroyTiles", ids, options);
 }
 
 /**
