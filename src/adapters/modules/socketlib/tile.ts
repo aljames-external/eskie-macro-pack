@@ -1,6 +1,6 @@
 import { MODULE_ID } from "../../../lib/constants.js";
 import { log } from "../../../lib/logger.js";
-import { socketlib } from "./socketlib-module-adapter.js";
+import { socketlib } from "./instance.js";
 import { adapter } from "../../index.js";
 
 const tileTrackers = new Map();

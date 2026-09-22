@@ -750,7 +750,3 @@ test('thornWhip uses Sequencer 4.3.0+ sequence.motion(target).moveTo() for pulli
     assert.match(jsContent, /sequence\.motion\(target\)/, 'thorn-whip.js must use sequence.motion(target)');
     assert.match(jsContent, /\.moveTo\(/, 'thorn-whip.js must use .moveTo()');
 });
-
-
-
-

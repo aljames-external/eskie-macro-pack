@@ -1,5 +1,5 @@
 import { MODULE_ID } from "../../../lib/constants.js";
-import { socketlib } from "./socketlib-module-adapter.js";
+import { socketlib } from "./instance.js";
 
 /* To be registered in socketlib */
 async function editDoor(id: any, updates: any = {}) {

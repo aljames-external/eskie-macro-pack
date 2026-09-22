@@ -1,6 +1,7 @@
 
 import { log } from '../../../lib/logger.js';
-import { socket, socketlib } from "./socketlib-module-adapter.js";
+import { socketlib } from "./instance.js";
+import { socket } from "./socketlib-module-adapter.js";
 import { tokenMaskEffect, tokenMaskTracker, playLocal, stopLocal } from "../../../animation/mask/token-mask.js";
 import { tile } from "./tile.js";
 import { adapter } from "../../index.js";

@@ -7,86 +7,48 @@ if (!game.modules.get("sequencer")?.active) {
 }
 
 const token = canvas.tokens.controlled[0];
-if (!token) return ui.notifications.warn("Please select a token!");
+const target = Array.from(game.user.targets)[0];
 
-const target = game.user.targets.first() ?? token;
+if (!token) return ui.notifications.warn("Please select a token!");
 
 const closest = (path) => game.modules.get('eskie-macros')?.api?.util?.closest?.(path) ?? path;
 
-const slowParry = false;
-const type = "slashing";
-const weight = "medium";
-const color = "blue";
+const cfg = {
+    type: 'slashing',
+    weight: 'medium',
+    color: 'blue'
+};
 
-const deg = (rad) => (rad * 180) / Math.PI;
-const src = token.center ?? { x: token.x ?? 0, y: token.y ?? 0 };
-const tgtCenter = target.center ?? { x: target.x ?? 0, y: target.y ?? 0 };
-
-const baseRad = Math.atan2(tgtCenter.y - src.y, tgtCenter.x - src.x);
-const baseDeg = deg(baseRad);
-
-const tokenWidth = token.document?.width ?? token.width ?? 1;
+const weightIndex = ({ light: 0, medium: 1, heavy: 2 })[cfg.weight] ?? 1;
+const effectSize = 2 + (0.25 * weightIndex);
+const effectOffset = -0.75 - (0.25 * weightIndex);
+const tokenWidth = token.document?.width ?? 1;
 
 const sequence = new Sequence();
 
-sequence
-    .animation()
-        .on(token)
-        .opacity(0)
-        .delay(100)
+// Attacker parry recoil block motion via Sequencer 4.3.0+ sequence.motion(token)
+sequence.motion(token)
+    .moveBy({ x: -0.25 }, { gridUnits: true, duration: 250, ease: 'easeOutSine', delay: 100 })
+    .moveBy({ x: 0.25 }, { gridUnits: true, duration: 350, ease: 'easeOutCubic', delay: 350 });
 
-    .effect()
-        .name("Parry")
-        .copySprite(token)
+if (target) {
+    const targetSquare = { x: target.center.x, y: target.center.y };
+    sequence.effect()
+        .file(closest(`eskie.attack.melee.generic.01.${cfg.type}.${cfg.weight}.${cfg.color}.fast.03`))
         .atLocation(token)
-        .rotateTowards(target)
-        .animateProperty("spriteContainer", "position.x", { from: 0, to: -0.6, duration: 250, gridUnits: true, ease: "easeOutCubic", delay: 100 })
-        .animateProperty("spriteContainer", "position.x", { from: 0, to: 0.6, duration: 400, gridUnits: true, ease: "easeOutSine", delay: 450 })
-        .duration(1000)
-        .spriteRotation(-baseDeg)
-        .spriteOffset({ x: -0.5 }, { gridUnits: true });
+        .rotateTowards(targetSquare)
+        .scaleToObject(effectSize, { considerTokenScale: true })
+        .spriteOffset({ x: effectOffset * tokenWidth }, { gridUnits: true })
+        .randomizeMirrorY()
+        .zIndex(1);
 
-if (!slowParry) {
-    sequence
-        .effect()
-            .file(closest(`eskie.attack.melee.generic.01.${type}.${weight}.${color}.normal.01`))
-            .atLocation(token)
-            .rotateTowards(target)
-            .scaleToObject(2, { considerTokenScale: true })
-            .spriteOffset({ x: -1.675 * tokenWidth }, { gridUnits: true })
-            .randomizeMirrorY()
-            .zIndex(1)
-
-        .effect()
-            .file(closest("eskie.particle.05.orange"))
-            .atLocation(token)
-            .scaleToObject(2, { considerTokenScale: true })
-            .randomRotation()
-            .zIndex(1.1);
-} else {
-    sequence
-        .effect()
-            .file(closest(`eskie.attack.melee.generic.01.${type}.${weight}.${color}.slow.01`))
-            .atLocation(token)
-            .rotateTowards(target)
-            .scaleToObject(2, { considerTokenScale: true })
-            .spriteOffset({ x: -1.675 * tokenWidth }, { gridUnits: true })
-            .randomizeMirrorY()
-            .zIndex(1)
-
-        .effect()
-            .file(closest("eskie.particle.07.orange"))
-            .atLocation(token)
-            .rotateTowards(target)
-            .scaleToObject(1.5, { considerTokenScale: true })
-            .zIndex(1.1)
-            .spriteOffset({ x: -1.25 * tokenWidth }, { gridUnits: true });
+    sequence.effect()
+        .file(closest("eskie.particle.07.orange"))
+        .atLocation(token)
+        .rotateTowards(targetSquare)
+        .scaleToObject(1.5, { considerTokenScale: true })
+        .zIndex(1.1)
+        .spriteOffset({ x: -1.25 * tokenWidth }, { gridUnits: true });
 }
-
-sequence
-    .wait(850)
-    .animation()
-        .on(token)
-        .opacity(1);
 
 await sequence.play({ preload: true });
