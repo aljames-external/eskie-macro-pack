@@ -895,6 +895,69 @@ test('channelDivinityDreadAspect uses Sequencer 4.3.0+ sequence.motion(target).n
     assert.match(jsContent, /\.noise\(/, 'dread-aspect.js must use .noise()');
 });
 
+test('fingerOfDeath uses Sequencer 4.3.0+ sequence.motion(target).noise() for finger of death target death shudder instead of copySprite and opacity(0) hiding', () => {
+    const tsModulePath = path.join(rootDir, 'src/animation/effects/target/fingerOfDeath.ts');
+    const jsMacroPath = path.join(rootDir, 'src/standalone-macros/finger-of-death.js');
+
+    const tsContent = fs.readFileSync(tsModulePath, 'utf8');
+    const jsContent = fs.readFileSync(jsMacroPath, 'utf8');
+
+    assert.doesNotMatch(tsContent, /copySprite/, 'fingerOfDeath.ts must not use copySprite');
+    assert.doesNotMatch(tsContent, /\.opacity\(0\)/, 'fingerOfDeath.ts must not hide token with opacity(0)');
+    assert.match(tsContent, /\.motion\(/, 'fingerOfDeath.ts must use .motion()');
+    assert.match(tsContent, /\.motion\(target\)/, 'fingerOfDeath.ts must use .motion(target)');
+    assert.match(tsContent, /\.noise\(\)/, 'fingerOfDeath.ts must use .noise()');
+
+    assert.doesNotMatch(jsContent, /copySprite/, 'finger-of-death.js must not use copySprite');
+    assert.doesNotMatch(jsContent, /\.opacity\(0\)/, 'finger-of-death.js must not hide token with opacity(0)');
+    assert.match(jsContent, /\.motion\(/, 'finger-of-death.js must use .motion()');
+    assert.match(jsContent, /\.motion\(target\)/, 'finger-of-death.js must use .motion(target)');
+    assert.match(jsContent, /\.noise\(\)/, 'finger-of-death.js must use .noise()');
+});
+
+test('rapidStrike uses Sequencer 4.3.0+ sequence.motion(token).moveBy() for rapid strike slash step instead of copySprite and opacity(0) hiding', () => {
+    const tsModulePath = path.join(rootDir, 'src/animation/effects/on-target/rapid-strike.ts');
+    const jsMacroPath = path.join(rootDir, 'src/standalone-macros/rapid-strike.js');
+
+    const tsContent = fs.readFileSync(tsModulePath, 'utf8');
+    const jsContent = fs.readFileSync(jsMacroPath, 'utf8');
+
+    assert.doesNotMatch(tsContent, /copySprite/, 'rapid-strike.ts must not use copySprite');
+    assert.doesNotMatch(tsContent, /\.opacity\(0\)/, 'rapid-strike.ts must not hide token with opacity(0)');
+    assert.match(tsContent, /\.motion\(/, 'rapid-strike.ts must use .motion()');
+    assert.match(tsContent, /\.motion\(token\)/, 'rapid-strike.ts must use .motion(token)');
+    assert.match(tsContent, /\.moveBy\(/, 'rapid-strike.ts must use .moveBy()');
+
+    assert.doesNotMatch(jsContent, /copySprite/, 'rapid-strike.js must not use copySprite');
+    assert.doesNotMatch(jsContent, /\.opacity\(0\)/, 'rapid-strike.js must not hide token with opacity(0)');
+    assert.match(jsContent, /\.motion\(/, 'rapid-strike.js must use .motion()');
+    assert.match(jsContent, /\.motion\(token\)/, 'rapid-strike.js must use .motion(token)');
+    assert.match(jsContent, /\.moveBy\(/, 'rapid-strike.js must use .moveBy()');
+});
+
+test('flurryOfBlows uses Sequencer 4.3.0+ sequence.motion(token).moveBy() for flurry strike step instead of copySprite and opacity(0) hiding', () => {
+    const tsModulePath = path.join(rootDir, 'src/animation/effects/on-target/flurry-of-blows.ts');
+    const jsMacroPath = path.join(rootDir, 'src/standalone-macros/flurry-of-blows.js');
+
+    const tsContent = fs.readFileSync(tsModulePath, 'utf8');
+    const jsContent = fs.readFileSync(jsMacroPath, 'utf8');
+
+    assert.doesNotMatch(tsContent, /copySprite/, 'flurry-of-blows.ts must not use copySprite');
+    assert.doesNotMatch(tsContent, /\.opacity\(0\)/, 'flurry-of-blows.ts must not hide token with opacity(0)');
+    assert.match(tsContent, /\.motion\(/, 'flurry-of-blows.ts must use .motion()');
+    assert.match(tsContent, /\.motion\(token\)/, 'flurry-of-blows.ts must use .motion(token)');
+    assert.match(tsContent, /\.moveBy\(/, 'flurry-of-blows.ts must use .moveBy()');
+
+    assert.doesNotMatch(jsContent, /copySprite/, 'flurry-of-blows.js must not use copySprite');
+    assert.doesNotMatch(jsContent, /\.opacity\(0\)/, 'flurry-of-blows.js must not hide token with opacity(0)');
+    assert.match(jsContent, /\.motion\(/, 'flurry-of-blows.js must use .motion()');
+    assert.match(jsContent, /\.motion\(token\)/, 'flurry-of-blows.js must use .motion(token)');
+    assert.match(jsContent, /\.moveBy\(/, 'flurry-of-blows.js must use .moveBy()');
+});
+
+
+
+
 
 
 

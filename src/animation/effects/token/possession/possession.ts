@@ -25,31 +25,20 @@ async function create(token: Token, target: Token, config: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id, color, sound } = mConfig;
     const tintColor = getTintColor(color);
+    const label = `${id} - ${target.document.uuid}`;
 
     let seq = new Sequence();
     applySound(seq, sound);
-    seq.wait(100)
-        .animation()
-        .on(token)
-        .opacity(1)
-        .hide()
-        .wait(500)
 
-        .effect()
-        .copySprite(token)
-        .spriteRotation(-token.document.rotation)
-        .atLocation(target)
-        .mirrorX(token.document.texture.scaleX < 0)
-        .animateProperty('spriteContainer', 'position.y', { from: -1, to: 0, duration: 750, gridUnits: true, ease: "easeOutExpo" })
-        .scaleToObject(1, { considerTokenScale: true })
-        .duration(750)
-        .fadeOut(400)
-        .opacity(0.65)
-        .tint(tintColor)
-        .filter("ColorMatrix", { saturate: -0.2, brightness: 1.2 })
-        .filter("Blur", { blurX: 0, blurY: 10 })
+    // Possessing spirit float motion via Sequencer 4.3.0+ .motion() API
+    seq.motion(token)
+        .name(label)
+        .oscillate()
+        .fadeTo(0.65)
+        .tintTo(tintColor)
+        .persist();
 
-        .effect()
+    seq.effect()
         .delay(100)
         .file(closest(`jb2a.particles.outward.white.01.03`))
         .attachTo(target, { offset: { y: 0.2 }, gridUnits: true, bindRotation: false })
@@ -63,11 +52,11 @@ async function create(token: Token, target: Token, config: any = {}) {
         .tint(tintColor)
         .filter("Blur", { blurX: 0, blurY: 5 })
         .opacity(0.8)
-        .zIndex(0.3)
+        .zIndex(0.3);
 
-        .effect()
+    seq.effect()
         .delay(500)
-        .name(`${id} - ${target.document.uuid}`)
+        .name(label)
         .file(closest("jb2a.extras.tmfx.outflow.circle.01"))
         .attachTo(target, { cacheLocation: true, offset: { y: 0 }, gridUnits: true, bindAlpha: false })
         .scaleToObject(1.45, { considerTokenScale: true })
@@ -79,11 +68,11 @@ async function create(token: Token, target: Token, config: any = {}) {
         .tint(tintColor)
         .loopProperty("alphaFilter", "alpha", { from: 0.75, to: 1, duration: 1500, pingPong: true, ease: "easeOutSine" })
         .filter("ColorMatrix", { saturate: -0.2, brightness: 1.2 })
-        .persist()
+        .persist();
 
-        .effect()
+    seq.effect()
         .delay(500)
-        .name(`${id} - ${target.document.uuid}`)
+        .name(label)
         .copySprite(target)
         .spriteRotation(-target.document.rotation)
         .attachTo(target, { bindAlpha: false })
@@ -96,11 +85,7 @@ async function create(token: Token, target: Token, config: any = {}) {
         .fadeOut(500)
         .persist()
         .zIndex(0.1)
-        .waitUntilFinished()
-    
-        .animation()
-        .on(token)
-        .show(false);
+        .waitUntilFinished();
 
     return seq;
 }
@@ -113,9 +98,8 @@ async function play(token: Token, target: Token, config: any = {}) {
 async function stop(token: Token, target: Token, config: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id } = mConfig;
-    await Sequencer.EffectManager.endEffects({ name: `${id} - ${target.document.uuid}`, object: target });
-    let sequence = new Sequence().animation().on(token).show(true);
-    return sequence.play();
+    const label = `${id} - ${target.document.uuid}`;
+    return Sequencer.EffectManager.endEffects({ name: label });
 }
 
 export const possession = {
@@ -124,3 +108,4 @@ export const possession = {
     stop,
     default_config: DEFAULT_CONFIG,
 };
+

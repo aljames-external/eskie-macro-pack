@@ -30,9 +30,16 @@ const DEFAULT_CONFIG = {
 };
 
 async function create(token: Token, target: Token, config: any = {}) {
+    if (!token || !target) return null;
     config = settingsOverride(config);
     const { color, sound } = adapter.mergeObject(DEFAULT_CONFIG, config);
     const tokenWidth = adapter.getTokenDimensions(token).widthUnits;
+    const tokenCenter = adapter.getCenter(token);
+    const targetCenter = adapter.getCenter(target);
+    const middle = {
+        x: (targetCenter.x - tokenCenter.x) * 0.25,
+        y: (targetCenter.y - tokenCenter.y) * 0.25,
+    };
     let seq = new Sequence();
 
     applySound(seq, sound.punch1);
@@ -60,6 +67,10 @@ async function create(token: Token, target: Token, config: any = {}) {
         .mirrorY()
         .zIndex(1);
 
+    seq = seq.motion(token)
+        .moveBy(middle, { duration: 100, ease: "easeOutExpo" })
+        .moveBy({ x: -middle.x, y: -middle.y }, { duration: 350, ease: "easeInOutQuad" });
+
     seq = seq.wait(250);
 
     seq = seq.effect()
@@ -68,17 +79,6 @@ async function create(token: Token, target: Token, config: any = {}) {
         .size(tokenWidth * 1.25, {gridUnits:true})
         .repeats(14,125,125)
         .randomRotation();
-
-    seq = seq.effect()
-        .copySprite(target)
-        .spriteRotation(-adapter.getTokenRotation(target))
-        .atLocation(target)
-        .scaleToObject(1, { considerTokenScale: true })
-        .fadeIn(200)
-        .fadeOut(200)
-        .loopProperty('spriteContainer', 'position.x', { from: -0.05, to: 0.05, duration: 50, pingPong: true, gridUnits: true})
-        .duration(1750)
-        .opacity(0.25);
 
     return seq;
 }

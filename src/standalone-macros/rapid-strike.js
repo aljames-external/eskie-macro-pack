@@ -1,6 +1,6 @@
 // Standalone Macro: Rapid Strike
 // Original Author: EskieMoh#2969
-// Modular Conversion: standalone-macro
+// Modular Conversion & Sequencer 4.3.0+ .motion() Update: bakanabaka
 
 if (!game.modules.get("sequencer")?.active) {
     return ui.notifications.error("The 'Rapid Strike' macro requires the 'Sequencer' module to be installed and active!");
@@ -62,7 +62,7 @@ const DEFAULT_CONFIG = {
     color: "red",       // Set Attack Color
     attacks: 12,        // Set Attack Number
     sound: {
-        enabled: true,
+        enable: true,
         volume: 0.5
     }
 };
@@ -94,15 +94,22 @@ const tokenWidth = token.document?.width ?? 1;
 
 function createAttackAnimation(token, target, targetSquare) {
     const targetWidth = target.document?.width ?? 1;
-    const targetRotation = target.document?.rotation ?? 0;
+    const srcCenter = token.center ?? { x: token.x, y: token.y };
+    const baseRad = Math.atan2(targetSquare.y - srcCenter.y, targetSquare.x - srcCenter.x);
+    const slashX = Math.cos(baseRad) * 0.35;
+    const slashY = Math.sin(baseRad) * 0.35;
 
     const seq = new Sequence();
 
-    if (sound?.enabled ?? true) {
+    if (sound?.enable ?? sound?.enabled ?? true) {
         seq.sound()
             .file(closest(`psfx.impacts.${type}`))
             .volume(sound?.volume ?? 0.5);
     }
+
+    seq.motion(token)
+        .moveBy({ x: slashX, y: slashY }, { duration: 80, ease: "easeOutQuad", gridUnits: true })
+        .moveBy({ x: -slashX, y: -slashY }, { duration: 120, ease: "easeInQuad", gridUnits: true });
 
     seq.effect()
         .name(label)
@@ -159,19 +166,6 @@ function createAttackAnimation(token, target, targetSquare) {
         .belowTokens()
         .opacity(0.15)
         .zIndex(0.15)
-
-    .effect()
-        .name(label)
-        .delay(150)
-        .copySprite(target)
-        .attachTo(target)
-        .scaleToObject(1, { considerTokenScale: true })
-        .spriteRotation(-targetRotation)
-        .loopProperty('spriteContainer', 'position.x', { from: -0.05, to: 0.05, duration: 50, pingPong: true, gridUnits: true })
-        .opacity(0.25)
-        .duration(1000)
-        .fadeOut(750)
-        .tint("#FF0000")
 
     .wait(150);
 

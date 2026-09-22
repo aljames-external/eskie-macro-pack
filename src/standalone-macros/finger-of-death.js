@@ -100,7 +100,6 @@ sequence.effect()
     .zIndex(1);
 
 for (const target of targets) {
-    const targetRotation = target.document?.rotation ?? target.rotation ?? 0;
     const tokenWidth = token.document?.width ?? 1;
 
     sequence.wait(750)
@@ -200,18 +199,6 @@ for (const target of targets) {
         .repeats(10, 250, 250)
         .zIndex(1)
 
-    // Desaturated soul wither residual ghost image
-    .effect()
-        .name(id)
-        .copySprite(target)
-        .spriteRotation(-targetRotation)
-        .attachTo(target)
-        .scaleToObject(1, { considerTokenScale: true })
-        .fadeIn(5000)
-        .fadeOut(5000)
-        .filter("ColorMatrix", { saturate: -1, brightness: 0.5 })
-        .duration(10000)
-
     // Dark necrotic shadow ring under target token
     .effect()
         .name(id)
@@ -224,20 +211,11 @@ for (const target of targets) {
         .belowTokens()
         .duration(10000)
 
-    // Soul wither disintegration rapid jitter flicker
-    .effect()
+    // Soul wither disintegration death shudder motion
+    .motion(target)
         .name(id)
-        .copySprite(target)
-        .spriteRotation(-targetRotation)
-        .attachTo(target)
-        .scaleToObject(1, { considerTokenScale: true })
-        .fadeIn(100)
-        .fadeOut(1000)
-        .playbackRate(4)
-        .loopProperty('spriteContainer', 'position.x', { from: -0.05, to: 0.05, duration: 55, pingPong: true, gridUnits: true })
+        .noise()
         .duration(5000)
-        .opacity(0.15)
-        .zIndex(0.1)
 
     // Secondary dying static electricity crackle
     .effect()

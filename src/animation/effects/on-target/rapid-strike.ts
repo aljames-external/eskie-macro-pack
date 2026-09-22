@@ -1,3 +1,6 @@
+// Author: EskieMoh#2969
+// Modular Conversion & Sequencer 4.3.0+ .motion() Update: bakanabaka
+
 import { adapter } from '../../../adapters/index.js';
 import { closest } from '../../../lib/filemanager.js';
 import { settingsOverride } from "../../../lib/settings.js";
@@ -17,108 +20,113 @@ const DEFAULT_CONFIG = {
     }
 };
 
-function create(token: Token, target: Token, config: any = {}) {
+async function create(token: Token, target: Token, config: Record<string, any> = {}) {
+    config = settingsOverride(config);
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { type, weight, color, attacks, sound } = mConfig;
+
+    if (!token || !target) return null;
 
     //Determine Attack Size
     const weightIndex = ({ light: 0, medium: 1, heavy: 2 } as Record<string, number>)[weight] ?? 2;
     const effectSize = 2 + (0.25 * weightIndex);
     const effectOffset = -0.75 - (0.25 * weightIndex);
     const targetSquare = adapter.getNearestSquareCenter(token, target);
-    if (!targetSquare) return;
+    if (!targetSquare) return null;
     const tokenWidth = adapter.getTokenDimensions(token).widthUnits;
 
-    function attackAnimation(token: Token, target: Token, config: any) {
+    const tokenCenter = adapter.getCenter(token);
+    const baseRad = Math.atan2(targetSquare.y - tokenCenter.y, targetSquare.x - tokenCenter.x);
+    const slashX = Math.cos(baseRad) * 0.35;
+    const slashY = Math.sin(baseRad) * 0.35;
+
+    function attackAnimation(token: Token, target: Token, config: Record<string, any>) {
         const seq = new Sequence();
         applySound(seq, { ...sound, file: sound.file ?? `psfx.impacts.${type}` });
 
+        seq.motion(token)
+            .moveBy({ x: slashX, y: slashY }, { duration: 80, ease: "easeOutQuad", gridUnits: true })
+            .moveBy({ x: -slashX, y: -slashY }, { duration: 120, ease: "easeInQuad", gridUnits: true });
+
         seq.effect()
-                .file(closest(`eskie.attack.melee.generic.01.${type}.${weight}.${color}.slow`))
-                .atLocation(token)
-                .rotateTowards(targetSquare,{randomOffset:0.25})
-                .scaleToObject(effectSize)
-                .spriteOffset({ x: effectOffset * tokenWidth }, { gridUnits: true })
-                .randomizeMirrorY()
-                .fadeOut(750, {ease:"easeOutQuint"})
-                .zIndex(1)
+            .file(closest(`eskie.attack.melee.generic.01.${type}.${weight}.${color}.slow`))
+            .atLocation(token)
+            .rotateTowards(targetSquare, { randomOffset: 0.25 })
+            .scaleToObject(effectSize)
+            .spriteOffset({ x: effectOffset * tokenWidth }, { gridUnits: true })
+            .randomizeMirrorY()
+            .fadeOut(750, { ease: "easeOutQuint" })
+            .zIndex(1)
 
-            .effect()
-                .delay(150)
-                .file(closest("jb2a.impact.003.yellow"))
-                .size(1.75 * tokenWidth, { gridUnits: true })
-                .atLocation(targetSquare)
-                .randomRotation()
-                .playbackRate(1)
-                .spriteScale({x:1, y:1}, {gridUnits:true})
-                .zIndex(0.1)
+        .effect()
+            .delay(150)
+            .file(closest("jb2a.impact.003.yellow"))
+            .size(1.75 * tokenWidth, { gridUnits: true })
+            .atLocation(targetSquare)
+            .randomRotation()
+            .playbackRate(1)
+            .spriteScale({ x: 1, y: 1 }, { gridUnits: true })
+            .zIndex(0.1)
 
-            .effect()
-                .delay(150)
-                .file(closest(`jb2a.impact.008.${color}`))
-                .size(0.75 * tokenWidth, { gridUnits: true })
-                .atLocation(targetSquare)
-                .randomRotation()
-                .playbackRate(1.25)
-                .zIndex(0.1)
+        .effect()
+            .delay(150)
+            .file(closest(`jb2a.impact.008.${color}`))
+            .size(0.75 * tokenWidth, { gridUnits: true })
+            .atLocation(targetSquare)
+            .randomRotation()
+            .playbackRate(1.25)
+            .zIndex(0.1)
 
-            .effect()
-                .delay(150)
-                .file(closest(`eskie.slice.01.color.${color}`))
-                .size(1.25 * tokenWidth, { gridUnits: true })
-                .atLocation(targetSquare)
-                .randomRotation()
-                .playbackRate(1)
-                .spriteScale({x:4, y:1}, {gridUnits:true})
-                .zIndex(0.15)
+        .effect()
+            .delay(150)
+            .file(closest(`eskie.slice.01.color.${color}`))
+            .size(1.25 * tokenWidth, { gridUnits: true })
+            .atLocation(targetSquare)
+            .randomRotation()
+            .playbackRate(1)
+            .spriteScale({ x: 4, y: 1 }, { gridUnits: true })
+            .zIndex(0.15)
 
-            .effect()
-                .delay(150)
-                .file(closest("eskie.slice.01.black.colorless"))
-                .size(1.25 * tokenWidth, { gridUnits: true })
-                .atLocation(targetSquare)
-                .randomRotation()
-                .playbackRate(1)
-                .spriteScale({x:16, y:1}, {gridUnits:true})
-                .belowTokens()
-                .opacity(0.15)
-                .zIndex(0.15)
+        .effect()
+            .delay(150)
+            .file(closest("eskie.slice.01.black.colorless"))
+            .size(1.25 * tokenWidth, { gridUnits: true })
+            .atLocation(targetSquare)
+            .randomRotation()
+            .playbackRate(1)
+            .spriteScale({ x: 16, y: 1 }, { gridUnits: true })
+            .belowTokens()
+            .opacity(0.15)
+            .zIndex(0.15)
 
-            .effect()
-                .delay(150)
-                .copySprite(target)
-                .attachTo(target)
-                .scaleToObject(1, { considerTokenScale: true })
-                .spriteRotation(-adapter.getTokenRotation(target))
-                .loopProperty('spriteContainer', 'position.x', { from: -0.05, to: 0.05, duration: 50, pingPong: true, gridUnits: true})
-                .opacity(0.25)
-                .duration(1000)
-                .fadeOut(750)
-                .tint("#FF0000")
-
-            .wait(150);
+        .wait(150);
 
         return seq;
     }
 
     const seq = new Sequence();
-    for(let i = 1; i <= attacks; i++){    
+    for (let i = 1; i <= attacks; i++) {
         seq.addSequence(attackAnimation(token, target, config));
-    };
+    }
 
     return seq;
 }
 
-async function play(token: Token, target: Token, config: any = {}) {
-    config = settingsOverride(config);
+async function play(token: Token, target: Token, config: Record<string, any> = {}) {
     const seq = await create(token, target, config);
     if (seq) { return seq.play(); }
+    return null;
+}
+
+function stop() {
+    // Transient animation
 }
 
 export const rapidStrike = {
     create,
     play,
+    stop,
     default_config: DEFAULT_CONFIG,
 };
 
-adapter.autorec.register("rapidStrike", "melee-target", "eskie.effect.rapidStrike", DEFAULT_CONFIG, "0.0.1", "Rapid Strike");
+adapter.autorec.register("rapidStrike", "melee-target", "eskie.effect.rapidStrike", DEFAULT_CONFIG, "0.0.2", "Rapid Strike");

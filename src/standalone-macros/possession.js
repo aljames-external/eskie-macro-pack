@@ -14,7 +14,6 @@ const closest = (path) => game.modules.get('eskie-macros')?.api?.util?.closest?.
 const activePossessions = Sequencer.EffectManager.getEffects({ name: "eskie.effect.possession.main*" });
 if (activePossessions.length > 0) {
     await Sequencer.EffectManager.endEffects({ name: "eskie.effect.possession.main*" });
-    await new Sequence().animation().on(token).opacity(1).show(true).play();
     return ui.notifications.info(`Ended ghost possession.`);
 }
 
@@ -25,32 +24,17 @@ const targetUuid = target.document?.uuid ?? target.uuid ?? target.id;
 const effectName = `eskie.effect.possession.main - ${targetUuid}`;
 
 const tintColor = "#6ff087"; // Teal ghostly energy tint
-const tokenRotation = token.document?.rotation ?? token.rotation ?? 0;
 const targetRotation = target.document?.rotation ?? target.rotation ?? 0;
 const mirrorX = token.document?.mirrorX ?? false;
 
 const seq = new Sequence();
 
-seq.wait(100)
-    .animation()
-    .on(token)
-    .opacity(1)
-    .hide()
-    .wait(500);
-
-seq.effect()
-    .copySprite(token)
-    .spriteRotation(-tokenRotation)
-    .atLocation(target)
-    .mirrorX(mirrorX)
-    .animateProperty("spriteContainer", "position.y", { from: -1, to: 0, duration: 750, gridUnits: true, ease: "easeOutExpo" })
-    .scaleToObject(1, { considerTokenScale: true })
-    .duration(750)
-    .fadeOut(400)
-    .opacity(0.65)
-    .tint(tintColor)
-    .filter("ColorMatrix", { saturate: -0.2, brightness: 1.2 })
-    .filter("Blur", { blurX: 0, blurY: 10 });
+seq.motion(token)
+    .name(effectName)
+    .oscillate()
+    .fadeTo(0.65)
+    .tintTo(tintColor)
+    .persist();
 
 seq.effect()
     .delay(100)
@@ -100,9 +84,5 @@ seq.effect()
     .persist()
     .zIndex(0.1)
     .waitUntilFinished();
-
-seq.animation()
-    .on(token)
-    .show(false);
 
 await seq.play();
