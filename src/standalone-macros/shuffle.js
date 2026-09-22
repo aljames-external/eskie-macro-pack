@@ -1,6 +1,6 @@
 // Standalone Macro: Shuffle
 // Original Author: Gornetron (nefin)
-// Update Author: bakanabaka
+// Modular Conversion & Sequencer 4.3.0+ .motion() Update: bakanabaka
 
 if (!game.modules.get("sequencer")?.active) {
     return ui.notifications.error("The 'Shuffle' macro requires the 'Sequencer' module to be installed and active!");
@@ -26,17 +26,15 @@ if (sendToCenter) {
     centerPoint.y /= destinationPoints.length;
 
     for (const t of targets) {
-        shuffleSeq.animation()
-            .on(t)
-            .moveTowards(centerPoint)
+        shuffleSeq.motion(t)
+            .moveTo(centerPoint)
             .duration(800);
     }
 }
 
 for (let i = 0; i < targets.length; i++) {
-    shuffleSeq.animation()
-        .on(targets[i])
-        .moveTowards(shuffledPositions[i])
+    shuffleSeq.motion(targets[i])
+        .moveTo(shuffledPositions[i])
         .delay(sendToCenter ? 200 : 0)
         .duration(1000);
 }

@@ -1,10 +1,12 @@
 
 import { log } from '../../../lib/logger.js';
 import { socketlib } from "./instance.js";
-import { socket } from "./socketlib-module-adapter.js";
 import { tokenMaskEffect, tokenMaskTracker, playLocal, stopLocal } from "../../../animation/mask/token-mask.js";
 import { tile } from "./tile.js";
-import { adapter } from "../../index.js";
+
+function getAdapter() {
+    return (globalThis as any).adapter;
+}
 
 /**
  * Socketlib handler to execute local sequence rendering on a client.
@@ -18,7 +20,7 @@ async function playTokenMaskLocal(tokenId: string, tileIds: any, initiatorUserId
         animationId: config.animationId
     });
 
-    const object = adapter.getPlaceable(tokenId);
+    const object = getAdapter().getPlaceable(tokenId);
     if (!object) {
         log.warn(`playTokenMaskLocal | Object ${tokenId} not found on this client!`);
         // Report completion immediately to not block the initiator
@@ -90,7 +92,7 @@ async function cleanUpTokenMask(tokenId: any, animationId: any, tileIds: any, de
         }
     }
 
-    const object = adapter.getPlaceable(tokenId);
+    const object = getAdapter().getPlaceable(tokenId);
     if (object) {
         const doc = object.document ?? object;
         if (deleteObject) {
@@ -114,7 +116,7 @@ async function cleanUpTokenMask(tokenId: any, animationId: any, tileIds: any, de
  */
 async function playTokenMaskGM(tokenId: any, config: any = {}) {
     if (!game.user.isGM) return;
-    const object = adapter.getPlaceable(tokenId);
+    const object = getAdapter().getPlaceable(tokenId);
     if (!object) return;
     return tokenMaskEffect.play(object, config);
 }

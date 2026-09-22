@@ -1,7 +1,10 @@
 import { MODULE_ID } from "../../../lib/constants.js";
 import { log } from "../../../lib/logger.js";
 import { socketlib } from "./instance.js";
-import { adapter } from "../../index.js";
+
+function getAdapter() {
+    return (globalThis as any).adapter;
+}
 
 const tileTrackers = new Map();
 
@@ -17,7 +20,7 @@ async function waitForTileReplication(tileId: any) {
         resolvePromise = resolve;
     });
 
-    const trackerId = adapter.randomID();
+    const trackerId = getAdapter().randomID();
     
     // Safety timeout (10 seconds)
     const timeoutId = setTimeout(() => {
@@ -104,7 +107,7 @@ async function createTile(updates: any = {}) {
         width: 1,
         height: 1
     };
-    updates = adapter.mergeObject(DEFAULT_TILE_UPDATES, updates);
+    updates = getAdapter().mergeObject(DEFAULT_TILE_UPDATES, updates);
     return (canvas as any).scene?.createEmbeddedDocuments("Tile", [updates as any]) ?? [];
 }
 
@@ -125,7 +128,7 @@ async function destroyTiles(ids: any, options: any = {}) {
         const tiles = tileIds.map((id: string) => (canvas as any).scene?.tiles?.get(id)).filter(Boolean);
         if (tiles.length > 0) {
             try {
-                await adapter.detachPlaceableElements(tiles, null);
+                await getAdapter().detachPlaceableElements(tiles, null);
             } catch (err) {
                 log.warn(`destroyTiles | Error detaching tiles before deletion:`, err);
             }

@@ -3,7 +3,7 @@ import { applySound, DEFAULT_SOUND_CONFIG } from '../../utils/sound.js';
 
 /* **
    Original Author: Gornetron (nefin)
-   Update Author: bakanabaka
+   Modular Conversion & Sequencer 4.3.0+ .motion() Update: bakanabaka
 ** */
 
 const DEFAULT_CONFIG = {
@@ -33,17 +33,15 @@ function create(targets: Token[], config: any = {}) {
         centerPoint.x /= destinationPoints.length;
         centerPoint.y /= destinationPoints.length;
         for (const t of targets) {
-            shuffleSeq.animation()
-                .on(t)
-                .moveTowards(centerPoint)
+            shuffleSeq.motion(t)
+                .moveTo(centerPoint)
                 .duration(1000);
         }
     }
 
     for (let i = 0; i < targets.length; i++) {
-        shuffleSeq.animation()
-            .on(targets[i])
-            .moveTowards(shuffle[i])
+        shuffleSeq.motion(targets[i])
+            .moveTo(shuffle[i])
             .delay(200)
             .duration(1000);
     }

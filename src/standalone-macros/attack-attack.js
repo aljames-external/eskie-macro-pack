@@ -1,6 +1,6 @@
 // Standalone Macro: Showcase - Attack Attack Duel
 // Original Author: EskieMoh#2969
-// Modular Conversion: bakanabaka
+// Modular Conversion & Sequencer 4.3.0+ .motion() Update: bakanabaka
 
 if (!game.modules.get("sequencer")?.active) {
     return ui.notifications.error("The 'Attack Attack Duel' macro requires the 'Sequencer' module to be installed and active!");
@@ -17,8 +17,6 @@ const isPlaying = Sequencer.EffectManager.getEffects({ name: "gob" }).length > 0
 if (isPlaying) {
     Sequencer.EffectManager.endEffects({ name: "gob" });
     Sequencer.EffectManager.endEffects({ name: "Trail" });
-    if (red) new Sequence().animation().on(red).opacity(1).play();
-    if (blue) new Sequence().animation().on(blue).opacity(1).play();
     return ui.notifications.info("Stopped Attack Attack duel.");
 }
 
@@ -61,38 +59,16 @@ const { b1, b2, b3, b4, r1, r2, r3, r4 } = positions;
 
 const seq = new Sequence();
 
-// Movement 1: Initial clash clash charges
-seq.animation()
+// Initial clash charges via Sequencer 4.3.0+ sequence.motion(token)
+seq.motion(blue)
     .delay(400)
-    .on(blue)
-    .teleportTo(b1, { relativeToCenter: true })
-    .opacity(0);
+    .moveTo(b1, { relativeToCenter: true })
+    .moveTo(b2, { delay: 1000, ease: "easeOutQuint", rotate: false });
 
-seq.animation()
+seq.motion(red)
     .delay(400)
-    .on(red)
-    .teleportTo(r1, { relativeToCenter: true })
-    .opacity(0);
-
-seq.effect()
-    .name("gob")
-    .copySprite(blue)
-    .spriteRotation(-blue.document.rotation)
-    .scaleToObject(1, { considerTokenScale: true })
-    .moveTowards(b2, { delay: 1000, ease: "easeOutQuint", rotate: false })
-    .loopProperty("spriteContainer", "position.x", { from: 0.05, to: 0, duration: 50, pingPong: true, gridUnits: true, delay: 1500 })
-    .animateProperty("spriteContainer", "position.x", { from: 0, to: -1, duration: 250, pingPong: true, gridUnits: true, fromEnd: true, ease: "easeOutCubic" })
-    .persist();
-
-seq.effect()
-    .name("gob")
-    .copySprite(red)
-    .spriteRotation(-red.document.rotation)
-    .scaleToObject(1, { considerTokenScale: true })
-    .moveTowards(r2, { delay: 1000, ease: "easeOutQuint", rotate: false })
-    .loopProperty("spriteContainer", "position.x", { from: -0.05, to: 0, duration: 50, pingPong: true, gridUnits: true, delay: 1500 })
-    .animateProperty("spriteContainer", "position.x", { from: 0, to: 1, duration: 250, pingPong: true, gridUnits: true, fromEnd: true, ease: "easeOutCubic" })
-    .persist();
+    .moveTo(r1, { relativeToCenter: true })
+    .moveTo(r2, { delay: 1000, ease: "easeOutQuint", rotate: false });
 
 seq.wait(750);
 
@@ -175,7 +151,7 @@ seq.thenDo(() => {
     Sequencer.EffectManager.endEffects({ name: "gob" });
 });
 
-seq.animation().on(blue).opacity(1).teleportTo(b3, { relativeToCenter: true });
-seq.animation().on(red).opacity(1).teleportTo(r3, { relativeToCenter: true });
+seq.motion(blue).moveTo(b3, { relativeToCenter: true });
+seq.motion(red).moveTo(r3, { relativeToCenter: true });
 
 await seq.play({ preload: true });

@@ -1,16 +1,21 @@
 
+// Original Author: EskieMoh#2969
+// Modular Conversion & Sequencer 4.3.0+ .motion() Update: bakanabaka
+
 import { closest } from '../../../lib/filemanager.js';
 import { matt } from '../../utils/matt-tiles.js';
 import { applySound, DEFAULT_SOUND_CONFIG } from '../../utils/sound.js';
+import { settingsOverride } from '../../../lib/settings.js';
+import { adapter } from '../../../adapters/index.js';
 
-import { adapter } from "../../../adapters/index.js";
 export const DEFAULT_CONFIG = {
     id: 'Grapple Latch',
     follow: true,
     sound: { ...DEFAULT_SOUND_CONFIG }
 };
 
-function create(token: Token, target: Token, config: any = {}) {
+function create(token: Token, target: Token, config: Record<string, any> = {}) {
+    config = settingsOverride(config);
     const { id, sound } = adapter.mergeObject(DEFAULT_CONFIG, config);
     const label = `${id} - ${token.id}`;
 
@@ -33,12 +38,12 @@ function create(token: Token, target: Token, config: any = {}) {
             .scaleToObject(1.75, {considerTokenScale: true})
             .belowTokens()
             .opacity(0.6)
-            .waitUntilFinished()
+            .waitUntilFinished();
     
     return sequenceOn;
 }
 
-async function play(token: Token, target: Token, config: any = {}) {
+async function play(token: Token, target: Token, config: Record<string, any> = {}) {
     const targetuuid = target.document.uuid;
     const mergedConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const effectFunction = `eskie.effect.grapple.macro.movement`;
@@ -48,29 +53,27 @@ async function play(token: Token, target: Token, config: any = {}) {
     if (sequence) return sequence.play();
 }
 
-async function stop(token: Token, target?: Token, config: any = {}) {
+async function stop(token: Token, target?: Token, config: Record<string, any> = {}) {
     const { id } = adapter.mergeObject(DEFAULT_CONFIG, config);
     const label = matt.getLabel(id, token);
     await matt.movement.stop(token, label);
     Sequencer.EffectManager.endEffects({ name: label, object: token });
 }
 
-async function movement(token: Token, targetuuid: string, tile: Tile, config: any = {}) {
+async function movement(token: Token, targetuuid: string, tile: Tile, config: Record<string, any> = {}) {
     const targetDoc = await adapter.fromUuid(targetuuid);
     const target = targetDoc?.object;
     if (!target) return;
-    function travelSequence(config: any = {}) {
+    function travelSequence(config: Record<string, any> = {}) {
         const {rotation, travelTime, label, delta: {x: dx, y: dy}} = config;
         const repetitions = Math.floor(travelTime / 100);
         
         let SequenceMATT = new Sequence();
     
         if (config.follow) {
-            SequenceMATT = SequenceMATT
-                .animation()
-                    .on(target)
-                    .moveTowards({x: target.x - dx, y: target.y - dy})
-                    .duration(travelTime)
+            SequenceMATT.motion(target)
+                .moveTo({ x: target.x - dx, y: target.y - dy })
+                .duration(travelTime);
         }
             
         SequenceMATT = SequenceMATT
@@ -122,9 +125,8 @@ async function movement(token: Token, targetuuid: string, tile: Tile, config: an
 
     const mergedConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const {rotation, travelTime, label, delta: {x: dx, y: dy}} = await matt.movement.configure(token, tile, mergedConfig);
-    return travelSequence({tile, rotation, travelTime, label, delta: {x: dx, y: dy}, follow: config.follow}).play();
+    return travelSequence({tile, rotation, travelTime, label, delta: {x: dx, y: dy}, follow: mergedConfig.follow}).play();
 }
-
 
 export const grapple = {
     create,

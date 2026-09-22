@@ -1177,6 +1177,35 @@ test('maxtacTraumaTeamAV uses Sequencer 4.3.0+ sequence.motion(tile) and motion(
     assert.match(jsContent, /\.oscillate\(\)/, 'maxtac.js must use .oscillate()');
 });
 
+test('shuffle uses Sequencer 4.3.0+ sequence.motion(target).moveTo() API for position swaps instead of legacy moveTowards', () => {
+    const tsModulePath = path.join(rootDir, 'src/animation/effects/multi-token/shuffle.ts');
+    const jsMacroPath = path.join(rootDir, 'src/standalone-macros/shuffle.js');
+
+    const tsContent = fs.readFileSync(tsModulePath, 'utf8');
+    const jsContent = fs.readFileSync(jsMacroPath, 'utf8');
+
+    assert.doesNotMatch(tsContent, /\.moveTowards\(/, 'shuffle.ts must not use legacy moveTowards()');
+    assert.match(tsContent, /\.motion\(/, 'shuffle.ts must use .motion()');
+    assert.match(tsContent, /\.moveTo\(/, 'shuffle.ts must use .moveTo()');
+
+    assert.doesNotMatch(jsContent, /\.moveTowards\(/, 'shuffle.js must not use legacy moveTowards()');
+    assert.match(jsContent, /\.motion\(/, 'shuffle.js must use .motion()');
+    assert.match(jsContent, /\.moveTo\(/, 'shuffle.js must use .moveTo()');
+});
+
+test('attackAttack macro uses Sequencer 4.3.0+ sequence.motion().moveTo() API for clashing token dash movement instead of copySprite and opacity(0) hiding', () => {
+    const jsMacroPath = path.join(rootDir, 'src/standalone-macros/attack-attack.js');
+    const jsContent = fs.readFileSync(jsMacroPath, 'utf8');
+
+    assert.doesNotMatch(jsContent, /copySprite/, 'attack-attack.js must not use copySprite');
+    assert.doesNotMatch(jsContent, /\.opacity\(0\)/, 'attack-attack.js must not hide token with opacity(0)');
+    assert.match(jsContent, /\.motion\(blue\)/, 'attack-attack.js must use sequence.motion(blue)');
+    assert.match(jsContent, /\.motion\(red\)/, 'attack-attack.js must use sequence.motion(red)');
+    assert.match(jsContent, /\.moveTo\(/, 'attack-attack.js must use .moveTo()');
+});
+
+
+
 
 
 
