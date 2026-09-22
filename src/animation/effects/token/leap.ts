@@ -106,14 +106,11 @@ async function createLeap(token: Token, config: AnimationEffectConfig = {}) {
         .moveTowards(position, { rotate: false })
         .zIndex(2)
 
-        .animation()
-        .on(token)
-        .moveTowards(position, { rotate: false, ease: "easeInOutQuad" })
-        .motion({
-            arc: 0.8,
-            duration: 1000,
-            ease: "easeInOutQuad"
-        })
+    const tokenPlaceable = (adapter.getPlaceable(token as any) ?? (token as any)?.object ?? token) as Token;
+    if (!tokenPlaceable) return null;
+
+    sequence.motion(tokenPlaceable)
+        .moveTo(position, { duration: 1000, ease: "easeInOutQuad" })
         .snapToGrid();
 
     return sequence;

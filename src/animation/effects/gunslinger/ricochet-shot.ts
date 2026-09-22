@@ -36,16 +36,16 @@ async function create(token: Token, targetToken?: Token, config: AnimationEffect
         y: (casterCenter.y + finalPos.y) / 2 - 100
     };
 
+    const tokenPlaceable = (adapter.getPlaceable(token as any) ?? (token as any)?.object ?? token) as Token;
+    if (!tokenPlaceable) return null;
+
     const sequence = new Sequence();
     applySound(sequence, sound);
 
     // Caster recoil via Sequencer 4.3.0+ .motion()
-    sequence.animation()
-        .on(token)
-        .motion({
-            recoil: 0.15,
-            duration: 250
-        });
+    sequence.motion(tokenPlaceable)
+        .moveBy({ x: -10, y: 0 }, { duration: 125, ease: 'easeOutQuad' })
+        .moveBy({ x: 10, y: 0 }, { duration: 125, ease: 'easeInQuad' });
 
     // Primary shot streak to ricochet point
     sequence.effect()

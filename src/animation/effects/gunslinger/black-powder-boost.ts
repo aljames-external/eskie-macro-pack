@@ -38,15 +38,12 @@ async function create(token: Token, config: AnimationEffectConfig = {}, options:
         .playbackRate(1.5)
         .opacity(0.7);
 
+    const tokenPlaceable = (adapter.getPlaceable(token as any) ?? (token as any)?.object ?? token) as Token;
+    if (!tokenPlaceable) return null;
+
     // Gunslinger token propulsion using Sequencer 4.3.0+ .motion()
-    sequence.animation()
-        .on(token)
-        .moveTowards(position, { delay: 50, rotate: false, ease: 'easeOutExpo' })
-        .motion({
-            arc: 0.5,
-            speed: 2,
-            ease: 'easeOutExpo'
-        });
+    sequence.motion(tokenPlaceable)
+        .moveTo(position, { duration: 500, ease: 'easeOutExpo' });
 
     // Landing smoke impact puff
     sequence.effect()

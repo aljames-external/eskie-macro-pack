@@ -29,16 +29,16 @@ async function create(token: Token, targetToken?: Token, config: AnimationEffect
         targetPos = pos;
     }
 
+    const tokenPlaceable = (adapter.getPlaceable(token as any) ?? (token as any)?.object ?? token) as Token;
+    if (!tokenPlaceable) return null;
+
     const sequence = new Sequence();
     applySound(sequence, sound);
 
     // Caster weapon recoil via Sequencer 4.3.0+ .motion()
-    sequence.animation()
-        .on(token)
-        .motion({
-            recoil: 0.3,
-            duration: 300
-        });
+    sequence.motion(tokenPlaceable)
+        .moveBy({ x: -15, y: 0 }, { duration: 150, ease: 'easeOutQuad' })
+        .moveBy({ x: 15, y: 0 }, { duration: 150, ease: 'easeInQuad' });
 
     // Muzzle flash at caster position
     sequence.effect()

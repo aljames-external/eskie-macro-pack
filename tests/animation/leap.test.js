@@ -52,8 +52,18 @@ test('leap.create builds sequence with .motion() animation and ground shadow wit
                         };
                     }
                     if (prop === 'motion') {
-                        return (motionCfg) => {
-                            capturedMotionConfig = motionCfg;
+                        return (targetOrCfg) => {
+                            if (targetOrCfg && typeof targetOrCfg === 'object' && targetOrCfg.id) {
+                                capturedAnimationTarget = targetOrCfg;
+                            } else {
+                                capturedMotionConfig = targetOrCfg;
+                            }
+                            return proxy;
+                        };
+                    }
+                    if (prop === 'moveTo') {
+                        return (pos, options) => {
+                            capturedMotionConfig = options;
                             return proxy;
                         };
                     }
@@ -101,9 +111,8 @@ test('leap.create builds sequence with .motion() animation and ground shadow wit
         const seq = await leap.create(mockToken, { position: targetPos });
         assert.ok(seq, 'Sequence must be created');
         assert.equal(capturedAnimationTarget, mockToken, 'Animation target must be the token');
-        assert.ok(capturedMotionConfig, '.motion() configuration must be passed');
-        assert.equal(capturedMotionConfig.arc, 0.8, 'motion.arc must be 0.8');
-        assert.equal(capturedMotionConfig.duration, 1000, 'motion.duration must be 1000');
+        assert.ok(capturedMotionConfig, 'motion configuration must be passed');
+        assert.equal(capturedMotionConfig.duration, 1000, 'motion duration must be 1000');
         assert.equal(opacitySetZero, false, 'Token opacity must NOT be set to 0');
         assert.equal(teleportToCalled, false, 'teleportTo must NOT be called');
         assert.equal(copySpriteCount, 1, 'Only 1 copySprite effect should be present for the ground shadow overlay');

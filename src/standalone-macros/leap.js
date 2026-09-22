@@ -97,15 +97,10 @@ sequence.effect()
     .zIndex(2);
 
 // --- 3. HIGH ARC AERIAL SPIN TRAJECTORY VIA SEQUENCER 4.3.0+ .MOTION() ---
-sequence.animation()
-    .on(token)
-    .moveTowards(position, { rotate: false, ease: "linear" })
-    .motion({
-        arc: 0.8,
-        rotation: 720,
-        duration: jumpTime,
-        ease: "easeInOutSine"
-    })
+const tokenPlaceable = token?.object ?? token;
+
+sequence.motion(tokenPlaceable)
+    .moveTo(position, { duration: jumpTime, ease: "easeInOutQuad" })
     .snapToGrid();
 
 sequence.effect()

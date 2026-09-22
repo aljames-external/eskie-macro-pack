@@ -46,15 +46,14 @@ const bouncePos = {
     y: (casterCenter.y + finalPos.y) / 2 - 100
 };
 
+const tokenPlaceable = token?.object ?? token;
+
 const sequence = new Sequence();
 
 // Caster recoil via Sequencer 4.3.0+ .motion()
-sequence.animation()
-    .on(token)
-    .motion({
-        recoil: 0.15,
-        duration: 250
-    });
+sequence.motion(tokenPlaceable)
+    .moveBy({ x: -10, y: 0 }, { duration: 125, ease: 'easeOutQuad' })
+    .moveBy({ x: 10, y: 0 }, { duration: 125, ease: 'easeInQuad' });
 
 // Primary shot streak to ricochet point
 sequence.effect()

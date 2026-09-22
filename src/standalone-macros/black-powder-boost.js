@@ -48,15 +48,11 @@ sequence.effect()
     .playbackRate(1.5)
     .opacity(0.7);
 
+const tokenPlaceable = token?.object ?? token;
+
 // Gunslinger token propulsion using Sequencer 4.3.0+ .motion()
-sequence.animation()
-    .on(token)
-    .moveTowards(position, { delay: 50, rotate: false, ease: 'easeOutExpo' })
-    .motion({
-        arc: 0.5,
-        speed: 2,
-        ease: 'easeOutExpo'
-    });
+sequence.motion(tokenPlaceable)
+    .moveTo(position, { duration: 500, ease: 'easeOutExpo' });
 
 // Landing smoke impact puff
 sequence.effect()

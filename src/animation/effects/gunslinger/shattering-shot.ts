@@ -29,16 +29,16 @@ async function create(token: Token, targetToken?: Token, config: AnimationEffect
         targetPos = pos;
     }
 
+    const tokenPlaceable = (adapter.getPlaceable(token as any) ?? (token as any)?.object ?? token) as Token;
+    if (!tokenPlaceable) return null;
+
     const sequence = new Sequence();
     applySound(sequence, sound);
 
     // Heavy shooter recoil motion via Sequencer 4.3.0+ .motion()
-    sequence.animation()
-        .on(token)
-        .motion({
-            recoil: 0.4,
-            duration: 400
-        });
+    sequence.motion(tokenPlaceable)
+        .moveBy({ x: -20, y: 0 }, { duration: 200, ease: 'easeOutQuad' })
+        .moveBy({ x: 20, y: 0 }, { duration: 200, ease: 'easeInQuad' });
 
     // High velocity armor piercing projectile beam
     sequence.effect()

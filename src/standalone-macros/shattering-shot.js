@@ -40,15 +40,14 @@ if (!targetPos) {
     if (!targetPos) return;
 }
 
+const tokenPlaceable = token?.object ?? token;
+
 const sequence = new Sequence();
 
 // Heavy shooter recoil motion via Sequencer 4.3.0+ .motion()
-sequence.animation()
-    .on(token)
-    .motion({
-        recoil: 0.4,
-        duration: 400
-    });
+sequence.motion(tokenPlaceable)
+    .moveBy({ x: -20, y: 0 }, { duration: 200, ease: 'easeOutQuad' })
+    .moveBy({ x: 20, y: 0 }, { duration: 200, ease: 'easeInQuad' });
 
 // High velocity armor piercing projectile beam
 sequence.effect()

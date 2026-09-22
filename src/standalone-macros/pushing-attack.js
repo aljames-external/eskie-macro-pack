@@ -75,13 +75,9 @@ const tokenWidth = tokenPlaceable.document?.width ?? tokenPlaceable.width ?? 1;
 const sequence = new Sequence();
 
 // Attacker thrust motion using Sequencer 4.3.0+ .motion()
-sequence.animation()
-    .on(tokenPlaceable)
-    .motion({
-        recoil: -0.2,
-        duration: 450,
-        ease: 'easeOutExpo'
-    });
+sequence.motion(tokenPlaceable)
+    .moveBy({ x: -backposition.x, y: -backposition.y }, { duration: 250, ease: 'easeOutExpo' })
+    .moveBy({ x: backposition.x, y: backposition.y }, { duration: 200, ease: 'easeInExpo' });
 
 sequence.effect()
     .file(closest("eskie.smoke.02.white"))

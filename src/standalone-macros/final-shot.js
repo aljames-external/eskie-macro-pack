@@ -40,15 +40,14 @@ if (!targetPos) {
     if (!targetPos) return;
 }
 
+const tokenPlaceable = token?.object ?? token;
+
 const sequence = new Sequence();
 
 // Caster weapon recoil via Sequencer 4.3.0+ .motion()
-sequence.animation()
-    .on(token)
-    .motion({
-        recoil: 0.3,
-        duration: 300
-    });
+sequence.motion(tokenPlaceable)
+    .moveBy({ x: -15, y: 0 }, { duration: 150, ease: 'easeOutQuad' })
+    .moveBy({ x: 15, y: 0 }, { duration: 150, ease: 'easeInQuad' });
 
 // Muzzle flash at caster position
 sequence.effect()
