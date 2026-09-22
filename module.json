@@ -48,7 +48,9 @@
             {
                 "id": "sequencer",
                 "type": "module",
-                "compatibility": {}
+                "compatibility": {
+                    "minimum": "4.3.0"
+                }
             },
             {
                 "id": "socketlib",
