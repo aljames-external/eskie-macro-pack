@@ -750,3 +750,24 @@ test('thornWhip uses Sequencer 4.3.0+ sequence.motion(target).moveTo() for pulli
     assert.match(jsContent, /sequence\.motion\(target\)/, 'thorn-whip.js must use sequence.motion(target)');
     assert.match(jsContent, /\.moveTo\(/, 'thorn-whip.js must use .moveTo()');
 });
+
+test('hide uses Sequencer 4.3.0+ sequence.motion(token).fadeTo(0.25) for stealth fade instead of copySprite and opacity(0) hiding', () => {
+    const tsModulePath = path.join(rootDir, 'src/animation/effects/active-effect/hide.ts');
+    const jsMacroPath = path.join(rootDir, 'src/standalone-macros/hide.js');
+
+    const tsContent = fs.readFileSync(tsModulePath, 'utf8');
+    const jsContent = fs.readFileSync(jsMacroPath, 'utf8');
+
+    assert.doesNotMatch(tsContent, /copySprite/, 'hide.ts must not use copySprite');
+    assert.doesNotMatch(tsContent, /\.opacity\(0\)/, 'hide.ts must not hide token with opacity(0)');
+    assert.match(tsContent, /\.motion\(/, 'hide.ts must use .motion()');
+    assert.match(tsContent, /seq\.motion\(token\)/, 'hide.ts must use seq.motion(token)');
+    assert.match(tsContent, /\.fadeTo\(0\.25\)/, 'hide.ts must use .fadeTo(0.25)');
+
+    assert.doesNotMatch(jsContent, /copySprite/, 'hide.js must not use copySprite');
+    assert.doesNotMatch(jsContent, /\.opacity\(0\)/, 'hide.js must not hide token with opacity(0)');
+    assert.match(jsContent, /\.motion\(/, 'hide.js must use .motion()');
+    assert.match(jsContent, /sequence\.motion\(token\)/, 'hide.js must use sequence.motion(token)');
+    assert.match(jsContent, /\.fadeTo\(0\.25\)/, 'hide.js must use .fadeTo(0.25)');
+});
+

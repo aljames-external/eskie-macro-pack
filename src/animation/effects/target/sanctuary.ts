@@ -5,12 +5,18 @@ import { closest } from '../../../lib/filemanager.js';
 
 import { adapter } from "../../../adapters/index.js";
 import { applySound, DEFAULT_SOUND_CONFIG } from "../../utils/sound.js";
-const DEFAULT_CONFIG = {
+export interface SanctuaryConfig {
+    id?: string;
+    sound?: SoundConfig;
+    [key: string]: unknown;
+}
+
+const DEFAULT_CONFIG: SanctuaryConfig = {
     id: 'Sanctuary',
     sound: { ...DEFAULT_SOUND_CONFIG },
 };
 
-async function create(token: Token, target: Token, config: any = {}) {
+async function create(token: Token, target: Token, config: SanctuaryConfig = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { sound } = mConfig;
     let seq = new Sequence();
@@ -58,17 +64,10 @@ async function create(token: Token, target: Token, config: any = {}) {
 
         .wait(250)
 
-        .effect()
-            .copySprite(target)
-            .spriteRotation(-target.document.rotation)
-            .atLocation(target)
-            .scaleToObject(1, { considerTokenScale: true })
-            .duration(2000)
-            .fadeIn(2000)
-            .filter("ColorMatrix", {saturate:-1, brightness:10})
-            .filter("Blur", { blurX: 5, blurY: 10 })
-            .opacity(0.5)
-            .waitUntilFinished(-1500)
+        .motion(target)
+            .name(`${target.name} Sanctuary`)
+            .oscillate()
+            .persist()
 
         .effect()
             .file(closest("jb2a.extras.tmfx.border.circle.outpulse.01.normal"))
@@ -151,12 +150,12 @@ async function create(token: Token, target: Token, config: any = {}) {
     return seq;
 }
 
-async function play(token: Token, target: Token, config: any = {}) {
+async function play(token: Token, target: Token, config: SanctuaryConfig = {}) {
     const seq = await create(token, target, config);
-    if (seq) { seq.play(); }
+    if (seq) { return seq.play(); }
 }
 
-function stop(token: Token, config: any = {}) {
+function stop(token: Token, config: SanctuaryConfig = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id } = mConfig;
     return Sequencer.EffectManager.endEffects({ name: `${token.name} ${id}`, object: token });

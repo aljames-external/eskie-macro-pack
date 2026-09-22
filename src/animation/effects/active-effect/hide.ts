@@ -6,48 +6,21 @@ import { closest } from "../../../lib/filemanager.js";
 
 import { adapter } from "../../../adapters/index.js";
 import { applySound, DEFAULT_SOUND_CONFIG } from "../../utils/sound.js";
+
 const DEFAULT_CONFIG = {
     id: "hide",
     sound: { ...DEFAULT_SOUND_CONFIG },
 };
 
-async function create(token: Token, config: any = {}) {
+async function create(token: Token, config: Record<string, any> = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
-    const { id, sound } = mConfig;
+    const { sound } = mConfig;
 
-    let seq = new Sequence();
+    const seq = new Sequence();
     applySound(seq, sound);
-    seq = seq
-      .effect()
-        .copySprite(token)
-        .spriteRotation(-token.document.rotation)
-        .attachTo(token)
-        .scaleToObject(1, { considerTokenScale: true })
-        .duration(1500) 
-        .animateProperty('sprite', 'width', { from: 0, to: 0.05, duration: 400, gridUnits:true, ease: "easeOutCubic"})
-        .animateProperty('sprite', 'height', { from: 0, to:  0.05, duration: 400, gridUnits:true, ease: "easeOutCubic"})
-        .animateProperty('sprite', 'width', { from: 0, to: - 0.05, duration: 250, gridUnits:true, ease: "easeOutCubic", delay: 500})
-        .animateProperty('sprite', 'height', { from: 0, to: - 0.05, duration: 250, gridUnits:true, ease: "easeOutCubic", delay: 500})
-        .filter("Glow", { color: 0x000000 })
-        .tint("#696969")
-        .fadeIn(500, {delay:150})
-        .fadeOut(1000)
-     
-      .effect()
-        .copySprite(token)
-        .spriteRotation(-token.document.rotation)
-        .attachTo(token)
-        .scaleToObject(1, { considerTokenScale: true })
-        .duration(750) 
-        .animateProperty('sprite', 'width', { from: 0, to: 0.05, duration: 400, gridUnits:true, ease: "easeOutCubic"})
-        .animateProperty('sprite', 'height', { from: 0, to:  0.05, duration: 400, gridUnits:true, ease: "easeOutCubic"})
-        .animateProperty('sprite', 'width', { from: 0, to: - 0.05, duration: 250, gridUnits:true, ease: "easeOutCubic", delay: 500})
-        .animateProperty('sprite', 'height', { from: 0, to: - 0.05, duration: 250, gridUnits:true, ease: "easeOutCubic", delay: 500})
-        .fadeOut(250)
-        .zIndex(1)  
-        .waitUntilFinished(-250)  
 
-      .effect()
+    // Black smoke burst
+    seq.effect()
         .file(closest("eskie.smoke.03.black"))
         .attachTo(token)
         .scaleToObject(1.75)
@@ -55,30 +28,27 @@ async function create(token: Token, config: any = {}) {
         .randomRotation()
         .fadeOut(1000)
         .zIndex(2)
-        .tint("#696969")
+        .tint("#696969");
 
-      .animation()
-        .on(token)
-        .tint("#696969")
-        .opacity(0.8)
-  
+    // Stealth fade motion via Sequencer 4.3.0+ sequence.motion(token)
+    seq.motion(token)
+        .fadeTo(0.25)
+        .tintTo("#696969");
+
     return seq;
 }
 
-async function play(token: Token, config: any = {}) {
+async function play(token: Token, config: Record<string, any> = {}) {
     const seq = await create(token, config);
     if (seq) return seq.play();
 }
 
-async function stop(token: Token, config: any = {}) {
-    new Sequence()
-
-      .animation()
-        .on(token)
-        .opacity(1)
-        .tint("#FFFFFF")
-      
-    .play();
+async function stop(token: Token, _config: Record<string, any> = {}) {
+    return new Sequence()
+        .motion(token)
+        .fadeTo(1)
+        .tintTo("#FFFFFF")
+        .play();
 }
 
 export const hide = {
@@ -88,4 +58,4 @@ export const hide = {
     default_config: DEFAULT_CONFIG,
 };
 
-adapter.autorec.register("hide", "effect", "eskie.effect.hide", DEFAULT_CONFIG, "0.0.2", "Hide");
+adapter.autorec.register("hide", "effect", "eskie.effect.hide", DEFAULT_CONFIG, "0.0.3", "Hide");
