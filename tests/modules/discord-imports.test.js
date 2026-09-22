@@ -1139,6 +1139,26 @@ test('petrified uses Sequencer 4.3.0+ sequence.motion(token).noise() for petrifi
     assert.match(jsContent, /\.noise\(/, 'petrified.js must use .noise()');
 });
 
+test('totemicAttunementElk uses Sequencer 4.3.0+ sequence.motion(target).moveBy() for elk charge knockback push instead of copySprite and opacity(0) hiding', () => {
+    const tsModulePath = path.join(rootDir, 'src/animation/effects/active-effect/rage/totemic-attunement/elk.ts');
+    const jsMacroPath = path.join(rootDir, 'src/standalone-macros/totemic-attunement-elk.js');
+
+    const tsContent = fs.readFileSync(tsModulePath, 'utf8');
+    const jsContent = fs.readFileSync(jsMacroPath, 'utf8');
+
+    assert.doesNotMatch(tsContent, /copySprite/, 'elk.ts must not use copySprite');
+    assert.doesNotMatch(tsContent, /\.opacity\(0\)/, 'elk.ts must not hide token with opacity(0)');
+    assert.match(tsContent, /\.motion\(/, 'elk.ts must use .motion()');
+    assert.match(tsContent, /\.motion\(target\)/, 'elk.ts must use motion(target)');
+    assert.match(tsContent, /\.moveBy\(/, 'elk.ts must use .moveBy()');
+
+    assert.doesNotMatch(jsContent, /copySprite/, 'totemic-attunement-elk.js must not use copySprite');
+    assert.doesNotMatch(jsContent, /\.opacity\(0\)/, 'totemic-attunement-elk.js must not hide token with opacity(0)');
+    assert.match(jsContent, /\.motion\(/, 'totemic-attunement-elk.js must use .motion()');
+    assert.match(jsContent, /seq\.motion\(target\)/, 'totemic-attunement-elk.js must use seq.motion(target)');
+    assert.match(jsContent, /\.moveBy\(/, 'totemic-attunement-elk.js must use .moveBy()');
+});
+
 
 
 

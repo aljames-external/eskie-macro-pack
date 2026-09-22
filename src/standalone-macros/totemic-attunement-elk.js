@@ -48,23 +48,19 @@ seq.effect()
 // Optional Prone / Trample knock-down animation if targeting an enemy
 if (target) {
     const targetRotation = target.document?.rotation ?? target.rotation ?? 0;
+    const tokenCenter = token.center ?? { x: token.x, y: token.y };
+    const targetCenter = target.center ?? { x: target.x, y: target.y };
+    const gridSize = canvas.grid?.size ?? 100;
 
-    seq.animation()
-        .delay(100)
-        .on(target)
-        .opacity(0);
+    const pushDistance = 10;
+    const dx = targetCenter.x - tokenCenter.x;
+    const dy = targetCenter.y - tokenCenter.y;
+    const dist = Math.hypot(dx, dy) || 1;
 
-    seq.effect()
-        .copySprite(target)
-        .spriteRotation(-targetRotation)
-        .attachTo(target, { bindAlpha: false, bindRotation: false, local: false })
-        .scaleToObject(0.9, { considerTokenScale: true })
-        .zIndex(0.1)
-        .belowTokens()
-        .filter("ColorMatrix", { brightness: 0 })
-        .filter("Blur", { blurX: 5, blurY: 10 })
-        .opacity(0.65)
-        .duration(1200);
+    const pushOffset = {
+        x: (dx / dist) * (gridSize * (pushDistance / 5)),
+        y: (dy / dist) * (gridSize * (pushDistance / 5)),
+    };
 
     seq.effect()
         .delay(100)
@@ -77,16 +73,10 @@ if (target) {
         .animateProperty("spriteContainer", "position.y", { from: 0, to: -0.5, duration: 500, ease: "easeOutCubic", gridUnits: true })
         .filter("ColorMatrix", { saturate: 1 });
 
-    seq.effect()
-        .copySprite(target)
-        .spriteRotation(-targetRotation)
-        .attachTo(target, { bindAlpha: false, bindRotation: false, local: false })
-        .scaleToObject(1, { considerTokenScale: true })
-        .animateProperty("spriteContainer", "position.y", { from: 0, to: -0.5, duration: 500, ease: "easeOutCubic", delay: 100, gridUnits: true })
-        .animateProperty("spriteContainer", "position.y", { from: 0, to: 0.5, duration: 250, ease: "easeOutCubic", delay: 600, gridUnits: true })
-        .animateProperty("sprite", "rotation", { from: 0, to: 90, duration: 250, ease: "easeOutCubic", delay: 100 })
-        .duration(1200)
-        .waitUntilFinished(-500);
+    // Target elk charge knockback push and prone rotation tilt using Sequencer 4.3.0+ sequence.motion(target).moveBy()
+    seq.motion(target)
+        .rotateTo(targetRotation + 90)
+        .moveBy(pushOffset, { duration: 500, ease: "easeOutCubic" });
 
     seq.effect()
         .file(closest("eskie.smoke.03.tan"))
@@ -94,12 +84,6 @@ if (target) {
         .scaleToObject(2)
         .opacity(0.8)
         .belowTokens();
-
-    seq.animation()
-        .delay(300)
-        .on(target)
-        .opacity(1)
-        .rotate(targetRotation + 90);
 }
 
 await seq.play();

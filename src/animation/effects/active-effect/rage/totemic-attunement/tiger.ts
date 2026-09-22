@@ -33,92 +33,79 @@ async function create(token: Token, target: Token, config: any = {}) {
     let seq = new Sequence();
     applySound(seq, sound);
 
-    seq = seq.animation()
-        .delay(100)
-        .on(token)
-        .opacity(0)
+    seq.motion(token)
+        .moveTo(location, {
+            arc: 0.7,
+            duration: 900,
+            delay: 250,
+            ease: "easeOutQuint",
+            rotate: false
+        })
+        .snapToGrid();
 
-    .effect()
+    seq.effect()
         .file(closest(`eskie.aura.token.generic.02.${color}`))
         .name(label)
         .atLocation(token)
         .scaleToObject(2.1)
         .startTime(550)
         .duration(1450)
-        .moveTowards(location, {relativeToCenter: true, ease:"easeOutQuint",rotate:false,delay:240, snapToGrid:true})
-        .zIndex(1)
-    
-    .effect()
-        .copySprite(token)
-        .spriteRotation(-token.document.rotation)
-        .atLocation(token)
-        .scaleToObject(1, { considerTokenScale: true })
-        .duration(900)
-        .moveTowards(location, {relativeToCenter: true, ease:"easeOutQuint",rotate:false,delay:250, snapToGrid:true})
+        .moveTowards(location, { relativeToCenter: true, ease: "easeOutQuint", rotate: false, delay: 240, snapToGrid: true })
+        .zIndex(1);
 
-    .effect()
+    seq.effect()
         .delay(250)
         .file(closest("jb2a.teleport.01.white"))
         .atLocation(token)
         .rotateTowards(target)
         .scaleToObject(4)
-        .spriteScale({x:1.25,y:1},{gridUnits:true})
-        .spriteOffset({x:-3*tokenWidth},{gridUnits:true})
+        .spriteScale({ x: 1.25, y: 1 }, { gridUnits: true })
+        .spriteOffset({ x: -3 * tokenWidth }, { gridUnits: true })
         .duration(900)
         .tint("#ff0000")
-        .moveTowards(location, {relativeToCenter: true, ease:"easeOutQuint",rotate:false, snapToGrid:true})
-                
-    .effect()
+        .moveTowards(location, { relativeToCenter: true, ease: "easeOutQuint", rotate: false, snapToGrid: true });
+
+    seq.effect()
         .delay(100)
         .file(closest("eskie.velocity.01.white"))
         .atLocation(token)
         .rotateTowards(target)
         .scaleToObject(4)
         .opacity(0.5)
-        .spriteOffset({x:-2*tokenWidth},{gridUnits:true})
-        .zIndex(3)
+        .spriteOffset({ x: -2 * tokenWidth }, { gridUnits: true })
+        .zIndex(3);
 
-    .canvasPan()
-        .shake({ duration: 500, strength: 1, rotation: false, fadeOut: 500, delay:200 })
+    seq.canvasPan()
+        .shake({ duration: 500, strength: 1, rotation: false, fadeOut: 500, delay: 200 });
 
-    .animation()
-        .delay(250)
-        .on(token)
-        .teleportTo(location, {relativeToCenter:false})
-        .snapToGrid()
-
-    .effect()
+    seq.effect()
         .delay(400)
         .file(closest(`jb2a.melee_generic.creature_attack.claw.001.${color}`))
         .atLocation(location)
         .rotateTowards(target)
-        .filter("ColorMatrix", {saturate:0.5})
-        .spriteOffset({x:-0.9, y:0},{gridUnits:true})
+        .filter("ColorMatrix", { saturate: 0.5 })
+        .spriteOffset({ x: -0.9, y: 0 }, { gridUnits: true })
         .rotate(-60)
         .zIndex(1)
-        .rotateIn(-270, 400, {ease: "easeOutCubic"}) 
-        .size(2+tokenWidth,{gridUnits:true})
-        .playIf(count >= 1)
+        .rotateIn(-270, 400, { ease: "easeOutCubic" })
+        .size(2 + tokenWidth, { gridUnits: true })
+        .playIf(count >= 1);
 
-    .effect()
+    seq.effect()
         .delay(450)
         .file(closest(`jb2a.melee_generic.creature_attack.claw.001.${color}`))
         .atLocation(location)
         .rotateTowards(target)
-        .filter("ColorMatrix", {saturate:0.5})
-        .spriteOffset({x:-0.9, y:0},{gridUnits:true})
+        .filter("ColorMatrix", { saturate: 0.5 })
+        .spriteOffset({ x: -0.9, y: 0 }, { gridUnits: true })
         .rotate(60)
         .zIndex(1)
-        .rotateIn(270, 400, {ease: "easeOutCubic"}) 
-        .size(2+tokenWidth,{gridUnits:true})
+        .rotateIn(270, 400, { ease: "easeOutCubic" })
+        .size(2 + tokenWidth, { gridUnits: true })
         .mirrorY()
-        .playIf(count >= 2)
-    
-    .wait(850)
+        .playIf(count >= 2);
 
-    .animation()
-        .on(token)
-        .opacity(1);
+    seq.wait(850);
 
     return seq;
 }

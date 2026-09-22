@@ -22,60 +22,46 @@ function proneCreate(token: Token, target: Token, config: any = {}) {
     const { id, color, sound } = mConfig;
     const label = `${id} - ${token.id}`;
 
+    const targetRotation = adapter.getTokenRotation(target);
+    const tokenCenter = adapter.getCenter(token);
+    const targetCenter = adapter.getCenter(target);
+    const gridSize = adapter.getGridSize();
+
+    const pushDistance = 10;
+    const dx = targetCenter.x - tokenCenter.x;
+    const dy = targetCenter.y - tokenCenter.y;
+    const dist = Math.hypot(dx, dy) || 1;
+
+    const pushOffset = {
+        x: (dx / dist) * (gridSize * (pushDistance / 5)),
+        y: (dy / dist) * (gridSize * (pushDistance / 5)),
+    };
+
     const seq = new Sequence();
     applySound(seq, sound);
     seq
-        .animation()
-            .delay(100)
-            .on(target)
-            .opacity(0)
-
-        .effect()
-            .copySprite(target)
-            .spriteRotation(-adapter.getTokenRotation(target))
-            .attachTo(target, {bindAlpha:false, bindRotation:false,local:false})
-            .scaleToObject(0.9, { considerTokenScale: true })
-            .zIndex(0.1)
-            .belowTokens()
-            .filter("ColorMatrix", { brightness:0 })
-            .filter("Blur", { blurX: 5, blurY: 10 })
-            .opacity(0.65)
-            .duration(1200)
-
         .effect()
             .delay(100)
             .file(closest(`eskie.damage.bludgeoning.01.${color}`))
-            .attachTo(target,{bindAlpha:false,bindRotation:false})
+            .attachTo(target, { bindAlpha: false, bindRotation: false })
             .scaleToObject(1.5)
             .opacity(1)
             .zIndex(1)
             .belowTokens()
-            .animateProperty('spriteContainer', 'position.y', { from: 0, to: -0.5, duration: 500, ease: "easeOutCubic", gridUnits: true })
-            .filter("ColorMatrix", { saturate:1 })
-        
-        .effect()
-            .copySprite(target)
-            .spriteRotation(-adapter.getTokenRotation(target))
-            .attachTo(target, {bindAlpha:false, bindRotation:false,local:false})
-            .scaleToObject(1, { considerTokenScale: true })
-            .animateProperty('spriteContainer', 'position.y', { from: 0, to: -0.5, duration: 500, ease: "easeOutCubic", delay:100, gridUnits: true })
-            .animateProperty('spriteContainer', 'position.y', { from: 0, to: 0.5, duration: 250, ease: "easeOutCubic", delay:600, gridUnits: true })
-            .animateProperty('sprite', 'rotation', { from: 0, to: 90, duration: 250, ease: "easeOutCubic", delay:100 })  
-            .duration(1200)
-            .waitUntilFinished(-500)
+            .animateProperty('spriteContainer', 'position.y', { from: 0, to: -0.5, duration: 500, ease: 'easeOutCubic', gridUnits: true })
+            .filter('ColorMatrix', { saturate: 1 })
+
+        .motion(target)
+            .rotateTo(targetRotation + 90)
+            .moveBy(pushOffset, { duration: 500, ease: 'easeOutCubic' })
 
         .effect()
-            .file(closest("eskie.smoke.03.tan"))
-            .attachTo(target,{bindAlpha:false,bindRotation:false})
+            .file(closest('eskie.smoke.03.tan'))
+            .attachTo(target, { bindAlpha: false, bindRotation: false })
             .scaleToObject(2)
             .opacity(0.8)
-            .belowTokens()
+            .belowTokens();
 
-        .animation()
-            .delay(300)
-            .on(target)
-            .opacity(1)
-            .rotate(adapter.getTokenRotation(target)+90);
     return seq;
 }
 
