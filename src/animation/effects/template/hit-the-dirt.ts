@@ -30,11 +30,14 @@ async function create(token: Token, config: AnimationEffectConfig = {}, options:
     const sequence = new Sequence();
     applySound(sequence, sound);
 
+    const tokenPlaceable = (adapter.getPlaceable(token as any) ?? (token as any)?.object ?? token) as Token;
+    if (!tokenPlaceable) return null;
+
     // Launch dust puff
     sequence.effect()
         .delay(100)
         .file(closest('eskie.smoke.06.white'))
-        .atLocation(token)
+        .atLocation(tokenPlaceable)
         .scaleToObject(1.1)
         .belowTokens()
         .playbackRate(1.5)
@@ -42,8 +45,8 @@ async function create(token: Token, config: AnimationEffectConfig = {}, options:
 
     // Dynamic motion shadow under diving token
     sequence.effect()
-        .copySprite(token)
-        .atLocation(token)
+        .copySprite(tokenPlaceable)
+        .atLocation(tokenPlaceable)
         .scaleToObject(0.85, { considerTokenScale: true })
         .moveTowards(position, { delay: 100, rotate: false, ease: 'easeOutQuint' })
         .duration(1600)
@@ -57,17 +60,17 @@ async function create(token: Token, config: AnimationEffectConfig = {}, options:
         .delay(900)
         .file(closest('eskie.smoke.01.white'))
         .atLocation(position)
-        .rotateTowards(token)
+        .rotateTowards(tokenPlaceable)
         .scaleToObject(1.5)
         .belowTokens()
         .spriteOffset({ x: -1.25 }, { gridUnits: true })
         .spriteRotation(-180)
         .opacity(0.5);
 
-    // Dive prone tilt and movement using Sequencer 4.3.0+ sequence.motion(token).rotateTo(90, { duration: 300 }).moveBy()
-    sequence.motion(token)
+    // Dive prone tilt and movement using Sequencer 4.3.0+ sequence.motion(tokenPlaceable).rotateTo(90, { duration: 300 }).moveTo()
+    sequence.motion(tokenPlaceable)
         .rotateTo(90, { duration: 300 })
-        .moveBy(position, { duration: 800, delay: 100, ease: 'easeOutQuint' });
+        .moveTo(position, { duration: 800, delay: 100, ease: 'easeOutQuint' });
 
     return sequence;
 }

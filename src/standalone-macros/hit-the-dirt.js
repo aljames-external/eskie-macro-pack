@@ -62,45 +62,46 @@ if (!position) return;
 
 const sequence = new Sequence();
 
-// Departure dust puff at launch location
+const tokenPlaceable = token?.object ?? token;
+
+// Launch dust puff
 sequence.effect()
     .delay(100)
     .file(closest("eskie.smoke.06.white"))
-    .atLocation(token)
+    .atLocation(tokenPlaceable)
     .scaleToObject(1.1)
     .belowTokens()
     .playbackRate(1.5)
     .opacity(0.5);
 
-// Motion shadow tracking underneath the diving character
+// Dynamic motion shadow under diving token
 sequence.effect()
-    .copySprite(token)
-    .spriteRotation(-tokenRotation)
-    .atLocation(token)
+    .copySprite(tokenPlaceable)
+    .atLocation(tokenPlaceable)
     .scaleToObject(0.85, { considerTokenScale: true })
-    .moveTowards(position, { delay: 100, rotate: false, ease: "easeOutQuint" })
+    .moveTowards(position, { delay: 100, rotate: false, ease: 'easeOutQuint' })
     .duration(1600)
     .belowTokens()
     .filter("ColorMatrix", { saturate: -1, brightness: 0 })
     .filter("Blur", { blurX: 5, blurY: 10 })
     .opacity(0.5);
 
-// Target dirt impact puff as token lands hit-the-dirt
+// Target landing dirt impact puff
 sequence.effect()
     .delay(900)
     .file(closest("eskie.smoke.01.white"))
     .atLocation(position)
-    .rotateTowards(token)
+    .rotateTowards(tokenPlaceable)
     .scaleToObject(1.5)
     .belowTokens()
     .spriteOffset({ x: -1.25 }, { gridUnits: true })
     .spriteRotation(-180)
     .opacity(0.5);
 
-// Dive prone tilt and movement using Sequencer 4.3.0+ sequence.motion(token).rotateTo(90, { duration: 300 }).moveBy()
-sequence.motion(token)
+// Dive prone tilt and movement using Sequencer 4.3.0+ sequence.motion(tokenPlaceable).rotateTo(90, { duration: 300 }).moveTo()
+sequence.motion(tokenPlaceable)
     .rotateTo(90, { duration: 300 })
-    .moveBy(position, { duration: 800, delay: 100, ease: 'easeOutQuint' });
+    .moveTo(position, { duration: 800, delay: 100, ease: 'easeOutQuint' });
 
 // Persistent tracking effect for staying low evasive cover state & macro toggle support
 sequence.effect()

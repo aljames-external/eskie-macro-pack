@@ -478,14 +478,14 @@ test('pushingAttack uses Sequencer 4.3.0+ .motion() animation instead of copySpr
     assert.doesNotMatch(tsContent, /copySprite/, 'pushing-attack.ts must not use copySprite');
     assert.doesNotMatch(tsContent, /\.opacity\(0\)/, 'pushing-attack.ts must not hide token with opacity(0)');
     assert.match(tsContent, /\.motion\(/, 'pushing-attack.ts must use .motion()');
-    assert.match(tsContent, /sequence\.motion\(target\)/, 'pushing-attack.ts must use sequence.motion(target)');
-    assert.match(tsContent, /\.moveBy\(/, 'pushing-attack.ts must use .moveBy()');
+    assert.match(tsContent, /sequence\.motion\(target/, 'pushing-attack.ts must use sequence.motion()');
+    assert.match(tsContent, /\.(moveBy|moveTo)\(/, 'pushing-attack.ts must move target');
 
     assert.doesNotMatch(jsContent, /copySprite/, 'pushing-attack.js must not use copySprite');
     assert.doesNotMatch(jsContent, /\.opacity\(0\)/, 'pushing-attack.js must not hide token with opacity(0)');
     assert.match(jsContent, /\.motion\(/, 'pushing-attack.js must use .motion()');
-    assert.match(jsContent, /sequence\.motion\(target\)/, 'pushing-attack.js must use sequence.motion(target)');
-    assert.match(jsContent, /\.moveBy\(/, 'pushing-attack.js must use .moveBy()');
+    assert.match(jsContent, /sequence\.motion\(target/, 'pushing-attack.js must use sequence.motion()');
+    assert.match(jsContent, /\.(moveBy|moveTo)\(/, 'pushing-attack.js must move target');
 });
 
 test('lungingAttack uses Sequencer 4.3.0+ sequence.motion(token).moveTo() API', () => {
@@ -1090,15 +1090,15 @@ test('hitTheDirt uses Sequencer 4.3.0+ sequence.motion(token).rotateTo(90).moveB
 
     assert.doesNotMatch(tsContent, /\.opacity\(0\)/, 'hit-the-dirt.ts must not hide token with opacity(0)');
     assert.match(tsContent, /\.motion\(/, 'hit-the-dirt.ts must use .motion()');
-    assert.match(tsContent, /sequence\.motion\(token\)/, 'hit-the-dirt.ts must use sequence.motion(token)');
+    assert.match(tsContent, /sequence\.motion\(token/, 'hit-the-dirt.ts must use sequence.motion()');
     assert.match(tsContent, /\.rotateTo\(90/, 'hit-the-dirt.ts must use .rotateTo(90)');
-    assert.match(tsContent, /\.moveBy\(/, 'hit-the-dirt.ts must use .moveBy()');
+    assert.match(tsContent, /\.(moveBy|moveTo)\(/, 'hit-the-dirt.ts must move token');
 
     assert.doesNotMatch(jsContent, /\.opacity\(0\)/, 'hit-the-dirt.js must not hide token with opacity(0)');
     assert.match(jsContent, /\.motion\(/, 'hit-the-dirt.js must use .motion()');
-    assert.match(jsContent, /sequence\.motion\(token\)/, 'hit-the-dirt.js must use sequence.motion(token)');
+    assert.match(jsContent, /sequence\.motion\(token/, 'hit-the-dirt.js must use sequence.motion()');
     assert.match(jsContent, /\.rotateTo\(90/, 'hit-the-dirt.js must use .rotateTo(90)');
-    assert.match(jsContent, /\.moveBy\(/, 'hit-the-dirt.js must use .moveBy()');
+    assert.match(jsContent, /\.(moveBy|moveTo)\(/, 'hit-the-dirt.js must move token');
 });
 
 test('petrifyingGaze uses Sequencer 4.3.0+ sequence.motion().noise() for petrification stone shudder instead of copySprite and opacity(0) hiding', () => {

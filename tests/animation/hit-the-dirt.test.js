@@ -58,7 +58,7 @@ test('hitTheDirt.create builds sequence with sequence.motion(token).rotateTo(90)
                             return proxy;
                         };
                     }
-                    if (prop === 'moveBy') {
+                    if (prop === 'moveBy' || prop === 'moveTo') {
                         return (pos) => {
                             capturedMoveByPos = pos;
                             return proxy;

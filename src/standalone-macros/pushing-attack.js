@@ -38,6 +38,9 @@ const getNearestSquareCenter = (srcToken, tgtToken) => {
     return bestPoint;
 };
 
+const tokenPlaceable = token?.object ?? token;
+const targetPlaceable = target?.object ?? target;
+
 const pushDistance = 15;
 const type = "bludgeoning";
 const weight = "heavy";
@@ -47,39 +50,33 @@ const weightIndex = { light: 0, medium: 1, heavy: 2 }[weight] ?? 2;
 const effectSize = 2 + (0.25 * weightIndex);
 const effectOffset = -0.75 - (0.25 * weightIndex);
 
-const targetSquare = getNearestSquareCenter(token, target);
-const tokenCenter = token.center;
-const targetCenter = target.center;
+const targetSquare = getNearestSquareCenter(tokenPlaceable, targetPlaceable);
+const tokenCenter = tokenPlaceable.center;
+const targetCenter = targetPlaceable.center;
 const gridSize = canvas.grid.size;
 
+const dx = targetCenter.x - tokenCenter.x;
+const dy = targetCenter.y - tokenCenter.y;
+const dist = Math.hypot(dx, dy);
+
+// Calculate destination position pushing AWAY from attacker along vector (dx, dy)
 const position = {
-    x: targetCenter.x - (gridSize * (pushDistance / 5) * Math.sign(tokenCenter.x - targetCenter.x)),
-    y: targetCenter.y - (gridSize * (pushDistance / 5) * Math.sign(tokenCenter.y - targetCenter.y)),
+    x: targetCenter.x + (dist > 0 ? (dx / dist) * (pushDistance / 5) * gridSize : (pushDistance / 5) * gridSize),
+    y: targetCenter.y + (dist > 0 ? (dy / dist) * (pushDistance / 5) * gridSize : 0),
 };
 
 const backposition = {
-    x: (targetCenter.x - tokenCenter.x) * -0.1,
-    y: (targetCenter.y - tokenCenter.y) * -0.1,
+    x: dist > 0 ? (dx / dist) * gridSize * 0.5 : 0,
+    y: dist > 0 ? (dy / dist) * gridSize * 0.5 : 0,
 };
 
-const distanceX = Math.abs(tokenCenter.x - targetCenter.x);
-const distanceY = Math.abs(tokenCenter.y - targetCenter.y);
-
-if (distanceY < distanceX) {
-    position.y = targetCenter.y;
-    backposition.y = 0;
-} else if (distanceX < distanceY) {
-    position.x = targetCenter.x;
-    backposition.x = 0;
-}
-
-const tokenWidth = token.document?.width ?? token.width ?? 1;
+const tokenWidth = tokenPlaceable.document?.width ?? tokenPlaceable.width ?? 1;
 
 const sequence = new Sequence();
 
 // Attacker thrust motion using Sequencer 4.3.0+ .motion()
 sequence.animation()
-    .on(token)
+    .on(tokenPlaceable)
     .motion({
         recoil: -0.2,
         duration: 450,
@@ -89,7 +86,7 @@ sequence.animation()
 sequence.effect()
     .file(closest("eskie.smoke.02.white"))
     .atLocation({ x: tokenCenter.x - backposition.x, y: tokenCenter.y - backposition.y })
-    .rotateTowards(target)
+    .rotateTowards(targetPlaceable)
     .size(tokenWidth * 2.15, { gridUnits: true })
     .spriteOffset({ x: -1.5 }, { gridUnits: true })
     .spriteRotation(180)
@@ -102,7 +99,7 @@ sequence.canvasPan()
 
 sequence.effect()
     .file(closest(`eskie.attack.melee.generic.01.${type}.${weight}.${color}.slow`))
-    .atLocation(token)
+    .atLocation(tokenPlaceable)
     .rotateTowards(targetSquare)
     .scaleToObject(effectSize, { considerTokenScale: true })
     .spriteOffset({ x: effectOffset * tokenWidth }, { gridUnits: true })
@@ -112,7 +109,7 @@ sequence.effect()
 
 sequence.effect()
     .file(closest("jb2a.gust_of_wind.veryfast"))
-    .atLocation(token)
+    .atLocation(tokenPlaceable)
     .stretchTo(position, { onlyX: true })
     .opacity(0.75)
     .belowTokens()
@@ -122,7 +119,7 @@ sequence.effect()
 sequence.effect()
     .delay(1000)
     .file(closest("eskie.trail.token.generic.01.white"))
-    .atLocation(token)
+    .atLocation(tokenPlaceable)
     .rotateTowards(position)
     .scaleToObject(1.5, { considerTokenScale: true })
     .startTime(750)
@@ -132,15 +129,15 @@ sequence.wait(1000);
 
 sequence.effect()
     .file(closest(`eskie.damage.${type}.01.yellow`))
-    .atLocation(target)
+    .atLocation(targetPlaceable)
     .size(tokenWidth * 1.5, { gridUnits: true })
     .zIndex(1);
 
 sequence.wait(250);
 
-// Target knockback push using Sequencer 4.3.0+ sequence.motion(target).moveBy() API
-sequence.motion(target)
-    .moveBy(position, { duration: 500, ease: 'easeOutCirc' });
+// Target knockback push using Sequencer 4.3.0+ sequence.motion(targetPlaceable).moveTo() API
+sequence.motion(targetPlaceable)
+    .moveTo(position, { duration: 500, ease: 'easeOutCirc' });
 
 await sequence.play();
 
