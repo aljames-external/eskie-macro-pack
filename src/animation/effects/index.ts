@@ -57,6 +57,7 @@ import { fireShield } from './active-effect/fire-shield.js';
 import { flurryOfBlows } from './on-target/flurry-of-blows.js';
 import { fly } from './token/fly.js';
 import { frightfulMoan } from './token/frightful-moan.js';
+import { gunslinger } from './gunslinger/index.js';
 import { gate } from './template/gate.js';
 import { ghostWalk } from './token/ghost-walk.js';
 import { goodberry } from './token/goodberry.js';

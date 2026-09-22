@@ -1,0 +1,73 @@
+import { closest } from '../../../lib/filemanager.js';
+import { template as templatelib } from '../../../lib/templates.js';
+import { adapter } from '../../../adapters/index.js';
+import { applySound, DEFAULT_SOUND_CONFIG } from '../../utils/sound.js';
+import { settingsOverride } from '../../../lib/settings.js';
+
+// Author: bakanabaka
+// Gunslinger: Final Shot (Sequencer 4.3.0+ .motion() Animation)
+
+const DEFAULT_CONFIG: AnimationEffectConfig = {
+    id: 'finalShot',
+    label: 'Final Shot',
+    sound: { ...DEFAULT_SOUND_CONFIG }
+};
+
+async function create(token: Token, targetToken?: Token, config: AnimationEffectConfig = {}) {
+    config = settingsOverride(config);
+    const { template, sound } = adapter.mergeObject(DEFAULT_CONFIG, config);
+
+    let targetPos = targetToken ? adapter.getCenter(targetToken) : null;
+    if (!targetPos) {
+        const crosshairCfg = {
+            radius: 1,
+            icon: 'icons/weapons/guns/revolver-fire-yellow.webp',
+            label: 'Final Shot'
+        };
+        const [pos] = await templatelib.getPosition(template, crosshairCfg);
+        if (!pos || pos.cancelled) return null;
+        targetPos = pos;
+    }
+
+    const sequence = new Sequence();
+    applySound(sequence, sound);
+
+    // Caster weapon recoil via Sequencer 4.3.0+ .motion()
+    sequence.animation()
+        .on(token)
+        .motion({
+            recoil: 0.3,
+            duration: 300
+        });
+
+    // Muzzle flash at caster position
+    sequence.effect()
+        .file(closest('jb2a.disintegrate.orange'))
+        .atLocation(token)
+        .stretchTo(targetPos)
+        .playbackRate(1.8)
+        .opacity(0.9);
+
+    // Target impact flash
+    sequence.effect()
+        .delay(200)
+        .file(closest('jb2a.impact.fire.orange'))
+        .atLocation(targetPos)
+        .scaleToObject(1.5, { considerTokenScale: true });
+
+    return sequence;
+}
+
+async function play(token: Token, targetToken?: Token, config: AnimationEffectConfig = {}) {
+    const seq = await create(token, targetToken, config);
+    if (seq) return seq.play();
+    return null;
+}
+
+export const finalShot = {
+    create,
+    play,
+    default_config: DEFAULT_CONFIG
+};
+
+adapter.autorec.register('finalShot', 'template', 'eskie.effect.finalShot', DEFAULT_CONFIG, '0.0.1', 'Final Shot');

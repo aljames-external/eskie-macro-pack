@@ -48,6 +48,7 @@ declare global {
   type SoundConfig = import('./animation.js').SoundConfig;
   type Dependency = import('./animation.js').Dependency;
   type TrapConfig = import('./animation.js').TrapConfig;
+  type AnimationEffectConfig = import('./animation.js').AnimationEffectConfig;
   type ConcreteToken = import('./animation.js').ConcreteToken;
   type ConcreteTile = import('./animation.js').ConcreteTile;
   type CasterProxy = import('./animation.js').CasterProxy;

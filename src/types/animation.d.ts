@@ -30,6 +30,14 @@ export interface TrapConfig {
     [key: string]: unknown;
 }
 
+export interface AnimationEffectConfig {
+    id?: string;
+    label?: string;
+    sound?: SoundConfig;
+    template?: any;
+    [key: string]: unknown;
+}
+
 export type ConcreteToken = Token;
 export type ConcreteTile = Tile;
 
