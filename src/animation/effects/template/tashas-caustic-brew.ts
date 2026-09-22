@@ -115,25 +115,13 @@ async function createTarget(source: Token, config: any = {}, options: any = {}) 
     for (let target of targets) {
         const targetWidth = adapter.getTokenDimensions(target).widthUnits;
         const targetName = target.name;
-        const targetScaleX = target.document.texture.scaleX ?? 1;
-        const targetRotation = adapter.getTokenRotation(target);
-
         let targetSeq = new Sequence()
             .wait(2200)
 
-            .effect()
+            .motion(target)
             .delay(200)
-            .copySprite(target)
-            .spriteRotation(-targetRotation)
-            .attachTo(target)
-            .fadeIn(200)
-            .fadeOut(500)
-            .loopProperty('spriteContainer', 'position.x', { from: -0.05, to: 0.05, duration: 50, pingPong: true, gridUnits: true })
-            .scaleToObject(targetScaleX)
+            .noise()
             .duration(1800)
-            .opacity(0.25)
-            .tint('#BEE43E')
-            .filter('ColorMatrix', { saturate: 1 })
 
             .effect()
             .file(closest('jb2a.grease.dark_grey.loop'))

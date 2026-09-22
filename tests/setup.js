@@ -29,6 +29,12 @@ globalThis.Macro = class Macro {
 globalThis.tokenAttacher = undefined;
 globalThis.MassEdit = undefined;
 globalThis.socketlib = undefined;
+globalThis.Tagger = {
+    hasTags: () => false,
+    addTags: async () => {},
+    removeTags: async () => {},
+    getByTag: () => []
+};
 globalThis.adapter = undefined;
 globalThis.Sequence = class Sequence {
     constructor() {

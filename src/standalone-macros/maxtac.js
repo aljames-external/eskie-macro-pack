@@ -60,16 +60,8 @@ if (activeFly.length > 0 || activeLanding.length > 0 || hasTag) {
             .zIndex(0);
     }
 
-    departureSeq.effect()
-        .copySprite(target)
-        .spriteRotation(-tileRotation)
-        .attachTo(target, { offset: { y: -10 }, local: false, gridUnits: true, bindAlpha: false })
-        .size({ width: w, height: h })
-        .animateProperty("spriteContainer", "position.y", { from: 8, to: -40, gridUnits: true, duration: 1500, ease: "easeInCubic" })
-        .animateProperty("spriteContainer", "scale.x", { from: 1, to: 0.5, duration: 1500, ease: "easeInCubic" })
-        .animateProperty("spriteContainer", "scale.y", { from: 1, to: 0.5, duration: 1500, ease: "easeInCubic" })
-        .fadeOut(500, { delay: 1000 })
-        .zIndex(2);
+    departureSeq.motion(target)
+        .moveTo({ y: -40 }, { gridUnits: true, duration: 1500, ease: "easeInCubic" });
 
     departureSeq.effect()
         .copySprite(target)
@@ -242,35 +234,27 @@ for (const offset of thrusterPositions) {
         .zIndex(0);
 }
 
-// Elevated AV sprite lift & dynamic ground drop shadow
-seq.effect()
-    .copySprite(target)
-    .spriteRotation(-tileRotation)
+// Sequencer 4.3.0+ Vehicle tile flying hover motion
+seq.motion(target)
     .name(effectNameFly)
-    .attachTo(target, { offset: { y: -10 }, local: false, gridUnits: true, bindAlpha: false })
-    .size({ width: w, height: h })
-    .opacity(1)
-    .animateProperty("spriteContainer", "position.y", { from: 0, to: 8, gridUnits: true, duration: 5000, ease: "easeOutBack" })
-    .loopProperty("sprite", "position.y", { from: 0, to: -20, duration: 2500, pingPong: true, delay: 500 })
-    .zIndex(2)
+    .moveTo({ y: -0.5 }, { gridUnits: true })
+    .oscillate()
     .persist();
 
+// Ground drop shadow effect staying on ground underneath tile
 seq.effect()
     .copySprite(target)
     .spriteRotation(-tileRotation)
     .name(effectNameFly)
-    .attachTo(target, { offset: { y: -8 }, gridUnits: true, bindAlpha: false })
+    .atLocation(target, { ignoreMotion: true })
     .size({ width: w, height: h })
-    .opacity(1)
-    .animateProperty("spriteContainer", "position.y", { from: 0, to: 7, gridUnits: true, duration: 4000, ease: "easeOutBack" })
-    .animateProperty("spriteContainer", "rotation", { from: 0, to: 0, duration: 0 })
-    .loopProperty("sprite", "position.y", { from: 0, to: -20, duration: 2500, pingPong: true, delay: 500 })
-    .zIndex(2)
-    .persist()
     .opacity(0.35)
     .filter("ColorMatrix", { brightness: -1 })
     .filter("Blur", { blurX: 5, blurY: 10 })
-    .belowTokens();
+    .attachTo(target, { bindAlpha: false, ignoreMotion: true })
+    .belowTokens()
+    .zIndex(0)
+    .persist();
 
 seq.effect()
     .name(effectNameFly)

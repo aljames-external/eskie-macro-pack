@@ -15,16 +15,6 @@ const label = "Teleportation Circle";
 const activeEffects = Sequencer.EffectManager.getEffects({ name: label, object: token });
 if (activeEffects.length > 0) {
     Sequencer.EffectManager.endEffects({ name: label });
-    const restoreSeq = new Sequence()
-        .animation()
-            .on(token)
-            .opacity(1)
-            .show();
-    const targetedTokens = Array.from(game.user.targets).filter(t => t.id !== token.id);
-    targetedTokens.forEach(t => {
-        restoreSeq.animation().on(t).opacity(1).show();
-    });
-    await restoreSeq.play();
     return;
 }
 
@@ -211,43 +201,7 @@ sequence = sequence.effect()
     .scaleToObject(maxDistance)
     .duration(2500);
 
-// Fade out caster token
-sequence = sequence.animation()
-    .on(token)
-    .delay(2000)
-    .opacity(0);
-
-// Fade out group party tokens
-partyTargets.forEach(target => {
-    sequence = sequence.animation()
-        .on(target)
-        .delay(2000)
-        .opacity(0);
-});
-
 sequence = sequence.wait(2500);
-
-// ==========================================
-// INSTANT GROUP TELEPORTATION / RECALL
-// ==========================================
-
-sequence = sequence.animation()
-    .on(token)
-    .teleportTo(destination, { offset: { x: -1, y: -1 } })
-    .snapToGrid();
-
-partyTargets.forEach(target => {
-    const targetCenterX = target.center?.x ?? target.x;
-    const targetCenterY = target.center?.y ?? target.y;
-    const offsetX = targetCenterX - tokenCenter.x;
-    const offsetY = targetCenterY - tokenCenter.y;
-    const targetDest = { x: destination.x + offsetX, y: destination.y + offsetY };
-
-    sequence = sequence.animation()
-        .on(target)
-        .teleportTo(targetDest, { offset: { x: -1, y: -1 } })
-        .snapToGrid();
-});
 
 // ==========================================
 // ARRIVAL: Teleportation Circle & Planar Magic Flash
@@ -257,7 +211,7 @@ partyTargets.forEach(target => {
 sequence = sequence.effect()
     .name(label)
     .file(closest("jb2a.magic_signs.circle.02.conjuration.intro.blue"))
-    .atLocation(token)
+    .atLocation(destination)
     .belowTokens()
     .scaleToObject(maxDistance)
     .filter("ColorMatrix", { saturate: -0.25, brightness: 1 })
@@ -268,7 +222,7 @@ sequence = sequence.effect()
 sequence = sequence.effect()
     .name(label)
     .file(closest("jb2a.magic_signs.circle.02.conjuration.loop.blue"))
-    .atLocation(token)
+    .atLocation(destination)
     .filter("ColorMatrix", { saturate: -0.5, brightness: 1.5 })
     .opacity(0.65)
     .belowTokens()
@@ -276,55 +230,32 @@ sequence = sequence.effect()
     .duration(2500)
     .waitUntilFinished(-1500);
 
-// Dynamic Planar Magic Flash descending column on caster
-sequence = sequence.effect()
-    .name(label)
-    .copySprite(token)
-    .spriteRotation(-(token.document?.rotation ?? 0))
-    .atLocation(token)
-    .scaleToObject(1.1, { considerTokenScale: true })
-    .filter("ColorMatrix", { saturate: -1, brightness: 10 })
-    .filter("Blur", { blurX: 5, blurY: 10 })
-    .animateProperty('spriteContainer', 'position.y', { from: -1000, to: 0, duration: 500, ease: "easeOutCubic" })
-    .duration(500)
-    .attachTo(token, { bindAlpha: false });
+// Sequencer 4.3.0+ motion arrival for caster
+sequence = sequence.motion(token)
+    .moveTo(destination, { offset: { x: -1, y: -1 } })
+    .snapToGrid();
 
-// Dynamic Planar Magic Flash descending column on each party target
+// Sequencer 4.3.0+ motion arrival for each party target
 partyTargets.forEach(target => {
-    sequence = sequence.effect()
-        .name(label)
-        .copySprite(target)
-        .spriteRotation(-(target.document?.rotation ?? 0))
-        .atLocation(target)
-        .scaleToObject(1.1, { considerTokenScale: true })
-        .filter("ColorMatrix", { saturate: -1, brightness: 10 })
-        .filter("Blur", { blurX: 5, blurY: 10 })
-        .animateProperty('spriteContainer', 'position.y', { from: -1000, to: 0, duration: 500, ease: "easeOutCubic" })
-        .duration(500)
-        .attachTo(target, { bindAlpha: false });
+    const targetCenterX = target.center?.x ?? target.x;
+    const targetCenterY = target.center?.y ?? target.y;
+    const offsetX = targetCenterX - tokenCenter.x;
+    const offsetY = targetCenterY - tokenCenter.y;
+    const targetDest = { x: destination.x + offsetX, y: destination.y + offsetY };
+
+    sequence = sequence.motion(target)
+        .moveTo(targetDest, { offset: { x: -1, y: -1 } })
+        .snapToGrid();
 });
 
 // Flash bloom impact blue wave on arrival
 sequence = sequence.effect()
     .name(label)
     .file(closest("jb2a.impact.004.blue"))
-    .atLocation(token)
+    .atLocation(destination)
     .scaleToObject(maxDistance)
     .belowTokens();
 
 sequence = sequence.wait(500);
-
-// Rematerialize caster & group party members
-sequence = sequence.animation()
-    .on(token)
-    .opacity(1.0)
-    .show();
-
-partyTargets.forEach(target => {
-    sequence = sequence.animation()
-        .on(target)
-        .opacity(1.0)
-        .show();
-});
 
 await sequence.play();

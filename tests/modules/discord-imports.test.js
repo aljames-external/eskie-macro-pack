@@ -430,64 +430,24 @@ test('all active-effect modules export standard interfaces and sound configurati
     assert.ok(strengthBeforeDeath.default_config.sound, 'strengthBeforeDeath DEFAULT_CONFIG must have sound');
 });
 
-test('tashasCausticBrew uses copySprite and applies counter token rotation', async () => {
-    let copySpriteCalledWith = null;
-    let capturedSpriteRotation = null;
-    let fromCalled = false;
-    const origSequence = globalThis.Sequence;
-    globalThis.Sequence = class MockCausticSequence {
-        constructor() {
-            const handler = {
-                get(_t, prop) {
-                    if (prop === 'copySprite') {
-                        return (tok) => {
-                            copySpriteCalledWith = tok;
-                            return proxy;
-                        };
-                    }
-                    if (prop === 'spriteRotation') {
-                        return (rot) => {
-                            capturedSpriteRotation = rot;
-                            return proxy;
-                        };
-                    }
-                    if (prop === 'from') {
-                        return () => {
-                            fromCalled = true;
-                            throw new Error('Sequence.effect().from is not a function');
-                        };
-                    }
-                    if (prop === 'play') return async () => proxy;
-                    if (prop === 'then') return undefined;
-                    return (..._args) => proxy;
-                }
-            };
-            const proxy = new Proxy(this, handler);
-            return proxy;
-        }
-    };
+test('tashasCausticBrew uses Sequencer 4.3.0+ sequence.motion(target).noise() for caustic brew acid burn shudder instead of copySprite and opacity(0) hiding', () => {
+    const tsModulePath = path.join(rootDir, 'src/animation/effects/template/tashas-caustic-brew.ts');
+    const jsMacroPath = path.join(rootDir, 'src/standalone-macros/tashas-caustic-brew.js');
 
-    game.modules.set('jb2a_patreon', { id: 'jb2a_patreon', active: true });
-    game.modules.set('eskie-effects', { id: 'eskie-effects', active: true });
-    try {
-        const mockCaster = { id: 'c1', name: 'Wizard', document: { rotation: 0, width: 1 }, center: { x: 100, y: 100 } };
-        const mockTarget = {
-            id: 't1',
-            name: 'Goblin',
-            document: { width: 1, rotation: 45, texture: { scaleX: 1 } },
-            center: { x: 200, y: 200 }
-        };
+    const tsContent = fs.readFileSync(tsModulePath, 'utf8');
+    const jsContent = fs.readFileSync(jsMacroPath, 'utf8');
 
-        const seq = await effect.tashasCausticBrew.target.create(mockCaster, { targets: [mockTarget] });
-        assert.ok(seq, 'tashasCausticBrew.create must return a Sequence');
-        assert.equal(fromCalled, false, '.from must not be called');
-        assert.equal(copySpriteCalledWith, mockTarget, '.copySprite must be called with target');
-        assert.equal(capturedSpriteRotation, -45, '.spriteRotation must be -45 for a 45 degree rotated target');
-    } finally {
-        globalThis.Sequence = origSequence;
-        game.modules.delete('jb2a_patreon');
-        game.modules.delete('eskie-effects');
-    }
+    assert.doesNotMatch(tsContent, /copySprite/, 'tashas-caustic-brew.ts must not use copySprite');
+    assert.doesNotMatch(tsContent, /\.opacity\(0\)/, 'tashas-caustic-brew.ts must not hide token with opacity(0)');
+    assert.match(tsContent, /\.motion\(/, 'tashas-caustic-brew.ts must use .motion()');
+    assert.match(tsContent, /\.motion\(target\)/, 'tashas-caustic-brew.ts must use .motion(target)');
+    assert.match(tsContent, /\.noise\(\)/, 'tashas-caustic-brew.ts must use .noise()');
+
+    assert.doesNotMatch(jsContent, /copySprite/, 'tashas-caustic-brew.js must not use copySprite');
+    assert.doesNotMatch(jsContent, /\.opacity\(0\)/, 'tashas-caustic-brew.js must not hide token with opacity(0)');
+    assert.match(jsContent, /\.motion\(/, 'tashas-caustic-brew.js must use .motion()');
+    assert.match(jsContent, /\.motion\(target\)/, 'tashas-caustic-brew.js must use .motion(target)');
+    assert.match(jsContent, /\.noise\(\)/, 'tashas-caustic-brew.js must use .noise()');
 });
 
 test('tashasCausticBrew DEFAULT_CONFIG defines phased sound sections and registers at 0.1.2', async () => {
@@ -615,6 +575,28 @@ test('baitAndSwitch uses Sequencer 4.3.0+ sequence.motion(token).moveTo() and se
     assert.match(jsContent, /sequence\.motion\(token\)/, 'bait-and-switch.js must use sequence.motion(token)');
     assert.match(jsContent, /sequence\.motion\(target\)/, 'bait-and-switch.js must use sequence.motion(target)');
     assert.match(jsContent, /\.moveTo\(/, 'bait-and-switch.js must use .moveTo()');
+});
+
+test('teleportIn and teleport macro use Sequencer 4.3.0+ sequence.motion(token).moveTo() and sequence.motion(target).moveTo() instead of copySprite and opacity(0) hiding', () => {
+    const tsModulePath = path.join(rootDir, 'src/animation/effects/template/teleport/teleportIn.ts');
+    const jsMacroPath = path.join(rootDir, 'src/standalone-macros/teleport.js');
+
+    const tsContent = fs.readFileSync(tsModulePath, 'utf8');
+    const jsContent = fs.readFileSync(jsMacroPath, 'utf8');
+
+    assert.doesNotMatch(tsContent, /copySprite/, 'teleportIn.ts must not use copySprite');
+    assert.doesNotMatch(tsContent, /\.opacity\(0\)/, 'teleportIn.ts must not hide token with opacity(0)');
+    assert.doesNotMatch(tsContent, /teleportTo/, 'teleportIn.ts must not use teleportTo');
+    assert.match(tsContent, /sequence\.motion\(token\)/, 'teleportIn.ts must use sequence.motion(token)');
+    assert.match(tsContent, /sequence\.motion\(target\)/, 'teleportIn.ts must use sequence.motion(target)');
+    assert.match(tsContent, /\.moveTo\(/, 'teleportIn.ts must use .moveTo()');
+
+    assert.doesNotMatch(jsContent, /copySprite/, 'teleport.js must not use copySprite');
+    assert.doesNotMatch(jsContent, /\.opacity\(0\)/, 'teleport.js must not hide token with opacity(0)');
+    assert.doesNotMatch(jsContent, /teleportTo/, 'teleport.js must not use teleportTo');
+    assert.match(jsContent, /sequence\.motion\(token\)/, 'teleport.js must use sequence.motion(token)');
+    assert.match(jsContent, /sequence\.motion\(target\)/, 'teleport.js must use sequence.motion(target)');
+    assert.match(jsContent, /\.moveTo\(/, 'teleport.js must use .moveTo()');
 });
 
 test('stepOfTheWindJump uses Sequencer 4.3.0+ sequence.motion(token).moveTo() with arc: 0.8 for jump trajectory', () => {
@@ -1157,6 +1139,42 @@ test('totemicAttunementElk uses Sequencer 4.3.0+ sequence.motion(target).moveBy(
     assert.match(jsContent, /\.motion\(/, 'totemic-attunement-elk.js must use .motion()');
     assert.match(jsContent, /seq\.motion\(target\)/, 'totemic-attunement-elk.js must use seq.motion(target)');
     assert.match(jsContent, /\.moveBy\(/, 'totemic-attunement-elk.js must use .moveBy()');
+});
+
+test('armsOfHadar uses Sequencer 4.3.0+ sequence.motion(target).moveBy() for arms of hadar tentacle target pull/shake instead of copySprite and opacity(0) hiding', () => {
+    const tsModulePath = path.join(rootDir, 'src/animation/effects/template/arms-of-hadar.ts');
+    const jsMacroPath = path.join(rootDir, 'src/standalone-macros/arms-of-hadar.js');
+
+    const tsContent = fs.readFileSync(tsModulePath, 'utf8');
+    const jsContent = fs.readFileSync(jsMacroPath, 'utf8');
+
+    assert.doesNotMatch(tsContent, /copySprite/, 'arms-of-hadar.ts must not use copySprite');
+    assert.doesNotMatch(tsContent, /\.opacity\(0\)/, 'arms-of-hadar.ts must not hide token with opacity(0)');
+    assert.match(tsContent, /\.motion\(/, 'arms-of-hadar.ts must use .motion()');
+    assert.match(tsContent, /sequence\.motion\(target\)/, 'arms-of-hadar.ts must use sequence.motion(target)');
+    assert.match(tsContent, /\.moveBy\(/, 'arms-of-hadar.ts must use .moveBy()');
+
+    assert.doesNotMatch(jsContent, /copySprite/, 'arms-of-hadar.js must not use copySprite');
+    assert.doesNotMatch(jsContent, /\.opacity\(0\)/, 'arms-of-hadar.js must not hide token with opacity(0)');
+    assert.match(jsContent, /\.motion\(/, 'arms-of-hadar.js must use .motion()');
+    assert.match(jsContent, /sequence\.motion\(target\)/, 'arms-of-hadar.js must use sequence.motion(target)');
+    assert.match(jsContent, /\.moveBy\(/, 'arms-of-hadar.js must use .moveBy()');
+});
+
+test('maxtacTraumaTeamAV uses Sequencer 4.3.0+ sequence.motion(tile) and motion(target) for AV vehicle tile flying movement', () => {
+    const tsModulePath = path.join(rootDir, 'src/animation/effects/tile/maxtac-trauma-team-av.ts');
+    const jsMacroPath = path.join(rootDir, 'src/standalone-macros/maxtac.js');
+
+    const tsContent = fs.readFileSync(tsModulePath, 'utf8');
+    const jsContent = fs.readFileSync(jsMacroPath, 'utf8');
+
+    assert.match(tsContent, /\.motion\(tile\)/, 'maxtac-trauma-team-av.ts must use .motion(tile)');
+    assert.match(tsContent, /\.moveTo\(/, 'maxtac-trauma-team-av.ts must use .moveTo()');
+    assert.match(tsContent, /\.oscillate\(\)/, 'maxtac-trauma-team-av.ts must use .oscillate()');
+
+    assert.match(jsContent, /\.motion\(target\)/, 'maxtac.js must use .motion(target)');
+    assert.match(jsContent, /\.moveTo\(/, 'maxtac.js must use .moveTo()');
+    assert.match(jsContent, /\.oscillate\(\)/, 'maxtac.js must use .oscillate()');
 });
 
 

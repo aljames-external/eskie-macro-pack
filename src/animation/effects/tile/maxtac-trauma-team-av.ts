@@ -145,7 +145,7 @@ async function create(tile: Tile, config: any = {}) {
 
         .wait(2000)
 
-        // 2. Fly / Thrusters / Vehicle copy
+        // 2. Fly / Thrusters / Vehicle tile motion
         .effect()
             .file(closest('jb2a.dancing_light.red'))
             .scaleToObject(0.25)
@@ -202,34 +202,27 @@ async function create(tile: Tile, config: any = {}) {
             .loopProperty('sprite', 'position.y', { from: 0, to: -20, duration: 2500, pingPong: true, delay: 500 })
             .zIndex(0)
 
-        .effect()
-            .copySprite(tile)
-            .spriteRotation(-tile.document.rotation)
+        // Sequencer 4.3.0+ Vehicle tile flying hover motion
+        .motion(tile)
             .name(effectNameFly)
-            .attachTo(tile, { offset: { y: -10 }, local: false, gridUnits: true, bindAlpha: false })
-            .size({ width: w, height: h })
-            .opacity(1)
-            .animateProperty('spriteContainer', 'position.y', { from: 0, to: 8, gridUnits: true, duration: 5000, ease: 'easeOutBack' })
-            .loopProperty('sprite', 'position.y', { from: 0, to: -20, duration: 2500, pingPong: true, delay: 500 })
-            .zIndex(2)
+            .moveTo({ y: -0.5 }, { gridUnits: true })
+            .oscillate()
             .persist()
 
+        // Ground drop shadow effect
         .effect()
             .copySprite(tile)
-            .spriteRotation(-tile.document.rotation)
+            .spriteRotation(-tileRotation)
             .name(effectNameFly)
-            .attachTo(tile, { offset: { y: -8 }, gridUnits: true, bindAlpha: false })
+            .atLocation(tile, { ignoreMotion: true })
             .size({ width: w, height: h })
-            .opacity(1)
-            .animateProperty('spriteContainer', 'position.y', { from: 0, to: 7, gridUnits: true, duration: 4000, ease: 'easeOutBack' })
-            .animateProperty('spriteContainer', 'rotation', { from: 0, to: 0, duration: 0 })
-            .loopProperty('sprite', 'position.y', { from: 0, to: -20, duration: 2500, pingPong: true, delay: 500 })
-            .zIndex(2)
-            .persist()
             .opacity(0.35)
             .filter('ColorMatrix', { brightness: -1 })
             .filter('Blur', { blurX: 5, blurY: 10 })
+            .attachTo(tile, { bindAlpha: false, ignoreMotion: true })
             .belowTokens()
+            .zIndex(0)
+            .persist()
 
         .effect()
             .name(effectNameFly)
@@ -251,12 +244,14 @@ async function play(tile: Tile, config: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { flyingTag } = mConfig;
 
-    if (Tagger.hasTags(tile, flyingTag)) {
+    if (game.modules.get('tagger')?.active && Tagger.hasTags(tile, flyingTag)) {
         await stop(tile, config);
         return;
     }
 
-    await Tagger.addTags(tile, flyingTag);
+    if (game.modules.get('tagger')?.active) {
+        await Tagger.addTags(tile, flyingTag);
+    }
     const seq = await create(tile, config);
     if (seq) return seq.play();
 }
@@ -274,10 +269,12 @@ async function stop(tile: Tile, config: any = {}) {
     // End persistent hovering fly effects
     await Sequencer.EffectManager.endEffects({ name: effectNameFly, object: tile });
 
-    await Tagger.removeTags(tile, flyingTag);
+    if (game.modules.get('tagger')?.active) {
+        await Tagger.removeTags(tile, flyingTag);
+    }
 
     // Play fly-off animation sequence
-    new Sequence()
+    return new Sequence()
         // Thrusters firing / moving off
         .effect()
             .file(closest('jb2a.dancing_light.red'))
@@ -323,22 +320,14 @@ async function stop(tile: Tile, config: any = {}) {
             .animateProperty('spriteContainer', 'rotation', { from: 0, to: tileRotation + 90, duration: 0 })
             .zIndex(0)
 
-        // Main Vehicle flying off
-        .effect()
-            .copySprite(tile)
-            .spriteRotation(-tile.document.rotation)
-            .attachTo(tile, { offset: { y: -10 }, local: false, gridUnits: true, bindAlpha: false })
-            .size({ width: w, height: h })
-            .animateProperty('spriteContainer', 'position.y', { from: 8, to: -40, gridUnits: true, duration: 1500, ease: 'easeInCubic' })
-            .animateProperty('spriteContainer', 'scale.x', { from: 1, to: 0.5, duration: 1500, ease: 'easeInCubic' })
-            .animateProperty('spriteContainer', 'scale.y', { from: 1, to: 0.5, duration: 1500, ease: 'easeInCubic' })
-            .fadeOut(500, { delay: 1000 })
-            .zIndex(2)
+        // Vehicle tile fly-off motion via Sequencer 4.3.0+ .motion() API
+        .motion(tile)
+            .moveTo({ y: -40 }, { gridUnits: true, duration: 1500, ease: 'easeInCubic' })
 
         // Shadow moving and fading
         .effect()
             .copySprite(tile)
-            .spriteRotation(-tile.document.rotation)
+            .spriteRotation(-tileRotation)
             .attachTo(tile, { offset: { y: -8 }, gridUnits: true, bindAlpha: false })
             .size({ width: w, height: h })
             .animateProperty('spriteContainer', 'position.y', { from: 7, to: -20, gridUnits: true, duration: 1500, ease: 'easeInCubic' })

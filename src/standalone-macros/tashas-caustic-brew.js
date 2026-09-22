@@ -140,25 +140,13 @@ sequence.effect()
 for (let target of targets) {
     const targetWidth = target.document?.width ?? target.width ?? 1;
     const targetName = target.document?.name ?? target.name ?? "Target";
-    const targetScaleX = target.document?.texture?.scaleX ?? 1;
-    const targetRotation = target.document?.rotation ?? target.rotation ?? 0;
-
     let targetSeq = new Sequence()
         .wait(2200)
 
-        .effect()
+        .motion(target)
         .delay(200)
-        .copySprite(target)
-        .spriteRotation(-targetRotation)
-        .attachTo(target)
-        .fadeIn(200)
-        .fadeOut(500)
-        .loopProperty('spriteContainer', 'position.x', { from: -0.05, to: 0.05, duration: 50, pingPong: true, gridUnits: true })
-        .scaleToObject(targetScaleX)
+        .noise()
         .duration(1800)
-        .opacity(0.25)
-        .tint('#BEE43E')
-        .filter('ColorMatrix', { saturate: 1 })
 
         // Persistent Sizzling Acid Pool 1
         .effect()
