@@ -143,16 +143,10 @@ for (const target of targets) {
         .mask(target)
         .zIndex(1);
 
-    // Target grows pale as life vigor is drained away
-    sequence.effect()
+    // Target draining touch shudder motion via Sequencer 4.3.0+ .motion() API
+    sequence.motion(target)
         .name(label)
-        .copySprite(target)
-        .spriteRotation(-targetRotation)
-        .attachTo(target)
-        .scaleToObject(1, { considerTokenScale: true })
-        .filter("ColorMatrix", { saturate: -1, brightness: 0.6 })
-        .fadeIn(1500)
-        .fadeOut(1000)
+        .noise()
         .duration(duration)
         .persist()
         .name(id);

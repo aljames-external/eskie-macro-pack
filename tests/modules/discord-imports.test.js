@@ -835,4 +835,67 @@ test('ghostWalk uses Sequencer 4.3.0+ sequence.motion(token).oscillate().fadeTo(
     assert.match(jsContent, /\.fadeTo\(0\.65\)/, 'ghost-walk.js must use .fadeTo(0.65)');
 });
 
+test('drainingTouch uses Sequencer 4.3.0+ sequence.motion(target).noise() for draining touch shudder instead of copySprite and opacity(0) hiding', () => {
+    const tsModulePath = path.join(rootDir, 'src/animation/effects/target/drainingTouch.ts');
+    const jsMacroPath = path.join(rootDir, 'src/standalone-macros/draining-touch.js');
+
+    const tsContent = fs.readFileSync(tsModulePath, 'utf8');
+    const jsContent = fs.readFileSync(jsMacroPath, 'utf8');
+
+    assert.doesNotMatch(tsContent, /copySprite/, 'drainingTouch.ts must not use copySprite');
+    assert.doesNotMatch(tsContent, /\.opacity\(0\)/, 'drainingTouch.ts must not hide token with opacity(0)');
+    assert.match(tsContent, /\.motion\(/, 'drainingTouch.ts must use .motion()');
+    assert.match(tsContent, /\.motion\(target\)/, 'drainingTouch.ts must use .motion(target)');
+    assert.match(tsContent, /\.noise\(\)/, 'drainingTouch.ts must use .noise()');
+
+    assert.doesNotMatch(jsContent, /copySprite/, 'draining-touch.js must not use copySprite');
+    assert.doesNotMatch(jsContent, /\.opacity\(0\)/, 'draining-touch.js must not hide token with opacity(0)');
+    assert.match(jsContent, /\.motion\(/, 'draining-touch.js must use .motion()');
+    assert.match(jsContent, /sequence\.motion\(target\)/, 'draining-touch.js must use sequence.motion(target)');
+    assert.match(jsContent, /\.noise\(\)/, 'draining-touch.js must use .noise()');
+});
+
+test('stunningStrike uses Sequencer 4.3.0+ sequence.motion(target).oscillate() for stunning strike stunned wobble instead of copySprite and opacity(0) hiding', () => {
+    const tsModulePath = path.join(rootDir, 'src/animation/effects/target/stunning-strike.ts');
+    const jsMacroPath = path.join(rootDir, 'src/standalone-macros/stunning-strike.js');
+
+    const tsContent = fs.readFileSync(tsModulePath, 'utf8');
+    const jsContent = fs.readFileSync(jsMacroPath, 'utf8');
+
+    assert.doesNotMatch(tsContent, /copySprite/, 'stunning-strike.ts must not use copySprite');
+    assert.doesNotMatch(tsContent, /\.opacity\(0\)/, 'stunning-strike.ts must not hide token with opacity(0)');
+    assert.match(tsContent, /\.motion\(/, 'stunning-strike.ts must use .motion()');
+    assert.match(tsContent, /\.motion\(target\)/, 'stunning-strike.ts must use .motion(target)');
+    assert.match(tsContent, /\.oscillate\(\)/, 'stunning-strike.ts must use .oscillate()');
+
+    assert.doesNotMatch(jsContent, /copySprite/, 'stunning-strike.js must not use copySprite');
+    assert.doesNotMatch(jsContent, /\.opacity\(0\)/, 'stunning-strike.js must not hide token with opacity(0)');
+    assert.match(jsContent, /\.motion\(/, 'stunning-strike.js must use .motion()');
+    assert.match(jsContent, /\.motion\(target\)/, 'stunning-strike.js must use .motion(target)');
+    assert.match(jsContent, /\.oscillate\(\)/, 'stunning-strike.js must use .oscillate()');
+});
+
+test('channelDivinityDreadAspect uses Sequencer 4.3.0+ sequence.motion(target).noise() for dread aspect fear shudder instead of copySprite and opacity(0) hiding', () => {
+    const tsModulePath = path.join(rootDir, 'src/animation/effects/token/channelDivinityDreadAspect.ts');
+    const jsMacroPath = path.join(rootDir, 'src/standalone-macros/dread-aspect.js');
+
+    const tsContent = fs.readFileSync(tsModulePath, 'utf8');
+    const jsContent = fs.readFileSync(jsMacroPath, 'utf8');
+
+    assert.doesNotMatch(tsContent, /copySprite/, 'channelDivinityDreadAspect.ts must not use copySprite');
+    assert.doesNotMatch(tsContent, /\.opacity\(0\)/, 'channelDivinityDreadAspect.ts must not hide token with opacity(0)');
+    assert.match(tsContent, /\.motion\(/, 'channelDivinityDreadAspect.ts must use .motion()');
+    assert.match(tsContent, /sequence\.motion\(target\)/, 'channelDivinityDreadAspect.ts must use sequence.motion(target)');
+    assert.match(tsContent, /\.noise\(/, 'channelDivinityDreadAspect.ts must use .noise()');
+
+    assert.doesNotMatch(jsContent, /copySprite/, 'dread-aspect.js must not use copySprite');
+    assert.doesNotMatch(jsContent, /\.opacity\(0\)/, 'dread-aspect.js must not hide token with opacity(0)');
+    assert.match(jsContent, /\.motion\(/, 'dread-aspect.js must use .motion()');
+    assert.match(jsContent, /sequence\.motion\(target\)/, 'dread-aspect.js must use sequence.motion(target)');
+    assert.match(jsContent, /\.noise\(/, 'dread-aspect.js must use .noise()');
+});
+
+
+
+
 

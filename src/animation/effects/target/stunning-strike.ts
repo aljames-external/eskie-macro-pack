@@ -4,10 +4,17 @@
 ** */
 
 import { closest } from "../../../lib/filemanager.js";
-
+import { settingsOverride } from '../../../lib/settings.js';
 import { adapter } from "../../../adapters/index.js";
 import { applySound, DEFAULT_SOUND_CONFIG } from "../../utils/sound.js";
-const DEFAULT_CONFIG = {
+
+export interface StunningStrikeConfig {
+    id?: string;
+    sound?: SoundConfig;
+    [key: string]: unknown;
+}
+
+const DEFAULT_CONFIG: StunningStrikeConfig = {
     id: 'stunningStrike',
     sound: { ...DEFAULT_SOUND_CONFIG },
 };
@@ -17,12 +24,15 @@ const DEFAULT_CONFIG = {
  *
  * @param {Token} token The token performing the strike.
  * @param {Token} target The token being stunned.
- * @param {object} config Configuration options for the animation.
+ * @param {StunningStrikeConfig} config Configuration options for the animation.
  * @returns {Sequence} The created Sequence object.
  */
-async function createStunningStrike(token: Token, target: Token, config: any = {}) {
+async function createStunningStrike(token: Token, target: Token, config: StunningStrikeConfig = {}) {
+    config = settingsOverride(config);
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id, sound } = mConfig;
+
+    if (!token || !target) return null;
 
     const sequence = new Sequence();
     applySound(sequence, sound);
@@ -81,26 +91,9 @@ async function createStunningStrike(token: Token, target: Token, config: any = {
         .atLocation(token)
         .zIndex(1)
 
-        .animation()
-        .on(token)
-        .opacity(0)
-
-        .effect()
-        .copySprite(token)
-        .spriteRotation(-token.document.rotation)
-        .atLocation(token)
-        .scaleToObject(1, { considerTokenScale: true })
-        .mirrorX(token.document.texture.scaleX < 0)
-        .animateProperty('spriteContainer', 'position.x', { from: 0, to: middle.x, duration: 100, ease: "easeOutExpo" })
-        .animateProperty('spriteContainer', 'position.y', { from: 0, to: middle.y, duration: 100, ease: "easeOutExpo" })
-        .animateProperty('spriteContainer', 'position.x', { from: 0, to: -middle.x, duration: 350, ease: "easeInOutQuad", fromEnd: true })
-        .animateProperty('spriteContainer', 'position.y', { from: 0, to: -middle.y, duration: 350, ease: "easeInOutQuad", fromEnd: true })
-        .duration(600)
-
-        .animation()
-        .on(token)
-        .opacity(1)
-        .delay(600)
+        .motion(token)
+        .moveBy(middle, { duration: 100, ease: "easeOutExpo" })
+        .moveBy({ x: -middle.x, y: -middle.y }, { duration: 350, ease: "easeInOutQuad" })
 
         .effect()
         .file(closest("jb2a.impact.010.blue"))
@@ -135,16 +128,8 @@ async function createStunningStrike(token: Token, target: Token, config: any = {
         .atLocation(target)
         .belowTokens()
 
-        .effect()
-        .copySprite(target)
-        .spriteRotation(-target.document.rotation)
-        .atLocation(target)
-        .scaleToObject(1, { considerTokenScale: true })
-        .fadeIn(200)
-        .fadeOut(500)
-        .loopProperty('spriteContainer', 'position.x', { from: -0.05, to: 0.05, duration: 50, pingPong: true, gridUnits: true })
-        .duration(1500)
-        .opacity(0.25)
+        .motion(target)
+        .oscillate()
 
         .effect()
         .name(`StunningStrike - DizzyStars - ${id} - ${target.document.uuid}`) // Unique name for stopping
@@ -165,21 +150,24 @@ async function createStunningStrike(token: Token, target: Token, config: any = {
  *
  * @param {Token} token The token performing the strike.
  * @param {Token} target The token being stunned.
- * @param {object} config Configuration options for the animation.
- * @returns {Promise<Sequence>} A promise that resolves when the sequence starts playing.
+ * @param {StunningStrikeConfig} config Configuration options for the animation.
+ * @returns {Promise<Sequence | null>} A promise that resolves when the sequence starts playing.
  */
-async function playStunningStrike(token: Token, target: Token, config: any = {}) {
+async function playStunningStrike(token: Token, target: Token, config: StunningStrikeConfig = {}) {
+    if (!token || !target) return null;
     const sequence = await createStunningStrike(token, target, config);
     if (sequence) { return sequence.play(); }
+    return null;
 }
 
 /**
  * Stops the persistent "dizzy stars" effect from Stunning Strike.
  *
  * @param {Token} target The token affected by the persistent effect.
- * @param {object} config Configuration options.
+ * @param {StunningStrikeConfig} config Configuration options.
  */
-function stopStunningStrike(target: Token, config: any = {}) {
+function stopStunningStrike(target: Token, config: StunningStrikeConfig = {}) {
+    if (!target?.document?.uuid) return;
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id } = mConfig;
     Sequencer.EffectManager.endEffects({ name: `StunningStrike - DizzyStars - ${id} - ${target.document.uuid}` });
@@ -191,3 +179,6 @@ export const stunningStrike = {
     stop: stopStunningStrike,
     default_config: DEFAULT_CONFIG,
 };
+
+adapter.autorec.register('stunningStrike', 'melee-target', 'eskie.effect.stunningStrike', DEFAULT_CONFIG, '0.0.1', 'Stunning Strike');
+

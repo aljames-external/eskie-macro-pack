@@ -139,7 +139,6 @@ sequence.effect()
     .tint("#e51e19");
 
 targets.forEach((target) => {
-    const targetRotation = target.document?.rotation ?? target.rotation ?? 0;
     const targetWidth = target.document?.width ?? 1;
 
     sequence.effect()
@@ -149,18 +148,9 @@ targets.forEach((target) => {
         .filter("ColorMatrix", { saturate: 0.25, hue: -2 })
         .zIndex(1);
 
-    sequence.effect()
-        .copySprite(target)
-        .spriteRotation(-targetRotation)
-        .attachTo(target)
-        .scaleToObject(1, { considerTokenScale: true })
-        .fadeIn(500)
-        .fadeOut(2000)
-        .loopProperty("spriteContainer", "position.x", { from: -0.05, to: 0.05, duration: 55, pingPong: true, gridUnits: true })
-        .filter("ColorMatrix", { saturate: -1, brightness: 0.5 })
-        .duration(5000)
-        .opacity(0.65)
-        .zIndex(0.1);
+    sequence.motion(target)
+        .noise({ strength: 0.05, speed: 55, gridUnits: true })
+        .duration(5000);
 
     sequence.effect()
         .file(closest("jb2a.particles.outward.red.01.03"))

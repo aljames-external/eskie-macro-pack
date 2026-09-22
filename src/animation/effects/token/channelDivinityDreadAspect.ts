@@ -54,6 +54,7 @@ async function create(token: Token, targets: Token[], config: any = {}) {
     }
 
     const { widthUnits: tokenWidth } = adapter.getTokenDimensions(token);
+    const scaleX = token.document.texture.scaleX;
 
     sequence.effect()
         .file(closest(`jb2a.particles.outward.red.01.03`))
@@ -71,7 +72,7 @@ async function create(token: Token, targets: Token[], config: any = {}) {
     sequence.effect()
         .file(closest("jb2a.flames.04.complete.purple"))
         .attachTo(token, { offset: { y: -0.35 }, gridUnits: true, bindRotation: true })
-        .scaleToObject(1.5 * token.document.texture.scaleX)
+        .scaleToObject(1.5 * scaleX)
         .tint("#e51e19")
         .fadeOut(500)
         .scaleOut(0, 500, { ease: "easeOutCubic" })
@@ -105,7 +106,7 @@ async function create(token: Token, targets: Token[], config: any = {}) {
     sequence.effect()
         .attachTo(token)
         .file(closest("jb2a.extras.tmfx.outflow.circle.01"))
-        .scaleToObject(1.5 * token.document.texture.scaleX)
+        .scaleToObject(1.5 * scaleX)
         .opacity(1)
         .belowTokens()
         .randomRotation()
@@ -140,6 +141,8 @@ async function create(token: Token, targets: Token[], config: any = {}) {
         .tint("#e51e19");
 
     targets.forEach(target => {
+        const { widthUnits: targetWidth } = adapter.getTokenDimensions(target);
+
         sequence.effect()
             .file(closest("jb2a.toll_the_dead.red.skull_smoke"))
             .attachTo(target)
@@ -147,23 +150,14 @@ async function create(token: Token, targets: Token[], config: any = {}) {
             .filter("ColorMatrix", { saturate: 0.25, hue: -2 })
             .zIndex(1);
 
-        sequence.effect()
-            .copySprite(target)
-            .spriteRotation(-target.document.rotation)
-            .attachTo(target)
-            .scaleToObject(1, { considerTokenScale: true })
-            .fadeIn(500)
-            .fadeOut(2000)
-            .loopProperty('spriteContainer', 'position.x', { from: -0.05, to: 0.05, duration: 55, pingPong: true, gridUnits: true })
-            .filter("ColorMatrix", { saturate: -1, brightness: 0.5 })
-            .duration(5000)
-            .opacity(0.65)
-            .zIndex(0.1);
+        sequence.motion(target)
+            .noise({ strength: 0.05, speed: 55, gridUnits: true })
+            .duration(5000);
 
         sequence.effect()
             .file(closest(`jb2a.particles.outward.red.01.03`))
             .attachTo(target, { offset: { y: 0.1 }, gridUnits: true, bindRotation: false })
-            .size(1 * target.document.width, { gridUnits: true })
+            .size(1 * targetWidth, { gridUnits: true })
             .duration(1000)
             .fadeOut(800)
             .scaleIn(0, 1000, { ease: "easeOutCubic" })

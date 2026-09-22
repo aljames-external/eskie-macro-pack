@@ -61,22 +61,9 @@ async function create(token: Token, target: Token, config: any = {}) {
             return Tagger.hasTags(token, "Incorporeal");
         })
 
-        .effect()
-        .copySprite(token)
-        .spriteRotation(-token.document.rotation)
-        .atLocation(token)
-        .mirrorX(token.document.texture.scaleX < 0)
-        .scaleToObject(1, { considerTokenScale: true })
-        .animateProperty('spriteContainer', 'position.x', { from: 0, to: middleposition.x, duration: 250, ease: "easeOutCubic" })
-        .animateProperty('spriteContainer', 'position.y', { from: 0, to: middleposition.y, duration: 250, ease: "easeOutCubic" })
-        .duration(500)
-        .fadeOut(400)
-        .opacity(0.65)
-        .tint(tintColor)
-        .loopProperty("alphaFilter", "alpha", { from: 0.75, to: 1, duration: 1500, pingPong: true, ease: "easeOutSine" })
-        .filter("Glow", { color: tintColor, distance: 5, outerStrength: 4, innerStrength: 0 })
-        .filter("ColorMatrix", { saturate: -0.2, brightness: 1.2 })
-        .filter("Blur", { blurX: 0, blurY: 0.8 })
+        .motion(token)
+        .moveBy(middleposition, { duration: 250, ease: "easeOutCubic" })
+        .tintTo(tintColor)
         .playIf(() => {
             return Tagger.hasTags(token, "Incorporeal");
         })
@@ -105,15 +92,9 @@ async function create(token: Token, target: Token, config: any = {}) {
         .mask(target)
         .zIndex(1)
 
-        // Target grows pale
-        .effect()
-        .copySprite(target)
-        .spriteRotation(-target.document.rotation)
-        .attachTo(target)
-        .scaleToObject(1, { considerTokenScale: true })
-        .filter("ColorMatrix", { saturate: -1 })
-        .fadeIn(3000)
-        .fadeOut(1000)
+        // Target draining touch shudder motion
+        .motion(target)
+        .noise()
         .duration(5000)
 
         // Animate hit dust
@@ -164,11 +145,8 @@ async function play(token: Token, target: Token, config: any = {}) {
         };
         const tintColor = tintColors[color] ?? '#6ff087';
 
-        // Make attacker into a poltergeist
+        // Make attacker into a poltergeist via .motion()
         new Sequence()
-            .animation()
-            .on(token)
-            .opacity(0)
             .thenDo(function () {
                 if (changeLight) {
                     var light = { dim: 0, bright: 1, alpha: 0.25, luminosity: 0.55, color: tintColor, animation: { type: "torch", speed: 4, intensity: 5 }, attenuation: 0.85, contrast: 0, shadows: 0 };
@@ -190,22 +168,12 @@ async function play(token: Token, target: Token, config: any = {}) {
             .filter("ColorMatrix", { saturate: -0.2, brightness: 1.2 })
             .persist()
 
-            .effect()
+            .motion(token)
             .name(`Incorporeal ${token.document.name}`)
-            .copySprite(token)
-            .spriteRotation(-token.document.rotation)
-            .attachTo(token, { bindAlpha: false })
-            .scaleToObject(1, { considerTokenScale: true })
-            .opacity(0.65)
-            .tint(tintColor)
-            .fadeIn(500)
-            .loopProperty("alphaFilter", "alpha", { from: 0.75, to: 1, duration: 1500, pingPong: true, ease: "easeOutSine" })
-            .loopProperty('spriteContainer', 'position.x', { from: 0.025, to: -0.025, duration: 5000, gridUnits: true, pingPong: true, ease: "easeOutSine" })
-            .loopProperty('spriteContainer', 'position.y', { from: 0, to: -0.03, duration: 2500, gridUnits: true, pingPong: true })
+            .oscillate()
+            .fadeTo(0.65)
+            .tintTo(tintColor)
             .persist()
-            .filter("Glow", { color: tintColor, distance: 5, outerStrength: 4, innerStrength: 0 })
-            .filter("ColorMatrix", { saturate: -0.2, brightness: 1.2 })
-            .filter("Blur", { blurX: 0, blurY: 0.8 })
             .waitUntilFinished()
 
             .effect()

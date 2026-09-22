@@ -26,18 +26,15 @@ const label = `StunningStrike - DizzyStars - ${id} - ${target.uuid}`;
 
 const closest = (path) => game.modules.get('eskie-macros')?.api?.util?.closest?.(path) ?? path;
 
-const tokenCenter = token.center ?? { x: token.x ?? 0, y: token.y ?? 0 };
-const targetCenter = target.center ?? { x: target.x ?? 0, y: target.y ?? 0 };
+const tokenCenter = token.center;
+const targetCenter = target.center;
 
 const middle = {
     x: (targetCenter.x - tokenCenter.x) * 0.25,
     y: (targetCenter.y - tokenCenter.y) * 0.25,
 };
 
-const tokenRotation = token.document?.rotation ?? token.rotation ?? 0;
-const tokenMirrorX = token.document?.mirrorX ?? token.mirrorX ?? false;
-const targetRotation = target.document?.rotation ?? target.rotation ?? 0;
-const targetWidth = target.document?.width ?? target.width ?? 1;
+const targetWidth = target.document.width;
 
 const sequence = new Sequence();
 
@@ -87,26 +84,9 @@ sequence
     .atLocation(token)
     .zIndex(1)
 
-    .animation()
-    .on(token)
-    .opacity(0)
-
-    .effect()
-    .copySprite(token)
-    .spriteRotation(-tokenRotation)
-    .atLocation(token)
-    .scaleToObject(1, { considerTokenScale: true })
-    .mirrorX(tokenMirrorX)
-    .animateProperty("spriteContainer", "position.x", { from: 0, to: middle.x, duration: 100, ease: "easeOutExpo" })
-    .animateProperty("spriteContainer", "position.y", { from: 0, to: middle.y, duration: 100, ease: "easeOutExpo" })
-    .animateProperty("spriteContainer", "position.x", { from: 0, to: -middle.x, duration: 350, ease: "easeInOutQuad", fromEnd: true })
-    .animateProperty("spriteContainer", "position.y", { from: 0, to: -middle.y, duration: 350, ease: "easeInOutQuad", fromEnd: true })
-    .duration(600)
-
-    .animation()
-    .on(token)
-    .opacity(1)
-    .delay(600)
+    .motion(token)
+    .moveBy(middle, { duration: 100, ease: "easeOutExpo" })
+    .moveBy({ x: -middle.x, y: -middle.y }, { duration: 350, ease: "easeInOutQuad" })
 
     .effect()
     .file(closest("jb2a.impact.010.blue"))
@@ -141,16 +121,8 @@ sequence
     .atLocation(target)
     .belowTokens()
 
-    .effect()
-    .copySprite(target)
-    .spriteRotation(-targetRotation)
-    .atLocation(target)
-    .scaleToObject(1, { considerTokenScale: true })
-    .fadeIn(200)
-    .fadeOut(500)
-    .loopProperty("spriteContainer", "position.x", { from: -0.05, to: 0.05, duration: 50, pingPong: true, gridUnits: true })
-    .duration(1500)
-    .opacity(0.25)
+    .motion(target)
+    .oscillate()
 
     .effect()
     .name(label)
@@ -163,3 +135,4 @@ sequence
     .persist();
 
 await sequence.play();
+

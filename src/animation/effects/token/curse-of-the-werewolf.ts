@@ -17,14 +17,14 @@ const DEFAULT_CONFIG = {
 
 /**
  * Creates a Sequencer effect for the Curse of the Werewolf animation.
- * Plays a dark transformation burst on the target token, briefly flashing
- * the werewolf form image as a ghostly overlay.
+ * Plays a dark transformation burst on the target token, using native motion for
+ * werewolf transformation scale and shudder.
  *
  * @param {Token} target The token receiving the curse.
  * @param {object} config Configuration options.
  * @returns {Sequence} The created Sequence object.
  */
-async function create(target: Token, config: any = {}) {
+async function create(target: Token, config: Record<string, any> = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { werewolfForm, sound } = mConfig;
 
@@ -97,34 +97,13 @@ async function create(target: Token, config: any = {}) {
         .filter('ColorMatrix', { brightness: 0.5 })
         .tint('#e82121')
         .rotate(-15)
-        .mask(target)
+        .mask(target);
 
-        // Ghost of the current token — glowing red, fading in as the curse takes hold.
-        .effect()
-        .copySprite(target)
-        .spriteRotation(-target.document.rotation)
-        .attachTo(target)
-        .scaleToObject(1, { considerTokenScale: true })
-        .fadeIn(250)
-        .fadeOut(2500)
-        .duration(4000)
-        .belowTokens()
-        .opacity(0.5)
-        .filter('ColorMatrix', { brightness: 0.5 })
-        .filter('Glow', { color: 0xe82121, distance: 5 })
-
-        // Subtle stretch-squash ghost of the current form — the body beginning to change.
-        .effect()
-        .copySprite(target)
-        .spriteRotation(-target.document.rotation)
-        .attachTo(target)
-        .fadeIn(500)
-        .fadeOut(500)
-        .scaleToObject(1, { considerTokenScale: true })
-        .animateProperty('sprite', 'width', { from: target.document.width * target.document.texture.scaleX, to: (target.document.width * 1.06) * target.document.texture.scaleX, duration: 500, gridUnits: true, ease: 'easeInOutBack' })
-        .animateProperty('sprite', 'height', { from: target.document.width * target.document.texture.scaleX, to: (target.document.width * 1.06) * target.document.texture.scaleX, duration: 750, gridUnits: true, ease: 'easeOutBack' })
-        .loopProperty('spriteContainer', 'position.x', { from: -0.005, to: 0.005, duration: 100, pingPong: true, gridUnits: true })
-        .opacity(0.4);
+    // Native motion for werewolf transformation scale and shudder via Sequencer 4.3.0+
+    sequence
+        .motion(target)
+        .scaleTo(1.06, { duration: 750, ease: 'easeOutBack' })
+        .noise();
 
     // Ghost of the werewolf form — the beast briefly surfacing through the curse.
     if (werewolfForm) {
@@ -135,9 +114,6 @@ async function create(target: Token, config: any = {}) {
             .fadeIn(500)
             .fadeOut(500)
             .scaleToObject(1, { considerTokenScale: true })
-            .animateProperty('sprite', 'width', { from: target.document.width * target.document.texture.scaleX, to: (target.document.width * 1.06) * target.document.texture.scaleX, duration: 500, gridUnits: true, ease: 'easeInOutBack' })
-            .animateProperty('sprite', 'height', { from: target.document.width * target.document.texture.scaleX, to: (target.document.width * 1.06) * target.document.texture.scaleX, duration: 750, gridUnits: true, ease: 'easeOutBack' })
-            .loopProperty('spriteContainer', 'position.x', { from: -0.005, to: 0.005, duration: 100, pingPong: true, gridUnits: true })
             .opacity(0.4);
     }
 
@@ -151,7 +127,7 @@ async function create(target: Token, config: any = {}) {
  * @param {object} config Configuration options.
  * @returns {Promise<void>}
  */
-async function play(target: Token, config: any = {}) {
+async function play(target: Token, config: Record<string, any> = {}) {
     const sequence = await create(target, config);
     if (sequence) return sequence.play();
 }
@@ -161,3 +137,4 @@ export const curseOfTheWerewolf = {
     play,
     default_config: DEFAULT_CONFIG,
 };
+
