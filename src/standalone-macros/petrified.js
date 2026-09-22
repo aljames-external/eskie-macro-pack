@@ -14,7 +14,6 @@ const closest = (path) => game.modules.get('eskie-macros')?.api?.util?.closest?.
 const id = "Petrified";
 const tokenId = token.id ?? token.document?.id ?? "";
 const label = `${id}-${tokenId}`;
-const rotation = token.document?.rotation ?? token.rotation ?? 0;
 
 // Toggle / re-entrant persistent effect handling
 const activeEffects = Sequencer.EffectManager.getEffects({ name: label, object: token }) ?? [];
@@ -53,22 +52,10 @@ sequence.effect()
     .scaleToObject(2)
     .randomRotation();
 
-// Gray saturation shift copy-sprite overlay
-sequence.effect()
-    .name(label)
-    .copySprite(token)
-    .spriteRotation(-rotation)
-    .atLocation(token)
-    .scaleToObject(1, { considerTokenScale: true })
-    .mask(token)
-    .opacity(0.4)
-    .filter("ColorMatrix", { contrast: 1, saturate: -1 })
-    .filter("Glow", { color: 0x000000, distance: 3, outerStrength: 4 })
-    .attachTo(token)
-    .fadeIn(3000)
-    .duration(5000)
-    .zIndex(1)
-    .persist();
+// Stone shudder motion as token petrifies
+sequence.motion(token)
+    .noise({ strength: 0.05, speed: 75, gridUnits: true })
+    .duration(5000);
 
 // Stone gray petrification statue texture overlay
 sequence.effect()

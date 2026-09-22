@@ -49,14 +49,9 @@ async function create(token: Token, target: Token, config: any = {}) {
             .zIndex(1)
             .waitUntilFinished(-3000)
 
-        .effect()
-            .copySprite(target)
-            .attachTo(target)
-            .scaleToObject(1, { considerTokenScale: true })
-            .loopProperty('sprite', 'position.x', { from: -0.05, to: 0.05, duration: 50, pingPong: true, gridUnits: true })
-            .opacity(0.5)
+        .motion(target)
+            .noise()
             .duration(1000)
-            .fadeOut(250)
 
         .effect()
             .file(closest('eskie.texture_mask.ink.01.black'))

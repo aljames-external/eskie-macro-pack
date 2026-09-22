@@ -20,21 +20,9 @@ async function create(token: Token, config: any = {}) {
     let sequence = new Sequence();
     applySound(sequence, sound);
     sequence = sequence
-        .effect()
-        .name(id)
-        .copySprite(token)
-        .spriteRotation(-token.document.rotation)
-        .atLocation(token)
-        .scaleToObject(1, { considerTokenScale: true })
-        .mask(token)
-        .opacity(0.4)
-        .filter("ColorMatrix", { contrast: 1, saturate: -1 })
-        .filter("Glow", { color: 0x000000, distance: 3, outerStrength: 4 })
-        .attachTo(token)
-        .fadeIn(3000)
+        .motion(token)
+        .noise({ strength: 0.05, speed: 75, gridUnits: true })
         .duration(5000)
-        .zIndex(1)
-        .persist()
 
         .effect()
         .file("https://i.imgur.com/4P2tITB.png")

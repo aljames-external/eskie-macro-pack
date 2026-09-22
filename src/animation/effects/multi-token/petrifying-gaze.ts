@@ -51,16 +51,9 @@ async function create(token: Token, targets: Token[], config: any = {}) {
         .fadeIn(200)
         .fadeOut(500)
 
-        .effect()
-        .copySprite(token)
-        .spriteRotation(-adapter.getTokenRotation(token))
-        .atLocation(token)
-        .scaleToObject(1, { considerTokenScale: true })
-        .filter("Blur", { blurX: 5, blurY: 20 })
-        .loopProperty('spriteContainer', 'position.y', { from: -10, to: 10, duration: 75, pingPong: true })
-        .opacity(0.4)
+        .motion(token)
+        .noise({ strength: 0.05, speed: 75, gridUnits: true })
         .duration(5000)
-        .fadeOut(500)
 
         .effect()
         .file(closest(eyeAnimation))
@@ -109,17 +102,9 @@ async function create(token: Token, targets: Token[], config: any = {}) {
             .loopProperty('spriteContainer', 'position.y', { from: -10, to: 10, duration: 100, pingPong: true })
             .opacity(0.3)
 
-            .effect()
-            .copySprite(target)
-            .spriteRotation(-adapter.getTokenRotation(target))
-            .atLocation(target)
-            .scaleToObject(1, { considerTokenScale: true })
-            .filter("Blur", { blurX: 5, blurY: 20 })
-            .loopProperty('spriteContainer', 'position.y', { from: -10, to: 10, duration: 100, pingPong: true })
-            .opacity(0.8)
-            .duration(5000)
-            .fadeIn(1000)
-            .fadeOut(500);
+            .motion(target)
+            .noise({ strength: 0.05, speed: 100, gridUnits: true })
+            .duration(5000);
     }
 
     return sequence;

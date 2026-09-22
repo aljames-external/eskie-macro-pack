@@ -17,7 +17,6 @@ if (targetTokens.length === 0) {
 const closest = (path) => game.modules.get('eskie-macros')?.api?.util?.closest?.(path) ?? path;
 
 const eyeAnimation = "jb2a.eyes.01.single.orangeyellow";
-const tokenRotation = token.document?.rotation ?? token.rotation ?? 0;
 const sequence = new Sequence();
 
 sequence.effect()
@@ -41,16 +40,9 @@ sequence.effect()
     .fadeIn(200)
     .fadeOut(500);
 
-sequence.effect()
-    .copySprite(token)
-    .spriteRotation(-tokenRotation)
-    .atLocation(token)
-    .scaleToObject(1, { considerTokenScale: true })
-    .filter("Blur", { blurX: 5, blurY: 20 })
-    .loopProperty("spriteContainer", "position.y", { from: -10, to: 10, duration: 75, pingPong: true })
-    .opacity(0.4)
-    .duration(5000)
-    .fadeOut(500);
+sequence.motion(token)
+    .noise({ strength: 0.05, speed: 75, gridUnits: true })
+    .duration(5000);
 
 sequence.effect()
     .file(closest(eyeAnimation))
@@ -63,8 +55,6 @@ sequence.effect()
     .fadeOut(500);
 
 for (const target of targetTokens) {
-    const targetRotation = target.document?.rotation ?? target.rotation ?? 0;
-
     sequence.effect()
         .file(closest(eyeAnimation))
         .atLocation(token)
@@ -99,17 +89,9 @@ for (const target of targetTokens) {
         .loopProperty("spriteContainer", "position.y", { from: -10, to: 10, duration: 100, pingPong: true })
         .opacity(0.3);
 
-    sequence.effect()
-        .copySprite(target)
-        .spriteRotation(-targetRotation)
-        .atLocation(target)
-        .scaleToObject(1, { considerTokenScale: true })
-        .filter("Blur", { blurX: 5, blurY: 20 })
-        .loopProperty("spriteContainer", "position.y", { from: -10, to: 10, duration: 100, pingPong: true })
-        .opacity(0.8)
-        .duration(5000)
-        .fadeIn(1000)
-        .fadeOut(500);
+    sequence.motion(target)
+        .noise({ strength: 0.05, speed: 100, gridUnits: true })
+        .duration(5000);
 }
 
 await sequence.play();

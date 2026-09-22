@@ -39,7 +39,6 @@ if (isPlaying) {
 }
 
 const tokenWidth = token.document?.width ?? token.width ?? 1;
-const targetRotation = target.document?.rotation ?? target.rotation ?? 0;
 
 const sequence = new Sequence();
 
@@ -103,16 +102,9 @@ sequence
     .filter("ColorMatrix", { hue: -15, saturate: 1 })
     .repeats(3, 300, 300)
 
-    .effect()
+    .motion(target)
     .name(id)
-    .copySprite(target)
-    .spriteRotation(-targetRotation)
-    .attachTo(target)
-    .scaleToObject(1, { considerTokenScale: true })
-    .fadeIn(250)
-    .fadeOut(1500)
-    .loopProperty('spriteContainer', 'position.x', { from: -0.05, to: 0.05, duration: 50, pingPong: true, gridUnits: true })
-    .duration(4000)
-    .opacity(0.25);
+    .noise()
+    .duration(4000);
 
 await sequence.play({ preload: true });

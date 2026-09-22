@@ -191,20 +191,12 @@ for (const target of targets) {
         .zIndex(1);
 
 
-    // Psychic distortion target token shake & purple tint
-    sequence.effect()
+    // Psychic recoil wobble noise motion on target
+    sequence.motion(target)
         .name(targetLabel)
         .delay(600)
-        .copySprite(target)
-        .spriteRotation(-targetRotation)
-        .attachTo(target)
-        .scaleToObject(1, { considerTokenScale: true })
-        .fadeIn(200)
-        .fadeOut(500)
-        .loopProperty("spriteContainer", "position.x", { from: -0.05, to: 0.05, duration: 50, pingPong: true, gridUnits: true })
-        .duration(1800)
-        .opacity(0.2)
-        .tint(0x6820ee);
+        .noise()
+        .duration(1800);
 
 
     // Confused / mockery emote #1

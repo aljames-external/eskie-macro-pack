@@ -1,6 +1,6 @@
 // Standalone Macro: Ray of Sickness
 // Original Author: .eskie
-// Modular Conversion: bakanabaka
+// Modular Conversion & Sequencer 4.3.0+ .motion() Update: bakanabaka
 
 if (!game.modules.get("sequencer")?.active) {
     return ui.notifications.error("The 'Ray of Sickness' macro requires the 'Sequencer' module to be installed and active!");
@@ -67,14 +67,9 @@ sequence
         .zIndex(1)
         .waitUntilFinished(-3000)
 
-    .effect()
-        .copySprite(target)
-        .attachTo(target)
-        .scaleToObject(1, { considerTokenScale: true })
-        .loopProperty("sprite", "position.x", { from: -0.05, to: 0.05, duration: 50, pingPong: true, gridUnits: true })
-        .opacity(0.5)
+    .motion(target)
+        .noise()
         .duration(1000)
-        .fadeOut(250)
 
     .effect()
         .file(closest("eskie.texture_mask.ink.01.black"))

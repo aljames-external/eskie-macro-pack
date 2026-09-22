@@ -86,16 +86,9 @@ async function create(token: Token, target: Token, config: any = {}) {
             .filter('ColorMatrix', { hue: -15, saturate: 1 })
             .repeats(3, 300, 300)
 
-        .effect()
-            .copySprite(target)
-            .spriteRotation(-adapter.getTokenRotation(target))
-            .attachTo(target)
-            .scaleToObject(1, { considerTokenScale: true })
-            .fadeIn(250)
-            .fadeOut(1500)
-            .loopProperty('spriteContainer', 'position.x', { from: -0.05, to: 0.05, duration: 50, pingPong: true, gridUnits: true })
-            .duration(4000)
-            .opacity(0.25);
+        .motion(target)
+            .noise()
+            .duration(4000);
 
     return sequence;
 }
