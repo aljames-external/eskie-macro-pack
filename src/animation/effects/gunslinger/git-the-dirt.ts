@@ -80,9 +80,8 @@ async function play(token: Token, config: AnimationEffectConfig = {}) {
 function destroy(token: Token) {
     const tokenRotation = adapter.getTokenRotation(token);
     return new Sequence()
-        .animation()
-        .on(token)
-        .rotate(tokenRotation - 90);
+        .motion(token)
+        .rotateTo(tokenRotation - 90);
 }
 
 async function stop(token: Token) {
