@@ -61,7 +61,7 @@ if (activeFly.length > 0 || activeLanding.length > 0 || hasTag) {
     }
 
     departureSeq.motion(target)
-        .moveTo({ y: -40 }, { gridUnits: true, duration: 1500, ease: "easeInCubic" });
+        .moveBy({ y: -40 }, { gridUnits: true, duration: 1500, ease: "easeInCubic" });
 
     departureSeq.effect()
         .copySprite(target)
@@ -235,11 +235,10 @@ for (const offset of thrusterPositions) {
 }
 
 // Sequencer 4.3.0+ Vehicle tile flying hover motion
-seq.motion(target)
+seq.motion(tile)
     .name(effectNameFly)
-    .moveTo({ y: -0.5 }, { duration: 1000, gridUnits: true })
-    .oscillate()
-    .persist();
+    .moveBy({ y: -0.5 }, { duration: 1000, gridUnits: true })
+    .oscillate({ period: 2000, amplitude: 0.05 });
 
 // Ground drop shadow effect staying on ground underneath tile
 seq.effect()

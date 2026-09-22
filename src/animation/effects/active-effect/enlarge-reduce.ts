@@ -198,6 +198,7 @@ async function playReduce(token: Token, config: any = {}) {
 }
 
 export const enlargeReduce = {
+    play: playEnlarge,
     enlarge: {
         create: createEnlarge,
         play: playEnlarge,

@@ -17,15 +17,21 @@ const DEFAULT_CONFIG = {
  * Creates a Petrifying Gaze effect sequence from a source token to multiple target tokens.
  *
  * @param {Token} token The token initiating the effect.
- * @param {Array<Token>} targetTokens An array of target tokens.
+ * @param {Token|Token[]} targetTokens A target token or an array of target tokens.
  * @param {object} [config={}] Configuration for the effect.
  * @param {string} [config.id='PetrifyingGaze'] The id of the effect.
  * @returns {Promise<Sequence>} A promise that resolves with the complete effect sequence.
  */
-async function create(token: Token, targets: Token[], config: any = {}) {
+async function create(token: Token, targetTokens?: Token | Token[], config: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id, sound } = mConfig;
     const eyeAnimation = "jb2a.eyes.01.single.orangeyellow";
+
+    const targetsList = Array.isArray(targetTokens)
+        ? targetTokens
+        : (targetTokens ? [targetTokens] : Array.from(game.user?.targets ?? []));
+
+    if (!token || !targetsList.length) return null;
 
     let sequence = new Sequence();
     applySound(sequence, sound);
@@ -52,8 +58,7 @@ async function create(token: Token, targets: Token[], config: any = {}) {
         .fadeOut(500)
 
         .motion(token)
-        .noise({ strength: 0.05, speed: 75, gridUnits: true })
-        .duration(5000)
+        .noise({ strength: 0.05, frequency: 75, duration: 3000, gridUnits: true })
 
         .effect()
         .file(closest(eyeAnimation))
@@ -66,7 +71,7 @@ async function create(token: Token, targets: Token[], config: any = {}) {
         .fadeOut(500);
 
     // Effects for each target
-    for (const target of targets) {
+    for (const target of targetsList) {
         sequence
             .effect()
             .file(closest(eyeAnimation))
@@ -103,8 +108,7 @@ async function create(token: Token, targets: Token[], config: any = {}) {
             .opacity(0.3)
 
             .motion(target)
-            .noise({ strength: 0.05, speed: 100, gridUnits: true })
-            .duration(5000);
+            .noise({ strength: 0.05, frequency: 100, duration: 4000, gridUnits: true });
     }
 
     return sequence;
@@ -113,13 +117,13 @@ async function create(token: Token, targets: Token[], config: any = {}) {
 /**
  * Creates and plays the Petrifying Gaze effect.
  * @param {Token} token The token initiating the effect.
- * @param {Array<Token>} targetTokens An array of target tokens.
+ * @param {Token|Token[]} targetTokens A target token or an array of target tokens.
  * @param {object} [config={}] Configuration for the effect.
  * @returns {Promise<void>} A promise that resolves when the effect is finished.
  */
-async function play(token: Token, targets: Token[], config: any = {}) {
-    let seq = await create(token, targets, config);
-    if (seq) { await seq.play(); }
+async function play(token: Token, targetTokens?: Token | Token[], config: any = {}) {
+    const sequence = await create(token, targetTokens, config);
+    if (sequence) { return sequence.play(); }
 }
 
 export const petrifyingGaze = {

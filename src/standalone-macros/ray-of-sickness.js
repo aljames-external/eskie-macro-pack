@@ -68,8 +68,7 @@ sequence
         .waitUntilFinished(-3000)
 
     .motion(target)
-        .noise()
-        .duration(1000)
+        .noise({ strength: 0.05, frequency: 50, duration: 1000, gridUnits: true })
 
     .effect()
         .file(closest("eskie.texture_mask.ink.01.black"))

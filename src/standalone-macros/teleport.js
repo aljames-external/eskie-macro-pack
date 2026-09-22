@@ -232,8 +232,7 @@ sequence = sequence.effect()
 
 // Sequencer 4.3.0+ motion arrival for caster
 sequence = sequence.motion(token)
-    .moveTo(destination, { duration: 500, offset: { x: -1, y: -1 } })
-    .snapToGrid();
+    .moveTo(destination, { duration: 500, offset: { x: -1, y: -1 } });
 
 // Sequencer 4.3.0+ motion arrival for each party target
 partyTargets.forEach(target => {
@@ -244,8 +243,7 @@ partyTargets.forEach(target => {
     const targetDest = { x: destination.x + offsetX, y: destination.y + offsetY };
 
     sequence = sequence.motion(target)
-        .moveTo(targetDest, { duration: 500, offset: { x: -1, y: -1 } })
-        .snapToGrid();
+        .moveTo(targetDest, { duration: 500, offset: { x: -1, y: -1 } });
 });
 
 // Flash bloom impact blue wave on arrival

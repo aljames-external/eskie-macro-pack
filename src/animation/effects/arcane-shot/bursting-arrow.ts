@@ -11,23 +11,24 @@ const DEFAULT_CONFIG = {
     sound: { ...DEFAULT_SOUND_CONFIG },
 };
 
-async function create(token: Token, target: Token, config: any = {}) {
+async function create(token: Token, target?: Token, config: any = {}) {
     config = settingsOverride(config);
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { sound } = mConfig;
 
-    if (!target) return;
+    const trg = target ?? Array.from(game.user?.targets ?? [])[0];
+    if (!token || !trg) return;
 
     const sequence = new Sequence();
     applySound(sequence, sound);
 
-    const targetWidth = adapter.getTokenDimensions(target).widthUnits;
+    const targetWidth = adapter.getTokenDimensions(trg).widthUnits;
 
     sequence
         .effect()
             .file(closest('eskie.casting.physical.03.side.one_shot.white'))
             .attachTo(token)
-            .rotateTowards(target)
+            .rotateTowards(trg)
             .scaleToObject(1, { considerTokenScale: true })
             .zIndex(2)
             .waitUntilFinished(-750)
@@ -35,7 +36,7 @@ async function create(token: Token, target: Token, config: any = {}) {
         .effect()
             .file(closest('eskie.attack.ranged.arrow.01.physical.medium.white.slow'))
             .atLocation(token)
-            .stretchTo(target)
+            .stretchTo(trg)
             .loopProperty('sprite', 'position.y', { from: -0.05, to: 0.05, duration: 50, gridUnits: true, pingPong: true })
             .opacity(0.5)
             .zIndex(3)
@@ -43,7 +44,7 @@ async function create(token: Token, target: Token, config: any = {}) {
         .effect()
             .file(closest('eskie.attack.ranged.arrow.01.physical.medium.white.slow'))
             .atLocation(token)
-            .stretchTo(target)
+            .stretchTo(trg)
             .zIndex(2)
             .waitUntilFinished(-750)
 
@@ -53,7 +54,7 @@ async function create(token: Token, target: Token, config: any = {}) {
 
         .effect()
             .file(closest('jb2a.explosion.04.blue'))
-            .atLocation(target)
+            .atLocation(trg)
             .size(3.5 + targetWidth, { gridUnits: true })
             .opacity(0.75)
             .filter('ColorMatrix', { saturate: -1 })
@@ -61,7 +62,7 @@ async function create(token: Token, target: Token, config: any = {}) {
         .effect()
             .delay(200)
             .file(closest('jb2a.extras.tmfx.border.circle.outpulse.01.fast'))
-            .atLocation(target)
+            .atLocation(trg)
             .size(3.75 + targetWidth, { gridUnits: true })
             .opacity(0.5)
             .belowTokens()
@@ -71,7 +72,7 @@ async function create(token: Token, target: Token, config: any = {}) {
         .effect()
             .delay(200)
             .file(closest('jb2a.impact.ground_crack.still_frame.01'))
-            .atLocation(target)
+            .atLocation(trg)
             .size(4 + targetWidth, { gridUnits: true })
             .fadeIn(250)
             .fadeOut(1000)
@@ -79,12 +80,11 @@ async function create(token: Token, target: Token, config: any = {}) {
             .opacity(0.75)
             .belowTokens();
 
-    const hitTargets = (mConfig.targets?.length ? mConfig.targets : [target]);
+    const hitTargets = (mConfig.targets?.length ? mConfig.targets : [trg]);
     for (const t of hitTargets) {
         const targetSeq = new Sequence()
             .motion(t)
-                .noise()
-                .duration(1000)
+                .noise({ strength: 0.05, frequency: 50, duration: 1000, gridUnits: true })
             .effect()
                 .file(closest('eskie.damage.force.01.white'))
                 .attachTo(t, { bindAlpha: false, bindVisibility: false })
@@ -97,7 +97,7 @@ async function create(token: Token, target: Token, config: any = {}) {
     return sequence;
 }
 
-async function play(token: Token, target: Token, config: any = {}) {
+async function play(token: Token, target?: Token, config: any = {}) {
     const sequence = await create(token, target, config);
     if (sequence) return sequence.play();
 }

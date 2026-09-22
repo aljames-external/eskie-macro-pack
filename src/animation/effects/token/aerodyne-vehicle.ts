@@ -35,9 +35,8 @@ async function create(token: Token, config: any = {}) {
 
         .motion(token)
         .name(EFFECT_NAME)
-        .moveTo({ y: -0.2 }, { duration: 1000, gridUnits: true })
-        .oscillate()
-        .persist()
+        .moveBy({ y: -0.2 }, { duration: 1000, gridUnits: true })
+        .oscillate({ period: 2000, amplitude: 0.05 })
 
         .effect()
         .copySprite(token)

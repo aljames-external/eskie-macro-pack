@@ -27,16 +27,13 @@ if (sendToCenter) {
 
     for (const t of targets) {
         shuffleSeq.motion(t)
-            .moveTo(centerPoint)
-            .duration(800);
+            .moveTo(centerPoint, { duration: 800 });
     }
 }
 
 for (let i = 0; i < targets.length; i++) {
     shuffleSeq.motion(targets[i])
-        .moveTo(shuffledPositions[i])
-        .delay(sendToCenter ? 200 : 0)
-        .duration(1000);
+        .moveTo(shuffledPositions[i], { duration: 1000, delay: sendToCenter ? 200 : 0 });
 }
 
 await shuffleSeq.play();

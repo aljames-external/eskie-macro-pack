@@ -19,7 +19,7 @@ const isPlaying = Sequencer.EffectManager.getEffects({ name: label }).length > 0
 
 if (isPlaying) {
     Sequencer.EffectManager.endEffects({ name: label });
-    await new Sequence().motion(target).scaleTo(1).play();
+    await new Sequence().motion(target).scaleTo(1, { duration: 500 }).play();
     return ui.notifications.info(`Ended Banishing Arrow on ${target.name}.`);
 }
 
@@ -35,7 +35,7 @@ sequence
         .waitUntilFinished(-1250)
 
     .motion(target)
-        .scaleTo(0, { duration: 500 })
+        .scaleTo(0.01, { duration: 500 })
         .rotateBy(360, { duration: 500 })
 
     .effect()

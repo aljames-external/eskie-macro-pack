@@ -26,15 +26,11 @@ const sequence = new Sequence();
 
 // Target position swap motion via Sequencer 4.3.0+ sequence.motion(target)
 sequence.motion(target)
-    .moveTo(tokenCenter, { rotate: false, ease: "easeInBack", delay: 250 })
-    .moveSpeed(500)
-    .duration(1000);
+    .moveTo(tokenCenter, { duration: 1000, rotate: false, ease: "easeInBack", delay: 250 });
 
 // Token position swap motion via Sequencer 4.3.0+ sequence.motion(token)
 sequence.motion(token)
-    .moveTo(targetCenter, { rotate: false, ease: "easeOutCubic", delay: 500 })
-    .moveSpeed(300)
-    .duration(1250);
+    .moveTo(targetCenter, { duration: 1250, rotate: false, ease: "easeOutCubic", delay: 500 });
 
 sequence.effect()
     .copySprite(token)

@@ -29,11 +29,11 @@ const rotation = -(token.document?.rotation ?? token.rotation ?? 0);
 const sequence = new Sequence();
 
 // Levitating token hover motion via Sequencer 4.3.0+ .motion() API
-sequence.motion(token)
+sequence
+    .motion(token)
     .name(label)
-    .moveTo({ y: -0.6 }, { gridUnits: true, duration: 2000, ease: "easeOutCubic" })
-    .oscillate()
-    .persist();
+    .moveBy({ y: -0.6 }, { gridUnits: true, duration: 2000, ease: "easeOutCubic" })
+    .oscillate({ period: 2000, amplitude: 0.05 });
 
 // Ground shadow sprite (shadow blur shrink under token) anchored to ground
 sequence.effect()

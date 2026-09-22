@@ -151,8 +151,7 @@ async function create(token: Token, targets: Token[], config: any = {}) {
             .zIndex(1);
 
         sequence.motion(target)
-            .noise({ strength: 0.05, speed: 55, gridUnits: true })
-            .duration(5000);
+            .noise({ strength: 0.05, frequency: 55, duration: 3000, gridUnits: true });
 
         sequence.effect()
             .file(closest(`jb2a.particles.outward.red.01.03`))

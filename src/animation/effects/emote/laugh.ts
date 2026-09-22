@@ -64,12 +64,13 @@ async function create(token: Token, config: any = {}) {
         .private();
     laughEffect = (duration > 0) ? laughEffect.duration(duration) : laughEffect.persist();
 
+    const noiseOpts: any = { strength: 0.05, frequency: 50, gridUnits: true };
+    if (duration > 0) noiseOpts.duration = duration;
+
     laughEffect = laughEffect
         .motion(token)
         .name(id)
-        .noise()
-        .waitUntilFinished(-200);
-    laughEffect = (duration > 0) ? laughEffect.duration(duration) : laughEffect.persist();
+        .noise(noiseOpts);
 
     return laughEffect;
 }

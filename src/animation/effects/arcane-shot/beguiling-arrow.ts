@@ -11,12 +11,13 @@ const DEFAULT_CONFIG = {
     sound: { ...DEFAULT_SOUND_CONFIG },
 };
 
-async function create(token: Token, target: Token, config: any = {}) {
+async function create(token: Token, target?: Token, config: any = {}) {
     config = settingsOverride(config);
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { sound } = mConfig;
 
-    if (!target) return;
+    const trg = target ?? Array.from(game.user?.targets ?? [])[0];
+    if (!token || !trg) return;
 
     const sequence = new Sequence();
     applySound(sequence, sound);
@@ -25,7 +26,7 @@ async function create(token: Token, target: Token, config: any = {}) {
         .effect()
             .file(closest('eskie.casting.physical.03.side.one_shot.purple'))
             .attachTo(token)
-            .rotateTowards(target)
+            .rotateTowards(trg)
             .scaleToObject(1, { considerTokenScale: true })
             .zIndex(2)
             .filter('ColorMatrix', { hue: 35, brightness: 1 })
@@ -34,30 +35,29 @@ async function create(token: Token, target: Token, config: any = {}) {
         .effect()
             .file(closest('eskie.attack.ranged.arrow.01.physical.medium.purple.slow'))
             .atLocation(token)
-            .stretchTo(target, { attachTo: false })
+            .stretchTo(trg, { attachTo: false })
             .zIndex(2)
             .filter('ColorMatrix', { hue: 35, brightness: 1 })
             .waitUntilFinished(-750)
 
-        .motion(target)
-            .noise()
-            .duration(1000)
+        .motion(trg)
+            .noise({ strength: 0.05, frequency: 50, duration: 1000, gridUnits: true })
 
         .effect()
             .file(closest('jb2a.impact_themed.heart.02.pink'))
-            .attachTo(target)
+            .attachTo(trg)
             .scaleToObject(1.25, { considerTokenScale: true })
             .zIndex(1)
 
         .effect()
             .file(closest('eskie.damage.psychic.01.pink'))
-            .attachTo(target, { bindAlpha: false, bindVisibility: false })
+            .attachTo(trg, { bindAlpha: false, bindVisibility: false })
             .scaleToObject(1.5, { considerTokenScale: true })
             .zIndex(1)
 
         .effect()
-            .copySprite(target)
-            .attachTo(target)
+            .copySprite(trg)
+            .attachTo(trg)
             .scaleToObject(1, { considerTokenScale: true })
             .fadeIn(500)
             .duration(8750)
@@ -70,7 +70,7 @@ async function create(token: Token, target: Token, config: any = {}) {
 
         .effect()
             .file(closest('jb2a.template_circle.symbol.out_flow.heart.pink'))
-            .attachTo(target)
+            .attachTo(trg)
             .scaleToObject(1.75, { considerTokenScale: true })
             .fadeIn(500)
             .duration(8750)
@@ -79,7 +79,7 @@ async function create(token: Token, target: Token, config: any = {}) {
 
         .effect()
             .file(closest('jb2a.extras.tmfx.border.circle.outpulse.01.fast'))
-            .attachTo(target)
+            .attachTo(trg)
             .scaleToObject(0.95, { considerTokenScale: true })
             .fadeIn(500)
             .duration(8750)
@@ -91,7 +91,7 @@ async function create(token: Token, target: Token, config: any = {}) {
     return sequence;
 }
 
-async function play(token: Token, target: Token, config: any = {}) {
+async function play(token: Token, target?: Token, config: any = {}) {
     const sequence = await create(token, target, config);
     if (sequence) return sequence.play();
 }

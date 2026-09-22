@@ -62,10 +62,9 @@ async function create(token: Token, config: Record<string, any> = {}) {
     // Incorporeal spirit hover motion via Sequencer 4.3.0+ .motion() API
     seq.motion(token)
         .name(label)
-        .fadeTo(0.65)
-        .tintTo(color)
-        .oscillate()
-        .persist();
+        .fadeTo(0.65, { duration: 500 })
+        .tintTo(color, { duration: 500 })
+        .oscillate({ period: 2000, amplitude: 0.05 });
 
     // Smoke particle burst
     seq.effect()
@@ -95,8 +94,8 @@ async function stop(token: Token, config: Record<string, any> = {}) {
 
     await new Sequence()
         .motion(token)
-        .fadeTo(1)
-        .tintTo('#FFFFFF')
+        .fadeTo(1, { duration: 500 })
+        .tintTo('#FFFFFF', { duration: 500 })
         .play();
     await Sequencer.EffectManager.endEffects({ name: label, object: token });
 }

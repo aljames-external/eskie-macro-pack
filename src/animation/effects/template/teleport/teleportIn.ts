@@ -47,16 +47,14 @@ function create(token: Token, targets: any[] = [], config: any = {}) {
         .waitUntilFinished(-1500);
 
     sequence = sequence.motion(token)
-        .moveTo(position, { duration: 500, offset: { x: -1, y: -1 } })
-        .snapToGrid();
+        .moveTo(position, { duration: 500, offset: { x: -1, y: -1 } });
 
     targets.forEach(target => {
         const targetCenter = adapter.getCenter(target);
         let targetX = position.x + (targetCenter.x - tokenCenter.x);
         let targetY = position.y + (targetCenter.y - tokenCenter.y);
         sequence = sequence.motion(target)
-            .moveTo({ x: targetX, y: targetY }, { duration: 500, offset: { x: -1, y: -1 } })
-            .snapToGrid();
+            .moveTo({ x: targetX, y: targetY }, { duration: 500, offset: { x: -1, y: -1 } });
     });
     
     return sequence;

@@ -41,8 +41,6 @@ laughEffect.effect()
 
 laughEffect.motion(token)
     .name(label)
-    .noise()
-    .persist()
-    .waitUntilFinished(-200);
+    .noise({ strength: 0.05, frequency: 50, gridUnits: true });
 
 await laughEffect.play();

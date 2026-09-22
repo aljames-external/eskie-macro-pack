@@ -14,19 +14,20 @@ const DEFAULT_CONFIG = {
     sound: { ...DEFAULT_SOUND_CONFIG },
 };
 
-async function play(token: Token, target: Token, config: any = {}) {
+async function play(token: Token, target?: Token, config: any = {}) {
     const seq = await create(token, target, config);
     if (seq) { await seq.play(); }
 }
 
-async function create(token: Token, target: Token, config: any = {}) {
-    if (!token || !target) return;
+async function create(token: Token, target?: Token, config: any = {}) {
+    const trg = target ?? Array.from(game.user?.targets ?? [])[0];
+    if (!token || !trg) return;
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id, color, attack, sound } = mConfig;
     const count = attack?.count ?? 2;
     const label = `${id} - ${token.id}`;
 
-    const location = adapter.getNearestSquareCenter(token, target);
+    const location = adapter.getNearestSquareCenter(token, trg);
     if (!location) return;
     const tokenWidth = adapter.getTokenDimensions(token).widthUnits;
 
@@ -57,7 +58,7 @@ async function create(token: Token, target: Token, config: any = {}) {
         .delay(250)
         .file(closest("jb2a.teleport.01.white"))
         .atLocation(token)
-        .rotateTowards(target)
+        .rotateTowards(trg)
         .scaleToObject(4)
         .spriteScale({ x: 1.25, y: 1 }, { gridUnits: true })
         .spriteOffset({ x: -3 * tokenWidth }, { gridUnits: true })
@@ -69,7 +70,7 @@ async function create(token: Token, target: Token, config: any = {}) {
         .delay(100)
         .file(closest("eskie.velocity.01.white"))
         .atLocation(token)
-        .rotateTowards(target)
+        .rotateTowards(trg)
         .scaleToObject(4)
         .opacity(0.5)
         .spriteOffset({ x: -2 * tokenWidth }, { gridUnits: true })
@@ -82,7 +83,7 @@ async function create(token: Token, target: Token, config: any = {}) {
         .delay(400)
         .file(closest(`jb2a.melee_generic.creature_attack.claw.001.${color}`))
         .atLocation(location)
-        .rotateTowards(target)
+        .rotateTowards(trg)
         .filter("ColorMatrix", { saturate: 0.5 })
         .spriteOffset({ x: -0.9, y: 0 }, { gridUnits: true })
         .rotate(-60)
@@ -95,7 +96,7 @@ async function create(token: Token, target: Token, config: any = {}) {
         .delay(450)
         .file(closest(`jb2a.melee_generic.creature_attack.claw.001.${color}`))
         .atLocation(location)
-        .rotateTowards(target)
+        .rotateTowards(trg)
         .filter("ColorMatrix", { saturate: 0.5 })
         .spriteOffset({ x: -0.9, y: 0 }, { gridUnits: true })
         .rotate(60)

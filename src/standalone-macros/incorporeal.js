@@ -55,10 +55,9 @@ seq.effect()
 
 seq.motion(token)
     .name(id)
-    .oscillate()
-    .fadeTo(0.5)
-    .tintTo(tintColor)
-    .persist();
+    .oscillate({ period: 2000, amplitude: 0.05 })
+    .fadeTo(0.5, { duration: 500 })
+    .tintTo(tintColor, { duration: 500 });
 
 seq.effect()
     .file(closest("jb2a.smoke.puff.centered.grey"))

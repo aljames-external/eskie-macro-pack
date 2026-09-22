@@ -214,8 +214,7 @@ for (const target of targets) {
     // Soul wither disintegration death shudder motion
     .motion(target)
         .name(id)
-        .noise()
-        .duration(5000)
+        .noise({ strength: 0.05, frequency: 50, duration: 5000, gridUnits: true })
 
     // Secondary dying static electricity crackle
     .effect()

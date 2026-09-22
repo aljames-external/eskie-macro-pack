@@ -88,7 +88,7 @@ if (anyActive) {
             .waitUntilFinished(-4000);
 
         sequence.motion(target)
-            .scaleTo(1);
+            .scaleTo(1, { duration: 500 });
     }
 } else {
     // --- BANISHMENT SEQUENCE (TOGGLE ON) ---
@@ -239,7 +239,7 @@ if (anyActive) {
 
         // Banishing target scaling/rotation via Sequencer 4.3.0+ .motion() API
         sequence.motion(target)
-            .scaleTo(0, { duration: 500 })
+            .scaleTo(0.01, { duration: 500 })
             .rotateBy(360, { duration: 500 });
 
         sequence.effect()

@@ -43,8 +43,7 @@ sequence
         .waitUntilFinished(-750)
 
     .motion(target)
-        .noise()
-        .duration(1000)
+        .noise({ strength: 0.05, frequency: 50, duration: 1000, gridUnits: true })
 
     .effect()
         .file(closest("eskie.damage.necrotic.01.teal"))

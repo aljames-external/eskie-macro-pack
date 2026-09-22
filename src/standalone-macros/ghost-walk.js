@@ -16,8 +16,8 @@ if (isPlaying) {
     }
     await new Sequence()
         .motion(token)
-        .fadeTo(1)
-        .tintTo('#FFFFFF')
+        .fadeTo(1, { duration: 500 })
+        .tintTo('#FFFFFF', { duration: 500 })
         .play();
     await Sequencer.EffectManager.endEffects({ name: ghostEffectName, object: token });
 } else {
@@ -54,10 +54,9 @@ if (isPlaying) {
         .persist()
         .motion(token)
         .name(ghostEffectName)
-        .fadeTo(0.65)
-        .tintTo(color)
-        .oscillate()
-        .persist()
+        .fadeTo(0.65, { duration: 500 })
+        .tintTo(color, { duration: 500 })
+        .oscillate({ period: 2000, amplitude: 0.05 })
         .effect()
         .file(closest('jb2a.smoke.puff.centered.grey'))
         .atLocation(token)

@@ -60,7 +60,7 @@ if (isPlaying) {
     for (const target of targets) {
         Sequencer.EffectManager.endEffects({ name: label, object: target });
         Sequencer.EffectManager.endEffects({ name: id, object: target });
-        new Sequence().motion(target).scaleTo(1).fadeTo(1).play();
+        new Sequence().motion(target).scaleTo(1, { duration: 300 }).fadeTo(1).play();
     }
     return;
 }
@@ -68,7 +68,7 @@ if (isPlaying) {
 function buildDissolveSequence(target, effectId) {
     return new Sequence()
         .motion(target)
-        .scaleTo(0)
+        .scaleTo(0.01, { duration: 300 })
         .fadeTo(0);
 }
 

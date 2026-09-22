@@ -58,10 +58,14 @@ sequence.effect()
     .opacity(0.9);
 
 // Target impact flash
-sequence.effect()
+let impactFx = sequence.effect()
     .delay(200)
-    .file(closest('jb2a.impact.fire.orange'))
-    .atLocation(targetPos)
-    .scaleToObject(1.5, { considerTokenScale: true });
+    .file(closest('jb2a.impact.fire.orange'));
+
+if (targetToken) {
+    impactFx.atLocation(targetToken).scaleToObject(1.5, { considerTokenScale: true });
+} else {
+    impactFx.atLocation(targetPos).size(1.5, { gridUnits: true });
+}
 
 await sequence.play();

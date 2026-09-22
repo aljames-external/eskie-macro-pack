@@ -146,8 +146,7 @@ for (const target of targets) {
     // Target draining touch shudder motion via Sequencer 4.3.0+ .motion() API
     sequence.motion(target)
         .name(label)
-        .noise()
-        .duration(duration)
+        .noise({ strength: 0.05, frequency: 50, duration: duration, gridUnits: true })
         .persist()
         .name(id);
 

@@ -24,9 +24,8 @@ function create(token: Token, config: any = {}) {
     sequence
         .motion(token)
         .name(label)
-        .moveTo({ y: -0.6 }, { gridUnits: true, duration: 2000, ease: "easeOutCubic" })
-        .oscillate()
-        .persist();
+        .moveBy({ y: -0.6 }, { gridUnits: true, duration: 2000, ease: "easeOutCubic" })
+        .oscillate({ period: 2000, amplitude: 0.05 });
 
     // Bless loop effect
     sequence

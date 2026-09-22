@@ -25,9 +25,8 @@ async function create(token: Token, config: any = {}) {
 
     seq.motion(token)
         .name(label)
-        .moveTo({ y: -0.5 }, { duration: 1000, gridUnits: true })
-        .oscillate()
-        .persist();
+        .moveBy({ y: -0.5 }, { duration: 1000, gridUnits: true })
+        .oscillate({ period: 1500, amplitude: 0.05 });
 
     seq.effect()
         .copySprite(token)

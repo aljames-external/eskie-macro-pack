@@ -114,7 +114,7 @@ test('disintegrate.dissolve.create builds sequence with sequence.motion(target).
         assert.ok(seq, 'Sequence must be created');
         assert.equal(capturedMotionTargets.length, 1, 'Motion target count should be 1');
         assert.equal(capturedMotionTargets[0], mockTarget, 'Motion target must be target token');
-        assert.equal(capturedScaleTo, 0, 'scaleTo must be 0');
+        assert.equal(capturedScaleTo, 0.01, 'scaleTo must be 0.01');
         assert.equal(capturedFadeTo, 0, 'fadeTo must be 0');
         assert.equal(opacitySetZero, false, 'Token opacity must NOT be set to 0');
         assert.equal(copySpriteCount, 0, 'No copySprite should be present in disintegrate.dissolve.create');

@@ -195,8 +195,7 @@ for (const target of targets) {
     sequence.motion(target)
         .name(targetLabel)
         .delay(600)
-        .noise()
-        .duration(1800);
+        .noise({ strength: 0.05, frequency: 50, duration: 1800, gridUnits: true });
 
 
     // Confused / mockery emote #1

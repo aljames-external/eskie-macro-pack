@@ -14,20 +14,21 @@ const DEFAULT_CONFIG: AnimationEffectConfig = {
 };
 
 async function create(token: Token, targetToken?: Token, config: AnimationEffectConfig = {}) {
-    config = settingsOverride(config);
-    const { template, sound } = adapter.mergeObject(DEFAULT_CONFIG, config);
+    const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
+    const { template, sound } = mConfig;
 
-    let targetPos = targetToken ? adapter.getCenter(targetToken) : null;
+    const trg = targetToken ?? Array.from(game.user?.targets ?? [])[0];
+    let targetPos = trg ? adapter.getCenter(trg) : mConfig.position;
     if (!targetPos) {
         const crosshairCfg = {
             radius: 1,
             icon: 'icons/weapons/guns/revolver-fire-yellow.webp',
             label: 'Final Shot'
         };
-        const [pos] = await templatelib.getPosition(template, crosshairCfg);
-        if (!pos || pos.cancelled) return null;
-        targetPos = pos;
+        const [primary, secondary, center] = await templatelib.getPosition(template, crosshairCfg);
+        targetPos = center ?? primary;
     }
+    if (!targetPos) return null;
 
     const tokenPlaceable = (adapter.getPlaceable(token as any) ?? (token as any)?.object ?? token) as Token;
     if (!tokenPlaceable) return null;
@@ -44,16 +45,20 @@ async function create(token: Token, targetToken?: Token, config: AnimationEffect
     sequence.effect()
         .file(closest('jb2a.disintegrate.orange'))
         .atLocation(token)
-        .stretchTo(targetPos)
+        .stretchTo(trg ?? targetPos)
         .playbackRate(1.8)
         .opacity(0.9);
 
     // Target impact flash
-    sequence.effect()
+    let impactFx = sequence.effect()
         .delay(200)
-        .file(closest('jb2a.impact.fire.orange'))
-        .atLocation(targetPos)
-        .scaleToObject(1.5, { considerTokenScale: true });
+        .file(closest('jb2a.impact.fire.orange'));
+
+    if (trg) {
+        impactFx.atLocation(trg).scaleToObject(1.5, { considerTokenScale: true });
+    } else {
+        impactFx.atLocation(targetPos).size(1.5, { gridUnits: true });
+    }
 
     return sequence;
 }

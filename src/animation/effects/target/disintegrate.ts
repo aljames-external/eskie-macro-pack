@@ -35,10 +35,12 @@ const DEFAULT_CONFIG = {
     sound: { ...DEFAULT_SOUND_CONFIG },
 };
 
-function dissolveCreate(target: Token, config: any = {}) {
+function dissolveCreate(targetToken: Token, config: any = {}) {
+    const target = (adapter.getPlaceable(targetToken as any) ?? (targetToken as any)?.object ?? targetToken) as Token;
+    if (!target) return new Sequence();
     return new Sequence()
         .motion(target)
-        .scaleTo(0)
+        .scaleTo(0.01, { duration: 300 })
         .fadeTo(0);
 }
 
@@ -113,14 +115,15 @@ function beam(token: Token, target: Token, config: any = {}) {
  * 
  * @returns {Promise<Sequence>} A promise that resolves with the complete effect sequence.
  */
-async function create(token: Token, target: Token, config: any = {}) {
-    // Merge user config with default config
+async function create(token: Token, targetToken?: Token, config: any = {}) {
+    const trg = targetToken ?? Array.from(game.user?.targets ?? [])[0];
+    if (!token || !trg) return null;
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
 
-    let disintegrateEffect = beam(token, target, mConfig);
+    let disintegrateEffect = beam(token, trg, mConfig);
     applySound(disintegrateEffect, mConfig.sound);
     if (mConfig.targetDeath) // Chain the death animation if the target is dead
-        disintegrateEffect = disintegrateEffect.addSequence(death(target, mConfig));
+        disintegrateEffect = disintegrateEffect.addSequence(death(trg, mConfig));
 
     return disintegrateEffect;
 }
@@ -132,9 +135,9 @@ async function create(token: Token, target: Token, config: any = {}) {
  * @param {object} [config={}] Configuration for the effect.
  * @returns {Promise<void>} A promise that resolves when the effect is finished.
  */
-async function play(token: Token, target: Token, config: any = {}) {
-    let seq = await create(token, target, config);
-    if (seq) { await seq.play(); }
+async function play(token: Token, targetToken?: Token, config: any = {}) {
+    let seq = await create(token, targetToken, config);
+    if (seq) { return seq.play(); }
 }
 
 /**
@@ -147,8 +150,10 @@ async function play(token: Token, target: Token, config: any = {}) {
 async function stop(token: Token, config: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id } = mConfig;
-    Sequencer.EffectManager.endEffects({ name: id, object: token });
-    return new Sequence().motion(token).scaleTo(1).fadeTo(1).play();
+    const target = (adapter.getPlaceable(token as any) ?? (token as any)?.object ?? token) as Token;
+    Sequencer.EffectManager.endEffects({ name: id, object: target });
+    if (!target) return;
+    return new Sequence().motion(target).scaleTo(1, { duration: 300 }).fadeTo(1).play();
 }
 
 /**
@@ -157,13 +162,15 @@ async function stop(token: Token, config: any = {}) {
  * @param {object} config Configuration for the effect.
  * @returns {Sequence} A Sequencer sequence object.
  */
-function reformCreate(target: Token, config: any = {}) {
+function reformCreate(targetToken: Token, config: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id, duration } = mConfig;
+    const target = (adapter.getPlaceable(targetToken as any) ?? (targetToken as any)?.object ?? targetToken) as Token;
+    if (!target) return new Sequence();
 
     const reformSequence = new Sequence()
         .motion(target)
-        .scaleTo(1)
+        .scaleTo(1, { duration: 300 })
         .fadeTo(1)
         .wait(duration)
         .thenDo(() => {

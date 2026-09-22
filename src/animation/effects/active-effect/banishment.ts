@@ -243,7 +243,7 @@ async function createBanish(target: Token, config: any = {}) {
         .fadeOut(750);
 
     sequence.motion(target)
-        .scaleTo(0, { duration: 500 })
+        .scaleTo(0.01, { duration: 500 })
         .rotateBy(360, { duration: 500 });
 
     sequence.effect()
@@ -312,7 +312,7 @@ async function createReturn(target: Token, config: any = {}) {
         .delay(1500)
         .waitUntilFinished(-4000);
     sequence.motion(target)
-        .scaleTo(1);
+        .scaleTo(1, { duration: 500 });
     return sequence;
 }
 
@@ -324,7 +324,7 @@ async function playReturn(target: Token, config: any = {}) {
 async function clean(target: Token, config: any = {}) {
     new Sequence()
         .motion(target)
-        .scaleTo(1)
+        .scaleTo(1, { duration: 500 })
         .play();
 }
 

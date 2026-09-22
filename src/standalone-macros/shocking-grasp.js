@@ -104,7 +104,6 @@ sequence
 
     .motion(target)
     .name(id)
-    .noise()
-    .duration(4000);
+    .noise({ strength: 0.05, frequency: 50, duration: 4000, gridUnits: true });
 
 await sequence.play({ preload: true });

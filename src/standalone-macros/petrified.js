@@ -54,8 +54,7 @@ sequence.effect()
 
 // Stone shudder motion as token petrifies
 sequence.motion(token)
-    .noise({ strength: 0.05, speed: 75, gridUnits: true })
-    .duration(5000);
+    .noise({ strength: 0.05, frequency: 75, duration: 3000, gridUnits: true });
 
 // Stone gray petrification statue texture overlay
 sequence.effect()

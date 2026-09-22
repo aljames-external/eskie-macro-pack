@@ -110,18 +110,17 @@ async function createTarget(source: Token, config: any = {}, options: any = {}) 
     let sequence = new Sequence();
     applySound(sequence, mConfig.sound?.burn, 2400);
 
-    let targets = mConfig.targets?.length ? mConfig.targets : Array.from(game.user?.targets ?? []);
+    let rawTargets = mConfig.targets?.length ? mConfig.targets : Array.from(game.user?.targets ?? []);
+    let targets = rawTargets.map((t: any) => adapter.getPlaceable(t) ?? t?.object ?? t).filter((t: any) => t);
 
     for (let target of targets) {
         const targetWidth = adapter.getTokenDimensions(target).widthUnits;
-        const targetName = target.name;
+        const targetName = target.name ?? "Target";
         let targetSeq = new Sequence()
             .wait(2200)
 
             .motion(target)
-            .delay(200)
-            .noise()
-            .duration(1800)
+            .noise({ strength: 0.05, frequency: 50, duration: 1800, gridUnits: true })
 
             .effect()
             .file(closest('jb2a.grease.dark_grey.loop'))

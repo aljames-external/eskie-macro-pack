@@ -176,8 +176,8 @@ function createPulsingMuscle(token) {
     let seq = new Sequence();
 
     seq.motion(token)
-        .scaleTo(1.05)
-        .noise();
+        .scaleTo(1.05, { duration: 500 })
+        .noise({ strength: 0.05, frequency: 50, gridUnits: true });
 
     seq.canvasPan()
         .delay(250)
@@ -422,8 +422,8 @@ function createTotemSpirit(token, spirit = "bear") {
     let seq = new Sequence();
 
     seq.motion(token)
-        .scaleTo(1.05)
-        .noise();
+        .scaleTo(1.05, { duration: 500 })
+        .noise({ strength: 0.05, frequency: 50, gridUnits: true });
 
     seq.canvasPan()
         .delay(250)

@@ -31,10 +31,9 @@ const seq = new Sequence();
 
 seq.motion(token)
     .name(effectName)
-    .oscillate()
-    .fadeTo(0.65)
-    .tintTo(tintColor)
-    .persist();
+    .oscillate({ period: 2000, amplitude: 0.05 })
+    .fadeTo(0.65, { duration: 500 })
+    .tintTo(tintColor, { duration: 500 });
 
 seq.effect()
     .delay(100)

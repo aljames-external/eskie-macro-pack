@@ -52,7 +52,7 @@ test('levitation.create builds sequence with .motion() hover oscillation without
                             return proxy;
                         };
                     }
-                    if (prop === 'moveTo') {
+                    if (prop === 'moveTo' || prop === 'moveBy') {
                         return () => {
                             moveToCalled = true;
                             return proxy;

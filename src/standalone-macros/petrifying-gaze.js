@@ -41,8 +41,7 @@ sequence.effect()
     .fadeOut(500);
 
 sequence.motion(token)
-    .noise({ strength: 0.05, speed: 75, gridUnits: true })
-    .duration(5000);
+    .noise({ strength: 0.05, frequency: 75, duration: 3000, gridUnits: true });
 
 sequence.effect()
     .file(closest(eyeAnimation))
@@ -90,8 +89,7 @@ for (const target of targetTokens) {
         .opacity(0.3);
 
     sequence.motion(target)
-        .noise({ strength: 0.05, speed: 100, gridUnits: true })
-        .duration(5000);
+        .noise({ strength: 0.05, frequency: 100, duration: 4000, gridUnits: true });
 }
 
 await sequence.play();

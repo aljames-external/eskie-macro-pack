@@ -63,7 +63,7 @@ async function create(token: Token, target: Token, config: any = {}) {
 
         .motion(token)
         .moveBy(middleposition, { duration: 250, ease: "easeOutCubic" })
-        .tintTo(tintColor)
+        .tintTo(tintColor, { duration: 250 })
         .playIf(() => {
             return Tagger.hasTags(token, "Incorporeal");
         })
@@ -94,8 +94,7 @@ async function create(token: Token, target: Token, config: any = {}) {
 
         // Target draining touch shudder motion
         .motion(target)
-        .noise()
-        .duration(5000)
+        .noise({ strength: 0.05, frequency: 50, duration: 5000, gridUnits: true })
 
         // Animate hit dust
         .effect()
@@ -170,11 +169,9 @@ async function play(token: Token, target: Token, config: any = {}) {
 
             .motion(token)
             .name(`Incorporeal ${token.document.name}`)
-            .oscillate()
-            .fadeTo(0.65)
-            .tintTo(tintColor)
-            .persist()
-            .waitUntilFinished()
+            .oscillate({ period: 2000, amplitude: 0.05 })
+            .fadeTo(0.65, { duration: 500 })
+            .tintTo(tintColor, { duration: 500 })
 
             .effect()
             .file(closest("jb2a.smoke.puff.centered.grey"))

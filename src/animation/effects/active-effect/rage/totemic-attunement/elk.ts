@@ -168,6 +168,7 @@ async function chargeMovement(token: Token, tile: Tile, config: any = {}) {
 }
 
 export const elkAttunement = {
+    play: chargePlay,
     prone: {
         create: proneCreate,
         play: pronePlay,

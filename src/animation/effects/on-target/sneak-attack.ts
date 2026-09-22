@@ -18,8 +18,9 @@ const DEFAULT_CONFIG_MELEE = {
     }
 };
 
-async function createMelee(token: Token, target: Token, config: any = {}) {
-    if (!token || !target) return null;
+async function createMelee(token: Token, target?: Token, config: any = {}) {
+    const trg = target ?? Array.from(game.user?.targets ?? [])[0];
+    if (!token || !trg) return null;
     config = settingsOverride(config);
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG_MELEE, config);
     const { id, color, type, weight, sound } = mConfig;
@@ -31,7 +32,7 @@ async function createMelee(token: Token, target: Token, config: any = {}) {
     const effectOffset = -0.75 - (0.25 * weightIndex);
 
     //Determine nearest targetSquare
-    const targetSquare = adapter.getNearestSquareCenter(token, target);
+    const targetSquare = adapter.getNearestSquareCenter(token, trg);
     if (!targetSquare) return null;
     const tokenWidth = adapter.getTokenDimensions(token).widthUnits;
 
@@ -82,7 +83,7 @@ async function createMelee(token: Token, target: Token, config: any = {}) {
     return seq;
 }
 
-async function playMelee(token: Token, target: Token, config: any = {}) {
+async function playMelee(token: Token, target?: Token, config: any = {}) {
     const seq = await createMelee(token, target, config);
     if (seq) { return seq.play(); }
     return null;
@@ -111,8 +112,9 @@ const DEFAULT_CONFIG_RANGED = {
     }
 };
 
-function createRanged(token: Token, target: Token, config: any = {}) {
-    if (!token || !target) return null;
+function createRanged(token: Token, target?: Token, config: any = {}) {
+    const trg = target ?? Array.from(game.user?.targets ?? [])[0];
+    if (!token || !trg) return null;
     config = settingsOverride(config);
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG_RANGED, config);
     const { id, color, sound } = mConfig;
@@ -125,7 +127,7 @@ function createRanged(token: Token, target: Token, config: any = {}) {
         .effect()
         .file(closest(`eskie.slice.01_ranged.black.${color.attack}`))
         .atLocation(token)
-        .stretchTo(target)
+        .stretchTo(trg)
         .spriteOffset({ x: tokenWidth / 2 }, { gridUnits: true })
         .zIndex(1)
 
@@ -133,7 +135,7 @@ function createRanged(token: Token, target: Token, config: any = {}) {
         .delay(150)
         .file(closest(`jb2a.impact.008.${color.impact}`))
         .size(1.25 * tokenWidth, { gridUnits: true })
-        .atLocation(target)
+        .atLocation(trg)
         .randomRotation()
         .playbackRate(0.9)
         .zIndex(0.1)
@@ -141,7 +143,7 @@ function createRanged(token: Token, target: Token, config: any = {}) {
         .effect()
         .delay(150)
         .file(closest(`jb2a.liquid.splash_side.${color.damage}`))
-        .atLocation(target)
+        .atLocation(trg)
         .size(1.5 * tokenWidth, { gridUnits: true })
         .rotateTowards(token)
         .spriteOffset({ x: -1.15 * tokenWidth }, { gridUnits: true })
@@ -151,7 +153,7 @@ function createRanged(token: Token, target: Token, config: any = {}) {
     return seq;
 }
 
-async function playRanged(token: Token, target: Token, config: any = {}) {
+async function playRanged(token: Token, target?: Token, config: any = {}) {
     const seq = await createRanged(token, target, config);
     if (seq) { return seq.play(); }
     return null;
@@ -163,12 +165,28 @@ const ranged = {
     stop,
 };
 
+async function create(token: Token, target?: Token, config: any = {}) {
+    const trg = target ?? Array.from(game.user?.targets ?? [])[0];
+    if (!token || !trg) return null;
+    const isRanged = config.type === 'ranged' || (adapter.getDistance(token, trg) > 2);
+    return isRanged ? createRanged(token, trg, config) : createMelee(token, trg, config);
+}
+
+async function play(token: Token, target?: Token, config: any = {}) {
+    const seq = await create(token, target, config);
+    if (seq) { return seq.play(); }
+    return null;
+}
+
 const DEFAULT_CONFIG = {
     melee: DEFAULT_CONFIG_MELEE,
     ranged: DEFAULT_CONFIG_RANGED,
 };
 
 export const sneakAttack = {
+    create,
+    play,
+    stop,
     melee,
     ranged,
     default_config: DEFAULT_CONFIG,

@@ -103,7 +103,7 @@ async function create(target: Token, config: Record<string, any> = {}) {
     sequence
         .motion(target)
         .scaleTo(1.06, { duration: 750, ease: 'easeOutBack' })
-        .noise();
+        .noise({ strength: 0.05, frequency: 50, gridUnits: true });
 
     // Ghost of the werewolf form — the beast briefly surfacing through the curse.
     if (werewolfForm) {

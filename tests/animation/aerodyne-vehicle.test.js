@@ -52,7 +52,7 @@ test('aerodyneVehicle.create builds sequence with sequence.motion(token).moveTo(
                             return proxy;
                         };
                     }
-                    if (prop === 'moveTo') {
+                    if (prop === 'moveTo' || prop === 'moveBy') {
                         return (...args) => {
                             moveToCalled = true;
                             moveToArgs = args;

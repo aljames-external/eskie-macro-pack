@@ -27,8 +27,8 @@ function create(token: Token, config: any = {}) {
     applySound(seq, sound);
     seq = seq
         .motion(token)
-        .scaleTo(1.05)
-        .noise();
+        .scaleTo(1.05, { duration: 500 })
+        .noise({ strength: 0.05, frequency: 50, gridUnits: true });
 
     // Canvas pan and shake
     seq = seq

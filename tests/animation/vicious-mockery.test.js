@@ -10,6 +10,9 @@ game.modules.set('eskie-effects', { id: 'eskie-effects', active: true, version: 
 
 test('viciousMockery effect API contracts and exports', () => {
     assert.ok(viciousMockery, 'viciousMockery module must exist');
+    assert.equal(typeof viciousMockery.create, 'function', 'viciousMockery.create must be a function');
+    assert.equal(typeof viciousMockery.play, 'function', 'viciousMockery.play must be a function');
+    assert.equal(typeof viciousMockery.stop, 'function', 'viciousMockery.stop must be a function');
     assert.equal(typeof viciousMockery.cast.create, 'function', 'viciousMockery.cast.create must be a function');
     assert.equal(typeof viciousMockery.cast.play, 'function', 'viciousMockery.cast.play must be a function');
     assert.equal(typeof viciousMockery.cast.stop, 'function', 'viciousMockery.cast.stop must be a function');

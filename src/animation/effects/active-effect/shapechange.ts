@@ -90,8 +90,8 @@ async function createShapechange(token: Token, config: any = {}) {
     // Shapechange transformation warp and shudder via Sequencer 4.3.0+ sequence.motion(token).scaleTo(1.25).noise()
     sequence
         .motion(token)
-        .scaleTo(1.25)
-        .noise();
+        .scaleTo(1.25, { duration: 500 })
+        .noise({ strength: 0.05, frequency: 50, gridUnits: true });
 
     // First ghost of the target form — very faint, brightened.
     sequence

@@ -27,23 +27,24 @@ const DEFAULT_CONFIG: StunningStrikeConfig = {
  * @param {StunningStrikeConfig} config Configuration options for the animation.
  * @returns {Sequence} The created Sequence object.
  */
-async function createStunningStrike(token: Token, target: Token, config: StunningStrikeConfig = {}) {
+async function createStunningStrike(token: Token, targetToken?: Token, config: StunningStrikeConfig = {}) {
+    const trg = targetToken ?? Array.from(game.user?.targets ?? [])[0];
+    if (!token || !trg) return null;
+
     config = settingsOverride(config);
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id, sound } = mConfig;
-
-    if (!token || !target) return null;
 
     const sequence = new Sequence();
     applySound(sequence, sound);
 
     const tokenCenter = adapter.getCenter(token);
-    const targetCenter = adapter.getCenter(target);
+    const targetCenter = adapter.getCenter(trg);
     const middle = {
         x: (targetCenter.x - tokenCenter.x) * 0.25,
         y: (targetCenter.y - tokenCenter.y) * 0.25,
     };
-    const { widthUnits: targetWidth } = adapter.getTokenDimensions(target);
+    const { widthUnits: targetWidth } = adapter.getTokenDimensions(trg);
 
     sequence
         .effect()
@@ -99,14 +100,14 @@ async function createStunningStrike(token: Token, target: Token, config: Stunnin
         .file(closest("jb2a.impact.010.blue"))
         .scaleIn(0, 100, { ease: "easeOutCubic" })
         .scaleToObject(2.5)
-        .atLocation(target)
+        .atLocation(trg)
         .randomRotation()
 
         .effect()
         .file(closest("jb2a.impact.ground_crack.blue.02"))
         .scaleIn(0, 100, { ease: "easeOutCubic" })
         .scaleToObject(2.5)
-        .atLocation(target)
+        .atLocation(trg)
         .randomRotation()
         .belowTokens()
 
@@ -116,7 +117,7 @@ async function createStunningStrike(token: Token, target: Token, config: Stunnin
         .scaleIn(0, 100, { ease: "easeOutCubic" })
         .scaleToObject(1.75)
         .opacity(0.5)
-        .atLocation(target)
+        .atLocation(trg)
         .belowTokens()
 
         .effect()
@@ -125,20 +126,20 @@ async function createStunningStrike(token: Token, target: Token, config: Stunnin
         .scaleIn(0, 100, { ease: "easeOutCubic" })
         .scaleToObject(2.5)
         .opacity(0.5)
-        .atLocation(target)
+        .atLocation(trg)
         .belowTokens()
 
-        .motion(target)
-        .oscillate()
+        .motion(trg)
+        .oscillate({ period: 1000, amplitude: 0.05 })
 
         .effect()
-        .name(`StunningStrike - DizzyStars - ${id} - ${target.document.uuid}`) // Unique name for stopping
+        .name(`StunningStrike - DizzyStars - ${id} - ${trg.document.uuid}`) // Unique name for stopping
         .delay(1000)
         .file(closest("jb2a.dizzy_stars.200px.yellow"))
         .scaleIn(0, 100, { ease: "easeOutCubic" })
         .scaleToObject(1)
         .opacity(1)
-        .attachTo(target, { offset: { y: -0.5 * targetWidth }, gridUnits: true })
+        .attachTo(trg, { offset: { y: -0.5 * targetWidth }, gridUnits: true })
         .persist()
         ;
 
@@ -149,13 +150,12 @@ async function createStunningStrike(token: Token, target: Token, config: Stunnin
  * Plays the Stunning Strike effect.
  *
  * @param {Token} token The token performing the strike.
- * @param {Token} target The token being stunned.
+ * @param {Token} [targetToken] The token being stunned.
  * @param {StunningStrikeConfig} config Configuration options for the animation.
  * @returns {Promise<Sequence | null>} A promise that resolves when the sequence starts playing.
  */
-async function playStunningStrike(token: Token, target: Token, config: StunningStrikeConfig = {}) {
-    if (!token || !target) return null;
-    const sequence = await createStunningStrike(token, target, config);
+async function playStunningStrike(token: Token, targetToken?: Token, config: StunningStrikeConfig = {}) {
+    const sequence = await createStunningStrike(token, targetToken, config);
     if (sequence) { return sequence.play(); }
     return null;
 }

@@ -100,8 +100,7 @@ sequence.effect()
 const tokenPlaceable = token?.object ?? token;
 
 sequence.motion(tokenPlaceable)
-    .moveTo(position, { duration: jumpTime, ease: "easeInOutQuad" })
-    .snapToGrid();
+    .moveTo(position, { duration: jumpTime, ease: "easeInOutQuad" });
 
 sequence.effect()
     .file(closest("jb2a.wind_stream.white"))

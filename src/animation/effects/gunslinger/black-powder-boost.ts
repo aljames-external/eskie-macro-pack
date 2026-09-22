@@ -15,16 +15,19 @@ const DEFAULT_CONFIG: AnimationEffectConfig = {
 
 async function create(token: Token, config: AnimationEffectConfig = {}, options: Record<string, any> = {}) {
     if (options?.type === 'aefx') return null;
-    config = settingsOverride(config);
-    const { template, sound } = adapter.mergeObject(DEFAULT_CONFIG, config);
-
-    const crosshairCfg = {
-        radius: 1,
-        icon: 'icons/skills/movement/feet-boost-jumped-yellow.webp',
-        label: 'Black Powder Boost'
-    };
-    const [position] = await templatelib.getPosition(template, crosshairCfg);
-    if (!position || position.cancelled) return null;
+    const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
+    const { template, sound } = mConfig;
+    let position = mConfig.position;
+    if (!position) {
+        const crosshairCfg = {
+            radius: 1,
+            icon: 'icons/skills/movement/feet-boost-jumped-yellow.webp',
+            label: 'Black Powder Boost'
+        };
+        const [primary, secondary, center] = await templatelib.getPosition(template, crosshairCfg);
+        position = center ?? primary;
+    }
+    if (!position) return null;
 
     const sequence = new Sequence();
     applySound(sequence, sound);
@@ -50,7 +53,7 @@ async function create(token: Token, config: AnimationEffectConfig = {}, options:
         .delay(400)
         .file(closest('eskie.smoke.01.white'))
         .atLocation(position)
-        .scaleToObject(1.5)
+        .size(1.5, { gridUnits: true })
         .belowTokens()
         .opacity(0.6);
 

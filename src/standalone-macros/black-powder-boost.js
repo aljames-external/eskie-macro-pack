@@ -59,7 +59,7 @@ sequence.effect()
     .delay(400)
     .file(closest('eskie.smoke.01.white'))
     .atLocation(position)
-    .scaleToObject(1.5)
+    .size(1.5, { gridUnits: true })
     .belowTokens()
     .opacity(0.6);
 

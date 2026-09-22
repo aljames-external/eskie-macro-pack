@@ -10,7 +10,10 @@ const DEFAULT_CONFIG = {
     sound: { ...DEFAULT_SOUND_CONFIG }
 };
 
-async function create(token: Token, target: Token, config: any = {}) {
+async function create(token: Token, targetToken?: Token, config: any = {}) {
+    const trg = targetToken ?? Array.from(game.user?.targets ?? [])[0];
+    if (!token || !trg) return null;
+
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { darkMap, sound } = mConfig;
 
@@ -48,25 +51,16 @@ async function create(token: Token, target: Token, config: any = {}) {
             .spriteOffset({ x: -sceneBackground.offsetX, y: -sceneBackground.offsetY })
             .duration(6000)
             .fadeIn(500)
-            .fadeOut(500)
-            .belowTokens();
+            .fadeOut(2000)
+            .belowTokens()
+            .zIndex(0);
     }
-    sequence.wait(750)
+    sequence.wait(50);
 
-    .effect()
-        .file(closest("jb2a.impact.010.green"))
-        .atLocation(token)
-        .rotateTowards(target)
-        .spriteOffset({ x: -0.2 }, { gridUnits: true })
-        .scaleToObject(0.4)
-        .fadeOut(750)
-        .zIndex(1)
-        .wait(50)
-
-    .effect()
+    sequence.effect()
         .file(closest("jb2a.twinkling_stars.points04.orange"))
         .atLocation(token)
-        .rotateTowards(target)
+        .rotateTowards(trg)
         .spriteOffset({ x: -0.2 }, { gridUnits: true })
         .filter("ColorMatrix", { hue: 70 })
         .rotate(0)
@@ -76,12 +70,12 @@ async function create(token: Token, target: Token, config: any = {}) {
         .animateProperty('spriteContainer', 'position.x', { from: -0.2, to: 0.25, duration: 1500, gridUnits: true, ease: "easeOutBack", delay: 1500 })
         .animateProperty('sprite', 'rotation', { from: 0, to: 360, duration: 4042, ease: "easeOutSine" })
         .fadeOut(750)
-        .zIndex(1)
+        .zIndex(1);
 
-    .effect()
+    sequence.effect()
         .file(closest("jb2a.extras.tmfx.outpulse.circle.03.normal"))
         .atLocation(token)
-        .rotateTowards(target)
+        .rotateTowards(trg)
         .spriteOffset({ x: -0.175 }, { gridUnits: true })
         .rotate(0)
         .scaleToObject(0.35)
@@ -93,41 +87,41 @@ async function create(token: Token, target: Token, config: any = {}) {
         .duration(4042)
         .fadeOut(750)
         .zIndex(0)
-        .wait(3000)
+        .wait(3000);
 
-    .effect()
+    sequence.effect()
         .file(closest("jb2a.cast_generic.dark.side01.red"))
         .size(1 * token.document.width, { gridUnits: true })
         .atLocation(token)
-        .rotateTowards(target)
+        .rotateTowards(trg)
         .filter("ColorMatrix", { hue: -285 })
         .waitUntilFinished(-1500)
-        .zIndex(2)
+        .zIndex(2);
 
-    .effect()
+    sequence.effect()
         .file(closest("jb2a.fireball.beam.dark_red"))
         .atLocation(token)
         .playbackRate(1.75)
         .scale(0.3)
-        .stretchTo(target)
+        .stretchTo(trg)
         .filter("ColorMatrix", { hue: -285 })
         .startTime(2000)
-        .waitUntilFinished(-2100)
+        .waitUntilFinished(-2100);
 
-    .effect()
+    sequence.effect()
         .file(closest("jb2a.impact.004.dark_red"))
-        .atLocation(target)
+        .atLocation(trg)
         .scaleToObject(2.5)
         .filter("ColorMatrix", { hue: -285 })
         .fadeOut(1167)
         .opacity(0.45)
         .scaleIn(0, 1167, { ease: "easeOutCubic" })
         .canvasPan()
-        .shake({ duration: 100, strength: 25, rotation: false })
+        .shake({ duration: 100, strength: 25, rotation: false });
 
-    .effect()
+    sequence.effect()
         .file(closest("jb2a.static_electricity.03.blue"))
-        .attachTo(target)
+        .attachTo(trg)
         .scaleToObject(1.25)
         .filter("ColorMatrix", { saturate: -1, brightness: 0 })
         .opacity(0.75)
@@ -135,26 +129,25 @@ async function create(token: Token, target: Token, config: any = {}) {
         .fadeOut(1000)
         .randomRotation()
         .repeats(10, 250, 250)
-        .zIndex(1)
+        .zIndex(1);
 
-    .effect()
+    sequence.effect()
         .file(closest("jb2a.token_border.circle.static.blue.009"))
-        .attachTo(target)
+        .attachTo(trg)
         .fadeIn(1000)
         .fadeOut(6000)
         .scaleToObject(1.6, { considerTokenScale: true })
         .filter("ColorMatrix", { saturate: -1, brightness: 0 })
         .belowTokens()
-        .duration(10000)
+        .duration(10000);
 
-    .motion(target)
-        .noise()
-        .duration(5000)
+    sequence.motion(trg)
+        .noise({ strength: 0.05, frequency: 50, duration: 5000, gridUnits: true });
 
-    .effect()
+    sequence.effect()
         .delay(2000)
         .file(closest("jb2a.static_electricity.03.blue"))
-        .attachTo(target)
+        .attachTo(trg)
         .scaleToObject(1.25)
         .filter("ColorMatrix", { saturate: -1, brightness: 0 })
         .opacity(0.75)
@@ -167,8 +160,8 @@ async function create(token: Token, target: Token, config: any = {}) {
     return sequence;
 }
 
-async function play(token: Token, target: Token, config: any = {}) {
-    const sequence = await create(token, target, config);
+async function play(token: Token, targetToken?: Token, config: any = {}) {
+    const sequence = await create(token, targetToken, config);
     if (sequence) return sequence.play();
 }
 

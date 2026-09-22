@@ -205,9 +205,8 @@ async function create(tile: Tile, config: any = {}) {
         // Sequencer 4.3.0+ Vehicle tile flying hover motion
         .motion(tile)
             .name(effectNameFly)
-            .moveTo({ y: -0.5 }, { duration: 1000, gridUnits: true })
-            .oscillate()
-            .persist()
+            .moveBy({ y: -0.5 }, { duration: 1000, gridUnits: true })
+            .oscillate({ period: 2000, amplitude: 0.05 })
 
         // Ground drop shadow effect
         .effect()
@@ -322,7 +321,7 @@ async function stop(tile: Tile, config: any = {}) {
 
         // Vehicle tile fly-off motion via Sequencer 4.3.0+ .motion() API
         .motion(tile)
-            .moveTo({ y: -40 }, { gridUnits: true, duration: 1500, ease: 'easeInCubic' })
+            .moveBy({ y: -40 }, { gridUnits: true, duration: 1500, ease: 'easeInCubic' })
 
         // Shadow moving and fading
         .effect()

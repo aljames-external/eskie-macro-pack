@@ -144,9 +144,7 @@ for (let target of targets) {
         .wait(2200)
 
         .motion(target)
-        .delay(200)
-        .noise()
-        .duration(1800)
+        .noise({ strength: 0.05, frequency: 50, duration: 1800, gridUnits: true })
 
         // Persistent Sizzling Acid Pool 1
         .effect()

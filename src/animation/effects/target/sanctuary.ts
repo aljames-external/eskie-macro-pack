@@ -16,7 +16,10 @@ const DEFAULT_CONFIG: SanctuaryConfig = {
     sound: { ...DEFAULT_SOUND_CONFIG },
 };
 
-async function create(token: Token, target: Token, config: SanctuaryConfig = {}) {
+async function create(token: Token, targetToken?: Token, config: SanctuaryConfig = {}) {
+    const trg = targetToken ?? Array.from(game.user?.targets ?? [])[0] ?? token;
+    if (!token || !trg) return null;
+
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { sound } = mConfig;
     let seq = new Sequence();
@@ -64,40 +67,39 @@ async function create(token: Token, target: Token, config: SanctuaryConfig = {})
 
         .wait(250)
 
-        .motion(target)
-            .name(`${target.name} Sanctuary`)
-            .oscillate()
-            .persist()
+        .motion(trg)
+            .name(`${trg.name} Sanctuary`)
+            .oscillate({ period: 2000, amplitude: 0.05 })
 
         .effect()
             .file(closest("jb2a.extras.tmfx.border.circle.outpulse.01.normal"))
-            .atLocation(target)
-            .scaleToObject(3.25 * target.document.texture.scaleX)
+            .atLocation(trg)
+            .scaleToObject(3.25 * trg.document.texture.scaleX)
             .delay(1200)
 
         .effect()
             .file(closest("jb2a.fireflies.few.02.yellow"))
-            .name(`${target.name} Sanctuary`)
-            .scaleToObject(2 * target.document.texture.scaleX)
+            .name(`${trg.name} Sanctuary`)
+            .scaleToObject(2 * trg.document.texture.scaleX)
             .opacity(1)
             .fadeIn(2000)
             .filter("ColorMatrix", {saturate:-1, brightness:2})
             .persist()
             .private()
-            .attachTo(target, {bindRotation: false})
+            .attachTo(trg, {bindRotation: false})
             .fadeOut(750)
             .zIndex(3)
             .delay(1200)
 
         .effect()
             .file(closest("jb2a.extras.tmfx.inflow.circle.03"))
-            .name(`${target.name} Sanctuary`)
-            .atLocation(target)
-            .scaleToObject(target.document.texture.scaleX)
+            .name(`${trg.name} Sanctuary`)
+            .atLocation(trg)
+            .scaleToObject(trg.document.texture.scaleX)
             .opacity(0.75)
             .persist()
             .private()
-            .attachTo(target)
+            .attachTo(trg)
             .fadeIn(1000)
             .fadeOut(500)
             .zIndex(1)
@@ -105,53 +107,53 @@ async function create(token: Token, target: Token, config: SanctuaryConfig = {})
 
         .effect()
             .file(closest("jb2a.extras.tmfx.outflow.circle.02"))
-            .atLocation(target)
+            .atLocation(trg)
             .fadeIn(200)
             .opacity(0.25)
             .duration(10000)
-            .scaleToObject(3 * target.document.texture.scaleX)
+            .scaleToObject(3 * trg.document.texture.scaleX)
             .fadeOut(500)
             .belowTokens()
             .delay(1200)
 
         .effect()
             .file(closest("jb2a.particles.outward.blue.01.03"))
-            .atLocation(target)
+            .atLocation(trg)
             .filter("ColorMatrix", {saturate:-1, brightness:2})
             .fadeIn(200, {ease: "easeInExpo"})
             .duration(10000)
             .opacity(0.25)
-            .scaleToObject(3 * target.document.texture.scaleX)
+            .scaleToObject(3 * trg.document.texture.scaleX)
             .fadeOut(500)
             .belowTokens()
             .delay(1200)
 
         .effect()
-            .name(`${target.name} Sanctuary`)
+            .name(`${trg.name} Sanctuary`)
             .file(closest("jb2a.bless.200px.intro.yellow"))
-            .atLocation(target)
-            .scaleToObject(1.5 * target.document.texture.scaleX)
+            .atLocation(trg)
+            .scaleToObject(1.5 * trg.document.texture.scaleX)
             .fadeIn(2000)
             .opacity(1)
             .waitUntilFinished(-500)
             .zIndex(0)
 
         .effect()
-            .name(`${target.name} Sanctuary`)
+            .name(`${trg.name} Sanctuary`)
             .file(closest("jb2a.bless.200px.loop.blue"))
-            .scaleToObject(1.5 * target.document.texture.scaleX)
+            .scaleToObject(1.5 * trg.document.texture.scaleX)
             .opacity(0.75)
             .fadeOut(500)
             .persist()
-            .attachTo(target, {bindRotation: false})
+            .attachTo(trg, {bindRotation: false})
             .zIndex(0)
             .waitUntilFinished();
             
     return seq;
 }
 
-async function play(token: Token, target: Token, config: SanctuaryConfig = {}) {
-    const seq = await create(token, target, config);
+async function play(token: Token, targetToken?: Token, config: SanctuaryConfig = {}) {
+    const seq = await create(token, targetToken, config);
     if (seq) { return seq.play(); }
 }
 

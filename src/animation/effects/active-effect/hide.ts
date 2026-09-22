@@ -32,8 +32,8 @@ async function create(token: Token, config: Record<string, any> = {}) {
 
     // Stealth fade motion via Sequencer 4.3.0+ sequence.motion(token)
     seq.motion(token)
-        .fadeTo(0.25)
-        .tintTo("#696969");
+        .fadeTo(0.25, { duration: 500 })
+        .tintTo("#696969", { duration: 500 });
 
     return seq;
 }
@@ -46,8 +46,8 @@ async function play(token: Token, config: Record<string, any> = {}) {
 async function stop(token: Token, _config: Record<string, any> = {}) {
     return new Sequence()
         .motion(token)
-        .fadeTo(1)
-        .tintTo("#FFFFFF")
+        .fadeTo(1, { duration: 500 })
+        .tintTo("#FFFFFF", { duration: 500 })
         .play();
 }
 

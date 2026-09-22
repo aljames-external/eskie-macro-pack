@@ -162,8 +162,7 @@ async function createViciousMockeryImpact(target: Token, word: any, config: any 
 
         .motion(target)
         .delay(600)
-        .noise()
-        .duration(1800)
+        .noise({ strength: 0.05, frequency: 50, duration: 1800, gridUnits: true })
 
         .effect()
         .delay(800)
@@ -187,15 +186,34 @@ async function createViciousMockeryImpact(target: Token, word: any, config: any 
     return sequence;
 }
 
+async function createViciousMockery(token: Token, targetToken?: Token, config: any = {}) {
+    const trg = targetToken ?? Array.from(game.user?.targets ?? [])[0];
+    if (!token || !trg) return null;
+
+    const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
+    const { word } = mConfig;
+
+    const castSequence = await createViciousMockeryCast(token, mConfig);
+    const impactSequence = await createViciousMockeryImpact(trg, word, mConfig);
+
+    const sequence = new Sequence();
+    if (castSequence) sequence.addSequence(castSequence);
+    if (impactSequence) sequence.addSequence(impactSequence);
+    return sequence;
+}
+
 /**
  * Plays the Vicious Mockery effect, including user input for the word.
  *
  * @param {Token} token The token casting the spell.
- * @param {Token} target The token being targeted.
- * @param {object} config Configuration options for the animation.
+ * @param {Token} [targetToken] The token being targeted.
+ * @param {object} [config={}] Configuration options for the animation.
  * @returns {Promise<void>} A promise that resolves when the effect sequences finish playing.
  */
-async function playViciousMockery(token: Token, target: Token, config: any = {}) {
+async function playViciousMockery(token: Token, targetToken?: Token, config: any = {}) {
+    const trg = targetToken ?? Array.from(game.user?.targets ?? [])[0];
+    if (!token || !trg) return;
+
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { word } = mConfig;
 
@@ -204,7 +222,7 @@ async function playViciousMockery(token: Token, target: Token, config: any = {})
     if (castSequence) { await castSequence.play(); }
 
     // Play impact animation
-    const impactSequence = await createViciousMockeryImpact(target, word, mConfig);
+    const impactSequence = await createViciousMockeryImpact(trg, word, mConfig);
     if (impactSequence) { await impactSequence.play(); }
 }
 
@@ -213,11 +231,14 @@ async function playViciousMockery(token: Token, target: Token, config: any = {})
  * @param {Token} token The token.
  * @param {object} options Options for stopping effects.
  */
-function stopViciousMockery(token: Token, { id = DEFAULT_CONFIG.id }: any = {}) {
+function stopViciousMockery(token?: Token, { id = DEFAULT_CONFIG.id }: any = {}) {
     // No persistent effects to stop for Vicious Mockery.
 }
 
 export const viciousMockery = {
+    create: createViciousMockery,
+    play: playViciousMockery,
+    stop: stopViciousMockery,
     cast: {
         create: createViciousMockeryCast,
         play: playViciousMockery, // The main play function for the spell

@@ -122,7 +122,7 @@ sequence
     .belowTokens()
 
     .motion(target)
-    .oscillate()
+    .oscillate({ period: 1000, amplitude: 0.05 })
 
     .effect()
     .name(label)

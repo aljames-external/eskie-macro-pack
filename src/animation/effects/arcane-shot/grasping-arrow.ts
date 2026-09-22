@@ -11,12 +11,13 @@ const DEFAULT_CONFIG = {
     sound: { ...DEFAULT_SOUND_CONFIG },
 };
 
-async function create(token: Token, target: Token, config: any = {}) {
+async function create(token: Token, target?: Token, config: any = {}) {
     config = settingsOverride(config);
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { sound } = mConfig;
 
-    if (!target) return;
+    const trg = target ?? Array.from(game.user?.targets ?? [])[0];
+    if (!token || !trg) return;
 
     const sequence = new Sequence();
     applySound(sequence, sound);
@@ -25,7 +26,7 @@ async function create(token: Token, target: Token, config: any = {}) {
         .effect()
             .file(closest('eskie.casting.physical.03.side.one_shot.green'))
             .attachTo(token)
-            .rotateTowards(target)
+            .rotateTowards(trg)
             .scaleToObject(1, { considerTokenScale: true })
             .zIndex(2)
             .waitUntilFinished(-750)
@@ -33,30 +34,29 @@ async function create(token: Token, target: Token, config: any = {}) {
         .effect()
             .file(closest('eskie.attack.ranged.arrow.01.physical.medium.green.normal'))
             .atLocation(token)
-            .stretchTo(target)
+            .stretchTo(trg)
             .zIndex(2)
             .waitUntilFinished(-750)
 
-        .motion(target)
-            .noise()
-            .duration(1000)
+        .motion(trg)
+            .noise({ strength: 0.05, frequency: 50, duration: 1000, gridUnits: true })
 
         .effect()
             .file(closest('eskie.damage.poison.01.green'))
-            .attachTo(target, { bindAlpha: false, bindVisibility: false })
+            .attachTo(trg, { bindAlpha: false, bindVisibility: false })
             .scaleToObject(0.95, { considerTokenScale: true })
             .zIndex(1)
 
         .effect()
             .file(closest('eskie.nature.vine.normal.01.physical.green'))
-            .atLocation(target)
+            .atLocation(trg)
             .scaleToObject(1.25, { considerTokenScale: true })
             .zIndex(3)
 
         .effect()
-            .name(`Grasping Arrow ${target.name}`)
+            .name(`Grasping Arrow ${trg.name}`)
             .file(closest('jb2a.plant_growth.04.ring.4x4.pulse.greenwhite'))
-            .attachTo(target)
+            .attachTo(trg)
             .scaleToObject(1.25, { considerTokenScale: true })
             .zIndex(1)
             .filter('ColorMatrix', { saturate: 0, hue: -20 })
@@ -64,9 +64,9 @@ async function create(token: Token, target: Token, config: any = {}) {
         .wait(250)
 
         .effect()
-            .name(`Grasping Arrow ${target.name}`)
+            .name(`Grasping Arrow ${trg.name}`)
             .file(closest('eskie.nature.vine.normal.circle.01.physical.green.radius_20ft'))
-            .attachTo(target)
+            .attachTo(trg)
             .scaleToObject(1.95, { considerTokenScale: true })
             .randomRotation()
             .zIndex(1)
@@ -74,9 +74,9 @@ async function create(token: Token, target: Token, config: any = {}) {
             .mask()
 
         .effect()
-            .name(`Grasping Arrow ${target.name}`)
+            .name(`Grasping Arrow ${trg.name}`)
             .file(closest('eskie.nature.vine.normal.circle.01.physical.green.radius_10ft'))
-            .attachTo(target)
+            .attachTo(trg)
             .scaleToObject(1.45, { considerTokenScale: true })
             .randomRotation()
             .zIndex(1)
@@ -86,7 +86,7 @@ async function create(token: Token, target: Token, config: any = {}) {
     return sequence;
 }
 
-async function play(token: Token, target: Token, config: any = {}) {
+async function play(token: Token, target?: Token, config: any = {}) {
     const sequence = await create(token, target, config);
     if (sequence) return sequence.play();
 }

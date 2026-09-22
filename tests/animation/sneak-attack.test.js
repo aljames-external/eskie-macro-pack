@@ -14,6 +14,10 @@ await adapter.init();
 
 test('sneakAttack effect API contracts and exports', () => {
     assert.ok(sneakAttack, 'sneakAttack module must exist');
+    assert.equal(typeof sneakAttack.create, 'function', 'sneakAttack.create must be a function');
+    assert.equal(typeof sneakAttack.play, 'function', 'sneakAttack.play must be a function');
+    assert.equal(typeof sneakAttack.stop, 'function', 'sneakAttack.stop must be a function');
+
     assert.ok(sneakAttack.melee, 'sneakAttack.melee must exist');
     assert.equal(typeof sneakAttack.melee.create, 'function', 'sneakAttack.melee.create must be a function');
     assert.equal(typeof sneakAttack.melee.play, 'function', 'sneakAttack.melee.play must be a function');

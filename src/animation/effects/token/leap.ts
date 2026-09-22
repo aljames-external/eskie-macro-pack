@@ -110,8 +110,7 @@ async function createLeap(token: Token, config: AnimationEffectConfig = {}) {
     if (!tokenPlaceable) return null;
 
     sequence.motion(tokenPlaceable)
-        .moveTo(position, { duration: 1000, ease: "easeInOutQuad" })
-        .snapToGrid();
+        .moveTo(position, { duration: 1000, ease: "easeInOutQuad" });
 
     return sequence;
 }

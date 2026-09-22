@@ -52,7 +52,7 @@ test('maxtacTraumaTeamAV.create builds sequence with sequence.motion(tile).moveT
                             return proxy;
                         };
                     }
-                    if (prop === 'moveTo') {
+                    if (prop === 'moveTo' || prop === 'moveBy') {
                         return (...args) => {
                             moveToCalled = true;
                             moveToArgs = args;
@@ -115,7 +115,7 @@ test('maxtacTraumaTeamAV.stop builds departure sequence with sequence.motion(til
                             return proxy;
                         };
                     }
-                    if (prop === 'moveTo') {
+                    if (prop === 'moveTo' || prop === 'moveBy') {
                         return (...args) => {
                             moveToCalled = true;
                             moveToArgs = args;

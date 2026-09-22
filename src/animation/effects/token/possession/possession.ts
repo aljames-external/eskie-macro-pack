@@ -33,10 +33,9 @@ async function create(token: Token, target: Token, config: any = {}) {
     // Possessing spirit float motion via Sequencer 4.3.0+ .motion() API
     seq.motion(token)
         .name(label)
-        .oscillate()
-        .fadeTo(0.65)
-        .tintTo(tintColor)
-        .persist();
+        .oscillate({ period: 2000, amplitude: 0.05 })
+        .fadeTo(0.65, { duration: 500 })
+        .tintTo(tintColor, { duration: 500 });
 
     seq.effect()
         .delay(100)

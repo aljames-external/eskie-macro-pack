@@ -74,8 +74,6 @@ const sequence = new Sequence()
 
     .motion(token)
         .moveTo(position, { duration: 500, offset: { x: -1, y: -1 } })
-        .snapToGrid()
-        .waitUntilFinished()
 
     .wait(1000)
 

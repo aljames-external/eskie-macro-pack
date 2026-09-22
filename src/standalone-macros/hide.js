@@ -21,8 +21,8 @@ if ((activeEffects?.length ?? 0) > 0) {
     Sequencer.EffectManager.endEffects({ name: label, object: token });
     await new Sequence()
         .motion(token)
-            .fadeTo(1)
-            .tintTo("#FFFFFF")
+            .fadeTo(1, { duration: 500 })
+            .tintTo("#FFFFFF", { duration: 500 })
         .play();
     return;
 }
@@ -42,8 +42,8 @@ sequence.effect()
 
 // Stealth fade motion via Sequencer 4.3.0+ sequence.motion(token)
 sequence.motion(token)
-    .fadeTo(0.25)
-    .tintTo("#696969");
+    .fadeTo(0.25, { duration: 500 })
+    .tintTo("#696969", { duration: 500 });
 
 // Persistent tracking effect for macro toggle support
 sequence.effect()

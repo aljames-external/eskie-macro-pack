@@ -11,35 +11,32 @@ const DEFAULT_CONFIG = {
     sound: { ...DEFAULT_SOUND_CONFIG },
 };
 
-async function create(token: Token, target: Token, config: Record<string, any> = {}) {
+async function create(token: Token, target?: Token, config: Record<string, any> = {}) {
     config = settingsOverride(config);
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { sound } = mConfig;
 
-    if (!token || !target) return;
+    const trg = target ?? Array.from(game.user?.targets ?? [])[0];
+    if (!token || !trg) return;
 
     const tokenCenter = adapter.getCenter(token);
-    const targetCenter = adapter.getCenter(target);
+    const targetCenter = adapter.getCenter(trg);
 
     let blurDirectionX = 0;
     let blurDirectionY = 0;
-    if (token.x === target.x) blurDirectionY = 15;
-    if (token.y === target.y) blurDirectionX = 20;
+    if (token.x === trg.x) blurDirectionY = 15;
+    if (token.y === trg.y) blurDirectionX = 20;
 
     const sequence = new Sequence();
     applySound(sequence, sound);
 
-    // Target position swap motion via Sequencer 4.3.0+ sequence.motion(target)
-    sequence.motion(target)
-        .moveTo(tokenCenter, { rotate: false, ease: 'easeInBack', delay: 250 })
-        .moveSpeed(500)
-        .duration(1000);
+    // Target position swap motion via Sequencer 4.3.0+ sequence.motion(trg)
+    sequence.motion(trg)
+        .moveTo(tokenCenter, { duration: 1000, rotate: false, ease: 'easeInBack', delay: 250 });
 
     // Token position swap motion via Sequencer 4.3.0+ sequence.motion(token)
     sequence.motion(token)
-        .moveTo(targetCenter, { rotate: false, ease: 'easeOutCubic', delay: 500 })
-        .moveSpeed(300)
-        .duration(1250);
+        .moveTo(targetCenter, { duration: 1250, rotate: false, ease: 'easeOutCubic', delay: 500 });
 
     sequence.effect()
         .copySprite(token)

@@ -11,18 +11,19 @@ const DEFAULT_CONFIG = {
     sound: { ...DEFAULT_SOUND_CONFIG },
 };
 
-async function create(token: Token, target: Token, config: any = {}) {
+async function create(token: Token, targetToken?: Token, config: any = {}) {
+    const trg = targetToken ?? Array.from(game.user?.targets ?? [])[0];
+    if (!token || !trg) return null;
+
     config = settingsOverride(config);
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { sound } = mConfig;
 
-    if (!token || !target) return;
-
-    const targetSquare = adapter.getNearestSquareCenter(token, target);
-    if (!targetSquare) return;
-    const targetCenter = adapter.getCenter(target);
+    const targetSquare = adapter.getNearestSquareCenter(token, trg);
+    if (!targetSquare) return null;
+    const targetCenter = adapter.getCenter(trg);
     const targetOffset = { x: targetSquare.x - targetCenter.x, y: targetSquare.y - targetCenter.y };
-    const { widthUnits: targetWidth } = adapter.getTokenDimensions(target);
+    const { widthUnits: targetWidth } = adapter.getTokenDimensions(trg);
 
     const sequence = new Sequence();
     applySound(sequence, sound);
@@ -49,16 +50,15 @@ async function create(token: Token, target: Token, config: any = {}) {
             .zIndex(1)
             .waitUntilFinished(-3000)
 
-        .motion(target)
-            .noise()
-            .duration(1000)
+        .motion(trg)
+            .noise({ strength: 0.05, frequency: 50, duration: 1000, gridUnits: true })
 
         .effect()
             .file(closest('eskie.texture_mask.ink.01.black'))
-            .attachTo(target, { offset: targetOffset })
+            .attachTo(trg, { offset: targetOffset })
             .scaleToObject(((2 * targetWidth) - 1) / targetWidth, { considerTokenScale: true })
             .playbackRate(1.5)
-            .mask(target)
+            .mask(trg)
             .opacity(0.5)
             .startTime(1000)
 
@@ -105,9 +105,9 @@ async function create(token: Token, target: Token, config: any = {}) {
 
         .effect()
             .file(closest('eskie.poison.01.green.full'))
-            .attachTo(target, { offset: targetOffset })
+            .attachTo(trg, { offset: targetOffset })
             .size(0.65, { gridUnits: true })
-            .mask(target)
+            .mask(trg)
             .zIndex(0)
 
         .effect()
@@ -119,8 +119,8 @@ async function create(token: Token, target: Token, config: any = {}) {
     return sequence;
 }
 
-async function play(token: Token, target: Token, config: any = {}) {
-    const sequence = await create(token, target, config);
+async function play(token: Token, targetToken?: Token, config: any = {}) {
+    const sequence = await create(token, targetToken, config);
     if (sequence) return sequence.play();
 }
 

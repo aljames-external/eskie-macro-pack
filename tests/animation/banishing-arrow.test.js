@@ -103,7 +103,7 @@ test('banishingArrow.create builds sequence with sequence.motion(target).scaleTo
         const seq = await banishingArrow.create(mockToken, mockTarget);
         assert.ok(seq, 'Sequence must be created');
         assert.equal(capturedMotionTarget, mockTarget, 'Motion target must be the target token');
-        assert.equal(capturedScaleToValue, 0, 'scaleTo target scale must be 0');
+        assert.equal(capturedScaleToValue, 0.01, 'scaleTo target scale must be 0.01');
         assert.equal(capturedRotateByValue, 360, 'rotateBy target amount must be 360');
         assert.equal(hideCalled, false, 'Token hide must NOT be called');
         assert.equal(copySpriteCount, 0, 'No copySprite should be present in banishingArrow.create');

@@ -78,8 +78,7 @@ const hitTargets = Array.from(game.user.targets);
 for (const t of hitTargets) {
     const targetSeq = new Sequence()
         .motion(t)
-            .noise()
-            .duration(1000)
+            .noise({ strength: 0.05, frequency: 50, duration: 1000, gridUnits: true })
         .effect()
             .file(closest("eskie.damage.force.01.white"))
             .attachTo(t, { bindAlpha: false, bindVisibility: false })

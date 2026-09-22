@@ -97,7 +97,7 @@ sequence.effect()
 // Native motion for werewolf transformation scale and shudder via Sequencer 4.3.0+
 sequence.motion(token)
     .scaleTo(1.06, { duration: 750, ease: "easeOutBack" })
-    .noise();
+    .noise({ strength: 0.05, frequency: 50, gridUnits: true });
 
 // Ghost of the werewolf form — the beast briefly surfacing through the curse
 if (werewolfForm) {

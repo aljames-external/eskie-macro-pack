@@ -441,13 +441,13 @@ test('tashasCausticBrew uses Sequencer 4.3.0+ sequence.motion(target).noise() fo
     assert.doesNotMatch(tsContent, /\.opacity\(0\)/, 'tashas-caustic-brew.ts must not hide token with opacity(0)');
     assert.match(tsContent, /\.motion\(/, 'tashas-caustic-brew.ts must use .motion()');
     assert.match(tsContent, /\.motion\(target\)/, 'tashas-caustic-brew.ts must use .motion(target)');
-    assert.match(tsContent, /\.noise\(\)/, 'tashas-caustic-brew.ts must use .noise()');
+    assert.match(tsContent, /\.noise\(/, 'tashas-caustic-brew.ts must use .noise(');
 
     assert.doesNotMatch(jsContent, /copySprite/, 'tashas-caustic-brew.js must not use copySprite');
     assert.doesNotMatch(jsContent, /\.opacity\(0\)/, 'tashas-caustic-brew.js must not hide token with opacity(0)');
     assert.match(jsContent, /\.motion\(/, 'tashas-caustic-brew.js must use .motion()');
     assert.match(jsContent, /\.motion\(target\)/, 'tashas-caustic-brew.js must use .motion(target)');
-    assert.match(jsContent, /\.noise\(\)/, 'tashas-caustic-brew.js must use .noise()');
+    assert.match(jsContent, /\.noise\(/, 'tashas-caustic-brew.js must use .noise(');
 });
 
 test('tashasCausticBrew DEFAULT_CONFIG defines phased sound sections and registers at 0.1.2', async () => {
@@ -568,7 +568,7 @@ test('baitAndSwitch uses Sequencer 4.3.0+ sequence.motion(token).moveTo() and se
 
     assert.doesNotMatch(tsContent, /\.opacity\(0\)/, 'bait-and-switch.ts must not hide token with opacity(0)');
     assert.match(tsContent, /sequence\.motion\(token\)/, 'bait-and-switch.ts must use sequence.motion(token)');
-    assert.match(tsContent, /sequence\.motion\(target\)/, 'bait-and-switch.ts must use sequence.motion(target)');
+    assert.match(tsContent, /sequence\.motion\((target|trg)\)/, 'bait-and-switch.ts must use sequence.motion(target)');
     assert.match(tsContent, /\.moveTo\(/, 'bait-and-switch.ts must use .moveTo()');
 
     assert.doesNotMatch(jsContent, /\.opacity\(0\)/, 'bait-and-switch.js must not hide token with opacity(0)');
@@ -654,7 +654,7 @@ test('iaijutsuStrike uses Sequencer 4.3.0+ sequence.motion().moveTo() API for sl
 });
 
 
-test('levitation uses Sequencer 4.3.0+ sequence.motion(token).oscillate() / .moveTo() hover motion', () => {
+test('levitation uses Sequencer 4.3.0+ sequence.motion(token).oscillate() / .moveBy() hover motion', () => {
     const tsModulePath = path.join(rootDir, 'src/animation/effects/active-effect/levitation.ts');
     const jsMacroPath = path.join(rootDir, 'src/standalone-macros/levitation.js');
 
@@ -664,16 +664,16 @@ test('levitation uses Sequencer 4.3.0+ sequence.motion(token).oscillate() / .mov
     assert.doesNotMatch(tsContent, /copySprite/, 'levitation.ts must not use copySprite');
     assert.doesNotMatch(tsContent, /\.opacity\(0\)/, 'levitation.ts must not hide token with opacity(0)');
     assert.match(tsContent, /\.motion\(token\)/, 'levitation.ts must use .motion(token)');
-    assert.match(tsContent, /\.moveTo\(/, 'levitation.ts must use .moveTo()');
+    assert.match(tsContent, /\.(moveBy|moveTo)\(/, 'levitation.ts must move token');
     assert.match(tsContent, /\.oscillate\(/, 'levitation.ts must use .oscillate()');
 
     assert.doesNotMatch(jsContent, /\.opacity\(0\)/, 'levitation.js must not hide token with opacity(0)');
     assert.match(jsContent, /\.motion\(token\)/, 'levitation.js must use .motion(token)');
-    assert.match(jsContent, /\.moveTo\(/, 'levitation.js must use .moveTo()');
+    assert.match(jsContent, /\.(moveBy|moveTo)\(/, 'levitation.js must move token');
     assert.match(jsContent, /\.oscillate\(/, 'levitation.js must use .oscillate()');
 });
 
-test('fly uses Sequencer 4.3.0+ sequence.motion(token).moveTo({ y: -0.5 }, { gridUnits: true }).oscillate().persist() hover motion', () => {
+test('fly uses Sequencer 4.3.0+ sequence.motion(token).moveBy({ y: -0.5 }, { gridUnits: true }).oscillate().persist() hover motion', () => {
     const tsModulePath = path.join(rootDir, 'src/animation/effects/token/fly.ts');
     const jsMacroPath = path.join(rootDir, 'src/standalone-macros/fly.js');
 
@@ -682,16 +682,16 @@ test('fly uses Sequencer 4.3.0+ sequence.motion(token).moveTo({ y: -0.5 }, { gri
 
     assert.doesNotMatch(tsContent, /\.opacity\(0\)/, 'fly.ts must not hide token with opacity(0)');
     assert.match(tsContent, /\.motion\(token\)/, 'fly.ts must use .motion(token)');
-    assert.match(tsContent, /\.moveTo\(/, 'fly.ts must use .moveTo()');
+    assert.match(tsContent, /\.(moveBy|moveTo)\(/, 'fly.ts must move token');
     assert.match(tsContent, /\.oscillate\(/, 'fly.ts must use .oscillate()');
 
     assert.doesNotMatch(jsContent, /\.opacity\(0\)/, 'fly.js must not hide token with opacity(0)');
     assert.match(jsContent, /\.motion\(token\)/, 'fly.js must use .motion(token)');
-    assert.match(jsContent, /\.moveTo\(/, 'fly.js must use .moveTo()');
+    assert.match(jsContent, /\.(moveBy|moveTo)\(/, 'fly.js must move token');
     assert.match(jsContent, /\.oscillate\(/, 'fly.js must use .oscillate()');
 });
 
-test('wings uses Sequencer 4.3.0+ sequence.motion(token).moveTo({ y: -0.5 }, { gridUnits: true }).oscillate().persist() hover motion', () => {
+test('wings uses Sequencer 4.3.0+ sequence.motion(token).moveBy({ y: -0.5 }, { gridUnits: true }).oscillate().persist() hover motion', () => {
     const tsModulePath = path.join(rootDir, 'src/animation/effects/token/wings.ts');
     const jsMacroPath = path.join(rootDir, 'src/standalone-macros/wings.js');
 
@@ -701,13 +701,13 @@ test('wings uses Sequencer 4.3.0+ sequence.motion(token).moveTo({ y: -0.5 }, { g
     assert.doesNotMatch(tsContent, /\.opacity\(0\)/, 'wings.ts must not hide token with opacity(0)');
     assert.doesNotMatch(tsContent, /copySprite.*scaleToObject\(1/, 'wings.ts must not use copySprite body');
     assert.match(tsContent, /\.motion\(token\)/, 'wings.ts must use .motion(token)');
-    assert.match(tsContent, /\.moveTo\(/, 'wings.ts must use .moveTo()');
+    assert.match(tsContent, /\.(moveBy|moveTo)\(/, 'wings.ts must move token');
     assert.match(tsContent, /\.oscillate\(/, 'wings.ts must use .oscillate()');
 
     assert.doesNotMatch(jsContent, /\.opacity\(0\)/, 'wings.js must not hide token with opacity(0)');
     assert.doesNotMatch(jsContent, /copySprite.*scaleToObject\(1/, 'wings.js must not use copySprite body');
     assert.match(jsContent, /\.motion\(token\)/, 'wings.js must use .motion(token)');
-    assert.match(jsContent, /\.moveTo\(/, 'wings.js must use .moveTo()');
+    assert.match(jsContent, /\.(moveBy|moveTo)\(/, 'wings.js must move token');
     assert.match(jsContent, /\.oscillate\(/, 'wings.js must use .oscillate()');
 });
 
@@ -722,18 +722,18 @@ test('banishment uses Sequencer 4.3.0+ sequence.motion(target).scaleTo(0).rotate
     assert.doesNotMatch(tsContent, /\.animation\(\)/, 'banishment.ts must not hide token with animation()');
     assert.match(tsContent, /\.motion\(/, 'banishment.ts must use .motion()');
     assert.match(tsContent, /sequence\.motion\(target\)/, 'banishment.ts must use sequence.motion(target)');
-    assert.match(tsContent, /\.scaleTo\(0/, 'banishment.ts must use .scaleTo(0)');
+    assert.match(tsContent, /\.scaleTo\(0\.01/, 'banishment.ts must use .scaleTo(0.01)');
     assert.match(tsContent, /\.rotateBy\(360/, 'banishment.ts must use .rotateBy(360)');
 
     assert.doesNotMatch(jsContent, /copySprite/, 'banishment.js must not use copySprite');
     assert.doesNotMatch(jsContent, /\.animation\(\)/, 'banishment.js must not hide token with animation()');
     assert.match(jsContent, /\.motion\(/, 'banishment.js must use .motion()');
     assert.match(jsContent, /sequence\.motion\(target\)/, 'banishment.js must use sequence.motion(target)');
-    assert.match(jsContent, /\.scaleTo\(0/, 'banishment.js must use .scaleTo(0)');
+    assert.match(jsContent, /\.scaleTo\(0\.01/, 'banishment.js must use .scaleTo(0.01)');
     assert.match(jsContent, /\.rotateBy\(360/, 'banishment.js must use .rotateBy(360)');
 });
 
-test('banishingArrow uses Sequencer 4.3.0+ sequence.motion(target).scaleTo(0).rotateBy(360) for target scaling/rotation instead of copySprite and opacity(0) hiding', () => {
+test('banishingArrow uses Sequencer 4.3.0+ sequence.motion(target).scaleTo(0.01).rotateBy(360) for target scaling/rotation instead of copySprite and opacity(0) hiding', () => {
     const tsModulePath = path.join(rootDir, 'src/animation/effects/arcane-shot/banishing-arrow.ts');
     const jsMacroPath = path.join(rootDir, 'src/standalone-macros/banishing-arrow.js');
 
@@ -744,18 +744,18 @@ test('banishingArrow uses Sequencer 4.3.0+ sequence.motion(target).scaleTo(0).ro
     assert.doesNotMatch(tsContent, /\.animation\(\)/, 'banishing-arrow.ts must not hide token with animation()');
     assert.match(tsContent, /\.motion\(/, 'banishing-arrow.ts must use .motion()');
     assert.match(tsContent, /\.motion\(target\)/, 'banishing-arrow.ts must use .motion(target)');
-    assert.match(tsContent, /\.scaleTo\(0/, 'banishing-arrow.ts must use .scaleTo(0)');
+    assert.match(tsContent, /\.scaleTo\(0\.01/, 'banishing-arrow.ts must use .scaleTo(0.01)');
     assert.match(tsContent, /\.rotateBy\(360/, 'banishing-arrow.ts must use .rotateBy(360)');
 
     assert.doesNotMatch(jsContent, /copySprite/, 'banishing-arrow.js must not use copySprite');
     assert.doesNotMatch(jsContent, /\.animation\(\)/, 'banishing-arrow.js must not hide token with animation()');
     assert.match(jsContent, /\.motion\(/, 'banishing-arrow.js must use .motion()');
     assert.match(jsContent, /\.motion\(target\)/, 'banishing-arrow.js must use .motion(target)');
-    assert.match(jsContent, /\.scaleTo\(0/, 'banishing-arrow.js must use .scaleTo(0)');
+    assert.match(jsContent, /\.scaleTo\(0\.01/, 'banishing-arrow.js must use .scaleTo(0.01)');
     assert.match(jsContent, /\.rotateBy\(360/, 'banishing-arrow.js must use .rotateBy(360)');
 });
 
-test('graspingArrow uses Sequencer 4.3.0+ sequence.motion(target).noise() for target vine grapple shudder instead of copySprite and opacity(0) hiding', () => {
+test('graspingArrow uses Sequencer 4.3.0+ sequence.motion(target).noise( for target vine grapple shudder instead of copySprite and opacity(0) hiding', () => {
     const tsModulePath = path.join(rootDir, 'src/animation/effects/arcane-shot/grasping-arrow.ts');
     const jsMacroPath = path.join(rootDir, 'src/standalone-macros/grasping-arrow.js');
 
@@ -765,14 +765,14 @@ test('graspingArrow uses Sequencer 4.3.0+ sequence.motion(target).noise() for ta
     assert.doesNotMatch(tsContent, /copySprite/, 'grasping-arrow.ts must not use copySprite');
     assert.doesNotMatch(tsContent, /loopProperty/, 'grasping-arrow.ts must not use loopProperty on copySprite');
     assert.match(tsContent, /\.motion\(/, 'grasping-arrow.ts must use .motion()');
-    assert.match(tsContent, /\.motion\(target\)/, 'grasping-arrow.ts must use .motion(target)');
-    assert.match(tsContent, /\.noise\(\)/, 'grasping-arrow.ts must use .noise()');
+    assert.match(tsContent, /\.motion\((target|trg)\)/, 'grasping-arrow.ts must use .motion(target)');
+    assert.match(tsContent, /\.noise\(/, 'grasping-arrow.ts must use .noise(');
 
     assert.doesNotMatch(jsContent, /copySprite/, 'grasping-arrow.js must not use copySprite');
     assert.doesNotMatch(jsContent, /loopProperty/, 'grasping-arrow.js must not use loopProperty on copySprite');
     assert.match(jsContent, /\.motion\(/, 'grasping-arrow.js must use .motion()');
     assert.match(jsContent, /\.motion\(target\)/, 'grasping-arrow.js must use .motion(target)');
-    assert.match(jsContent, /\.noise\(\)/, 'grasping-arrow.js must use .noise()');
+    assert.match(jsContent, /\.noise\(/, 'grasping-arrow.js must use .noise(');
 });
 
 test('thornWhip uses Sequencer 4.3.0+ sequence.motion(target).moveTo() for pulling target token instead of copySprite and opacity(0) hiding', () => {
@@ -806,13 +806,13 @@ test('hide uses Sequencer 4.3.0+ sequence.motion(token).fadeTo(0.25) for stealth
     assert.doesNotMatch(tsContent, /\.opacity\(0\)/, 'hide.ts must not hide token with opacity(0)');
     assert.match(tsContent, /\.motion\(/, 'hide.ts must use .motion()');
     assert.match(tsContent, /seq\.motion\(token\)/, 'hide.ts must use seq.motion(token)');
-    assert.match(tsContent, /\.fadeTo\(0\.25\)/, 'hide.ts must use .fadeTo(0.25)');
+    assert.match(tsContent, /\.fadeTo\(0\.25/, 'hide.ts must use .fadeTo(0.25)');
 
     assert.doesNotMatch(jsContent, /copySprite/, 'hide.js must not use copySprite');
     assert.doesNotMatch(jsContent, /\.opacity\(0\)/, 'hide.js must not hide token with opacity(0)');
     assert.match(jsContent, /\.motion\(/, 'hide.js must use .motion()');
     assert.match(jsContent, /sequence\.motion\(token\)/, 'hide.js must use sequence.motion(token)');
-    assert.match(jsContent, /\.fadeTo\(0\.25\)/, 'hide.js must use .fadeTo(0.25)');
+    assert.match(jsContent, /\.fadeTo\(0\.25/, 'hide.js must use .fadeTo(0.25)');
 });
 
 test('incorporeal uses Sequencer 4.3.0+ sequence.motion(token).oscillate().fadeTo(0.5) for incorporeal spirit phase instead of copySprite and opacity(0) hiding', () => {
@@ -826,15 +826,15 @@ test('incorporeal uses Sequencer 4.3.0+ sequence.motion(token).oscillate().fadeT
     assert.doesNotMatch(tsContent, /\.opacity\(0\)/, 'incorporeal.ts must not hide token with opacity(0)');
     assert.match(tsContent, /\.motion\(/, 'incorporeal.ts must use .motion()');
     assert.match(tsContent, /seq\.motion\(token\)/, 'incorporeal.ts must use seq.motion(token)');
-    assert.match(tsContent, /\.oscillate\(\)/, 'incorporeal.ts must use .oscillate()');
-    assert.match(tsContent, /\.fadeTo\(0\.5\)/, 'incorporeal.ts must use .fadeTo(0.5)');
+    assert.match(tsContent, /\.oscillate\(/, 'incorporeal.ts must use .oscillate()');
+    assert.match(tsContent, /\.fadeTo\(0\.5/, 'incorporeal.ts must use .fadeTo(0.5)');
 
     assert.doesNotMatch(jsContent, /copySprite/, 'incorporeal.js must not use copySprite');
     assert.doesNotMatch(jsContent, /\.opacity\(0\)/, 'incorporeal.js must not hide token with opacity(0)');
     assert.match(jsContent, /\.motion\(/, 'incorporeal.js must use .motion()');
     assert.match(jsContent, /seq\.motion\(token\)/, 'incorporeal.js must use seq.motion(token)');
-    assert.match(jsContent, /\.oscillate\(\)/, 'incorporeal.js must use .oscillate()');
-    assert.match(jsContent, /\.fadeTo\(0\.5\)/, 'incorporeal.js must use .fadeTo(0.5)');
+    assert.match(jsContent, /\.oscillate\(/, 'incorporeal.js must use .oscillate()');
+    assert.match(jsContent, /\.fadeTo\(0\.5/, 'incorporeal.js must use .fadeTo(0.5)');
 });
 
 test('ghostWalk uses Sequencer 4.3.0+ sequence.motion(token).oscillate().fadeTo(0.65) for incorporeal spirit hover instead of copySprite and opacity(0) hiding', () => {
@@ -848,18 +848,18 @@ test('ghostWalk uses Sequencer 4.3.0+ sequence.motion(token).oscillate().fadeTo(
     assert.doesNotMatch(tsContent, /\.opacity\(0\)/, 'ghost-walk.ts must not hide token with opacity(0)');
     assert.match(tsContent, /\.motion\(/, 'ghost-walk.ts must use .motion()');
     assert.match(tsContent, /seq\.motion\(token\)/, 'ghost-walk.ts must use seq.motion(token)');
-    assert.match(tsContent, /\.oscillate\(\)/, 'ghost-walk.ts must use .oscillate()');
-    assert.match(tsContent, /\.fadeTo\(0\.65\)/, 'ghost-walk.ts must use .fadeTo(0.65)');
+    assert.match(tsContent, /\.oscillate\(/, 'ghost-walk.ts must use .oscillate()');
+    assert.match(tsContent, /\.fadeTo\(0\.65/, 'ghost-walk.ts must use .fadeTo(0.65)');
 
     assert.doesNotMatch(jsContent, /copySprite/, 'ghost-walk.js must not use copySprite');
     assert.doesNotMatch(jsContent, /\.opacity\(0\)/, 'ghost-walk.js must not hide token with opacity(0)');
     assert.match(jsContent, /\.motion\(/, 'ghost-walk.js must use .motion()');
     assert.match(jsContent, /\.motion\(token\)/, 'ghost-walk.js must use .motion(token)');
-    assert.match(jsContent, /\.oscillate\(\)/, 'ghost-walk.js must use .oscillate()');
-    assert.match(jsContent, /\.fadeTo\(0\.65\)/, 'ghost-walk.js must use .fadeTo(0.65)');
+    assert.match(jsContent, /\.oscillate\(/, 'ghost-walk.js must use .oscillate()');
+    assert.match(jsContent, /\.fadeTo\(0\.65/, 'ghost-walk.js must use .fadeTo(0.65)');
 });
 
-test('drainingTouch uses Sequencer 4.3.0+ sequence.motion(target).noise() for draining touch shudder instead of copySprite and opacity(0) hiding', () => {
+test('drainingTouch uses Sequencer 4.3.0+ sequence.motion(target).noise( for draining touch shudder instead of copySprite and opacity(0) hiding', () => {
     const tsModulePath = path.join(rootDir, 'src/animation/effects/target/drainingTouch.ts');
     const jsMacroPath = path.join(rootDir, 'src/standalone-macros/draining-touch.js');
 
@@ -870,13 +870,13 @@ test('drainingTouch uses Sequencer 4.3.0+ sequence.motion(target).noise() for dr
     assert.doesNotMatch(tsContent, /\.opacity\(0\)/, 'drainingTouch.ts must not hide token with opacity(0)');
     assert.match(tsContent, /\.motion\(/, 'drainingTouch.ts must use .motion()');
     assert.match(tsContent, /\.motion\(target\)/, 'drainingTouch.ts must use .motion(target)');
-    assert.match(tsContent, /\.noise\(\)/, 'drainingTouch.ts must use .noise()');
+    assert.match(tsContent, /\.noise\(/, 'drainingTouch.ts must use .noise(');
 
     assert.doesNotMatch(jsContent, /copySprite/, 'draining-touch.js must not use copySprite');
     assert.doesNotMatch(jsContent, /\.opacity\(0\)/, 'draining-touch.js must not hide token with opacity(0)');
     assert.match(jsContent, /\.motion\(/, 'draining-touch.js must use .motion()');
     assert.match(jsContent, /sequence\.motion\(target\)/, 'draining-touch.js must use sequence.motion(target)');
-    assert.match(jsContent, /\.noise\(\)/, 'draining-touch.js must use .noise()');
+    assert.match(jsContent, /\.noise\(/, 'draining-touch.js must use .noise(');
 });
 
 test('stunningStrike uses Sequencer 4.3.0+ sequence.motion(target).oscillate() for stunning strike stunned wobble instead of copySprite and opacity(0) hiding', () => {
@@ -889,17 +889,17 @@ test('stunningStrike uses Sequencer 4.3.0+ sequence.motion(target).oscillate() f
     assert.doesNotMatch(tsContent, /copySprite/, 'stunning-strike.ts must not use copySprite');
     assert.doesNotMatch(tsContent, /\.opacity\(0\)/, 'stunning-strike.ts must not hide token with opacity(0)');
     assert.match(tsContent, /\.motion\(/, 'stunning-strike.ts must use .motion()');
-    assert.match(tsContent, /\.motion\(target\)/, 'stunning-strike.ts must use .motion(target)');
-    assert.match(tsContent, /\.oscillate\(\)/, 'stunning-strike.ts must use .oscillate()');
+    assert.match(tsContent, /\.motion\((target|trg)\)/, 'stunning-strike.ts must use .motion(target) or .motion(trg)');
+    assert.match(tsContent, /\.oscillate\(/, 'stunning-strike.ts must use .oscillate()');
 
     assert.doesNotMatch(jsContent, /copySprite/, 'stunning-strike.js must not use copySprite');
     assert.doesNotMatch(jsContent, /\.opacity\(0\)/, 'stunning-strike.js must not hide token with opacity(0)');
     assert.match(jsContent, /\.motion\(/, 'stunning-strike.js must use .motion()');
     assert.match(jsContent, /\.motion\(target\)/, 'stunning-strike.js must use .motion(target)');
-    assert.match(jsContent, /\.oscillate\(\)/, 'stunning-strike.js must use .oscillate()');
+    assert.match(jsContent, /\.oscillate\(/, 'stunning-strike.js must use .oscillate()');
 });
 
-test('channelDivinityDreadAspect uses Sequencer 4.3.0+ sequence.motion(target).noise() for dread aspect fear shudder instead of copySprite and opacity(0) hiding', () => {
+test('channelDivinityDreadAspect uses Sequencer 4.3.0+ sequence.motion(target).noise( for dread aspect fear shudder instead of copySprite and opacity(0) hiding', () => {
     const tsModulePath = path.join(rootDir, 'src/animation/effects/token/channelDivinityDreadAspect.ts');
     const jsMacroPath = path.join(rootDir, 'src/standalone-macros/dread-aspect.js');
 
@@ -910,16 +910,16 @@ test('channelDivinityDreadAspect uses Sequencer 4.3.0+ sequence.motion(target).n
     assert.doesNotMatch(tsContent, /\.opacity\(0\)/, 'channelDivinityDreadAspect.ts must not hide token with opacity(0)');
     assert.match(tsContent, /\.motion\(/, 'channelDivinityDreadAspect.ts must use .motion()');
     assert.match(tsContent, /sequence\.motion\(target\)/, 'channelDivinityDreadAspect.ts must use sequence.motion(target)');
-    assert.match(tsContent, /\.noise\(/, 'channelDivinityDreadAspect.ts must use .noise()');
+    assert.match(tsContent, /\.noise\(/, 'channelDivinityDreadAspect.ts must use .noise(');
 
     assert.doesNotMatch(jsContent, /copySprite/, 'dread-aspect.js must not use copySprite');
     assert.doesNotMatch(jsContent, /\.opacity\(0\)/, 'dread-aspect.js must not hide token with opacity(0)');
     assert.match(jsContent, /\.motion\(/, 'dread-aspect.js must use .motion()');
     assert.match(jsContent, /sequence\.motion\(target\)/, 'dread-aspect.js must use sequence.motion(target)');
-    assert.match(jsContent, /\.noise\(/, 'dread-aspect.js must use .noise()');
+    assert.match(jsContent, /\.noise\(/, 'dread-aspect.js must use .noise(');
 });
 
-test('fingerOfDeath uses Sequencer 4.3.0+ sequence.motion(target).noise() for finger of death target death shudder instead of copySprite and opacity(0) hiding', () => {
+test('fingerOfDeath uses Sequencer 4.3.0+ sequence.motion(target).noise( for finger of death target death shudder instead of copySprite and opacity(0) hiding', () => {
     const tsModulePath = path.join(rootDir, 'src/animation/effects/target/fingerOfDeath.ts');
     const jsMacroPath = path.join(rootDir, 'src/standalone-macros/finger-of-death.js');
 
@@ -929,17 +929,17 @@ test('fingerOfDeath uses Sequencer 4.3.0+ sequence.motion(target).noise() for fi
     assert.doesNotMatch(tsContent, /copySprite/, 'fingerOfDeath.ts must not use copySprite');
     assert.doesNotMatch(tsContent, /\.opacity\(0\)/, 'fingerOfDeath.ts must not hide token with opacity(0)');
     assert.match(tsContent, /\.motion\(/, 'fingerOfDeath.ts must use .motion()');
-    assert.match(tsContent, /\.motion\(target\)/, 'fingerOfDeath.ts must use .motion(target)');
-    assert.match(tsContent, /\.noise\(\)/, 'fingerOfDeath.ts must use .noise()');
+    assert.match(tsContent, /\.motion\((target|trg)\)/, 'fingerOfDeath.ts must use .motion(target) or .motion(trg)');
+    assert.match(tsContent, /\.noise\(/, 'fingerOfDeath.ts must use .noise(');
 
     assert.doesNotMatch(jsContent, /copySprite/, 'finger-of-death.js must not use copySprite');
     assert.doesNotMatch(jsContent, /\.opacity\(0\)/, 'finger-of-death.js must not hide token with opacity(0)');
     assert.match(jsContent, /\.motion\(/, 'finger-of-death.js must use .motion()');
     assert.match(jsContent, /\.motion\(target\)/, 'finger-of-death.js must use .motion(target)');
-    assert.match(jsContent, /\.noise\(\)/, 'finger-of-death.js must use .noise()');
+    assert.match(jsContent, /\.noise\(/, 'finger-of-death.js must use .noise(');
 });
 
-test('rayOfSickness uses Sequencer 4.3.0+ sequence.motion(target).noise() for ray of sickness poison shudder instead of copySprite and opacity(0) hiding', () => {
+test('rayOfSickness uses Sequencer 4.3.0+ sequence.motion(target).noise( for ray of sickness poison shudder instead of copySprite and opacity(0) hiding', () => {
     const tsModulePath = path.join(rootDir, 'src/animation/effects/target/ray-of-sickness.ts');
     const jsMacroPath = path.join(rootDir, 'src/standalone-macros/ray-of-sickness.js');
 
@@ -949,14 +949,14 @@ test('rayOfSickness uses Sequencer 4.3.0+ sequence.motion(target).noise() for ra
     assert.doesNotMatch(tsContent, /copySprite/, 'ray-of-sickness.ts must not use copySprite');
     assert.doesNotMatch(tsContent, /\.opacity\(0\)/, 'ray-of-sickness.ts must not hide token with opacity(0)');
     assert.match(tsContent, /\.motion\(/, 'ray-of-sickness.ts must use .motion()');
-    assert.match(tsContent, /\.motion\(target\)/, 'ray-of-sickness.ts must use .motion(target)');
-    assert.match(tsContent, /\.noise\(\)/, 'ray-of-sickness.ts must use .noise()');
+    assert.match(tsContent, /\.motion\((target|trg)\)/, 'ray-of-sickness.ts must use .motion(target) or .motion(trg)');
+    assert.match(tsContent, /\.noise\(/, 'ray-of-sickness.ts must use .noise(');
 
     assert.doesNotMatch(jsContent, /copySprite/, 'ray-of-sickness.js must not use copySprite');
     assert.doesNotMatch(jsContent, /\.opacity\(0\)/, 'ray-of-sickness.js must not hide token with opacity(0)');
     assert.match(jsContent, /\.motion\(/, 'ray-of-sickness.js must use .motion()');
     assert.match(jsContent, /\.motion\(target\)/, 'ray-of-sickness.js must use .motion(target)');
-    assert.match(jsContent, /\.noise\(\)/, 'ray-of-sickness.js must use .noise()');
+    assert.match(jsContent, /\.noise\(/, 'ray-of-sickness.js must use .noise(');
 });
 
 test('rapidStrike uses Sequencer 4.3.0+ sequence.motion(token).moveBy() for rapid strike slash step instead of copySprite and opacity(0) hiding', () => {
@@ -999,7 +999,7 @@ test('flurryOfBlows uses Sequencer 4.3.0+ sequence.motion(token).moveBy() for fl
     assert.match(jsContent, /\.moveBy\(/, 'flurry-of-blows.js must use .moveBy()');
 });
 
-test('laugh uses Sequencer 4.3.0+ sequence.motion(token).noise() for laughing wobble/shake motion instead of copySprite and opacity(0) hiding', () => {
+test('laugh uses Sequencer 4.3.0+ sequence.motion(token).noise( for laughing wobble/shake motion instead of copySprite and opacity(0) hiding', () => {
     const tsModulePath = path.join(rootDir, 'src/animation/effects/emote/laugh.ts');
     const jsMacroPath = path.join(rootDir, 'src/standalone-macros/laugh.js');
 
@@ -1010,16 +1010,16 @@ test('laugh uses Sequencer 4.3.0+ sequence.motion(token).noise() for laughing wo
     assert.doesNotMatch(tsContent, /\.opacity\(0\)/, 'laugh.ts must not hide token with opacity(0)');
     assert.match(tsContent, /\.motion\(/, 'laugh.ts must use .motion()');
     assert.match(tsContent, /\.motion\(token\)/, 'laugh.ts must use .motion(token)');
-    assert.match(tsContent, /\.noise\(\)/, 'laugh.ts must use .noise()');
+    assert.match(tsContent, /\.noise\(/, 'laugh.ts must use .noise(');
 
     assert.doesNotMatch(jsContent, /copySprite/, 'laugh.js must not use copySprite');
     assert.doesNotMatch(jsContent, /\.opacity\(0\)/, 'laugh.js must not hide token with opacity(0)');
     assert.match(jsContent, /\.motion\(/, 'laugh.js must use .motion()');
     assert.match(jsContent, /\.motion\(token\)/, 'laugh.js must use .motion(token)');
-    assert.match(jsContent, /\.noise\(\)/, 'laugh.js must use .noise()');
+    assert.match(jsContent, /\.noise\(/, 'laugh.js must use .noise(');
 });
 
-test('shockingGrasp uses Sequencer 4.3.0+ sequence.motion(target).noise() for shocking grasp spasm shudder instead of copySprite and opacity(0) hiding', () => {
+test('shockingGrasp uses Sequencer 4.3.0+ sequence.motion(target).noise( for shocking grasp spasm shudder instead of copySprite and opacity(0) hiding', () => {
     const tsModulePath = path.join(rootDir, 'src/animation/effects/target/shocking-grasp.ts');
     const jsMacroPath = path.join(rootDir, 'src/standalone-macros/shocking-grasp.js');
 
@@ -1029,14 +1029,14 @@ test('shockingGrasp uses Sequencer 4.3.0+ sequence.motion(target).noise() for sh
     assert.doesNotMatch(tsContent, /copySprite/, 'shocking-grasp.ts must not use copySprite');
     assert.doesNotMatch(tsContent, /\.opacity\(0\)/, 'shocking-grasp.ts must not hide token with opacity(0)');
     assert.match(tsContent, /\.motion\(/, 'shocking-grasp.ts must use .motion()');
-    assert.match(tsContent, /\.motion\(target\)/, 'shocking-grasp.ts must use .motion(target)');
-    assert.match(tsContent, /\.noise\(\)/, 'shocking-grasp.ts must use .noise()');
+    assert.match(tsContent, /\.motion\((target|trg)\)/, 'shocking-grasp.ts must use .motion(target) or .motion(trg)');
+    assert.match(tsContent, /\.noise\(/, 'shocking-grasp.ts must use .noise(');
 
     assert.doesNotMatch(jsContent, /copySprite/, 'shocking-grasp.js must not use copySprite');
     assert.doesNotMatch(jsContent, /\.opacity\(0\)/, 'shocking-grasp.js must not hide token with opacity(0)');
     assert.match(jsContent, /\.motion\(/, 'shocking-grasp.js must use .motion()');
     assert.match(jsContent, /\.motion\(target\)/, 'shocking-grasp.js must use .motion(target)');
-    assert.match(jsContent, /\.noise\(\)/, 'shocking-grasp.js must use .noise()');
+    assert.match(jsContent, /\.noise\(/, 'shocking-grasp.js must use .noise(');
 });
 
 test('sneakAttack uses Sequencer 4.3.0+ sequence.motion(token).moveBy() for sneak attack lunging step instead of copySprite and opacity(0) hiding', () => {
@@ -1070,14 +1070,14 @@ test('disintegrate uses Sequencer 4.3.0+ sequence.motion(target).scaleTo(0).fade
     assert.doesNotMatch(tsContent, /\.opacity\(0\)/, 'disintegrate.ts must not hide token with opacity(0)');
     assert.match(tsContent, /\.motion\(/, 'disintegrate.ts must use .motion()');
     assert.match(tsContent, /\.motion\(target\)/, 'disintegrate.ts must use sequence.motion(target)');
-    assert.match(tsContent, /\.scaleTo\(0\)/, 'disintegrate.ts must use .scaleTo(0)');
+    assert.match(tsContent, /\.scaleTo\(0\.01/, 'disintegrate.ts must use .scaleTo(0.01)');
     assert.match(tsContent, /\.fadeTo\(0\)/, 'disintegrate.ts must use .fadeTo(0)');
 
     assert.doesNotMatch(jsContent, /copySprite/, 'disintegrate.js must not use copySprite');
     assert.doesNotMatch(jsContent, /\.opacity\(0\)/, 'disintegrate.js must not hide token with opacity(0)');
     assert.match(jsContent, /\.motion\(/, 'disintegrate.js must use .motion()');
     assert.match(jsContent, /\.motion\(target\)/, 'disintegrate.js must use sequence.motion(target)');
-    assert.match(jsContent, /\.scaleTo\(0\)/, 'disintegrate.js must use .scaleTo(0)');
+    assert.match(jsContent, /\.scaleTo\(0\.01/, 'disintegrate.js must use .scaleTo(0.01)');
     assert.match(jsContent, /\.fadeTo\(0\)/, 'disintegrate.js must use .fadeTo(0)');
 });
 
@@ -1101,7 +1101,7 @@ test('hitTheDirt uses Sequencer 4.3.0+ sequence.motion(token).rotateTo(90).moveB
     assert.match(jsContent, /\.(moveBy|moveTo)\(/, 'hit-the-dirt.js must move token');
 });
 
-test('petrifyingGaze uses Sequencer 4.3.0+ sequence.motion().noise() for petrification stone shudder instead of copySprite and opacity(0) hiding', () => {
+test('petrifyingGaze uses Sequencer 4.3.0+ sequence.motion().noise( for petrification stone shudder instead of copySprite and opacity(0) hiding', () => {
     const tsModulePath = path.join(rootDir, 'src/animation/effects/multi-token/petrifying-gaze.ts');
     const jsMacroPath = path.join(rootDir, 'src/standalone-macros/petrifying-gaze.js');
 
@@ -1113,17 +1113,17 @@ test('petrifyingGaze uses Sequencer 4.3.0+ sequence.motion().noise() for petrifi
     assert.match(tsContent, /\.motion\(/, 'petrifying-gaze.ts must use .motion()');
     assert.match(tsContent, /\.motion\(token\)/, 'petrifying-gaze.ts must use .motion(token)');
     assert.match(tsContent, /\.motion\(target\)/, 'petrifying-gaze.ts must use .motion(target)');
-    assert.match(tsContent, /\.noise\(/, 'petrifying-gaze.ts must use .noise()');
+    assert.match(tsContent, /\.noise\(/, 'petrifying-gaze.ts must use .noise(');
 
     assert.doesNotMatch(jsContent, /copySprite/, 'petrifying-gaze.js must not use copySprite');
     assert.doesNotMatch(jsContent, /\.opacity\(0\)/, 'petrifying-gaze.js must not hide token with opacity(0)');
     assert.match(jsContent, /\.motion\(/, 'petrifying-gaze.js must use .motion()');
     assert.match(jsContent, /\.motion\(token\)/, 'petrifying-gaze.js must use .motion(token)');
     assert.match(jsContent, /\.motion\(target\)/, 'petrifying-gaze.js must use .motion(target)');
-    assert.match(jsContent, /\.noise\(/, 'petrifying-gaze.js must use .noise()');
+    assert.match(jsContent, /\.noise\(/, 'petrifying-gaze.js must use .noise(');
 });
 
-test('petrified uses Sequencer 4.3.0+ sequence.motion(token).noise() for petrification stone shudder instead of copySprite and opacity(0) hiding', () => {
+test('petrified uses Sequencer 4.3.0+ sequence.motion(token).noise( for petrification stone shudder instead of copySprite and opacity(0) hiding', () => {
     const tsModulePath = path.join(rootDir, 'src/animation/effects/active-effect/petrified.ts');
     const jsMacroPath = path.join(rootDir, 'src/standalone-macros/petrified.js');
 
@@ -1134,13 +1134,13 @@ test('petrified uses Sequencer 4.3.0+ sequence.motion(token).noise() for petrifi
     assert.doesNotMatch(tsContent, /\.opacity\(0\)/, 'petrified.ts must not hide token with opacity(0)');
     assert.match(tsContent, /\.motion\(/, 'petrified.ts must use .motion()');
     assert.match(tsContent, /\.motion\(token\)/, 'petrified.ts must use .motion(token)');
-    assert.match(tsContent, /\.noise\(/, 'petrified.ts must use .noise()');
+    assert.match(tsContent, /\.noise\(/, 'petrified.ts must use .noise(');
 
     assert.doesNotMatch(jsContent, /copySprite/, 'petrified.js must not use copySprite');
     assert.doesNotMatch(jsContent, /\.opacity\(0\)/, 'petrified.js must not hide token with opacity(0)');
     assert.match(jsContent, /\.motion\(/, 'petrified.js must use .motion()');
     assert.match(jsContent, /\.motion\(token\)/, 'petrified.js must use .motion(token)');
-    assert.match(jsContent, /\.noise\(/, 'petrified.js must use .noise()');
+    assert.match(jsContent, /\.noise\(/, 'petrified.js must use .noise(');
 });
 
 test('totemicAttunementElk uses Sequencer 4.3.0+ sequence.motion(target).moveBy() for elk charge knockback push instead of copySprite and opacity(0) hiding', () => {
@@ -1191,12 +1191,12 @@ test('maxtacTraumaTeamAV uses Sequencer 4.3.0+ sequence.motion(tile) and motion(
     const jsContent = fs.readFileSync(jsMacroPath, 'utf8');
 
     assert.match(tsContent, /\.motion\(tile\)/, 'maxtac-trauma-team-av.ts must use .motion(tile)');
-    assert.match(tsContent, /\.moveTo\(/, 'maxtac-trauma-team-av.ts must use .moveTo()');
-    assert.match(tsContent, /\.oscillate\(\)/, 'maxtac-trauma-team-av.ts must use .oscillate()');
+    assert.match(tsContent, /\.(moveBy|moveTo)\(/, 'maxtac-trauma-team-av.ts must move tile');
+    assert.match(tsContent, /\.oscillate\(/, 'maxtac-trauma-team-av.ts must use .oscillate()');
 
-    assert.match(jsContent, /\.motion\(target\)/, 'maxtac.js must use .motion(target)');
-    assert.match(jsContent, /\.moveTo\(/, 'maxtac.js must use .moveTo()');
-    assert.match(jsContent, /\.oscillate\(\)/, 'maxtac.js must use .oscillate()');
+    assert.match(jsContent, /\.motion\(tile\)/, 'maxtac.js must use .motion(tile)');
+    assert.match(jsContent, /\.(moveBy|moveTo)\(/, 'maxtac.js must move target');
+    assert.match(jsContent, /\.oscillate\(/, 'maxtac.js must use .oscillate()');
 });
 
 test('shuffle uses Sequencer 4.3.0+ sequence.motion(target).moveTo() API for position swaps instead of legacy moveTowards', () => {
@@ -1226,7 +1226,7 @@ test('attackAttack macro uses Sequencer 4.3.0+ sequence.motion().moveTo() API fo
     assert.match(jsContent, /\.moveTo\(/, 'attack-attack.js must use .moveTo()');
 });
 
-test('enfeeblingArrow uses Sequencer 4.3.0+ sequence.motion(target).noise() for target hit shudder instead of copySprite', () => {
+test('enfeeblingArrow uses Sequencer 4.3.0+ sequence.motion(target).noise( for target hit shudder instead of copySprite', () => {
     const tsModulePath = path.join(rootDir, 'src/animation/effects/arcane-shot/enfeebling-arrow.ts');
     const jsMacroPath = path.join(rootDir, 'src/standalone-macros/enfeebling-arrow.js');
 
@@ -1234,15 +1234,15 @@ test('enfeeblingArrow uses Sequencer 4.3.0+ sequence.motion(target).noise() for 
     const jsContent = fs.readFileSync(jsMacroPath, 'utf8');
 
     assert.doesNotMatch(tsContent, /copySprite/, 'enfeebling-arrow.ts must not use copySprite');
-    assert.match(tsContent, /\.motion\(target\)/, 'enfeebling-arrow.ts must use .motion(target)');
-    assert.match(tsContent, /\.noise\(\)/, 'enfeebling-arrow.ts must use .noise()');
+    assert.match(tsContent, /\.motion\((target|trg)\)/, 'enfeebling-arrow.ts must use .motion(target)');
+    assert.match(tsContent, /\.noise\(/, 'enfeebling-arrow.ts must use .noise(');
 
     assert.doesNotMatch(jsContent, /copySprite/, 'enfeebling-arrow.js must not use copySprite');
     assert.match(jsContent, /\.motion\(target\)/, 'enfeebling-arrow.js must use .motion(target)');
-    assert.match(jsContent, /\.noise\(\)/, 'enfeebling-arrow.js must use .noise()');
+    assert.match(jsContent, /\.noise\(/, 'enfeebling-arrow.js must use .noise(');
 });
 
-test('piercingArrow uses Sequencer 4.3.0+ sequence.motion(t).noise() for target hit shudder instead of copySprite', () => {
+test('piercingArrow uses Sequencer 4.3.0+ sequence.motion(t).noise( for target hit shudder instead of copySprite', () => {
     const tsModulePath = path.join(rootDir, 'src/animation/effects/arcane-shot/piercing-arrow.ts');
     const jsMacroPath = path.join(rootDir, 'src/standalone-macros/piercing-arrow.js');
 
@@ -1251,14 +1251,14 @@ test('piercingArrow uses Sequencer 4.3.0+ sequence.motion(t).noise() for target 
 
     assert.doesNotMatch(tsContent, /copySprite/, 'piercing-arrow.ts must not use copySprite');
     assert.match(tsContent, /\.motion\(t\)/, 'piercing-arrow.ts must use .motion(t)');
-    assert.match(tsContent, /\.noise\(\)/, 'piercing-arrow.ts must use .noise()');
+    assert.match(tsContent, /\.noise\(/, 'piercing-arrow.ts must use .noise(');
 
     assert.doesNotMatch(jsContent, /copySprite/, 'piercing-arrow.js must not use copySprite');
     assert.match(jsContent, /\.motion\(t\)/, 'piercing-arrow.js must use .motion(t)');
-    assert.match(jsContent, /\.noise\(\)/, 'piercing-arrow.js must use .noise()');
+    assert.match(jsContent, /\.noise\(/, 'piercing-arrow.js must use .noise(');
 });
 
-test('burstingArrow uses Sequencer 4.3.0+ sequence.motion(t).noise() for target hit shudder instead of copySprite', () => {
+test('burstingArrow uses Sequencer 4.3.0+ sequence.motion(t).noise( for target hit shudder instead of copySprite', () => {
     const tsModulePath = path.join(rootDir, 'src/animation/effects/arcane-shot/bursting-arrow.ts');
     const jsMacroPath = path.join(rootDir, 'src/standalone-macros/bursting-arrow.js');
 
@@ -1267,14 +1267,14 @@ test('burstingArrow uses Sequencer 4.3.0+ sequence.motion(t).noise() for target 
 
     assert.doesNotMatch(tsContent, /copySprite/, 'bursting-arrow.ts must not use copySprite');
     assert.match(tsContent, /\.motion\(t\)/, 'bursting-arrow.ts must use .motion(t)');
-    assert.match(tsContent, /\.noise\(\)/, 'bursting-arrow.ts must use .noise()');
+    assert.match(tsContent, /\.noise\(/, 'bursting-arrow.ts must use .noise(');
 
     assert.doesNotMatch(jsContent, /copySprite/, 'bursting-arrow.js must not use copySprite');
     assert.match(jsContent, /\.motion\(t\)/, 'bursting-arrow.js must use .motion(t)');
-    assert.match(jsContent, /\.noise\(\)/, 'bursting-arrow.js must use .noise()');
+    assert.match(jsContent, /\.noise\(/, 'bursting-arrow.js must use .noise(');
 });
 
-test('shadowArrow uses Sequencer 4.3.0+ sequence.motion(target).noise() for target hit shudder instead of copySprite loopProperty', () => {
+test('shadowArrow uses Sequencer 4.3.0+ sequence.motion(target).noise( for target hit shudder instead of copySprite loopProperty', () => {
     const tsModulePath = path.join(rootDir, 'src/animation/effects/arcane-shot/shadow-arrow.ts');
     const jsMacroPath = path.join(rootDir, 'src/standalone-macros/shadow-arrow.js');
 
@@ -1282,15 +1282,15 @@ test('shadowArrow uses Sequencer 4.3.0+ sequence.motion(target).noise() for targ
     const jsContent = fs.readFileSync(jsMacroPath, 'utf8');
 
     assert.doesNotMatch(tsContent, /loopProperty.*position\.x/, 'shadow-arrow.ts must not use loopProperty position.x shudder');
-    assert.match(tsContent, /\.motion\(target\)/, 'shadow-arrow.ts must use .motion(target)');
-    assert.match(tsContent, /\.noise\(\)/, 'shadow-arrow.ts must use .noise()');
+    assert.match(tsContent, /\.motion\((target|trg)\)/, 'shadow-arrow.ts must use .motion(target)');
+    assert.match(tsContent, /\.noise\(/, 'shadow-arrow.ts must use .noise(');
 
     assert.doesNotMatch(jsContent, /loopProperty.*position\.x/, 'shadow-arrow.js must not use loopProperty position.x shudder');
     assert.match(jsContent, /\.motion\(target\)/, 'shadow-arrow.js must use .motion(target)');
-    assert.match(jsContent, /\.noise\(\)/, 'shadow-arrow.js must use .noise()');
+    assert.match(jsContent, /\.noise\(/, 'shadow-arrow.js must use .noise(');
 });
 
-test('beguilingArrow uses Sequencer 4.3.0+ sequence.motion(target).noise() for target hit shudder instead of copySprite loopProperty', () => {
+test('beguilingArrow uses Sequencer 4.3.0+ sequence.motion(target).noise( for target hit shudder instead of copySprite loopProperty', () => {
     const tsModulePath = path.join(rootDir, 'src/animation/effects/arcane-shot/beguiling-arrow.ts');
     const jsMacroPath = path.join(rootDir, 'src/standalone-macros/beguiling-arrow.js');
 
@@ -1298,15 +1298,15 @@ test('beguilingArrow uses Sequencer 4.3.0+ sequence.motion(target).noise() for t
     const jsContent = fs.readFileSync(jsMacroPath, 'utf8');
 
     assert.doesNotMatch(tsContent, /loopProperty.*position\.x/, 'beguiling-arrow.ts must not use loopProperty position.x shudder');
-    assert.match(tsContent, /\.motion\(target\)/, 'beguiling-arrow.ts must use .motion(target)');
-    assert.match(tsContent, /\.noise\(\)/, 'beguiling-arrow.ts must use .noise()');
+    assert.match(tsContent, /\.motion\((target|trg)\)/, 'beguiling-arrow.ts must use .motion(target)');
+    assert.match(tsContent, /\.noise\(/, 'beguiling-arrow.ts must use .noise(');
 
     assert.doesNotMatch(jsContent, /loopProperty.*position\.x/, 'beguiling-arrow.js must not use loopProperty position.x shudder');
     assert.match(jsContent, /\.motion\(target\)/, 'beguiling-arrow.js must use .motion(target)');
-    assert.match(jsContent, /\.noise\(\)/, 'beguiling-arrow.js must use .noise()');
+    assert.match(jsContent, /\.noise\(/, 'beguiling-arrow.js must use .noise(');
 });
 
-test('rageV2 and rage macro use Sequencer 4.3.0+ sequence.motion(token).scaleTo(1.05).noise() for rage pulse and shudder instead of copySprite', () => {
+test('rageV2 and rage macro use Sequencer 4.3.0+ sequence.motion(token).scaleTo(1.05).noise( for rage pulse and shudder instead of copySprite', () => {
     const tsModulePath = path.join(rootDir, 'src/animation/effects/active-effect/rage/rage_v2.ts');
     const jsMacroPath = path.join(rootDir, 'src/standalone-macros/rage.js');
 
@@ -1316,14 +1316,14 @@ test('rageV2 and rage macro use Sequencer 4.3.0+ sequence.motion(token).scaleTo(
     assert.doesNotMatch(tsContent, /copySprite/, 'rage_v2.ts must not use copySprite');
     assert.match(tsContent, /\.motion\(/, 'rage_v2.ts must use .motion()');
     assert.match(tsContent, /\.motion\(token\)/, 'rage_v2.ts must use .motion(token)');
-    assert.match(tsContent, /\.scaleTo\(1\.05\)/, 'rage_v2.ts must use .scaleTo(1.05)');
-    assert.match(tsContent, /\.noise\(\)/, 'rage_v2.ts must use .noise()');
+    assert.match(tsContent, /\.scaleTo\(1\.05/, 'rage_v2.ts must use .scaleTo(1.05)');
+    assert.match(tsContent, /\.noise\(/, 'rage_v2.ts must use .noise(');
 
     assert.doesNotMatch(jsContent, /copySprite/, 'rage.js must not use copySprite');
     assert.match(jsContent, /\.motion\(/, 'rage.js must use .motion()');
     assert.match(jsContent, /\.motion\(token\)/, 'rage.js must use .motion(token)');
-    assert.match(jsContent, /\.scaleTo\(1\.05\)/, 'rage.js must use .scaleTo(1.05)');
-    assert.match(jsContent, /\.noise\(\)/, 'rage.js must use .noise()');
+    assert.match(jsContent, /\.scaleTo\(1\.05/, 'rage.js must use .scaleTo(1.05)');
+    assert.match(jsContent, /\.noise\(/, 'rage.js must use .noise(');
 });
 
 

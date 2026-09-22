@@ -110,7 +110,7 @@ test('banishment.banish.create builds sequence with sequence.motion(target).scal
         const seq = await banishment.banish.create(mockTarget);
         assert.ok(seq, 'Sequence must be created');
         assert.equal(capturedMotionTarget, mockTarget, 'Motion target must be the target token');
-        assert.equal(capturedScaleToValue, 0, 'scaleTo target scale must be 0');
+        assert.equal(capturedScaleToValue, 0.01, 'scaleTo target scale must be 0.01');
         assert.equal(capturedRotateByValue, 360, 'rotateBy target amount must be 360');
         assert.equal(opacitySetZero, false, 'Token opacity must NOT be set to 0');
         assert.equal(copySpriteCount, 0, 'No copySprite should be present');

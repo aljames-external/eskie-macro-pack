@@ -52,7 +52,7 @@ test('fly.create builds sequence with sequence.motion(token).moveTo({ y: -0.5 },
                             return proxy;
                         };
                     }
-                    if (prop === 'moveTo') {
+                    if (prop === 'moveTo' || prop === 'moveBy') {
                         return (...args) => {
                             moveToCalled = true;
                             moveToArgs = args;

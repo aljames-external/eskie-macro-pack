@@ -172,9 +172,7 @@ async function create(source: Token, target: Token, config: AnimationEffectConfi
 
     // Slash dash token movement via Sequencer 4.3.0+ sequence.motion() API
     sequence.motion(source)
-        .moveTo(dashDestination, { rotate: false, ease: 'easeOutCubic' })
-        .moveSpeed(1500)
-        .duration(400);
+        .moveTo(dashDestination, { duration: 400, rotate: false, ease: 'easeOutCubic' });
 
     sequence.wait(500);
 
