@@ -82,14 +82,9 @@ async function create(token: Token, target: Token, config: any = {}) {
     const hitTargets = (mConfig.targets?.length ? mConfig.targets : [target]);
     for (const t of hitTargets) {
         const targetSeq = new Sequence()
-            .effect()
-                .copySprite(t)
-                .attachTo(t)
-                .scaleToObject(1, { considerTokenScale: true })
-                .loopProperty('sprite', 'position.x', { from: -0.05, to: 0.05, duration: 50, pingPong: true, gridUnits: true })
-                .opacity(0.5)
+            .motion(t)
+                .noise()
                 .duration(1000)
-                .fadeOut(250)
             .effect()
                 .file(closest('eskie.damage.force.01.white'))
                 .attachTo(t, { bindAlpha: false, bindVisibility: false })

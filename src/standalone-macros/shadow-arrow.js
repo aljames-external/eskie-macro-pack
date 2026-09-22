@@ -42,14 +42,9 @@ sequence
         .filter("ColorMatrix", { hue: -35, brightness: 0.2 })
         .waitUntilFinished(-750)
 
-    .effect()
-        .copySprite(target)
-        .attachTo(target)
-        .scaleToObject(1, { considerTokenScale: true })
-        .loopProperty("sprite", "position.x", { from: -0.05, to: 0.05, duration: 50, pingPong: true, gridUnits: true })
-        .opacity(0.5)
+    .motion(target)
+        .noise()
         .duration(1000)
-        .fadeOut(250)
 
     .effect()
         .file(closest("eskie.damage.psychic.01.darkpurple"))

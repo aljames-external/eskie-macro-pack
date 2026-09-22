@@ -19,7 +19,7 @@ const isPlaying = Sequencer.EffectManager.getEffects({ name: label }).length > 0
 
 if (isPlaying) {
     Sequencer.EffectManager.endEffects({ name: label });
-    await new Sequence().animation().on(target).show().play();
+    await new Sequence().motion(target).scaleTo(1).play();
     return ui.notifications.info(`Ended Banishing Arrow on ${target.name}.`);
 }
 
@@ -34,19 +34,9 @@ sequence
         .zIndex(2)
         .waitUntilFinished(-1250)
 
-    .effect()
-        .copySprite(target)
-        .attachTo(target, { bindAlpha: false, bindVisibility: false })
-        .scaleToObject(1, { considerTokenScale: true })
-        .duration(2000)
-        .scaleOut(0, 1000, { ease: "easeInOutCubic" })
-        .rotateOut(360, 1000, { ease: "easeInOutQuint" })
-
-    .wait(500)
-
-    .animation()
-        .on(target)
-        .hide()
+    .motion(target)
+        .scaleTo(0)
+        .rotateBy(360)
 
     .effect()
         .file(closest("eskie.attack.ranged.arrow.01.physical.medium.purple.slow"))

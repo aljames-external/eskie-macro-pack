@@ -733,6 +733,48 @@ test('banishment uses Sequencer 4.3.0+ sequence.motion(target).scaleTo(0).rotate
     assert.match(jsContent, /\.rotateBy\(360\)/, 'banishment.js must use .rotateBy(360)');
 });
 
+test('banishingArrow uses Sequencer 4.3.0+ sequence.motion(target).scaleTo(0).rotateBy(360) for target scaling/rotation instead of copySprite and opacity(0) hiding', () => {
+    const tsModulePath = path.join(rootDir, 'src/animation/effects/arcane-shot/banishing-arrow.ts');
+    const jsMacroPath = path.join(rootDir, 'src/standalone-macros/banishing-arrow.js');
+
+    const tsContent = fs.readFileSync(tsModulePath, 'utf8');
+    const jsContent = fs.readFileSync(jsMacroPath, 'utf8');
+
+    assert.doesNotMatch(tsContent, /copySprite/, 'banishing-arrow.ts must not use copySprite');
+    assert.doesNotMatch(tsContent, /\.animation\(\)/, 'banishing-arrow.ts must not hide token with animation()');
+    assert.match(tsContent, /\.motion\(/, 'banishing-arrow.ts must use .motion()');
+    assert.match(tsContent, /\.motion\(target\)/, 'banishing-arrow.ts must use .motion(target)');
+    assert.match(tsContent, /\.scaleTo\(0\)/, 'banishing-arrow.ts must use .scaleTo(0)');
+    assert.match(tsContent, /\.rotateBy\(360\)/, 'banishing-arrow.ts must use .rotateBy(360)');
+
+    assert.doesNotMatch(jsContent, /copySprite/, 'banishing-arrow.js must not use copySprite');
+    assert.doesNotMatch(jsContent, /\.animation\(\)/, 'banishing-arrow.js must not hide token with animation()');
+    assert.match(jsContent, /\.motion\(/, 'banishing-arrow.js must use .motion()');
+    assert.match(jsContent, /\.motion\(target\)/, 'banishing-arrow.js must use .motion(target)');
+    assert.match(jsContent, /\.scaleTo\(0\)/, 'banishing-arrow.js must use .scaleTo(0)');
+    assert.match(jsContent, /\.rotateBy\(360\)/, 'banishing-arrow.js must use .rotateBy(360)');
+});
+
+test('graspingArrow uses Sequencer 4.3.0+ sequence.motion(target).noise() for target vine grapple shudder instead of copySprite and opacity(0) hiding', () => {
+    const tsModulePath = path.join(rootDir, 'src/animation/effects/arcane-shot/grasping-arrow.ts');
+    const jsMacroPath = path.join(rootDir, 'src/standalone-macros/grasping-arrow.js');
+
+    const tsContent = fs.readFileSync(tsModulePath, 'utf8');
+    const jsContent = fs.readFileSync(jsMacroPath, 'utf8');
+
+    assert.doesNotMatch(tsContent, /copySprite/, 'grasping-arrow.ts must not use copySprite');
+    assert.doesNotMatch(tsContent, /loopProperty/, 'grasping-arrow.ts must not use loopProperty on copySprite');
+    assert.match(tsContent, /\.motion\(/, 'grasping-arrow.ts must use .motion()');
+    assert.match(tsContent, /\.motion\(target\)/, 'grasping-arrow.ts must use .motion(target)');
+    assert.match(tsContent, /\.noise\(\)/, 'grasping-arrow.ts must use .noise()');
+
+    assert.doesNotMatch(jsContent, /copySprite/, 'grasping-arrow.js must not use copySprite');
+    assert.doesNotMatch(jsContent, /loopProperty/, 'grasping-arrow.js must not use loopProperty on copySprite');
+    assert.match(jsContent, /\.motion\(/, 'grasping-arrow.js must use .motion()');
+    assert.match(jsContent, /\.motion\(target\)/, 'grasping-arrow.js must use .motion(target)');
+    assert.match(jsContent, /\.noise\(\)/, 'grasping-arrow.js must use .noise()');
+});
+
 test('thornWhip uses Sequencer 4.3.0+ sequence.motion(target).moveTo() for pulling target token instead of copySprite and opacity(0) hiding', () => {
     const tsModulePath = path.join(rootDir, 'src/animation/effects/target/thorn-whip.ts');
     const jsMacroPath = path.join(rootDir, 'src/standalone-macros/thorn-whip.js');
@@ -1203,6 +1245,89 @@ test('attackAttack macro uses Sequencer 4.3.0+ sequence.motion().moveTo() API fo
     assert.match(jsContent, /\.motion\(red\)/, 'attack-attack.js must use sequence.motion(red)');
     assert.match(jsContent, /\.moveTo\(/, 'attack-attack.js must use .moveTo()');
 });
+
+test('enfeeblingArrow uses Sequencer 4.3.0+ sequence.motion(target).noise() for target hit shudder instead of copySprite', () => {
+    const tsModulePath = path.join(rootDir, 'src/animation/effects/arcane-shot/enfeebling-arrow.ts');
+    const jsMacroPath = path.join(rootDir, 'src/standalone-macros/enfeebling-arrow.js');
+
+    const tsContent = fs.readFileSync(tsModulePath, 'utf8');
+    const jsContent = fs.readFileSync(jsMacroPath, 'utf8');
+
+    assert.doesNotMatch(tsContent, /copySprite/, 'enfeebling-arrow.ts must not use copySprite');
+    assert.match(tsContent, /\.motion\(target\)/, 'enfeebling-arrow.ts must use .motion(target)');
+    assert.match(tsContent, /\.noise\(\)/, 'enfeebling-arrow.ts must use .noise()');
+
+    assert.doesNotMatch(jsContent, /copySprite/, 'enfeebling-arrow.js must not use copySprite');
+    assert.match(jsContent, /\.motion\(target\)/, 'enfeebling-arrow.js must use .motion(target)');
+    assert.match(jsContent, /\.noise\(\)/, 'enfeebling-arrow.js must use .noise()');
+});
+
+test('piercingArrow uses Sequencer 4.3.0+ sequence.motion(t).noise() for target hit shudder instead of copySprite', () => {
+    const tsModulePath = path.join(rootDir, 'src/animation/effects/arcane-shot/piercing-arrow.ts');
+    const jsMacroPath = path.join(rootDir, 'src/standalone-macros/piercing-arrow.js');
+
+    const tsContent = fs.readFileSync(tsModulePath, 'utf8');
+    const jsContent = fs.readFileSync(jsMacroPath, 'utf8');
+
+    assert.doesNotMatch(tsContent, /copySprite/, 'piercing-arrow.ts must not use copySprite');
+    assert.match(tsContent, /\.motion\(t\)/, 'piercing-arrow.ts must use .motion(t)');
+    assert.match(tsContent, /\.noise\(\)/, 'piercing-arrow.ts must use .noise()');
+
+    assert.doesNotMatch(jsContent, /copySprite/, 'piercing-arrow.js must not use copySprite');
+    assert.match(jsContent, /\.motion\(t\)/, 'piercing-arrow.js must use .motion(t)');
+    assert.match(jsContent, /\.noise\(\)/, 'piercing-arrow.js must use .noise()');
+});
+
+test('burstingArrow uses Sequencer 4.3.0+ sequence.motion(t).noise() for target hit shudder instead of copySprite', () => {
+    const tsModulePath = path.join(rootDir, 'src/animation/effects/arcane-shot/bursting-arrow.ts');
+    const jsMacroPath = path.join(rootDir, 'src/standalone-macros/bursting-arrow.js');
+
+    const tsContent = fs.readFileSync(tsModulePath, 'utf8');
+    const jsContent = fs.readFileSync(jsMacroPath, 'utf8');
+
+    assert.doesNotMatch(tsContent, /copySprite/, 'bursting-arrow.ts must not use copySprite');
+    assert.match(tsContent, /\.motion\(t\)/, 'bursting-arrow.ts must use .motion(t)');
+    assert.match(tsContent, /\.noise\(\)/, 'bursting-arrow.ts must use .noise()');
+
+    assert.doesNotMatch(jsContent, /copySprite/, 'bursting-arrow.js must not use copySprite');
+    assert.match(jsContent, /\.motion\(t\)/, 'bursting-arrow.js must use .motion(t)');
+    assert.match(jsContent, /\.noise\(\)/, 'bursting-arrow.js must use .noise()');
+});
+
+test('shadowArrow uses Sequencer 4.3.0+ sequence.motion(target).noise() for target hit shudder instead of copySprite loopProperty', () => {
+    const tsModulePath = path.join(rootDir, 'src/animation/effects/arcane-shot/shadow-arrow.ts');
+    const jsMacroPath = path.join(rootDir, 'src/standalone-macros/shadow-arrow.js');
+
+    const tsContent = fs.readFileSync(tsModulePath, 'utf8');
+    const jsContent = fs.readFileSync(jsMacroPath, 'utf8');
+
+    assert.doesNotMatch(tsContent, /loopProperty.*position\.x/, 'shadow-arrow.ts must not use loopProperty position.x shudder');
+    assert.match(tsContent, /\.motion\(target\)/, 'shadow-arrow.ts must use .motion(target)');
+    assert.match(tsContent, /\.noise\(\)/, 'shadow-arrow.ts must use .noise()');
+
+    assert.doesNotMatch(jsContent, /loopProperty.*position\.x/, 'shadow-arrow.js must not use loopProperty position.x shudder');
+    assert.match(jsContent, /\.motion\(target\)/, 'shadow-arrow.js must use .motion(target)');
+    assert.match(jsContent, /\.noise\(\)/, 'shadow-arrow.js must use .noise()');
+});
+
+test('beguilingArrow uses Sequencer 4.3.0+ sequence.motion(target).noise() for target hit shudder instead of copySprite loopProperty', () => {
+    const tsModulePath = path.join(rootDir, 'src/animation/effects/arcane-shot/beguiling-arrow.ts');
+    const jsMacroPath = path.join(rootDir, 'src/standalone-macros/beguiling-arrow.js');
+
+    const tsContent = fs.readFileSync(tsModulePath, 'utf8');
+    const jsContent = fs.readFileSync(jsMacroPath, 'utf8');
+
+    assert.doesNotMatch(tsContent, /loopProperty.*position\.x/, 'beguiling-arrow.ts must not use loopProperty position.x shudder');
+    assert.match(tsContent, /\.motion\(target\)/, 'beguiling-arrow.ts must use .motion(target)');
+    assert.match(tsContent, /\.noise\(\)/, 'beguiling-arrow.ts must use .noise()');
+
+    assert.doesNotMatch(jsContent, /loopProperty.*position\.x/, 'beguiling-arrow.js must not use loopProperty position.x shudder');
+    assert.match(jsContent, /\.motion\(target\)/, 'beguiling-arrow.js must use .motion(target)');
+    assert.match(jsContent, /\.noise\(\)/, 'beguiling-arrow.js must use .noise()');
+});
+
+
+
 
 
 
