@@ -24,14 +24,9 @@ if (activeEffects.length > 0 || activeIdEffects.length > 0) {
 }
 
 const tokenWidth = token.document?.width ?? 1;
-const tokenRotation = token.document?.rotation ?? token.rotation ?? 0;
 const facingFactor = 1;
 
 let laughEffect = new Sequence();
-
-laughEffect.animation()
-    .on(token)
-    .opacity(0);
 
 laughEffect.effect()
     .name(label)
@@ -44,22 +39,10 @@ laughEffect.effect()
     .persist()
     .private();
 
-laughEffect.effect()
+laughEffect.motion(token)
     .name(label)
-    .copySprite(token)
-    .spriteRotation(-tokenRotation)
-    .scaleToObject(1, { considerTokenScale: true })
-    .atLocation(token)
-    .attachTo(token, { bindAlpha: false })
-    .loopProperty("spriteContainer", "position.y", { from: 0, to: -0.01, duration: 150, gridUnits: true, pingPong: true, ease: "easeOutQuad" })
-    .loopProperty("sprite", "width", { from: 0, to: 0.015, duration: 150, gridUnits: true, pingPong: true, ease: "easeOutQuad" })
-    .loopProperty("sprite", "height", { from: 0, to: 0.015, duration: 150, gridUnits: true, pingPong: true, ease: "easeOutQuad" })
-    .mirrorY(token.document?.mirrorX)
+    .noise()
     .persist()
     .waitUntilFinished(-200);
-
-laughEffect.animation()
-    .on(token)
-    .opacity(1);
 
 await laughEffect.play();

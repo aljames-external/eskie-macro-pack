@@ -62,12 +62,6 @@ if (!position) return;
 
 const sequence = new Sequence();
 
-// Temporary hide token while copy sprite arc animates the dive
-sequence.animation()
-    .delay(100)
-    .on(token)
-    .opacity(0);
-
 // Departure dust puff at launch location
 sequence.effect()
     .delay(100)
@@ -103,25 +97,10 @@ sequence.effect()
     .spriteRotation(-180)
     .opacity(0.5);
 
-// Quick reactive dive jumping sprite trajectory and prone rotation tilt
-sequence.effect()
-    .copySprite(token)
-    .spriteRotation(-tokenRotation)
-    .atLocation(token)
-    .scaleToObject(1, { considerTokenScale: true })
-    .moveTowards(position, { delay: 100, rotate: false, ease: "easeOutQuint" })
-    .duration(1300)
-    .animateProperty('spriteContainer', 'position.y', { from: 0, to: -0.8, duration: 550, delay: 100, gridUnits: true, ease: "easeOutQuint" })
-    .animateProperty('spriteContainer', 'position.y', { from: 0, to: 0.8, duration: 550, delay: 650, gridUnits: true, ease: "easeOutQuad" })
-    .animateProperty('sprite', 'rotation', { from: 0, to: 90, duration: 500, delay: 100, ease: "easeOutCubic" })
-    .waitUntilFinished(-200);
-
-// Teleport and tilt actual token +90deg into staying low prone state
-sequence.animation()
-    .on(token)
-    .teleportTo(position, { relativeToCenter: true })
-    .rotate(tokenRotation + 90)
-    .opacity(1);
+// Dive prone tilt and movement using Sequencer 4.3.0+ sequence.motion(token).rotateTo(90).moveBy()
+sequence.motion(token)
+    .rotateTo(90)
+    .moveBy(position, { delay: 100, ease: 'easeOutQuint' });
 
 // Persistent tracking effect for staying low evasive cover state & macro toggle support
 sequence.effect()
@@ -131,3 +110,4 @@ sequence.effect()
     .private();
 
 await sequence.play();
+

@@ -62,16 +62,10 @@ sequence.effect()
     .filter('Blur', { blurX: 5, blurY: 10 })
     .opacity(0.5);
 
-// Gunslinger dive jump trajectory and prone rotation tilt using Sequencer 4.3.0+ .motion()
-sequence.animation()
-    .on(token)
-    .moveTowards(position, { delay: 50, rotate: false, ease: 'easeOutQuint' })
-    .motion({
-        arc: 0.8,
-        rotation: 90,
-        duration: 1200,
-        ease: 'easeOutQuint'
-    });
+// Gunslinger dive jump trajectory and prone rotation tilt using Sequencer 4.3.0+ sequence.motion(token).rotateTo(90).moveBy()
+sequence.motion(token)
+    .rotateTo(90)
+    .moveBy(position, { delay: 50, ease: 'easeOutQuint' });
 
 // Target landing dirt impact puff
 sequence.effect()

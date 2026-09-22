@@ -60,95 +60,16 @@ if (isPlaying) {
     for (const target of targets) {
         Sequencer.EffectManager.endEffects({ name: label, object: target });
         Sequencer.EffectManager.endEffects({ name: id, object: target });
-        new Sequence().animation().on(target).opacity(1).fadeIn(500).play();
+        new Sequence().motion(target).scaleTo(1).fadeTo(1).play();
     }
     return;
 }
 
-function getDissolveShape() {
-    return {
-        lineSize: 25,
-        lineColor: "#FF0000",
-        gridUnits: true,
-        name: "test",
-        isMask: true,
-        fillColor: "#FF0000",
-    };
-}
-
-function getDissolveConfig() {
-    const gridSize = canvas.grid?.size ?? 100;
-    return [
-        {
-            offset: { x: gridSize * 0.1, y: -gridSize * 0.4 },
-            steps: [
-                { radius: 0.15, duration: 1500, fill: true },
-                { radius: 0.2, duration: 1800 },
-                { radius: 0.25, duration: 2000 },
-                { radius: 0.3, duration: 2200 },
-                { radius: 0.35, duration: 2400 },
-                { radius: 0.4, duration: 2600 },
-                { radius: 0.45, duration: 2800 },
-            ],
-        },
-        {
-            offset: { x: -gridSize * 0.4, y: gridSize * 0.3 },
-            steps: [
-                { radius: 0.15, duration: 500, fill: true },
-                { radius: 0.2, duration: 700 },
-                { radius: 0.25, duration: 900 },
-                { radius: 0.3, duration: 1100 },
-                { radius: 0.35, duration: 1300 },
-                { radius: 0.4, duration: 1500 },
-                { radius: 0.45, duration: 1700 },
-                { radius: 0.5, duration: 1900 },
-                { radius: 0.55, duration: 2100 },
-            ],
-        },
-        {
-            offset: { x: gridSize * 0.5, y: gridSize * 0.4 },
-            steps: [
-                { radius: 0.15, duration: 1500, fill: true },
-                { radius: 0.25, duration: 1900 },
-                { radius: 0.3, duration: 2100 },
-                { radius: 0.35, duration: 2300 },
-                { radius: 0.4, duration: 2500 },
-                { radius: 0.45, duration: 2700 },
-            ],
-        },
-    ];
-}
-
 function buildDissolveSequence(target, effectId) {
-    let seq = new Sequence()
-        .animation()
-        .on(target)
-        .opacity(0);
-
-    const dissolveSections = getDissolveConfig();
-    const shape = getDissolveShape();
-
-    for (const section of dissolveSections) {
-        for (const step of section.steps) {
-            const stepShape = { ...shape };
-            stepShape.radius = step.radius;
-            stepShape.offset = section.offset;
-            if (step.fill) {
-                stepShape.fillColor = shape.fillColor;
-            }
-
-            seq = seq.effect()
-                .name(effectId)
-                .atLocation({ x: target.center.x, y: target.center.y })
-                .copySprite(target)
-                .spriteRotation(-(target.document?.rotation ?? target.rotation ?? 0))
-                .scaleToObject(1, { considerTokenScale: true })
-                .shape("circle", stepShape)
-                .duration(step.duration)
-                .fadeOut(1000);
-        }
-    }
-    return seq;
+    return new Sequence()
+        .motion(target)
+        .scaleTo(0)
+        .fadeTo(0);
 }
 
 function buildBeamSequence(casterToken, targetToken, effectId, beamEffects) {

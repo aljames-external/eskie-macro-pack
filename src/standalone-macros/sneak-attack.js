@@ -139,7 +139,6 @@ const rangedColorDamage = rangedColor.damage ?? "red";
 const sequence = new Sequence();
 
 for (const target of targets) {
-    const targetRotation = target.document?.rotation ?? 0;
     const targetSquare = getNearestSquareCenter(token, target);
 
     // Determine attack style: if auto, pick melee if within reach (<= 8 ft), else ranged
@@ -147,6 +146,16 @@ for (const target of targets) {
     const useMelee = mode === "melee" || (mode === "auto" && dist <= 8);
 
     if (useMelee) {
+        const srcCenter = token.center ?? { x: token.x, y: token.y };
+        const baseRad = Math.atan2(targetSquare.y - srcCenter.y, targetSquare.x - srcCenter.x);
+        const lungeX = Math.cos(baseRad) * 0.35;
+        const lungeY = Math.sin(baseRad) * 0.35;
+
+        // Sneak attack lunging step via Sequencer 4.3.0+ sequence.motion(token)
+        sequence.motion(token)
+            .moveBy({ x: lungeX, y: lungeY }, { duration: 80, ease: "easeOutQuad", gridUnits: true })
+            .moveBy({ x: -lungeX, y: -lungeY }, { duration: 120, ease: "easeInQuad", gridUnits: true });
+
         // Vital spot melee strike dagger slash
         sequence.effect()
             .name(label)
@@ -180,20 +189,6 @@ for (const target of targets) {
             .spriteOffset({ x: -1.15 * tokenWidth }, { gridUnits: true })
             .spriteRotation(180)
             .zIndex(0);
-
-        // Target shock reaction / tint impact shake
-        sequence.effect()
-            .name(label)
-            .delay(150)
-            .copySprite(target)
-            .spriteRotation(-targetRotation)
-            .attachTo(target)
-            .scaleToObject(1, { considerTokenScale: true })
-            .loopProperty('spriteContainer', 'position.x', { from: -0.05, to: 0.05, duration: 50, pingPong: true, gridUnits: true })
-            .opacity(0.25)
-            .duration(1000)
-            .fadeOut(750)
-            .tint("#FF0000");
     } else {
         // Vital spot ranged precision strike slice
         sequence.effect()
@@ -226,20 +221,6 @@ for (const target of targets) {
             .spriteOffset({ x: -1.15 * tokenWidth }, { gridUnits: true })
             .spriteRotation(180)
             .zIndex(0);
-
-        // Target shock reaction / tint impact shake
-        sequence.effect()
-            .name(label)
-            .delay(150)
-            .copySprite(target)
-            .spriteRotation(-targetRotation)
-            .attachTo(target)
-            .scaleToObject(1, { considerTokenScale: true })
-            .loopProperty('spriteContainer', 'position.x', { from: -0.05, to: 0.05, duration: 50, pingPong: true, gridUnits: true })
-            .opacity(0.25)
-            .duration(1000)
-            .fadeOut(750)
-            .tint("#FF0000");
     }
 }
 

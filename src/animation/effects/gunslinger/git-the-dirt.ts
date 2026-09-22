@@ -52,16 +52,10 @@ async function create(token: Token, config: AnimationEffectConfig = {}, options:
         .filter('Blur', { blurX: 5, blurY: 10 })
         .opacity(0.5);
 
-    // Gunslinger dive jump trajectory and prone rotation tilt using Sequencer 4.3.0+ .motion()
-    sequence.animation()
-        .on(token)
-        .moveTowards(position, { delay: 50, rotate: false, ease: 'easeOutQuint' })
-        .motion({
-            arc: 0.8,
-            rotation: 90,
-            duration: 1200,
-            ease: 'easeOutQuint'
-        });
+    // Gunslinger dive jump trajectory and prone rotation tilt using Sequencer 4.3.0+ sequence.motion(token).rotateTo(90).moveBy()
+    sequence.motion(token)
+        .rotateTo(90)
+        .moveBy(position, { delay: 50, ease: 'easeOutQuint' });
 
     // Target landing dirt impact puff
     sequence.effect()
@@ -107,5 +101,5 @@ export const gitTheDirt = {
 
 export const hitTheDirt = gitTheDirt;
 
-adapter.autorec.register('gitTheDirt', 'template', 'eskie.effect.gitTheDirt', DEFAULT_CONFIG, '0.0.1', 'Git the Dirt!');
-adapter.autorec.register('hitTheDirt', 'template', 'eskie.effect.hitTheDirt', DEFAULT_CONFIG, '0.0.1', 'Hit the Dirt');
+adapter.autorec.register('gitTheDirt', 'template', 'eskie.effect.gitTheDirt', DEFAULT_CONFIG, '0.0.2', 'Git the Dirt!');
+adapter.autorec.register('hitTheDirt', 'template', 'eskie.effect.hitTheDirt', DEFAULT_CONFIG, '0.0.2', 'Hit the Dirt');

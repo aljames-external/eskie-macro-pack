@@ -35,143 +35,23 @@ const DEFAULT_CONFIG = {
     sound: { ...DEFAULT_SOUND_CONFIG },
 };
 
-/**
- * Helper function to apply a series of dissolving mask effects to a sequence.
- * @param {Sequence} sequence The sequence to add the effects to.
- * @param {object} options The options for the dissolve effect.
- * @param {string} options.id The unique ID for the effect.
- * @param {Token} options.target The target token.
- * @param {number} options.centerX The center X coordinate.
- * @param {number} options.centerY The center Y coordinate.
- * @param {object} options.offset The offset for the mask.
- * @param {Array<object>} options.steps The steps of the animation, containing radius, duration, and fill.
- */
-function _dissolve({ id, target, offset, steps, shape }: any) {
-    let seq = new Sequence()
-        // Make the original target token invisible
-        .animation()
-        .on(target)
-        .opacity(0);
-
-    for (const step of steps) {
-        const stepShape = { ...shape };
-        stepShape.radius = step.radius;
-        stepShape.offset = offset;
-        if (step.fill) {
-            stepShape.fillColor = shape.fillColor;
-        }
-
-        seq = seq.effect()
-            .name(id)
-            .atLocation(adapter.getCenter(target))
-            .copySprite(target)
-            .spriteRotation(-target.document.rotation)
-            .scaleToObject(1, { considerTokenScale: true })
-            .shape("circle", stepShape)
-            .duration(step.duration)
-            .fadeOut(1000);
-    }
-
-    return seq;
-}
-
-function _reform({ id, target, allSteps, shape }: any) {
-    const formingSequence = new Sequence();
-
-    for (const step of allSteps) {
-        const stepShape = { ...shape };
-        stepShape.radius = step.radius;
-        stepShape.offset = step.offset;
-        if (step.fill) {
-            stepShape.fillColor = shape.fillColor;
-        }
-
-        formingSequence.effect()
-            .name(id)
-            .atLocation(adapter.getCenter(target))
-            .copySprite(target)
-            .spriteRotation(-target.document.rotation)
-            .scaleToObject(1, { considerTokenScale: true })
-            .shape("circle", stepShape)
-            .fadeIn(300)
-            .delay(step.duration - 200 > 0 ? step.duration - 200 : step.duration)
-            .persist();
-    }
-    return formingSequence;
-}
-
-function getDissolveShape() {
-    return {
-        lineSize: 25,
-        lineColor: "#FF0000",
-        gridUnits: true,
-        name: "test",
-        isMask: true,
-        fillColor: "#FF0000",
-    };
-}
-
-function getDissolveConfig() {
-    const gridSize = adapter.getGridSize();
-    return [
-        {
-            offset: { x: gridSize * 0.1, y: -gridSize * 0.4 },
-            steps: [
-                { radius: 0.15, duration: 1500, fill: true }, { radius: 0.2, duration: 1800 },
-                { radius: 0.25, duration: 2000 }, { radius: 0.3, duration: 2200 },
-                { radius: 0.35, duration: 2400 }, { radius: 0.4, duration: 2600 },
-                { radius: 0.45, duration: 2800 },
-            ]
-        },
-        {
-            offset: { x: -gridSize * 0.4, y: gridSize * 0.3 },
-            steps: [
-                { radius: 0.15, duration: 500, fill: true }, { radius: 0.2, duration: 700 },
-                { radius: 0.25, duration: 900 }, { radius: 0.3, duration: 1100 },
-                { radius: 0.35, duration: 1300 }, { radius: 0.4, duration: 1500 },
-                { radius: 0.45, duration: 1700 }, { radius: 0.5, duration: 1900 },
-                { radius: 0.55, duration: 2100 },
-            ]
-        },
-        {
-            offset: { x: gridSize * 0.5, y: gridSize * 0.4 },
-            steps: [
-                { radius: 0.15, duration: 1500, fill: true }, { radius: 0.25, duration: 1900 },
-                { radius: 0.3, duration: 2100 }, { radius: 0.35, duration: 2300 },
-                { radius: 0.4, duration: 2500 }, { radius: 0.45, duration: 2700 },
-            ]
-        }
-    ];
-}
-
 function dissolveCreate(target: Token, config: any = {}) {
-    const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
-    const { id } = mConfig;
-
-    let seq = new Sequence();
-    const dissolveSections = getDissolveConfig();
-    const shape = getDissolveShape();
-    for (const section of dissolveSections) {
-        seq = seq.addSequence(_dissolve({ id, target, offset: section.offset, steps: section.steps, shape }));
-    }
-    return seq;
+    return new Sequence()
+        .motion(target)
+        .scaleTo(0)
+        .fadeTo(0);
 }
 
 async function dissolvePlay(target: Token, config: any = {}) {
     let dissolve = dissolveCreate(target, config);
-    let hide = new Sequence().animation().on(target).show(false);
-    if (dissolve && hide) {
-        await dissolve.play();
-        return hide.play();
+    if (dissolve) {
+        return dissolve.play();
     }
 }
 
 /**
  * This function creates the core disintegration animation for a target token.
- * It works by first making the token invisible, then layering several visual effects.
- * The "dissolving" effect is achieved by creating multiple copies of the token's image
- * and applying a series of expanding circular masks to them, which makes it look like
- * the token is being eaten away from different angles.
+ * It works by shrinking and fading out the target token using native motion, while layering visual ash and spirit effects.
  *
  * @param {Token} target The token to apply the death effect to.
  * @param {object} config Configuration object for the effect.
@@ -209,7 +89,7 @@ function death(target: Token, config: any = {}) {
         .filter("ColorMatrix", { hue: -25 })
         .belowTokens()
 
-        // Dissolve and wait
+        // Dissolve target via motion shrink and fade
         .addSequence(dissolveCreate(target, config))
         .wait(1500);
 
@@ -258,7 +138,7 @@ async function play(token: Token, target: Token, config: any = {}) {
 }
 
 /**
- * Stops the disintegrate effect on a given token.
+ * Stops the disintegrate effect on a given token and restores target motion scale and fade.
  * @param {Token} token The token on which to stop the effect.
  * @param {object} [config={}] Configuration for stopping the effect.
  * @param {string} [config.id='disintegrate'] The id of the effect to stop.
@@ -267,7 +147,8 @@ async function play(token: Token, target: Token, config: any = {}) {
 async function stop(token: Token, config: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id } = mConfig;
-    return Sequencer.EffectManager.endEffects({ name: id, object: token });
+    Sequencer.EffectManager.endEffects({ name: id, object: token });
+    return new Sequence().motion(token).scaleTo(1).fadeTo(1).play();
 }
 
 /**
@@ -279,32 +160,12 @@ async function stop(token: Token, config: any = {}) {
 function reformCreate(target: Token, config: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id, duration } = mConfig;
-    const reformSequence = new Sequence();
-    const dissolveSections = getDissolveConfig();
-    const shape = getDissolveShape();
 
-    // Set target to be invisible at the start
-    reformSequence.animation().on(target).opacity(0);
-
-    const allSteps: any[] = [];
-    dissolveSections.forEach(section => {
-        section.steps.forEach(step => {
-            allSteps.push({ ...step, offset: section.offset });
-        });
-    });
-
-    allSteps.sort((a, b) => a.duration - b.duration);
-    const maxDuration = allSteps.length > 0 ? Math.max(...allSteps.map(s => s.duration)) : 0;
-
-    const formingSequence = _reform({ id: id, target, allSteps, shape: shape });
-
-    reformSequence
-        .addSequence(formingSequence)
-        .wait(maxDuration + duration)
-        .animation()
-        .on(target)
-        .opacity(1.0)
-        .wait(100)
+    const reformSequence = new Sequence()
+        .motion(target)
+        .scaleTo(1)
+        .fadeTo(1)
+        .wait(duration)
         .thenDo(() => {
             Sequencer.EffectManager.endEffects({ name: id, fadeOut: duration });
         });
@@ -313,10 +174,7 @@ function reformCreate(target: Token, config: any = {}) {
 }
 
 async function reformPlay(target: Token, config: any = {}) {
-    let reform = new Sequence();
-    reform = reform
-        .animation().on(target).show(true)
-        .addSequence(reformCreate(target, config));
+    let reform = reformCreate(target, config);
     if (reform) { return reform.play(); }
 }
 

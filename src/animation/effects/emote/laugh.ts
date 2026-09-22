@@ -52,10 +52,6 @@ async function create(token: Token, config: any = {}) {
     let laughEffect = new Sequence();
     applySound(laughEffect, sound);
     laughEffect = laughEffect
-        .animation()
-        .on(token)
-        .opacity(0)
-
         .effect()
         .name(id)
         .file(closest(effect[0].img))
@@ -69,24 +65,11 @@ async function create(token: Token, config: any = {}) {
     laughEffect = (duration > 0) ? laughEffect.duration(duration) : laughEffect.persist();
 
     laughEffect = laughEffect
-        .effect()
+        .motion(token)
         .name(id)
-        .copySprite(token)
-        .spriteRotation(-adapter.getTokenRotation(token))
-        .scaleToObject(1, { considerTokenScale: true })
-        .atLocation(token)
-        .attachTo(token, { bindAlpha: false })
-        .loopProperty('spriteContainer', 'position.y', { from: 0, to: -0.01, duration: 150, gridUnits: true, pingPong: true, ease: "easeOutQuad" })
-        .loopProperty('sprite', "width", { from: 0, to: 0.015, duration: 150, gridUnits: true, pingPong: true, ease: "easeOutQuad" })
-        .loopProperty('sprite', "height", { from: 0, to: 0.015, duration: 150, gridUnits: true, pingPong: true, ease: "easeOutQuad" })
-        .mirrorY(token.document.texture.scaleX < 0)
-        .waitUntilFinished(-200)
+        .noise()
+        .waitUntilFinished(-200);
     laughEffect = (duration > 0) ? laughEffect.duration(duration) : laughEffect.persist();
-
-    laughEffect = laughEffect
-        .animation()
-        .on(token)
-        .opacity(1);
 
     return laughEffect;
 }

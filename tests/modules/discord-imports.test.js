@@ -955,6 +955,109 @@ test('flurryOfBlows uses Sequencer 4.3.0+ sequence.motion(token).moveBy() for fl
     assert.match(jsContent, /\.moveBy\(/, 'flurry-of-blows.js must use .moveBy()');
 });
 
+test('laugh uses Sequencer 4.3.0+ sequence.motion(token).noise() for laughing wobble/shake motion instead of copySprite and opacity(0) hiding', () => {
+    const tsModulePath = path.join(rootDir, 'src/animation/effects/emote/laugh.ts');
+    const jsMacroPath = path.join(rootDir, 'src/standalone-macros/laugh.js');
+
+    const tsContent = fs.readFileSync(tsModulePath, 'utf8');
+    const jsContent = fs.readFileSync(jsMacroPath, 'utf8');
+
+    assert.doesNotMatch(tsContent, /copySprite/, 'laugh.ts must not use copySprite');
+    assert.doesNotMatch(tsContent, /\.opacity\(0\)/, 'laugh.ts must not hide token with opacity(0)');
+    assert.match(tsContent, /\.motion\(/, 'laugh.ts must use .motion()');
+    assert.match(tsContent, /\.motion\(token\)/, 'laugh.ts must use .motion(token)');
+    assert.match(tsContent, /\.noise\(\)/, 'laugh.ts must use .noise()');
+
+    assert.doesNotMatch(jsContent, /copySprite/, 'laugh.js must not use copySprite');
+    assert.doesNotMatch(jsContent, /\.opacity\(0\)/, 'laugh.js must not hide token with opacity(0)');
+    assert.match(jsContent, /\.motion\(/, 'laugh.js must use .motion()');
+    assert.match(jsContent, /\.motion\(token\)/, 'laugh.js must use .motion(token)');
+    assert.match(jsContent, /\.noise\(\)/, 'laugh.js must use .noise()');
+});
+
+test('sneakAttack uses Sequencer 4.3.0+ sequence.motion(token).moveBy() for sneak attack lunging step instead of copySprite and opacity(0) hiding', () => {
+    const tsModulePath = path.join(rootDir, 'src/animation/effects/on-target/sneak-attack.ts');
+    const jsMacroPath = path.join(rootDir, 'src/standalone-macros/sneak-attack.js');
+
+    const tsContent = fs.readFileSync(tsModulePath, 'utf8');
+    const jsContent = fs.readFileSync(jsMacroPath, 'utf8');
+
+    assert.doesNotMatch(tsContent, /copySprite/, 'sneak-attack.ts must not use copySprite');
+    assert.doesNotMatch(tsContent, /\.opacity\(0\)/, 'sneak-attack.ts must not hide token with opacity(0)');
+    assert.match(tsContent, /\.motion\(/, 'sneak-attack.ts must use .motion()');
+    assert.match(tsContent, /\.motion\(token\)/, 'sneak-attack.ts must use .motion(token)');
+    assert.match(tsContent, /\.moveBy\(/, 'sneak-attack.ts must use .moveBy()');
+
+    assert.doesNotMatch(jsContent, /copySprite/, 'sneak-attack.js must not use copySprite');
+    assert.doesNotMatch(jsContent, /\.opacity\(0\)/, 'sneak-attack.js must not hide token with opacity(0)');
+    assert.match(jsContent, /\.motion\(/, 'sneak-attack.js must use .motion()');
+    assert.match(jsContent, /\.motion\(token\)/, 'sneak-attack.js must use .motion(token)');
+    assert.match(jsContent, /\.moveBy\(/, 'sneak-attack.js must use .moveBy()');
+});
+
+test('disintegrate uses Sequencer 4.3.0+ sequence.motion(target).scaleTo(0).fadeTo(0) for target dissolution shrink instead of copySprite and opacity(0) hiding', () => {
+    const tsModulePath = path.join(rootDir, 'src/animation/effects/target/disintegrate.ts');
+    const jsMacroPath = path.join(rootDir, 'src/standalone-macros/disintegrate.js');
+
+    const tsContent = fs.readFileSync(tsModulePath, 'utf8');
+    const jsContent = fs.readFileSync(jsMacroPath, 'utf8');
+
+    assert.doesNotMatch(tsContent, /copySprite/, 'disintegrate.ts must not use copySprite');
+    assert.doesNotMatch(tsContent, /\.opacity\(0\)/, 'disintegrate.ts must not hide token with opacity(0)');
+    assert.match(tsContent, /\.motion\(/, 'disintegrate.ts must use .motion()');
+    assert.match(tsContent, /\.motion\(target\)/, 'disintegrate.ts must use sequence.motion(target)');
+    assert.match(tsContent, /\.scaleTo\(0\)/, 'disintegrate.ts must use .scaleTo(0)');
+    assert.match(tsContent, /\.fadeTo\(0\)/, 'disintegrate.ts must use .fadeTo(0)');
+
+    assert.doesNotMatch(jsContent, /copySprite/, 'disintegrate.js must not use copySprite');
+    assert.doesNotMatch(jsContent, /\.opacity\(0\)/, 'disintegrate.js must not hide token with opacity(0)');
+    assert.match(jsContent, /\.motion\(/, 'disintegrate.js must use .motion()');
+    assert.match(jsContent, /\.motion\(target\)/, 'disintegrate.js must use sequence.motion(target)');
+    assert.match(jsContent, /\.scaleTo\(0\)/, 'disintegrate.js must use .scaleTo(0)');
+    assert.match(jsContent, /\.fadeTo\(0\)/, 'disintegrate.js must use .fadeTo(0)');
+});
+
+test('hitTheDirt uses Sequencer 4.3.0+ sequence.motion(token).rotateTo(90).moveBy() for dive prone tilt instead of copySprite and opacity(0) hiding', () => {
+    const tsModulePath = path.join(rootDir, 'src/animation/effects/template/hit-the-dirt.ts');
+    const jsMacroPath = path.join(rootDir, 'src/standalone-macros/hit-the-dirt.js');
+
+    const tsContent = fs.readFileSync(tsModulePath, 'utf8');
+    const jsContent = fs.readFileSync(jsMacroPath, 'utf8');
+
+    assert.doesNotMatch(tsContent, /\.opacity\(0\)/, 'hit-the-dirt.ts must not hide token with opacity(0)');
+    assert.match(tsContent, /\.motion\(/, 'hit-the-dirt.ts must use .motion()');
+    assert.match(tsContent, /sequence\.motion\(token\)/, 'hit-the-dirt.ts must use sequence.motion(token)');
+    assert.match(tsContent, /\.rotateTo\(90\)/, 'hit-the-dirt.ts must use .rotateTo(90)');
+    assert.match(tsContent, /\.moveBy\(/, 'hit-the-dirt.ts must use .moveBy()');
+
+    assert.doesNotMatch(jsContent, /\.opacity\(0\)/, 'hit-the-dirt.js must not hide token with opacity(0)');
+    assert.match(jsContent, /\.motion\(/, 'hit-the-dirt.js must use .motion()');
+    assert.match(jsContent, /sequence\.motion\(token\)/, 'hit-the-dirt.js must use sequence.motion(token)');
+    assert.match(jsContent, /\.rotateTo\(90\)/, 'hit-the-dirt.js must use .rotateTo(90)');
+    assert.match(jsContent, /\.moveBy\(/, 'hit-the-dirt.js must use .moveBy()');
+});
+
+test('gitTheDirt uses Sequencer 4.3.0+ sequence.motion(token).rotateTo(90).moveBy() for dive prone tilt instead of copySprite and opacity(0) hiding', () => {
+    const tsModulePath = path.join(rootDir, 'src/animation/effects/gunslinger/git-the-dirt.ts');
+    const jsMacroPath = path.join(rootDir, 'src/standalone-macros/git-the-dirt.js');
+
+    const tsContent = fs.readFileSync(tsModulePath, 'utf8');
+    const jsContent = fs.readFileSync(jsMacroPath, 'utf8');
+
+    assert.doesNotMatch(tsContent, /\.opacity\(0\)/, 'git-the-dirt.ts must not hide token with opacity(0)');
+    assert.match(tsContent, /\.motion\(/, 'git-the-dirt.ts must use .motion()');
+    assert.match(tsContent, /sequence\.motion\(token\)/, 'git-the-dirt.ts must use sequence.motion(token)');
+    assert.match(tsContent, /\.rotateTo\(90\)/, 'git-the-dirt.ts must use .rotateTo(90)');
+    assert.match(tsContent, /\.moveBy\(/, 'git-the-dirt.ts must use .moveBy()');
+
+    assert.doesNotMatch(jsContent, /\.opacity\(0\)/, 'git-the-dirt.js must not hide token with opacity(0)');
+    assert.match(jsContent, /\.motion\(/, 'git-the-dirt.js must use .motion()');
+    assert.match(jsContent, /sequence\.motion\(token\)/, 'git-the-dirt.js must use sequence.motion(token)');
+    assert.match(jsContent, /\.rotateTo\(90\)/, 'git-the-dirt.js must use .rotateTo(90)');
+    assert.match(jsContent, /\.moveBy\(/, 'git-the-dirt.js must use .moveBy()');
+});
+
+
 
 
 

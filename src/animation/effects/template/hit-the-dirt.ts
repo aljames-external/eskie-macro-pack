@@ -2,109 +2,94 @@ import { closest } from '../../../lib/filemanager.js';
 import { template as templatelib } from '../../../lib/templates.js';
 import { adapter } from '../../../adapters/index.js';
 import { applySound, DEFAULT_SOUND_CONFIG } from '../../utils/sound.js';
+import { settingsOverride } from '../../../lib/settings.js';
 
-//Last Updated: 4/30/2024
-//Author: EskieMoh#2969
+// Last Updated: 4/30/2024
+// Author: EskieMoh#2969
+// Modular Conversion & .motion() Update: bakanabaka
 
-const DEFAULT_CONFIG = {
+const DEFAULT_CONFIG: AnimationEffectConfig = {
     id: 'hitTheDirt',
     label: 'Hit the Dirt',
     sound: { ...DEFAULT_SOUND_CONFIG }
 };
 
-async function create(token: Token, config: any = {}, options: any = {}) {
-    if (options?.type === 'aefx') return;
-    const { id, template, sound } = adapter.mergeObject(DEFAULT_CONFIG, config);
+async function create(token: Token, config: AnimationEffectConfig = {}, options: Record<string, any> = {}) {
+    if (options?.type === 'aefx') return null;
+    config = settingsOverride(config);
+    const { template, sound } = adapter.mergeObject(DEFAULT_CONFIG, config);
 
     const cfg = {
         radius: 1,
         icon: 'icons/magic/control/silhouette-fall-slip-prone.webp',
         label: 'Hit The Dirt!'
     };
-    let [position, _] = await templatelib.getPosition(template, cfg);
-    if (!position || position.cancelled) { return; }
+    const [position] = await templatelib.getPosition(template, cfg);
+    if (!position || position.cancelled) return null;
 
-    const tokenRotation = adapter.getTokenRotation(token);
+    const sequence = new Sequence();
+    applySound(sequence, sound);
 
-    let seq = new Sequence();
-    applySound(seq, sound);
-    seq = seq
-        .animation()
+    // Launch dust puff
+    sequence.effect()
         .delay(100)
-        .on(token)
-        .opacity(0)
-
-        .effect()
-        .delay(100)
-        .file(closest("eskie.smoke.06.white"))
+        .file(closest('eskie.smoke.06.white'))
         .atLocation(token)
         .scaleToObject(1.1)
         .belowTokens()
         .playbackRate(1.5)
-        .opacity(0.5)
+        .opacity(0.5);
 
-        .effect()
+    // Dynamic motion shadow under diving token
+    sequence.effect()
         .copySprite(token)
-        .spriteRotation(-tokenRotation)
         .atLocation(token)
         .scaleToObject(0.85, { considerTokenScale: true })
-        .moveTowards(position, { delay: 100, rotate: false, ease: "easeOutQuint" })
+        .moveTowards(position, { delay: 100, rotate: false, ease: 'easeOutQuint' })
         .duration(1600)
         .belowTokens()
-        .filter("ColorMatrix", { saturate: -1, brightness: 0 })
-        .filter("Blur", { blurX: 5, blurY: 10 })
-        .opacity(0.5)
+        .filter('ColorMatrix', { saturate: -1, brightness: 0 })
+        .filter('Blur', { blurX: 5, blurY: 10 })
+        .opacity(0.5);
 
-        .effect()
+    // Target landing dirt impact puff
+    sequence.effect()
         .delay(900)
-        .file(closest("eskie.smoke.01.white"))
+        .file(closest('eskie.smoke.01.white'))
         .atLocation(position)
         .rotateTowards(token)
         .scaleToObject(1.5)
         .belowTokens()
         .spriteOffset({ x: -1.25 }, { gridUnits: true })
         .spriteRotation(-180)
-        .opacity(0.5)
+        .opacity(0.5);
 
-        // Animate the token jumping
-        .effect()
-        .copySprite(token)
-        .spriteRotation(-tokenRotation)
-        .atLocation(token)
-        .scaleToObject(1, { considerTokenScale: true })
-        .moveTowards(position, { delay: 100, rotate: false, ease: "easeOutQuint" })    // Horizontal Movement
-        .duration(1300)
-        .animateProperty('spriteContainer', 'position.y', { from: 0, to: -0.8, duration: 550, delay: 100, gridUnits: true, ease: "easeOutQuint" })
-        .animateProperty('spriteContainer', 'position.y', { from: 0, to: 0.8, duration: 550, delay: 650, gridUnits: true, ease: "easeOutQuad" })
-        .animateProperty('sprite', 'rotation', { from: 0, to: 90, duration: 500, delay: 100, ease: "easeOutCubic" })
-        .waitUntilFinished(-200)
+    // Dive prone tilt and movement using Sequencer 4.3.0+ sequence.motion(token).rotateTo(90).moveBy()
+    sequence.motion(token)
+        .rotateTo(90)
+        .moveBy(position, { delay: 100, ease: 'easeOutQuint' });
 
-        // Update the actual token
-        .animation()
-        .on(token)
-        .teleportTo(position, { relativeToCenter: true })
-        .rotate(tokenRotation + 90)
-        .opacity(1);
-    return seq;
+    return sequence;
 }
 
-async function play(token: Token, config: any = {}) {
+async function play(token: Token, config: AnimationEffectConfig = {}) {
     const seq = await create(token, config);
     if (seq) return seq.play();
+    return null;
 }
 
-function destroy(token: Token, config: any = {}) {
+function destroy(token: Token) {
     const tokenRotation = adapter.getTokenRotation(token);
-    let seq = new Sequence()
+    return new Sequence()
         .animation()
         .on(token)
         .rotate(tokenRotation - 90);
-    return seq;
 }
 
-async function stop(token: Token, config: any = {}) {
-    const seq = destroy(token, config);
+async function stop(token: Token) {
+    const seq = destroy(token);
     if (seq) return seq.play();
+    return null;
 }
 
 export const hitTheDirt = {
@@ -112,8 +97,8 @@ export const hitTheDirt = {
     play,
     destroy,
     stop,
-    default_config: DEFAULT_CONFIG,
+    default_config: DEFAULT_CONFIG
 };
 
-adapter.autorec.register("hitTheDirt", 'template', 'eskie.effect.hitTheDirt', DEFAULT_CONFIG, "0.0.1", "Hit the Dirt");
-adapter.autorec.register("hitTheDirt", 'effect', 'eskie.effect.hitTheDirt', DEFAULT_CONFIG, "0.0.1", "Hit the Dirt");
+adapter.autorec.register('hitTheDirt', 'template', 'eskie.effect.hitTheDirt', DEFAULT_CONFIG, '0.0.2', 'Hit the Dirt');
+adapter.autorec.register('hitTheDirt', 'effect', 'eskie.effect.hitTheDirt', DEFAULT_CONFIG, '0.0.2', 'Hit the Dirt');
