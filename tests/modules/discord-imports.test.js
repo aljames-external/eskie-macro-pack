@@ -1101,26 +1101,6 @@ test('hitTheDirt uses Sequencer 4.3.0+ sequence.motion(token).rotateTo(90).moveB
     assert.match(jsContent, /\.moveBy\(/, 'hit-the-dirt.js must use .moveBy()');
 });
 
-test('gitTheDirt uses Sequencer 4.3.0+ sequence.motion(token).rotateTo(90).moveBy() for dive prone tilt instead of copySprite and opacity(0) hiding', () => {
-    const tsModulePath = path.join(rootDir, 'src/animation/effects/gunslinger/git-the-dirt.ts');
-    const jsMacroPath = path.join(rootDir, 'src/standalone-macros/git-the-dirt.js');
-
-    const tsContent = fs.readFileSync(tsModulePath, 'utf8');
-    const jsContent = fs.readFileSync(jsMacroPath, 'utf8');
-
-    assert.doesNotMatch(tsContent, /\.opacity\(0\)/, 'git-the-dirt.ts must not hide token with opacity(0)');
-    assert.match(tsContent, /\.motion\(/, 'git-the-dirt.ts must use .motion()');
-    assert.match(tsContent, /sequence\.motion\(token\)/, 'git-the-dirt.ts must use sequence.motion(token)');
-    assert.match(tsContent, /\.rotateTo\(90\)/, 'git-the-dirt.ts must use .rotateTo(90)');
-    assert.match(tsContent, /\.moveBy\(/, 'git-the-dirt.ts must use .moveBy()');
-
-    assert.doesNotMatch(jsContent, /\.opacity\(0\)/, 'git-the-dirt.js must not hide token with opacity(0)');
-    assert.match(jsContent, /\.motion\(/, 'git-the-dirt.js must use .motion()');
-    assert.match(jsContent, /sequence\.motion\(token\)/, 'git-the-dirt.js must use sequence.motion(token)');
-    assert.match(jsContent, /\.rotateTo\(90\)/, 'git-the-dirt.js must use .rotateTo(90)');
-    assert.match(jsContent, /\.moveBy\(/, 'git-the-dirt.js must use .moveBy()');
-});
-
 test('petrifyingGaze uses Sequencer 4.3.0+ sequence.motion().noise() for petrification stone shudder instead of copySprite and opacity(0) hiding', () => {
     const tsModulePath = path.join(rootDir, 'src/animation/effects/multi-token/petrifying-gaze.ts');
     const jsMacroPath = path.join(rootDir, 'src/standalone-macros/petrifying-gaze.js');

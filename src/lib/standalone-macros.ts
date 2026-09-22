@@ -74,7 +74,6 @@ export const KNOWN_STANDALONE_MACROS = [
     'frightful-moan.js',
     'gate.js',
     'ghost-walk.js',
-    'git-the-dirt.js',
     'goodberry-use.js',
     'goodberry.js',
     'grapple.js',
