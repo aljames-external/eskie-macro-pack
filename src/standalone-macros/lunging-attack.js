@@ -69,8 +69,9 @@ sequence.effect()
     .duration(1500);
 
 // Battlemaster lunging attack motion toward target via Sequencer 4.3.0+ sequence.motion(token)
+const angle = Math.atan2(tgt.y - src.y, tgt.x - src.x) * (180 / Math.PI) + 90;
 sequence.motion(token)
-    .rotateTowards(target)
+    .rotateTo(angle)
     .moveTo(targetSquare, {
         duration: 1500,
         ease: "easeOutCubic"
