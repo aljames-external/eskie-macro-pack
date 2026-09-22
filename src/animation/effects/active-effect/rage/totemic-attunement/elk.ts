@@ -52,7 +52,7 @@ function proneCreate(token: Token, target: Token, config: any = {}) {
             .filter('ColorMatrix', { saturate: 1 })
 
         .motion(target)
-            .rotateTo(targetRotation + 90)
+            .rotateTo(targetRotation + 90, { duration: 300 })
             .moveBy(pushOffset, { duration: 500, ease: 'easeOutCubic' })
 
         .effect()

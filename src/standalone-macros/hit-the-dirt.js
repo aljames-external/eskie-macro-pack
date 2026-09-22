@@ -97,9 +97,9 @@ sequence.effect()
     .spriteRotation(-180)
     .opacity(0.5);
 
-// Dive prone tilt and movement using Sequencer 4.3.0+ sequence.motion(token).rotateTo(90).moveBy()
+// Dive prone tilt and movement using Sequencer 4.3.0+ sequence.motion(token).rotateTo(90, { duration: 300 }).moveBy()
 sequence.motion(token)
-    .rotateTo(90)
+    .rotateTo(90, { duration: 300 })
     .moveBy(position, { delay: 100, ease: 'easeOutQuint' });
 
 // Persistent tracking effect for staying low evasive cover state & macro toggle support

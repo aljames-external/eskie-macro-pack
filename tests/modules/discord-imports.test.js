@@ -1091,13 +1091,13 @@ test('hitTheDirt uses Sequencer 4.3.0+ sequence.motion(token).rotateTo(90).moveB
     assert.doesNotMatch(tsContent, /\.opacity\(0\)/, 'hit-the-dirt.ts must not hide token with opacity(0)');
     assert.match(tsContent, /\.motion\(/, 'hit-the-dirt.ts must use .motion()');
     assert.match(tsContent, /sequence\.motion\(token\)/, 'hit-the-dirt.ts must use sequence.motion(token)');
-    assert.match(tsContent, /\.rotateTo\(90\)/, 'hit-the-dirt.ts must use .rotateTo(90)');
+    assert.match(tsContent, /\.rotateTo\(90/, 'hit-the-dirt.ts must use .rotateTo(90)');
     assert.match(tsContent, /\.moveBy\(/, 'hit-the-dirt.ts must use .moveBy()');
 
     assert.doesNotMatch(jsContent, /\.opacity\(0\)/, 'hit-the-dirt.js must not hide token with opacity(0)');
     assert.match(jsContent, /\.motion\(/, 'hit-the-dirt.js must use .motion()');
     assert.match(jsContent, /sequence\.motion\(token\)/, 'hit-the-dirt.js must use sequence.motion(token)');
-    assert.match(jsContent, /\.rotateTo\(90\)/, 'hit-the-dirt.js must use .rotateTo(90)');
+    assert.match(jsContent, /\.rotateTo\(90/, 'hit-the-dirt.js must use .rotateTo(90)');
     assert.match(jsContent, /\.moveBy\(/, 'hit-the-dirt.js must use .moveBy()');
 });
 

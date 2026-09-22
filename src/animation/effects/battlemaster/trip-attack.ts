@@ -63,7 +63,7 @@ async function create(token: Token, target: Token, config: Record<string, any> =
             .animateProperty('spriteContainer', 'position.y', { from: 0, to: -0.5, duration: 500, ease: 'easeOutCubic', gridUnits: true })
 
         .motion(target)
-            .rotateTo(90)
+            .rotateTo(90, { duration: 300 })
 
         .effect()
             .file(closest('eskie.smoke.03.white'))

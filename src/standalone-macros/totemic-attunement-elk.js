@@ -75,7 +75,7 @@ if (target) {
 
     // Target elk charge knockback push and prone rotation tilt using Sequencer 4.3.0+ sequence.motion(target).moveBy()
     seq.motion(target)
-        .rotateTo(targetRotation + 90)
+        .rotateTo(targetRotation + 90, { duration: 300 })
         .moveBy(pushOffset, { duration: 500, ease: "easeOutCubic" });
 
     seq.effect()

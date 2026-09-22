@@ -64,9 +64,9 @@ async function create(token: Token, config: AnimationEffectConfig = {}, options:
         .spriteRotation(-180)
         .opacity(0.5);
 
-    // Dive prone tilt and movement using Sequencer 4.3.0+ sequence.motion(token).rotateTo(90).moveBy()
+    // Dive prone tilt and movement using Sequencer 4.3.0+ sequence.motion(token).rotateTo(90, { duration: 300 }).moveBy()
     sequence.motion(token)
-        .rotateTo(90)
+        .rotateTo(90, { duration: 300 })
         .moveBy(position, { delay: 100, ease: 'easeOutQuint' });
 
     return sequence;
@@ -82,7 +82,7 @@ function destroy(token: Token) {
     const tokenRotation = adapter.getTokenRotation(token);
     return new Sequence()
         .motion(token)
-        .rotateTo(tokenRotation - 90);
+        .rotateTo(tokenRotation - 90, { duration: 300 });
 }
 
 async function stop(token: Token) {
