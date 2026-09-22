@@ -13,7 +13,7 @@ const DEFAULT_CONFIG = {
     sound: { ...DEFAULT_SOUND_CONFIG },
 };
 
-async function create(token: Token, config: any = {}) {
+async function create(token: Token, config: Record<string, any> = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id, changeLight, color, padding, sound } = mConfig;
 
@@ -21,10 +21,6 @@ async function create(token: Token, config: any = {}) {
 
     const seq = new Sequence();
     applySound(seq, sound);
-
-    seq.animation()
-        .on(token)
-        .opacity(0);
 
     if (changeLight) {
         seq.thenDo(async () => {
@@ -63,23 +59,12 @@ async function create(token: Token, config: any = {}) {
         .duration(5000)
         .persist();
 
-    // Ghost copy floating with subtle sway
-    seq.effect()
-        .delay(250)
+    // Incorporeal spirit hover motion via Sequencer 4.3.0+ .motion() API
+    seq.motion(token)
         .name(label)
-        .copySprite(token)
-        .spriteRotation(-token.document.rotation)
-        .attachTo(token, { bindAlpha: false })
-        .scaleToObject(1, { considerTokenScale: true })
-        .opacity(0.65)
-        .tint(color)
-        .loopProperty('sprite', 'position.x', { from: 0, to: 0.025, duration: 5000, gridUnits: true, pingPong: true, ease: 'easeOutSine', delay: 3000 })
-        .loopProperty('sprite', 'position.x', { from: 0, to: -0.025, duration: 5000, gridUnits: true, pingPong: true, ease: 'easeInSine', delay: 3000 })
-        .loopProperty('sprite', 'position.y', { from: 0, to: -0.03, duration: 2500, gridUnits: true, pingPong: true, delay: 3000 })
-        .filter('ColorMatrix', { saturate: -0.2, brightness: 1.2 })
-        .filter('Blur', { blurX: 0, blurY: 0.8 })
-        .fadeIn(1500, { ease: 'easeInSine' })
-        .fadeOut(1000)
+        .fadeTo(0.65)
+        .tintTo(color)
+        .oscillate()
         .persist();
 
     // Smoke particle burst
@@ -94,12 +79,12 @@ async function create(token: Token, config: any = {}) {
     return seq;
 }
 
-async function play(token: Token, config: any = {}) {
+async function play(token: Token, config: Record<string, any> = {}) {
     const seq = await create(token, config);
     if (seq) return seq.play();
 }
 
-async function stop(token: Token, config: any = {}) {
+async function stop(token: Token, config: Record<string, any> = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id, changeLight } = mConfig;
     const label = `${id} - ${token.id}`;
@@ -108,7 +93,11 @@ async function stop(token: Token, config: any = {}) {
         await token.document.update({ light: { dim: 0, bright: 0 } });
     }
 
-    await new Sequence().animation().on(token).opacity(1).show(true).play();
+    await new Sequence()
+        .motion(token)
+        .fadeTo(1)
+        .tintTo('#FFFFFF')
+        .play();
     await Sequencer.EffectManager.endEffects({ name: label, object: token });
 }
 
@@ -119,6 +108,6 @@ export const ghostWalk = {
     default_config: DEFAULT_CONFIG
 };
 
-adapter.autorec.register('ghostWalk', 'token', 'eskie.effect.ghostWalk', DEFAULT_CONFIG, '0.0.1', 'Ghost Walk');
-adapter.autorec.register('ghostWalk', 'effect', 'eskie.effect.ghostWalk', DEFAULT_CONFIG, '0.0.1', 'Ghost Walk');
+adapter.autorec.register('ghostWalk', 'token', 'eskie.effect.ghostWalk', DEFAULT_CONFIG, '0.0.2', 'Ghost Walk');
+adapter.autorec.register('ghostWalk', 'effect', 'eskie.effect.ghostWalk', DEFAULT_CONFIG, '0.0.2', 'Ghost Walk');
 

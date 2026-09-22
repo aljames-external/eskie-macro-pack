@@ -14,13 +14,14 @@ if (isPlaying) {
     if (changeLight) {
         await token.document.update({ light: { dim: 0, bright: 0 } });
     }
-    await new Sequence().animation().on(token).opacity(1).show(true).play();
+    await new Sequence()
+        .motion(token)
+        .fadeTo(1)
+        .tintTo('#FFFFFF')
+        .play();
     await Sequencer.EffectManager.endEffects({ name: ghostEffectName, object: token });
 } else {
     new Sequence()
-        .animation()
-        .on(token)
-        .opacity(0)
         .thenDo(async () => {
             if (changeLight) {
                 const light = {
@@ -51,22 +52,11 @@ if (isPlaying) {
         .fadeOut(1500)
         .duration(5000)
         .persist()
-        .effect()
-        .delay(250)
+        .motion(token)
         .name(ghostEffectName)
-        .copySprite(token)
-        .spriteRotation(-token.document.rotation)
-        .attachTo(token, { bindAlpha: false })
-        .scaleToObject(1, { considerTokenScale: true })
-        .opacity(0.65)
-        .tint(color)
-        .loopProperty('sprite', 'position.x', { from: 0, to: 0.025, duration: 5000, gridUnits: true, pingPong: true, ease: 'easeOutSine', delay: 3000 })
-        .loopProperty('sprite', 'position.x', { from: 0, to: -0.025, duration: 5000, gridUnits: true, pingPong: true, ease: 'easeInSine', delay: 3000 })
-        .loopProperty('sprite', 'position.y', { from: 0, to: -0.03, duration: 2500, gridUnits: true, pingPong: true, delay: 3000 })
-        .filter('ColorMatrix', { saturate: -0.2, brightness: 1.2 })
-        .filter('Blur', { blurX: 0, blurY: 0.8 })
-        .fadeIn(1500, { ease: 'easeInSine' })
-        .fadeOut(1000)
+        .fadeTo(0.65)
+        .tintTo(color)
+        .oscillate()
         .persist()
         .effect()
         .file(closest('jb2a.smoke.puff.centered.grey'))

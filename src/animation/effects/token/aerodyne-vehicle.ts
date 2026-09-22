@@ -1,5 +1,5 @@
 // Original Author: EskieMoh#2969
-// Modular Conversion: bakanabaka
+// Modular Conversion & Sequencer 4.3.0+ .motion() Update: bakanabaka
 
 import { closest } from '../../../lib/filemanager.js';
 
@@ -33,37 +33,23 @@ async function create(token: Token, config: any = {}) {
         .loopProperty('sprite', 'scale.y', { from: 1, to: 1.5, duration: 900 })
         .belowTokens()
 
-        .animation()
-        .on(token)
-        .opacity(0)
-
-        .effect()
-        .copySprite(token)
-        .spriteRotation(-tokenRotation)
+        .motion(token)
         .name(EFFECT_NAME)
-        .atLocation(token, { offset: { x: 0, y: -0.2 }, gridUnits: true })
-        .size({ width: w, height: h })
-        .opacity(1)
-        .animateProperty('spriteContainer', 'position.y', { from: 20, to: 0, duration: 500 })
-        .loopProperty('spriteContainer', 'position.y', { from: 0, to: -20, duration: 2500, pingPong: true, delay: 500 })
-        .attachTo(token, { gridUnits: true, bindRotation: true, bindAlpha: false })
-        .animateProperty('sprite', 'rotation', { from: 0, to: 0, duration: 0 })
-        .aboveLighting()
-        .zIndex(2)
+        .moveTo({ y: -0.2 }, { gridUnits: true })
+        .oscillate()
         .persist()
 
         .effect()
         .copySprite(token)
         .spriteRotation(-tokenRotation)
         .name(EFFECT_NAME)
-        .atLocation(token)
+        .atLocation(token, { ignoreMotion: true })
         .size({ width: w, height: h })
         .duration(1000)
         .opacity(0.5)
         .filter('ColorMatrix', { brightness: -1 })
         .filter('Blur', { blurX: 5, blurY: 10 })
-        .attachTo(token, { offset: { x: 0, y: 0.25 }, gridUnits: true, bindRotation: true, bindAlpha: false })
-        .animateProperty('sprite', 'rotation', { from: 0, to: 0, duration: 0 })
+        .attachTo(token, { offset: { x: 0, y: 0.25 }, gridUnits: true, bindRotation: true, bindAlpha: false, ignoreMotion: true })
         .zIndex(0)
         .persist()
 
@@ -78,7 +64,6 @@ async function create(token: Token, config: any = {}) {
         .filter('Blur', { blurX: 10, blurY: 10 })
         .persist()
         .playbackRate(5)
-        .loopProperty('spriteContainer', 'position.y', { from: 0, to: -20, duration: 2500, pingPong: true, delay: 500 })
         .spriteRotation(tokenRotation)
         .zIndex(0)
 
@@ -92,7 +77,6 @@ async function create(token: Token, config: any = {}) {
         .filter('Blur', { blurX: 10, blurY: 10 })
         .persist()
         .playbackRate(5)
-        .loopProperty('spriteContainer', 'position.y', { from: 0, to: -20, duration: 2500, pingPong: true, delay: 500 })
         .spriteRotation(tokenRotation)
         .zIndex(0)
 
@@ -106,7 +90,6 @@ async function create(token: Token, config: any = {}) {
         .filter('Blur', { blurX: 10, blurY: 10 })
         .persist()
         .playbackRate(5)
-        .loopProperty('spriteContainer', 'position.y', { from: 0, to: -20, duration: 2500, pingPong: true, delay: 500 })
         .spriteRotation(tokenRotation)
         .zIndex(0)
 
@@ -120,7 +103,6 @@ async function create(token: Token, config: any = {}) {
         .filter('Blur', { blurX: 10, blurY: 10 })
         .persist()
         .playbackRate(5)
-        .loopProperty('spriteContainer', 'position.y', { from: 0, to: -20, duration: 2500, pingPong: true, delay: 500 })
         .spriteRotation(tokenRotation)
         .zIndex(0);
 
@@ -133,13 +115,11 @@ async function play(token: Token, config: any = {}) {
 }
 
 async function stop(token: Token, config: any = {}) {
-    await Tagger.removeTags(token, FLYING_TAG);
+    if (game.modules.get('tagger')?.active) {
+        await Tagger.removeTags(token, FLYING_TAG);
+    }
     await Sequencer.EffectManager.endEffects({ name: EFFECT_NAME, object: token });
     return new Sequence()
-        .animation()
-        .on(token)
-        .opacity(1)
-
         .effect()
         .file(closest('eskie.smoke.07.white'))
         .atLocation(token)
@@ -159,3 +139,4 @@ export const aerodyneVehicle = {
     stop,
     default_config: DEFAULT_CONFIG,
 };
+

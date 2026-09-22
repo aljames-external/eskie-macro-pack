@@ -1,10 +1,11 @@
 // Original Author: EskieMoh#2969
-// Modular Conversion: bakanabaka
+// Modular Conversion & Sequencer 4.3.0+ .motion() Update: bakanabaka
 
 import { closest } from "../../../../lib/filemanager.js";
 
 import { adapter } from "../../../../adapters/index.js";
 import { applySound, DEFAULT_SOUND_CONFIG } from "../../../utils/sound.js";
+
 const DEFAULT_CONFIG = {
     id: 'eskie.effect.incorporeal.main',
     color: 'teal',
@@ -30,10 +31,6 @@ async function create(token: Token, config: any = {}) {
     let seq = new Sequence();
     applySound(seq, sound);
 
-    seq.animation()
-        .on(token)
-        .opacity(0);
-
     if (changeLight) {
         seq.thenDo(function () {
             const light = { dim: 0, bright: 1, alpha: 0.25, luminosity: 0.55, color: tintColor, animation: { type: "torch", speed: 4, intensity: 5 }, attenuation: 0.85, contrast: 0, shadows: 0 };
@@ -54,21 +51,12 @@ async function create(token: Token, config: any = {}) {
         .filter("ColorMatrix", { saturate: -0.2, brightness: 1.2 })
         .persist();
 
-    seq.effect()
+    seq.motion(token)
         .name(`${id} - ${token.document.uuid}`)
-        .copySprite(token)
-        .spriteRotation(-token.document.rotation)
-        .attachTo(token, { bindAlpha: false })
-        .scaleToObject(1, { considerTokenScale: true })
-        .opacity(0.65)
-        .tint(tintColor)
-        .loopProperty("alphaFilter", "alpha", { from: 0.75, to: 1, duration: 1500, pingPong: true, ease: "easeOutSine" })
-        .loopProperty('spriteContainer', 'position.x', { from: 0.025, to: -0.025, duration: 5000, gridUnits: true, pingPong: true, ease: "easeOutSine" })
-        .loopProperty('spriteContainer', 'position.y', { from: 0, to: -0.03, duration: 2500, gridUnits: true, pingPong: true })
-        .persist()
-        .filter("Glow", { color: tintColor, distance: 5, outerStrength: 4, innerStrength: 0 })
-        .filter("ColorMatrix", { saturate: -0.2, brightness: 1.2 })
-        .filter("Blur", { blurX: 0, blurY: 0.8 });
+        .oscillate()
+        .fadeTo(0.5)
+        .tintTo(tintColor)
+        .persist();
 
     seq.effect()
         .file(closest("jb2a.smoke.puff.centered.grey"))
@@ -96,11 +84,6 @@ async function stop(token: Token, config: any = {}) {
 }
 
 async function clean(token: Token, config: any = {}) {
-    new Sequence()
-        .animation()
-            .on(token)
-            .opacity(1)
-            .play();
     return stop(token, config);
 }
 
@@ -111,3 +94,4 @@ export const incorporeal = {
     stop,
     default_config: DEFAULT_CONFIG,
 };
+

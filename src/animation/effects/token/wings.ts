@@ -29,59 +29,46 @@ const DEFAULT_CONFIG = {
  */
 async function createWings(token: Token, config: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
-    const { id, image, offset, hue, wingSize, speedMulti, swayMulti, mirrorX, mirrorY, sound } = mConfig;
+    const { id, image, offset, hue, wingSize, speedMulti, mirrorX, mirrorY, sound } = mConfig;
+    const label = `${id} - ${token.id}`;
 
     const sequence = new Sequence();
     applySound(sequence, sound);
 
-    sequence
-        .animation()
-        .on(token)
-        .opacity(0)
+    // Flying token hover motion via Sequencer 4.3.0+ .motion() API
+    sequence.motion(token)
+        .name(label)
+        .moveTo({ y: -0.5 }, { gridUnits: true })
+        .oscillate()
+        .persist();
 
-        .effect()
-        .name(`${id} - ${token.id}`) // Unique name for stopping
+    // Ground drop shadow beneath token
+    sequence.effect()
+        .name(label)
         .copySprite(token)
-        .rotate(token.document.rotation)
-        .spriteRotation(token.document.rotation)
-        .attachTo(token, { bindAlpha: false })
+        .spriteRotation(-token.document.rotation)
+        .atLocation(token, { ignoreMotion: true })
         .scaleToObject(0.8, { considerTokenScale: true })
         .zIndex(0.1)
         .persist()
         .belowTokens()
-        .filter("ColorMatrix", { brightness: 0 })
+        .filter("ColorMatrix", { brightness: -1 })
         .filter("Blur", { blurX: 5, blurY: 10 })
         .opacity(0.65)
+        .attachTo(token, { bindAlpha: false, ignoreMotion: true });
 
-        .effect()
-        .name(`${id} - ${token.id}`) // Unique name for stopping
-        .copySprite(token)
-        .rotate(token.document.rotation)
-        .spriteRotation(token.document.rotation)
-        .attachTo(token, { offset: { y: -0.5 - (0.1 * swayMulti) }, gridUnits: true, bindAlpha: false })
-        .scaleToObject(1, { considerTokenScale: true })
-        .zIndex(0.1)
-        .persist()
-        .animateProperty('spriteContainer', 'position.y', { from: 0.5 + (0.1 * swayMulti), to: -0, duration: 1000, gridUnits: true, ease: "easeOutBack" })
-        .loopProperty('spriteContainer', 'position.y', { values: [0.075 * swayMulti, 0.1 * swayMulti, 0.025 * swayMulti, 0, 0.025 * swayMulti, 0.05 * swayMulti], duration: (3000 / speedMulti) / 6, gridUnits: true, ease: "linear", pingPong: true })
-
-        .effect()
-        .name(`${id} - ${token.id}`) // Unique name for stopping
+    // Wings attachment on token
+    sequence.effect()
+        .name(label)
         .file(closest(image))
         .mirrorX(mirrorX)
         .mirrorY(mirrorY)
-        .attachTo(token, { offset: { y: offset.y - 0.5 - (0.1 * swayMulti), x: offset.x }, gridUnits: true, bindAlpha: false })
+        .attachTo(token, { offset: { y: offset.y, x: offset.x }, gridUnits: true, bindAlpha: false })
         .scaleToObject(3 * wingSize)
-        .persist()
-        .animateProperty('spriteContainer', 'position.y', { from: 0.5 + (0.1 * swayMulti), to: -0, duration: 1000, gridUnits: true, ease: "easeOutBack" })
-        .loopProperty('spriteContainer', 'position.y', { values: [0.075 * swayMulti, 0.1 * swayMulti, 0.025 * swayMulti, 0, 0.025 * swayMulti, 0.05 * swayMulti], duration: (3000 / speedMulti) / 6, gridUnits: true, ease: "linear", pingPong: true })
+        .zIndex(0.15)
         .playbackRate(speedMulti)
         .filter("ColorMatrix", { hue: hue })
-        .waitUntilFinished()
-
-        .animation()
-        .on(token)
-        .opacity(1);
+        .persist();
 
     return sequence;
 }
@@ -96,7 +83,7 @@ async function createWings(token: Token, config: any = {}) {
  */
 async function playWings(token: Token, config: any = {}) {
     const sequence = await createWings(token, config);
-    if (sequence) { sequence.play(); }
+    if (sequence) { return sequence.play(); }
 }
 
 /**
@@ -108,8 +95,9 @@ async function playWings(token: Token, config: any = {}) {
 function stopWings(token: Token, config: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id } = mConfig;
+    const label = `${id} - ${token.id}`;
 
-    Sequencer.EffectManager.endEffects({ name: `${id} - ${token.id}` });
+    return Sequencer.EffectManager.endEffects({ name: label, object: token });
 }
 
 export const wings = {

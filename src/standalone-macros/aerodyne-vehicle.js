@@ -1,6 +1,6 @@
 // Standalone Macro: Aerodyne Vehicle / Hover Jet Thrusters
 // Original Author: EskieMoh#2969
-// Modular Conversion: bakanabaka
+// Modular Conversion & Sequencer 4.3.0+ .motion() Update: bakanabaka
 
 if (!game.modules.get("sequencer")?.active) {
     return ui.notifications.error("The 'Aerodyne Vehicle' macro requires the 'Sequencer' module to be installed and active!");
@@ -22,9 +22,6 @@ if (activeEffects.length > 0) {
     await Sequencer.EffectManager.endEffects({ name: effectName, object: token });
     await Sequencer.EffectManager.endEffects({ name: effectName });
     await new Sequence()
-        .animation()
-        .on(token)
-        .opacity(1)
         .effect()
         .file(closest("eskie.smoke.07.white"))
         .atLocation(token)
@@ -54,37 +51,23 @@ const seq = new Sequence()
     .loopProperty("sprite", "scale.y", { from: 1, to: 1.5, duration: 900 })
     .belowTokens()
 
-    .animation()
-    .on(token)
-    .opacity(0)
-
-    .effect()
-    .copySprite(token)
-    .spriteRotation(-tokenRotation)
+    .motion(token)
     .name(effectName)
-    .atLocation(token, { offset: { x: 0, y: -0.2 }, gridUnits: true })
-    .size({ width: w, height: h })
-    .opacity(1)
-    .animateProperty("spriteContainer", "position.y", { from: 20, to: 0, duration: 500 })
-    .loopProperty("spriteContainer", "position.y", { from: 0, to: -20, duration: 2500, pingPong: true, delay: 500 })
-    .attachTo(token, { gridUnits: true, bindRotation: true, bindAlpha: false })
-    .animateProperty("sprite", "rotation", { from: 0, to: 0, duration: 0 })
-    .aboveLighting()
-    .zIndex(2)
+    .moveTo({ y: -0.2 }, { gridUnits: true })
+    .oscillate()
     .persist()
 
     .effect()
     .copySprite(token)
     .spriteRotation(-tokenRotation)
     .name(effectName)
-    .atLocation(token)
+    .atLocation(token, { ignoreMotion: true })
     .size({ width: w, height: h })
     .duration(1000)
     .opacity(0.5)
     .filter("ColorMatrix", { brightness: -1 })
     .filter("Blur", { blurX: 5, blurY: 10 })
-    .attachTo(token, { offset: { x: 0, y: 0.25 }, gridUnits: true, bindRotation: true, bindAlpha: false })
-    .animateProperty("sprite", "rotation", { from: 0, to: 0, duration: 0 })
+    .attachTo(token, { offset: { x: 0, y: 0.25 }, gridUnits: true, bindRotation: true, bindAlpha: false, ignoreMotion: true })
     .zIndex(0)
     .persist();
 
@@ -106,9 +89,9 @@ for (const offset of thrusterOffsets) {
         .filter("Blur", { blurX: 10, blurY: 10 })
         .persist()
         .playbackRate(5)
-        .loopProperty("spriteContainer", "position.y", { from: 0, to: -20, duration: 2500, pingPong: true, delay: 500 })
         .spriteRotation(tokenRotation)
         .zIndex(0);
 }
 
 await seq.play();
+

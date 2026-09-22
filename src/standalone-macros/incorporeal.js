@@ -1,6 +1,6 @@
 // Standalone Macro: Incorporeal Form
 // Original Author: EskieMoh#2969
-// Modular Conversion: bakanabaka
+// Modular Conversion & Sequencer 4.3.0+ .motion() Update: bakanabaka
 
 if (!game.modules.get("sequencer")?.active) {
     return ui.notifications.error("The 'Incorporeal Form' macro requires the 'Sequencer' module to be installed and active!");
@@ -20,16 +20,10 @@ const activeEffects = Sequencer.EffectManager.getEffects({ name: id, object: tok
 if (activeEffects.length > 0) {
     await token.document.update({ light: { dim: 0, bright: 0 } });
     await Sequencer.EffectManager.endEffects({ name: id, object: token });
-    await new Sequence().animation().on(token).opacity(1).play();
     return ui.notifications.info(`Returned ${token.name} to material density.`);
 }
 
-const tokenRotation = token.document?.rotation ?? token.rotation ?? 0;
 const seq = new Sequence();
-
-seq.animation()
-    .on(token)
-    .opacity(0);
 
 seq.thenDo(function () {
     const light = {
@@ -59,21 +53,12 @@ seq.effect()
     .filter("ColorMatrix", { saturate: -0.2, brightness: 1.2 })
     .persist();
 
-seq.effect()
+seq.motion(token)
     .name(id)
-    .copySprite(token)
-    .spriteRotation(-tokenRotation)
-    .attachTo(token, { bindAlpha: false })
-    .scaleToObject(1, { considerTokenScale: true })
-    .opacity(0.65)
-    .tint(tintColor)
-    .loopProperty("alphaFilter", "alpha", { from: 0.75, to: 1, duration: 1500, pingPong: true, ease: "easeOutSine" })
-    .loopProperty("spriteContainer", "position.x", { from: 0.025, to: -0.025, duration: 5000, gridUnits: true, pingPong: true, ease: "easeOutSine" })
-    .loopProperty("spriteContainer", "position.y", { from: 0, to: -0.03, duration: 2500, gridUnits: true, pingPong: true })
-    .persist()
-    .filter("Glow", { color: tintColor, distance: 5, outerStrength: 4, innerStrength: 0 })
-    .filter("ColorMatrix", { saturate: -0.2, brightness: 1.2 })
-    .filter("Blur", { blurX: 0, blurY: 0.8 });
+    .oscillate()
+    .fadeTo(0.5)
+    .tintTo(tintColor)
+    .persist();
 
 seq.effect()
     .file(closest("jb2a.smoke.puff.centered.grey"))
@@ -84,3 +69,4 @@ seq.effect()
     .tint(tintColor);
 
 await seq.play();
+

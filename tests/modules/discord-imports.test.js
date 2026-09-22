@@ -709,6 +709,26 @@ test('fly uses Sequencer 4.3.0+ sequence.motion(token).moveTo({ y: -0.5 }, { gri
     assert.match(jsContent, /\.oscillate\(/, 'fly.js must use .oscillate()');
 });
 
+test('wings uses Sequencer 4.3.0+ sequence.motion(token).moveTo({ y: -0.5 }, { gridUnits: true }).oscillate().persist() hover motion', () => {
+    const tsModulePath = path.join(rootDir, 'src/animation/effects/token/wings.ts');
+    const jsMacroPath = path.join(rootDir, 'src/standalone-macros/wings.js');
+
+    const tsContent = fs.readFileSync(tsModulePath, 'utf8');
+    const jsContent = fs.readFileSync(jsMacroPath, 'utf8');
+
+    assert.doesNotMatch(tsContent, /\.opacity\(0\)/, 'wings.ts must not hide token with opacity(0)');
+    assert.doesNotMatch(tsContent, /copySprite.*scaleToObject\(1/, 'wings.ts must not use copySprite body');
+    assert.match(tsContent, /\.motion\(token\)/, 'wings.ts must use .motion(token)');
+    assert.match(tsContent, /\.moveTo\(/, 'wings.ts must use .moveTo()');
+    assert.match(tsContent, /\.oscillate\(/, 'wings.ts must use .oscillate()');
+
+    assert.doesNotMatch(jsContent, /\.opacity\(0\)/, 'wings.js must not hide token with opacity(0)');
+    assert.doesNotMatch(jsContent, /copySprite.*scaleToObject\(1/, 'wings.js must not use copySprite body');
+    assert.match(jsContent, /\.motion\(token\)/, 'wings.js must use .motion(token)');
+    assert.match(jsContent, /\.moveTo\(/, 'wings.js must use .moveTo()');
+    assert.match(jsContent, /\.oscillate\(/, 'wings.js must use .oscillate()');
+});
+
 test('banishment uses Sequencer 4.3.0+ sequence.motion(target).scaleTo(0).rotateBy(360) for target scaling/rotation instead of copySprite and opacity(0) hiding', () => {
     const tsModulePath = path.join(rootDir, 'src/animation/effects/active-effect/banishment.ts');
     const jsMacroPath = path.join(rootDir, 'src/standalone-macros/banishment.js');
@@ -770,4 +790,49 @@ test('hide uses Sequencer 4.3.0+ sequence.motion(token).fadeTo(0.25) for stealth
     assert.match(jsContent, /sequence\.motion\(token\)/, 'hide.js must use sequence.motion(token)');
     assert.match(jsContent, /\.fadeTo\(0\.25\)/, 'hide.js must use .fadeTo(0.25)');
 });
+
+test('incorporeal uses Sequencer 4.3.0+ sequence.motion(token).oscillate().fadeTo(0.5) for incorporeal spirit phase instead of copySprite and opacity(0) hiding', () => {
+    const tsModulePath = path.join(rootDir, 'src/animation/effects/token/incorporeal/incorporeal.ts');
+    const jsMacroPath = path.join(rootDir, 'src/standalone-macros/incorporeal.js');
+
+    const tsContent = fs.readFileSync(tsModulePath, 'utf8');
+    const jsContent = fs.readFileSync(jsMacroPath, 'utf8');
+
+    assert.doesNotMatch(tsContent, /copySprite/, 'incorporeal.ts must not use copySprite');
+    assert.doesNotMatch(tsContent, /\.opacity\(0\)/, 'incorporeal.ts must not hide token with opacity(0)');
+    assert.match(tsContent, /\.motion\(/, 'incorporeal.ts must use .motion()');
+    assert.match(tsContent, /seq\.motion\(token\)/, 'incorporeal.ts must use seq.motion(token)');
+    assert.match(tsContent, /\.oscillate\(\)/, 'incorporeal.ts must use .oscillate()');
+    assert.match(tsContent, /\.fadeTo\(0\.5\)/, 'incorporeal.ts must use .fadeTo(0.5)');
+
+    assert.doesNotMatch(jsContent, /copySprite/, 'incorporeal.js must not use copySprite');
+    assert.doesNotMatch(jsContent, /\.opacity\(0\)/, 'incorporeal.js must not hide token with opacity(0)');
+    assert.match(jsContent, /\.motion\(/, 'incorporeal.js must use .motion()');
+    assert.match(jsContent, /seq\.motion\(token\)/, 'incorporeal.js must use seq.motion(token)');
+    assert.match(jsContent, /\.oscillate\(\)/, 'incorporeal.js must use .oscillate()');
+    assert.match(jsContent, /\.fadeTo\(0\.5\)/, 'incorporeal.js must use .fadeTo(0.5)');
+});
+
+test('ghostWalk uses Sequencer 4.3.0+ sequence.motion(token).oscillate().fadeTo(0.65) for incorporeal spirit hover instead of copySprite and opacity(0) hiding', () => {
+    const tsModulePath = path.join(rootDir, 'src/animation/effects/token/ghost-walk.ts');
+    const jsMacroPath = path.join(rootDir, 'src/standalone-macros/ghost-walk.js');
+
+    const tsContent = fs.readFileSync(tsModulePath, 'utf8');
+    const jsContent = fs.readFileSync(jsMacroPath, 'utf8');
+
+    assert.doesNotMatch(tsContent, /copySprite/, 'ghost-walk.ts must not use copySprite');
+    assert.doesNotMatch(tsContent, /\.opacity\(0\)/, 'ghost-walk.ts must not hide token with opacity(0)');
+    assert.match(tsContent, /\.motion\(/, 'ghost-walk.ts must use .motion()');
+    assert.match(tsContent, /seq\.motion\(token\)/, 'ghost-walk.ts must use seq.motion(token)');
+    assert.match(tsContent, /\.oscillate\(\)/, 'ghost-walk.ts must use .oscillate()');
+    assert.match(tsContent, /\.fadeTo\(0\.65\)/, 'ghost-walk.ts must use .fadeTo(0.65)');
+
+    assert.doesNotMatch(jsContent, /copySprite/, 'ghost-walk.js must not use copySprite');
+    assert.doesNotMatch(jsContent, /\.opacity\(0\)/, 'ghost-walk.js must not hide token with opacity(0)');
+    assert.match(jsContent, /\.motion\(/, 'ghost-walk.js must use .motion()');
+    assert.match(jsContent, /\.motion\(token\)/, 'ghost-walk.js must use .motion(token)');
+    assert.match(jsContent, /\.oscillate\(\)/, 'ghost-walk.js must use .oscillate()');
+    assert.match(jsContent, /\.fadeTo\(0\.65\)/, 'ghost-walk.js must use .fadeTo(0.65)');
+});
+
 
