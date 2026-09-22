@@ -1,6 +1,6 @@
 // Standalone Macro: Leap
 // Original Author: EskieMoh#2969
-// Modular Conversion: bakanabaka
+// Modular Conversion & .motion() Update: bakanabaka
 
 if (!game.modules.get("sequencer")?.active) {
     return ui.notifications.error("The 'Leap' macro requires the 'Sequencer' module to be installed and active!");
@@ -12,19 +12,18 @@ if (!token) return ui.notifications.warn("Please select a token!");
 const closest = (path) => game.modules.get('eskie-macros')?.api?.util?.closest?.(path) ?? path;
 
 const id = "leap";
-const tokenId = token.id ?? token.document?.id ?? "";
+const tokenId = token.document.id;
 const label = `${id} - ${tokenId}`;
 
 // Toggle / re-entrant persistent effect handling
 const activeEffects = Sequencer.EffectManager.getEffects({ name: label, object: token }) ?? [];
 if (activeEffects.length > 0) {
     Sequencer.EffectManager.endEffects({ name: label, object: token });
-    await new Sequence().animation().on(token).opacity(1).play();
     return;
 }
 
-const tokenWidth = token.document?.width ?? token.width ?? 1;
-const tokenRotation = token.document?.rotation ?? token.rotation ?? 0;
+const tokenWidth = token.document.width;
+const tokenRotation = token.document.rotation;
 
 const crosshairConfig = {
     size: tokenWidth,
@@ -45,11 +44,6 @@ const upTime = jumpTime * 0.5;
 const downTime = jumpTime * 0.5;
 
 const sequence = new Sequence();
-
-// Hide original token during super-hero airborne jump
-sequence.animation()
-    .on(token)
-    .opacity(0);
 
 // --- 1. POWERFUL SUPERHERO JUMP TAKEOFF CRATER EXPLOSION ---
 sequence.effect()
@@ -102,20 +96,17 @@ sequence.effect()
     .animateProperty('sprite', 'height', { from: 0, to: 0.45, duration: downTime, delay: upTime, gridUnits: true, ease: "easeInCubic" })
     .zIndex(2);
 
-// --- 3. HIGH ARC AERIAL SPIN TRAJECTORY ---
-sequence.effect()
-    .name(label)
-    .copySprite(token)
-    .spriteRotation(-tokenRotation)
-    .atLocation(token)
-    .scaleToObject(1, { considerTokenScale: true })
-    .opacity(1)
-    .moveTowards(position, { ease: "linear", rotate: false })
-    .duration(jumpTime)
-    .animateProperty('spriteContainer', 'position.y', { from: 0, to: -2.8, duration: upTime, gridUnits: true, ease: "easeOutQuad" })
-    .animateProperty('spriteContainer', 'position.y', { from: 0, to: 2.8, duration: downTime, delay: upTime, gridUnits: true, ease: "easeInQuad" })
-    .animateProperty('sprite', 'rotation', { from: 0, to: 720, duration: jumpTime, ease: "easeInOutSine" })
-    .zIndex(5);
+// --- 3. HIGH ARC AERIAL SPIN TRAJECTORY VIA SEQUENCER 4.3.0+ .MOTION() ---
+sequence.animation()
+    .on(token)
+    .moveTowards(position, { rotate: false, ease: "linear" })
+    .motion({
+        arc: 0.8,
+        rotation: 720,
+        duration: jumpTime,
+        ease: "easeInOutSine"
+    })
+    .snapToGrid();
 
 sequence.effect()
     .file(closest("jb2a.wind_stream.white"))
@@ -130,17 +121,6 @@ sequence.effect()
     .zIndex(4);
 
 sequence.wait(jumpTime);
-
-// Teleport actual token to selected landing position
-sequence.animation()
-    .on(token)
-    .teleportTo(position)
-    .snapToGrid()
-    .waitUntilFinished();
-
-sequence.animation()
-    .on(token)
-    .opacity(1);
 
 // --- 4. THUNDEROUS GROUND POUNDING ARRIVAL SHOCKWAVE ---
 sequence.effect()

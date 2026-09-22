@@ -124,128 +124,22 @@ for (let e = 0; e < positions.length; e++) {
         .spriteOffset({ x: -3, y: -0.1 }, { gridUnits: true })
         .waitUntilFinished(-1900);
 
-    if (e === 0) {
-        stepSeq.animation()
-            .on(source)
-            .opacity(0)
-            .snapToGrid();
+    // Slash impact visual effect
+    stepSeq.effect()
+        .delay(e === 0 ? 100 : 0)
+        .file(closest('eskie.sound.roar.02'))
+        .scale(0.2)
+        .filter('Glow', { color: 0x29c9ff })
+        .spriteOffset({ x: 0.5, y: 0.5 }, { gridUnits: true })
+        .randomRotation()
+        .atLocation(e === 0 ? endPos : startPos);
 
-        stepSeq.effect()
-            .copySprite(source)
-            .spriteRotation(-source.document.rotation)
-            .name('Storm Dash Strikes')
-            .atLocation(source)
-            .moveTowards(endPos, { rotate: false, ease: 'easeOutCirc' })
-            .moveSpeed(1500)
-            .duration(400)
-            .fadeIn(400, { ease: 'easeInCirc' })
-            .fadeOut(400)
-            .opacity(0.5)
-            .scaleToObject(1, { considerTokenScale: true })
-            .filter('Blur', { blurX: 10, blurY: 5 })
-            .spriteOffset({ x: -0.05 }, { gridUnits: true })
-            .zIndex(0.1);
-
-        stepSeq.effect()
-            .delay(100)
-            .file(closest('eskie.sound.roar.02'))
-            .scale(0.2)
-            .filter('Glow', { color: 0x29c9ff })
-            .spriteOffset({ x: 0.5, y: 0.5 }, { gridUnits: true })
-            .randomRotation()
-            .atLocation(endPos);
-
-        stepSeq.effect()
-            .copySprite(source)
-            .spriteRotation(-source.document.rotation)
-            .name('Storm Dash Strikes')
-            .atLocation(source)
-            .moveTowards(endPos, { rotate: false, ease: 'easeOutCirc' })
-            .moveSpeed(1500)
-            .duration(400)
-            .fadeIn(400, { ease: 'easeInCirc' })
-            .fadeOut(0)
-            .scaleToObject(1, { considerTokenScale: true })
-            .waitUntilFinished(-500);
-
-        if (positions.length === 1) {
-            stepSeq.effect()
-                .delay(200)
-                .copySprite(source)
-                .spriteRotation(-source.document.rotation)
-                .scaleToObject(1, { considerTokenScale: true })
-                .atLocation(endPos)
-                .fadeOut(500, { ease: 'easeOutQuad' })
-                .duration(1000)
-                .opacity(1);
-
-            stepSeq.animation()
-                .delay(200)
-                .on(source)
-                .teleportTo(endPos)
-                .snapToGrid()
-                .opacity(1);
-        }
-    } else if (e === positions.length - 1) {
-        stepSeq.effect()
-            .file(closest('eskie.sound.roar.02'))
-            .scale(0.2)
-            .filter('Glow', { color: 0x29c9ff })
-            .atLocation(startPos)
-            .randomRotation()
-            .spriteOffset({ x: 0.5, y: 0.5 }, { gridUnits: true });
-
-        stepSeq.effect()
-            .copySprite(source)
-            .spriteRotation(-source.document.rotation)
-            .name('Storm Dash Strikes')
-            .atLocation(startPos)
-            .moveTowards(endPos, { rotate: false, ease: 'easeOutCirc' })
-            .moveSpeed(1500)
-            .duration(400)
-            .fadeIn(400, { ease: 'easeInCirc' })
-            .fadeOut(0)
-            .scaleToObject(1, { considerTokenScale: true })
-            .waitUntilFinished(-500);
-
-        stepSeq.effect()
-            .delay(200)
-            .copySprite(source)
-            .spriteRotation(-source.document.rotation)
-            .scaleToObject(1, { considerTokenScale: true })
-            .atLocation(endPos)
-            .fadeOut(500, { ease: 'easeOutQuad' })
-            .duration(1000)
-            .opacity(1);
-
-        stepSeq.animation()
-            .delay(200)
-            .on(source)
-            .teleportTo(endPos)
-            .snapToGrid()
-            .opacity(1);
-    } else {
-        stepSeq.effect()
-            .file(closest('eskie.sound.roar.02'))
-            .scale(0.2)
-            .filter('Glow', { color: 0x29c9ff })
-            .atLocation(startPos)
-            .randomRotation()
-            .spriteOffset({ x: 0.5, y: 0.5 }, { gridUnits: true });
-
-        stepSeq.effect()
-            .copySprite(source)
-            .spriteRotation(-source.document.rotation)
-            .name('Storm Dash Strikes')
-            .atLocation(startPos)
-            .moveTowards(endPos, { rotate: false, ease: 'easeOutCirc' })
-            .moveSpeed(1500)
-            .duration(400)
-            .fadeIn(400, { ease: 'easeInCirc' })
-            .fadeOut(0)
-            .scaleToObject(1, { considerTokenScale: true })
-            .waitUntilFinished(-500);
-    }
+    // Dash strike token motion via Sequencer 4.3.0+ .motion() API
+    stepSeq.motion(source)
+        .moveTo(endPos, { rotate: false, ease: 'easeOutCirc' })
+        .moveSpeed(1500)
+        .duration(400)
+        .waitUntilFinished(-500);
 
     sequence.addSequence(stepSeq);
 }

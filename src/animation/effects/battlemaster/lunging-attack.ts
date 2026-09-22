@@ -1,5 +1,5 @@
 // Original Author: .eskie
-// Modular Conversion: bakanabaka
+// Modular Conversion & .motion() Update: bakanabaka
 
 import { closest } from '../../../lib/filemanager.js';
 import { settingsOverride } from '../../../lib/settings.js';
@@ -15,12 +15,10 @@ const DEFAULT_CONFIG = {
     sound: { ...DEFAULT_SOUND_CONFIG },
 };
 
-function deg(rad: any) { return (rad * 180) / Math.PI; }
-
 async function create(token: Token, target: Token, config: any = {}) {
     config = settingsOverride(config);
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
-    const { type, weight, color, tint, sound } = mConfig;
+    const { type, weight, color, sound } = mConfig;
 
     if (!token || !target) return;
 
@@ -34,140 +32,59 @@ async function create(token: Token, target: Token, config: any = {}) {
     const src = adapter.getCenter(token);
     const tgt = adapter.getCenter(target);
 
-    const baseRad = Math.atan2(tgt.y - src.y, tgt.x - src.x);
-    const counterRot = deg(baseRad);
-
-    const dx = tgt.x - src.x;
-    let hop = -0.25;
-    let hopVert = 0;
-
-    if (dx === 0) {
-        hop = 0;
-        hopVert = -0.25;
-    } else if (dx < 0) {
-        hop = 0.25;
-        hopVert = 0;
-    } else {
-        hop = -0.25;
-        hopVert = 0;
-    }
-
     const tokenWidth = adapter.getTokenDimensions(token).widthUnits;
 
     const sequence = new Sequence();
     applySound(sequence, sound);
 
-    sequence
-        .animation()
-            .on(token)
-            .opacity(0)
-            .delay(100)
+    // Dynamic motion shadow under lunging token
+    sequence.effect()
+        .copySprite(token)
+        .attachTo(token)
+        .scaleToObject(0.9, { considerTokenScale: true })
+        .belowTokens()
+        .filter('ColorMatrix', { brightness: 0 })
+        .filter('Blur', { blurX: 5, blurY: 10 })
+        .opacity(0.65)
+        .fadeOut(500)
+        .duration(1500);
 
-        .effect()
-            .copySprite(token)
-            .attachTo(token, { bindAlpha: false })
-            .rotateTowards(target)
-            .scaleToObject(0.9, { considerTokenScale: true })
-            .animateProperty('spriteContainer', 'position.x', { from: 0, to: 0.5, duration: 500, ease: 'easeOutSine', gridUnits: true, delay: 250 })
-            .animateProperty('spriteContainer', 'position.x', { from: 0, to: -0.5, duration: 1000, ease: 'easeOutCubic', gridUnits: true, delay: 1000 })
-            .spriteOffset({ x: -0.5 }, { gridUnits: true })
-            .belowTokens()
-            .filter('ColorMatrix', { brightness: 0 })
-            .filter('Blur', { blurX: 5, blurY: 10 })
-            .opacity(0.65)
-            .fadeOut(500)
-            .duration(2100)
-            .spriteRotation(-counterRot)
+    // Battlemaster lunging attack motion toward target via Sequencer 4.3.0+ sequence.motion(token)
+    sequence.motion(token)
+        .rotateTowards(target)
+        .moveTo(targetSquare, {
+            duration: 1500,
+            ease: 'easeOutCubic'
+        });
 
-        .effect()
-            .copySprite(token)
-            .attachTo(token, { bindAlpha: false })
-            .rotateTowards(target)
-            .scaleToObject(1, { considerTokenScale: true })
-            .animateProperty('spriteContainer', 'position.x', { from: 0, to: 0.5, duration: 500, ease: 'easeOutSine', gridUnits: true, delay: 250 })
-            .animateProperty('spriteContainer', 'position.x', { from: 0, to: -0.5, duration: 1000, ease: 'easeOutCubic', gridUnits: true, delay: 1000 })
-            .animateProperty('spriteContainer', 'position.y', { from: 0, to: hop, duration: 250, ease: 'easeOutCubic', gridUnits: true, delay: 250 })
-            .animateProperty('spriteContainer', 'position.y', { from: 0, to: -hop, duration: 250, ease: 'easeOutCubic', gridUnits: true, delay: 500 })
-            .animateProperty('spriteContainer', 'position.x', { from: 0, to: hopVert, duration: 250, ease: 'easeOutCubic', gridUnits: true, delay: 250 })
-            .animateProperty('spriteContainer', 'position.x', { from: 0, to: -hopVert, duration: 250, ease: 'easeOutCubic', gridUnits: true, delay: 500 })
-            .spriteOffset({ x: -0.5 }, { gridUnits: true })
-            .duration(2100)
-            .spriteRotation(-counterRot)
-            .zIndex(1)
+    sequence.wait(400);
 
-        .effect()
-            .delay(50)
-            .copySprite(token)
-            .attachTo(token, { bindAlpha: false })
-            .rotateTowards(target)
-            .scaleToObject(1, { considerTokenScale: true })
-            .animateProperty('spriteContainer', 'position.x', { from: 0, to: 0.5, duration: 500, ease: 'easeOutSine', gridUnits: true, delay: 250 })
-            .animateProperty('spriteContainer', 'position.x', { from: 0, to: -0.5, duration: 1000, ease: 'easeOutCubic', gridUnits: true, delay: 1000 })
-            .animateProperty('spriteContainer', 'position.y', { from: 0, to: hop, duration: 250, ease: 'easeOutCubic', gridUnits: true, delay: 250 })
-            .animateProperty('spriteContainer', 'position.y', { from: 0, to: -hop, duration: 250, ease: 'easeOutCubic', gridUnits: true, delay: 500 })
-            .animateProperty('spriteContainer', 'position.x', { from: 0, to: hopVert, duration: 250, ease: 'easeOutCubic', gridUnits: true, delay: 250 })
-            .animateProperty('spriteContainer', 'position.x', { from: 0, to: -hopVert, duration: 250, ease: 'easeOutCubic', gridUnits: true, delay: 500 })
-            .spriteOffset({ x: -0.5 }, { gridUnits: true })
-            .duration(2100)
-            .opacity(0.4)
-            .fadeOut(1000, { ease: 'easeOutQuint' })
-            .tint(tint)
-            .filter('ColorMatrix', { brightness: 2 })
-            .spriteRotation(-counterRot)
+    sequence.effect()
+        .file(closest(`eskie.attack.melee.generic.01.${type}.${weight}.${color}.normal.02`))
+        .atLocation(token)
+        .rotateTowards(targetSquare)
+        .scaleToObject(effectSize, { considerTokenScale: true })
+        .spriteOffset({ x: effectOffset * tokenWidth + 0.75 }, { gridUnits: true })
+        .mirrorY(src.x >= tgt.x)
+        .zIndex(2);
 
-        .effect()
-            .delay(100)
-            .copySprite(token)
-            .attachTo(token, { bindAlpha: false })
-            .rotateTowards(target)
-            .scaleToObject(1, { considerTokenScale: true })
-            .animateProperty('spriteContainer', 'position.x', { from: 0, to: 0.5, duration: 500, ease: 'easeOutSine', gridUnits: true, delay: 250 })
-            .animateProperty('spriteContainer', 'position.x', { from: 0, to: -0.5, duration: 1000, ease: 'easeOutCubic', gridUnits: true, delay: 1000 })
-            .animateProperty('spriteContainer', 'position.y', { from: 0, to: hop, duration: 250, ease: 'easeOutCubic', gridUnits: true, delay: 250 })
-            .animateProperty('spriteContainer', 'position.y', { from: 0, to: -hop, duration: 250, ease: 'easeOutCubic', gridUnits: true, delay: 500 })
-            .animateProperty('spriteContainer', 'position.x', { from: 0, to: hopVert, duration: 250, ease: 'easeOutCubic', gridUnits: true, delay: 250 })
-            .animateProperty('spriteContainer', 'position.x', { from: 0, to: -hopVert, duration: 250, ease: 'easeOutCubic', gridUnits: true, delay: 500 })
-            .spriteOffset({ x: -0.5 }, { gridUnits: true })
-            .duration(2100)
-            .opacity(0.25)
-            .fadeOut(1000, { ease: 'easeOutQuint' })
-            .tint(tint)
-            .filter('ColorMatrix', { brightness: 1.5 })
-            .spriteRotation(-counterRot)
+    sequence.effect()
+        .delay(150)
+        .file(closest(`eskie.damage.${type}.01.yellow`))
+        .size(1.25 * tokenWidth, { gridUnits: true })
+        .atLocation(targetSquare)
+        .randomRotation()
+        .zIndex(0.1);
 
-        .animation()
-            .on(token)
-            .opacity(1)
-            .delay(2000)
-
-        .wait(400)
-
-        .effect()
-            .file(closest(`eskie.attack.melee.generic.01.${type}.${weight}.${color}.normal.02`))
-            .atLocation(token)
-            .rotateTowards(targetSquare)
-            .scaleToObject(effectSize, { considerTokenScale: true })
-            .spriteOffset({ x: effectOffset * tokenWidth + 0.75 }, { gridUnits: true })
-            .mirrorY(src.x >= tgt.x)
-            .zIndex(2)
-
-        .effect()
-            .delay(150)
-            .file(closest(`eskie.damage.${type}.01.yellow`))
-            .size(1.25 * tokenWidth, { gridUnits: true })
-            .atLocation(targetSquare)
-            .randomRotation()
-            .zIndex(0.1)
-
-        .effect()
-            .delay(150)
-            .copySprite(target)
-            .attachTo(target)
-            .scaleToObject(1, { considerTokenScale: true })
-            .loopProperty('sprite', 'position.x', { from: -0.05, to: 0.05, duration: 50, pingPong: true, gridUnits: true })
-            .opacity(0.25)
-            .duration(1000)
-            .fadeOut(750);
+    sequence.effect()
+        .delay(150)
+        .copySprite(target)
+        .attachTo(target)
+        .scaleToObject(1, { considerTokenScale: true })
+        .loopProperty('sprite', 'position.x', { from: -0.05, to: 0.05, duration: 50, pingPong: true, gridUnits: true })
+        .opacity(0.25)
+        .duration(1000)
+        .fadeOut(750);
 
     return sequence;
 }
@@ -189,3 +106,4 @@ export const lungingAttack = {
 };
 
 adapter.autorec.register('lungingAttack', 'melee-target', 'eskie.effect.battlemaster.lungingAttack', DEFAULT_CONFIG, '0.0.1', 'Lunging Attack');
+

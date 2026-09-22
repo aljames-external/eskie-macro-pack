@@ -507,3 +507,57 @@ test('tashasCausticBrew DEFAULT_CONFIG defines phased sound sections and registe
     assert.ok(entry, "Tasha's Caustic Brew must be in template menu");
     assert.equal(entry.metaData.version, '0.1.2', 'autorec version must be 0.1.2');
 });
+
+test('pushingAttack uses Sequencer 4.3.0+ .motion() animation instead of copySprite or opacity(0) hiding', () => {
+    const tsModulePath = path.join(rootDir, 'src/animation/effects/battlemaster/pushing-attack.ts');
+    const jsMacroPath = path.join(rootDir, 'src/standalone-macros/pushing-attack.js');
+
+    const tsContent = fs.readFileSync(tsModulePath, 'utf8');
+    const jsContent = fs.readFileSync(jsMacroPath, 'utf8');
+
+    assert.doesNotMatch(tsContent, /copySprite/, 'pushing-attack.ts must not use copySprite');
+    assert.doesNotMatch(tsContent, /\.opacity\(0\)/, 'pushing-attack.ts must not hide token with opacity(0)');
+    assert.match(tsContent, /\.motion\(/, 'pushing-attack.ts must use .motion()');
+    assert.match(tsContent, /sequence\.motion\(target\)/, 'pushing-attack.ts must use sequence.motion(target)');
+    assert.match(tsContent, /\.moveBy\(/, 'pushing-attack.ts must use .moveBy()');
+
+    assert.doesNotMatch(jsContent, /copySprite/, 'pushing-attack.js must not use copySprite');
+    assert.doesNotMatch(jsContent, /\.opacity\(0\)/, 'pushing-attack.js must not hide token with opacity(0)');
+    assert.match(jsContent, /\.motion\(/, 'pushing-attack.js must use .motion()');
+    assert.match(jsContent, /sequence\.motion\(target\)/, 'pushing-attack.js must use sequence.motion(target)');
+    assert.match(jsContent, /\.moveBy\(/, 'pushing-attack.js must use .moveBy()');
+});
+
+test('lungingAttack uses Sequencer 4.3.0+ sequence.motion(token).moveTo() API', () => {
+    const tsModulePath = path.join(rootDir, 'src/animation/effects/battlemaster/lunging-attack.ts');
+    const jsMacroPath = path.join(rootDir, 'src/standalone-macros/lunging-attack.js');
+
+    const tsContent = fs.readFileSync(tsModulePath, 'utf8');
+    const jsContent = fs.readFileSync(jsMacroPath, 'utf8');
+
+    assert.doesNotMatch(tsContent, /\.opacity\(0\)/, 'lunging-attack.ts must not hide token with opacity(0)');
+    assert.match(tsContent, /sequence\.motion\(token\)/, 'lunging-attack.ts must use sequence.motion(token)');
+    assert.match(tsContent, /\.moveTo\(/, 'lunging-attack.ts must use .moveTo()');
+
+    assert.doesNotMatch(jsContent, /\.opacity\(0\)/, 'lunging-attack.js must not hide token with opacity(0)');
+    assert.match(jsContent, /sequence\.motion\(token\)/, 'lunging-attack.js must use sequence.motion(token)');
+    assert.match(jsContent, /\.moveTo\(/, 'lunging-attack.js must use .moveTo()');
+});
+
+test('stormingDashStrikes uses Sequencer 4.3.0+ sequence.motion(token).moveTo() API for dash strikes movement', () => {
+    const tsModulePath = path.join(rootDir, 'src/animation/effects/token/storming-dash-strikes.ts');
+    const jsMacroPath = path.join(rootDir, 'src/standalone-macros/storming-dash-strikes.js');
+
+    const tsContent = fs.readFileSync(tsModulePath, 'utf8');
+    const jsContent = fs.readFileSync(jsMacroPath, 'utf8');
+
+    assert.doesNotMatch(tsContent, /\.opacity\(0\)/, 'storming-dash-strikes.ts must not hide token with opacity(0)');
+    assert.match(tsContent, /stepSeq\.motion\(source\)/, 'storming-dash-strikes.ts must use stepSeq.motion(source)');
+    assert.match(tsContent, /\.moveTo\(endPos/, 'storming-dash-strikes.ts must use .moveTo(endPos)');
+
+    assert.doesNotMatch(jsContent, /\.opacity\(0\)/, 'storming-dash-strikes.js must not hide token with opacity(0)');
+    assert.match(jsContent, /stepSeq\.motion\(source\)/, 'storming-dash-strikes.js must use stepSeq.motion(source)');
+    assert.match(jsContent, /\.moveTo\(endPos/, 'storming-dash-strikes.js must use .moveTo(endPos)');
+});
+
+

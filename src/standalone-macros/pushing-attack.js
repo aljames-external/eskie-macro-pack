@@ -1,6 +1,6 @@
 // Standalone Macro: Pushing Attack
 // Original Author: .eskie
-// Modular Conversion: bakanabaka
+// Modular Conversion & Sequencer 4.3.0+ .motion() Update: bakanabaka
 
 if (!game.modules.get("sequencer")?.active) {
     return ui.notifications.error("The 'Pushing Attack' macro requires the 'Sequencer' module to be installed and active!");
@@ -62,21 +62,14 @@ const backposition = {
     y: (targetCenter.y - tokenCenter.y) * -0.1,
 };
 
-const middleposition = {
-    x: (targetCenter.x - tokenCenter.x) * 0.26,
-    y: (targetCenter.y - tokenCenter.y) * 0.26,
-};
-
 const distanceX = Math.abs(tokenCenter.x - targetCenter.x);
 const distanceY = Math.abs(tokenCenter.y - targetCenter.y);
 
 if (distanceY < distanceX) {
     position.y = targetCenter.y;
-    middleposition.y = 0;
     backposition.y = 0;
 } else if (distanceX < distanceY) {
     position.x = targetCenter.x;
-    middleposition.x = 0;
     backposition.x = 0;
 }
 
@@ -84,98 +77,70 @@ const tokenWidth = token.document?.width ?? token.width ?? 1;
 
 const sequence = new Sequence();
 
-sequence
-    .animation()
-        .on(token)
-        .opacity(0)
-        .delay(100)
+// Attacker thrust motion using Sequencer 4.3.0+ .motion()
+sequence.animation()
+    .on(token)
+    .motion({
+        recoil: -0.2,
+        duration: 450,
+        ease: 'easeOutExpo'
+    });
 
-    .effect()
-        .file(closest("eskie.smoke.02.white"))
-        .atLocation({ x: tokenCenter.x - backposition.x, y: tokenCenter.y - backposition.y })
-        .rotateTowards(target)
-        .size(tokenWidth * 2.15, { gridUnits: true })
-        .spriteOffset({ x: -1.5 }, { gridUnits: true })
-        .spriteRotation(180)
-        .belowTokens()
-        .delay(150)
+sequence.effect()
+    .file(closest("eskie.smoke.02.white"))
+    .atLocation({ x: tokenCenter.x - backposition.x, y: tokenCenter.y - backposition.y })
+    .rotateTowards(target)
+    .size(tokenWidth * 2.15, { gridUnits: true })
+    .spriteOffset({ x: -1.5 }, { gridUnits: true })
+    .spriteRotation(180)
+    .belowTokens()
+    .delay(150);
 
-    .canvasPan()
-        .delay(250)
-        .shake({ duration: 250, strength: 2, rotation: false })
+sequence.canvasPan()
+    .delay(250)
+    .shake({ duration: 250, strength: 2, rotation: false });
 
-    .effect()
-        .copySprite(token)
-        .atLocation(token)
-        .scaleToObject(1, { considerTokenScale: true })
-        .animateProperty("spriteContainer", "position.x", { from: 0, to: backposition.x, duration: 250, ease: "easeOutExpo", delay: 200 })
-        .animateProperty("spriteContainer", "position.y", { from: 0, to: backposition.y, duration: 250, ease: "easeOutExpo", delay: 200 })
-        .animateProperty("spriteContainer", "position.x", { from: 0, to: middleposition.x - backposition.x, duration: 150, ease: "easeOutExpo", delay: 1000 })
-        .animateProperty("spriteContainer", "position.y", { from: 0, to: middleposition.y - backposition.y, duration: 150, ease: "easeOutExpo", delay: 1000 })
-        .animateProperty("spriteContainer", "position.x", { from: 0, to: -middleposition.x, duration: 450, ease: "easeOutQuad", delay: 1150 })
-        .animateProperty("spriteContainer", "position.y", { from: 0, to: -middleposition.y, duration: 450, ease: "easeOutQuad", delay: 1150 })
-        .duration(1750)
+sequence.effect()
+    .file(closest(`eskie.attack.melee.generic.01.${type}.${weight}.${color}.slow`))
+    .atLocation(token)
+    .rotateTowards(targetSquare)
+    .scaleToObject(effectSize, { considerTokenScale: true })
+    .spriteOffset({ x: effectOffset * tokenWidth }, { gridUnits: true })
+    .randomizeMirrorY()
+    .zIndex(1)
+    .delay(1000);
 
-    .animation()
-        .on(token)
-        .opacity(1)
-        .delay(1650)
+sequence.effect()
+    .file(closest("jb2a.gust_of_wind.veryfast"))
+    .atLocation(token)
+    .stretchTo(position, { onlyX: true })
+    .opacity(0.75)
+    .belowTokens()
+    .fadeOut(1000)
+    .delay(1500);
 
-    .effect()
-        .file(closest(`eskie.attack.melee.generic.01.${type}.${weight}.${color}.slow`))
-        .atLocation(token)
-        .rotateTowards(targetSquare)
-        .scaleToObject(effectSize, { considerTokenScale: true })
-        .spriteOffset({ x: effectOffset * tokenWidth }, { gridUnits: true })
-        .randomizeMirrorY()
-        .zIndex(1)
-        .delay(1000)
+sequence.effect()
+    .delay(1000)
+    .file(closest("eskie.trail.token.generic.01.white"))
+    .atLocation(token)
+    .rotateTowards(position)
+    .scaleToObject(1.5, { considerTokenScale: true })
+    .startTime(750)
+    .spriteOffset({ x: -1.25 }, { gridUnits: true });
 
-    .effect()
-        .file(closest("jb2a.gust_of_wind.veryfast"))
-        .atLocation(token)
-        .stretchTo(position, { onlyX: true })
-        .opacity(0.75)
-        .belowTokens()
-        .fadeOut(1000)
-        .delay(1500)
+sequence.wait(1000);
 
-    .effect()
-        .delay(1000)
-        .file(closest("eskie.trail.token.generic.01.white"))
-        .atLocation(token)
-        .rotateTowards(position)
-        .scaleToObject(1.5, { considerTokenScale: true })
-        .startTime(750)
-        .spriteOffset({ x: -1.25 }, { gridUnits: true })
+sequence.effect()
+    .file(closest(`eskie.damage.${type}.01.yellow`))
+    .atLocation(target)
+    .size(tokenWidth * 1.5, { gridUnits: true })
+    .zIndex(1);
 
-    .wait(1000)
+sequence.wait(250);
 
-    .effect()
-        .file(closest(`eskie.damage.${type}.01.yellow`))
-        .atLocation(target)
-        .size(tokenWidth * 1.5, { gridUnits: true })
-        .zIndex(1)
-
-    .wait(250)
-
-    .animation()
-        .on(target)
-        .opacity(0)
-        .delay(100)
-
-    .effect()
-        .copySprite(target)
-        .atLocation(target)
-        .scaleToObject(1, { considerTokenScale: true })
-        .moveTowards(position, { rotate: false, ease: "easeOutCirc", delay: 200 })
-        .moveSpeed(1250)
-        .waitUntilFinished(-100)
-
-    .animation()
-        .on(target)
-        .moveTowards(position, { relativeToCenter: true })
-        .snapToGrid()
-        .opacity(1);
+// Target knockback push using Sequencer 4.3.0+ sequence.motion(target).moveBy() API
+sequence.motion(target)
+    .moveBy(position, { ease: 'easeOutCirc' });
 
 await sequence.play();
+
