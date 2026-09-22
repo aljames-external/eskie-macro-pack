@@ -65,10 +65,10 @@ export interface MotionSection {
   noise(options: MotionNoiseOptions): MotionSection;
 
   // Root Sequence chaining extensions
-  effect(file?: string | Function | null | undefined): EffectSection;
+  effect(file?: string | Function): EffectSection;
   motion(target: any): MotionSection;
   animation(target?: any): AnimationSection;
-  sound(file?: string | null | undefined): SoundSection;
+  sound(file?: string): SoundSection;
   wait(duration?: number): SequenceBuilder;
   thenDo(callback: () => void | Promise<void>): SequenceBuilder;
   canvasPan(options?: any): SequenceBuilder;
@@ -79,63 +79,63 @@ export interface MotionSection {
 }
 
 export interface EffectSection {
-  file(file?: string | Function | null | undefined): EffectSection;
-  name(name?: string): EffectSection;
-  atLocation(location?: any, options?: any): EffectSection;
-  attachTo(target?: any, options?: any): EffectSection;
-  stretchTo(target?: any, options?: any): EffectSection;
-  scale(scale?: number | { x?: number; y?: number } | any): EffectSection;
+  file(file: string | Function): EffectSection;
+  name(name: string): EffectSection;
+  atLocation(location: any, options?: any): EffectSection;
+  attachTo(target: any, options?: any): EffectSection;
+  stretchTo(target: any, options?: any): EffectSection;
+  scale(scale: number | { x?: number; y?: number }): EffectSection;
   scaleToObject(scale?: number, options?: any): EffectSection;
-  size(size?: number | { width?: number; height?: number } | any, options?: any): EffectSection;
-  opacity(opacity?: number): EffectSection;
-  fadeIn(duration?: number, options?: any): EffectSection;
-  fadeOut(duration?: number, options?: any): EffectSection;
-  scaleIn(scale?: number, duration?: number, options?: any): EffectSection;
-  scaleOut(scale?: number, duration?: number, options?: any): EffectSection;
-  rotate(angle?: number): EffectSection;
-  rotateIn(angle?: number, duration?: number, options?: any): EffectSection;
-  rotateOut(angle?: number, duration?: number, options?: any): EffectSection;
-  rotateTowards(target?: any, options?: any): EffectSection;
+  size(size: number | { width?: number; height?: number }, options?: any): EffectSection;
+  opacity(opacity: number): EffectSection;
+  fadeIn(duration: number, options?: any): EffectSection;
+  fadeOut(duration: number, options?: any): EffectSection;
+  scaleIn(scale: number, duration: number, options?: any): EffectSection;
+  scaleOut(scale: number, duration: number, options?: any): EffectSection;
+  rotate(angle: number): EffectSection;
+  rotateIn(angle: number, duration: number, options?: any): EffectSection;
+  rotateOut(angle: number, duration: number, options?: any): EffectSection;
+  rotateTowards(target: any, options?: any): EffectSection;
   randomRotation(): EffectSection;
   randomizeMirrorX(): EffectSection;
   mirrorX(mirror?: boolean): EffectSection;
   mirrorY(mirror?: boolean): EffectSection;
-  duration(duration?: number): EffectSection;
-  delay(delay?: number | [number, number], maxDelay?: number): EffectSection;
-  startTime(time?: number): EffectSection;
-  endTime(time?: number): EffectSection;
-  playbackRate(rate?: number): EffectSection;
-  repeats(count?: number, delayMin?: number, delayMax?: number): EffectSection;
-  filter(filterType?: string, options?: any): EffectSection;
-  mask(target?: any): EffectSection;
-  tint(color?: string | number): EffectSection;
+  duration(duration: number): EffectSection;
+  delay(delay: number | [number, number], maxDelay?: number): EffectSection;
+  startTime(time: number): EffectSection;
+  endTime(time: number): EffectSection;
+  playbackRate(rate: number): EffectSection;
+  repeats(count: number, delayMin?: number, delayMax?: number): EffectSection;
+  filter(filterType: string, options?: any): EffectSection;
+  mask(target: any): EffectSection;
+  tint(color: string | number): EffectSection;
   belowTokens(below?: boolean): EffectSection;
   aboveLighting(above?: boolean): EffectSection;
-  zIndex(index?: number): EffectSection;
+  zIndex(index: number): EffectSection;
   persist(persist?: boolean, options?: any): EffectSection;
   private(isPrivate?: boolean): EffectSection;
   waitUntilFinished(delay?: number): EffectSection;
-  copySprite(target?: any): EffectSection;
-  shape(type?: string, options?: any): EffectSection;
-  text(text?: string, options?: any): EffectSection;
-  loopProperty(category?: string, property?: string, options?: any): EffectSection;
-  animateProperty(category?: string, property?: string, options?: any): EffectSection;
-  spriteOffset(offset?: { x?: number; y?: number }, options?: any): EffectSection;
-  spriteAnchor(anchor?: { x?: number; y?: number }): EffectSection;
-  spriteRotation(angle?: number): EffectSection;
-  spriteScale(scale?: number | { x?: number; y?: number }, options?: any): EffectSection;
-  extraEndDuration(duration?: number): EffectSection;
-  setMustache(mustacheObj?: Record<string, any>): EffectSection;
-  moveTowards(target?: any, options?: any): EffectSection;
-  moveSpeed(speed?: number): EffectSection;
-  anchor(anchor?: { x?: number; y?: number }): EffectSection;
+  copySprite(target: any): EffectSection;
+  shape(type: string, options?: any): EffectSection;
+  text(text: string, options?: any): EffectSection;
+  loopProperty(category: string, property: string, options?: any): EffectSection;
+  animateProperty(category: string, property: string, options?: any): EffectSection;
+  spriteOffset(offset: { x?: number; y?: number }, options?: any): EffectSection;
+  spriteAnchor(anchor: { x?: number; y?: number }): EffectSection;
+  spriteRotation(angle: number): EffectSection;
+  spriteScale(scale: number | { x?: number; y?: number }, options?: any): EffectSection;
+  extraEndDuration(duration: number): EffectSection;
+  setMustache(mustacheObj: Record<string, any>): EffectSection;
+  moveTowards(target: any, options?: any): EffectSection;
+  moveSpeed(speed: number): EffectSection;
+  anchor(anchor: { x?: number; y?: number }): EffectSection;
   center(): EffectSection;
 
   // Root Sequence chaining extensions
-  effect(file?: string | Function | null | undefined): EffectSection;
+  effect(file?: string | Function): EffectSection;
   motion(target: any): MotionSection;
   animation(target?: any): AnimationSection;
-  sound(file?: string | null | undefined): SoundSection;
+  sound(file?: string): SoundSection;
   wait(duration?: number): SequenceBuilder;
   thenDo(callback: () => void | Promise<void>): SequenceBuilder;
   canvasPan(options?: any): SequenceBuilder;
@@ -146,22 +146,22 @@ export interface EffectSection {
 }
 
 export interface AnimationSection {
-  on(target?: any): AnimationSection;
-  teleportTo(location?: any, options?: any): AnimationSection;
+  on(target: any): AnimationSection;
+  teleportTo(location: any, options?: any): AnimationSection;
   snapToGrid(snap?: boolean): AnimationSection;
-  offset(offset?: { x?: number; y?: number }): AnimationSection;
-  opacity(opacity?: number): AnimationSection;
-  duration(duration?: number): AnimationSection;
+  offset(offset: { x?: number; y?: number }): AnimationSection;
+  opacity(opacity: number): AnimationSection;
+  duration(duration: number): AnimationSection;
   waitUntilFinished(delay?: number): AnimationSection;
   show(show?: boolean): AnimationSection;
   hide(hide?: boolean): AnimationSection;
-  delay(delay?: number): AnimationSection;
+  delay(delay: number): AnimationSection;
 
   // Root Sequence chaining extensions
-  effect(file?: string | Function | null | undefined): EffectSection;
+  effect(file?: string | Function): EffectSection;
   motion(target: any): MotionSection;
   animation(target?: any): AnimationSection;
-  sound(file?: string | null | undefined): SoundSection;
+  sound(file?: string): SoundSection;
   wait(duration?: number): SequenceBuilder;
   thenDo(callback: () => void | Promise<void>): SequenceBuilder;
   canvasPan(options?: any): SequenceBuilder;
@@ -172,21 +172,21 @@ export interface AnimationSection {
 }
 
 export interface SoundSection {
-  file(file?: string | null | undefined): SoundSection;
-  volume(vol?: number): SoundSection;
-  fadeInAudio(duration?: number): SoundSection;
-  fadeOutAudio(duration?: number): SoundSection;
-  delay(delay?: number): SoundSection;
-  startTime(time?: number): SoundSection;
-  endTime(time?: number): SoundSection;
-  duration(duration?: number): SoundSection;
-  repeats(count?: number, delayMin?: number, delayMax?: number): SoundSection;
+  file(file: string): SoundSection;
+  volume(vol: number): SoundSection;
+  fadeInAudio(duration: number): SoundSection;
+  fadeOutAudio(duration: number): SoundSection;
+  delay(delay: number): SoundSection;
+  startTime(time: number): SoundSection;
+  endTime(time: number): SoundSection;
+  duration(duration: number): SoundSection;
+  repeats(count: number, delayMin?: number, delayMax?: number): SoundSection;
 
   // Root Sequence chaining extensions
-  effect(file?: string | Function | null | undefined): EffectSection;
+  effect(file?: string | Function): EffectSection;
   motion(target: any): MotionSection;
   animation(target?: any): AnimationSection;
-  sound(file?: string | null | undefined): SoundSection;
+  sound(file?: string): SoundSection;
   wait(duration?: number): SequenceBuilder;
   thenDo(callback: () => void | Promise<void>): SequenceBuilder;
   canvasPan(options?: any): SequenceBuilder;
@@ -197,10 +197,10 @@ export interface SoundSection {
 }
 
 export interface SequenceBuilder {
-  effect(file?: string | Function | null | undefined): EffectSection;
+  effect(file?: string | Function): EffectSection;
   motion(target: any): MotionSection;
   animation(target?: any): AnimationSection;
-  sound(file?: string | null | undefined): SoundSection;
+  sound(file?: string): SoundSection;
   wait(duration?: number): SequenceBuilder;
   thenDo(callback: () => void | Promise<void>): SequenceBuilder;
   canvasPan(options?: any): SequenceBuilder;
