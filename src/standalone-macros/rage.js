@@ -174,41 +174,14 @@ function createPulsingMuscle(token) {
     const label = `${id} - ${tokenId}`;
 
     let seq = new Sequence();
-    const tokenRotation = token.document?.rotation ?? 0;
 
-    seq.effect()
-        .name(label)
-        .copySprite(token)
-        .spriteRotation(-tokenRotation)
-        .attachTo(token)
-        .scaleToObject(1, { considerTokenScale: true })
-        .rotate(0)
-        .duration(750)
-        .animateProperty("sprite", "width", { from: 0, to: 0.05, duration: 400, gridUnits: true, ease: "easeOutCubic" })
-        .animateProperty("sprite", "height", { from: 0, to: 0.05, duration: 400, gridUnits: true, ease: "easeOutCubic" })
-        .animateProperty("sprite", "width", { from: 0, to: -0.05, duration: 250, gridUnits: true, ease: "easeOutCubic", delay: 500 })
-        .animateProperty("sprite", "height", { from: 0, to: -0.05, duration: 250, gridUnits: true, ease: "easeOutCubic", delay: 500 })
-        .zIndex(1)
-        .waitUntilFinished(-450);
+    seq.motion(token)
+        .scaleTo(1.05)
+        .noise();
 
     seq.canvasPan()
         .delay(250)
         .shake({ duration: 1100, strength: 1, rotation: false, fadeOut: 500 });
-
-    seq.effect()
-        .name(label)
-        .delay(250)
-        .copySprite(token)
-        .spriteRotation(-tokenRotation)
-        .attachTo(token)
-        .scaleToObject(1, { considerTokenScale: true })
-        .duration(3500)
-        .fadeOut(1500)
-        .loopProperty("spriteContainer", "position.y", { from: -0.035, to: 0.035, duration: 25, gridUnits: true, pingPong: true })
-        .filter("ColorMatrix", { brightness: 0 })
-        .filter("Blur", { blurX: 0, blurY: 10 })
-        .belowTokens()
-        .zIndex(2);
 
     seq.effect()
         .name(label)
@@ -447,67 +420,14 @@ function createTotemSpirit(token, spirit = "bear") {
     const label = `${id} - ${tokenId}`;
 
     let seq = new Sequence();
-    const tokenRotation = token.document?.rotation ?? 0;
 
-    seq.effect()
-        .copySprite(token)
-        .spriteRotation(-tokenRotation)
-        .attachTo(token)
-        .scaleToObject(1, { considerTokenScale: true })
-        .duration(750)
-        .animateProperty("sprite", "width", { from: 0, to: 0.05, duration: 400, gridUnits: true, ease: "easeOutCubic" })
-        .animateProperty("sprite", "height", { from: 0, to: 0.05, duration: 400, gridUnits: true, ease: "easeOutCubic" })
-        .animateProperty("sprite", "width", { from: 0.05, to: 0, duration: 250, gridUnits: true, ease: "easeOutCubic", delay: 500 })
-        .animateProperty("sprite", "height", { from: 0.05, to: 0, duration: 250, gridUnits: true, ease: "easeOutCubic", delay: 500 })
-        .zIndex(1)
-        .waitUntilFinished(-450);
+    seq.motion(token)
+        .scaleTo(1.05)
+        .noise();
 
     seq.canvasPan()
         .delay(250)
         .shake({ duration: 1100, strength: 1, rotation: false, fadeOut: 500 });
-
-    seq.effect()
-        .delay(251)
-        .file(closest(`eskie.symbol.animal.${spirit}.${color}`))
-        .attachTo(token, { offset: { y: 0 }, gridUnits: true })
-        .scaleToObject(1)
-        .playbackRate(1)
-        .startTime(2000)
-        .duration(4000)
-        .fadeIn(500, { ease: "easeOutCubic" })
-        .scaleIn(0.3, 2500, { ease: "easeOutSine" })
-        .opacity(0.9)
-        .fadeOut(1500, { ease: "easeInSine" })
-        .zIndex(5);
-
-    seq.effect()
-        .delay(251)
-        .file(closest(`eskie.symbol.animal.${spirit}.${color}`))
-        .attachTo(token, { offset: { y: 0 }, gridUnits: true })
-        .scaleToObject(3.25)
-        .startTime(2000)
-        .duration(4000)
-        .fadeIn(500, { ease: "easeOutCubic" })
-        .scaleIn(0.3, 2500, { ease: "easeOutSine" })
-        .opacity(0.35)
-        .belowTokens()
-        .animateProperty("spriteContainer", "position.y", { from: 0, to: -0.5, duration: 2000, gridUnits: true, ease: "easeOutCubic" })
-        .fadeOut(1500, { ease: "easeInSine" })
-        .zIndex(5);
-
-    seq.effect()
-        .delay(250)
-        .copySprite(token)
-        .spriteRotation(-tokenRotation)
-        .attachTo(token)
-        .scaleToObject(1, { considerTokenScale: true })
-        .duration(3500)
-        .fadeOut(1500)
-        .loopProperty("spriteContainer", "position.y", { from: -0.035, to: 0.035, duration: 25, gridUnits: true, pingPong: true })
-        .filter("ColorMatrix", { brightness: 0 })
-        .filter("Blur", { blurX: 0, blurY: 10 })
-        .belowTokens()
-        .zIndex(2);
 
     seq.effect()
         .delay(250)

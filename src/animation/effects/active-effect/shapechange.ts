@@ -85,22 +85,13 @@ async function createShapechange(token: Token, config: any = {}) {
         .scaleToObject(1.55, { considerTokenScale: true })
         .randomRotation()
         .filter('ColorMatrix', { saturate: -0, brightness: 0 })
-        .belowTokens()
+        .belowTokens();
 
-    // Ghost of the current token image — stretches and squashes as it warps.
+    // Shapechange transformation warp and shudder via Sequencer 4.3.0+ sequence.motion(token).scaleTo(1.25).noise()
     sequence
-        .effect()
-        .copySprite(token)
-        .spriteRotation(-token.document.rotation)
-        .attachTo(token)
-        .fadeIn(500)
-        .fadeOut(500)
-        .scaleToObject(1, { considerTokenScale: true })
-        .animateProperty('sprite', 'width', { from: (tokenWidth * 1.1) * scaleX, to: (tokenWidth * 1.25) * scaleX, duration: 500, gridUnits: true, ease: 'easeInOutBack' })
-        .animateProperty('sprite', 'height', { from: (tokenWidth) * scaleX, to: (tokenWidth * 1.25) * scaleX, duration: 750, gridUnits: true, ease: 'easeOutBack' })
-        .loopProperty('spriteContainer', 'position.x', { from: -0.005, to: 0.005, duration: 100, pingPong: true, gridUnits: true })
-        .opacity(0.65)
-        .repeats(3, 800, 800)
+        .motion(token)
+        .scaleTo(1.25)
+        .noise();
 
     // First ghost of the target form — very faint, brightened.
     sequence
@@ -114,7 +105,7 @@ async function createShapechange(token: Token, config: any = {}) {
         .animateProperty('sprite', 'height', { from: (tokenWidth) * scaleX, to: (tokenWidth * 1.25) * scaleX, duration: 750, gridUnits: true, ease: 'easeOutBack' })
         .loopProperty('spriteContainer', 'position.x', { from: -0.005, to: 0.005, duration: 100, pingPong: true, gridUnits: true })
         .opacity(0.25)
-        .filter('ColorMatrix', { brightness: 0.75 })
+        .filter('ColorMatrix', { brightness: 0.75 });
 
     // Second ghost — slightly more opaque.
     sequence
@@ -129,7 +120,7 @@ async function createShapechange(token: Token, config: any = {}) {
         .animateProperty('sprite', 'height', { from: (tokenWidth) * scaleX, to: (tokenWidth * 1.25) * scaleX, duration: 750, gridUnits: true, ease: 'easeOutBack' })
         .loopProperty('spriteContainer', 'position.x', { from: -0.005, to: 0.005, duration: 100, pingPong: true, gridUnits: true })
         .opacity(0.5)
-        .filter('ColorMatrix', { brightness: 0.5 })
+        .filter('ColorMatrix', { brightness: 0.5 });
 
     // Third ghost — nearly solid.
     sequence
@@ -144,9 +135,10 @@ async function createShapechange(token: Token, config: any = {}) {
         .animateProperty('sprite', 'height', { from: (tokenWidth) * scaleX, to: (tokenWidth * 1.25) * scaleX, duration: 750, gridUnits: true, ease: 'easeOutBack' })
         .loopProperty('spriteContainer', 'position.x', { from: -0.005, to: 0.005, duration: 100, pingPong: true, gridUnits: true })
         .opacity(0.75)
-        .filter('ColorMatrix', { brightness: 0.25 })
+        .filter('ColorMatrix', { brightness: 0.25 });
 
-        // Glowing red eyes flash at the peak of the transformation.
+    // Glowing red eyes flash at the peak of the transformation.
+    sequence
         .effect()
         .delay(3000)
         .file(closest('jb2a.eyes.01.dark_red.single'))
@@ -154,7 +146,7 @@ async function createShapechange(token: Token, config: any = {}) {
         .attachTo(token)
         .scaleToObject(1.15, { considerTokenScale: true })
         .fadeOut(500)
-        .zIndex(1)
+        .zIndex(1);
 
     // Final blurred ghost of the target form before the swap.
     sequence
@@ -171,33 +163,15 @@ async function createShapechange(token: Token, config: any = {}) {
         .loopProperty('spriteContainer', 'position.x', { from: -0.005, to: 0.005, duration: 100, pingPong: true, gridUnits: true })
         .opacity(0.75)
         .filter('ColorMatrix', { brightness: 0.2 })
+        .waitUntilFinished(-500);
 
-    // Copy of the current token sprite — blurred and darkened during the climax.
+    // Swap the token image to the chosen form.
+    sequence.thenDo(function () {
+        (token.document as any).update({ 'texture.src': targetForm });
+    });
+
+    // Claw slash impact — below the token for atmosphere.
     sequence
-        .effect()
-        .copySprite(token)
-        .spriteRotation(-token.document.rotation)
-        .delay(2400)
-        .attachTo(token)
-        .duration(2000)
-        .fadeIn(750)
-        .fadeOut(500)
-        .scaleToObject(1, { considerTokenScale: true })
-        .animateProperty('sprite', 'width', { from: (tokenWidth * 1.1) * scaleX, to: (tokenWidth * 1.25) * scaleX, duration: 500, gridUnits: true, ease: 'easeInOutBack' })
-        .animateProperty('sprite', 'height', { from: (tokenWidth) * scaleX, to: (tokenWidth * 1.25) * scaleX, duration: 750, gridUnits: true, ease: 'easeOutBack' })
-        .loopProperty('spriteContainer', 'position.x', { from: -0.005, to: 0.005, duration: 100, pingPong: true, gridUnits: true })
-        .opacity(1)
-        .filter('ColorMatrix', { brightness: 0 })
-        .filter('Blur', { blurX: 5, blurY: 5 })
-        .zIndex(0)
-        .waitUntilFinished(-500)
-
-        // Swap the token image to the chosen form.
-        .thenDo(function () {
-            (token.document as any).update({ 'texture.src': targetForm });
-        })
-
-        // Claw slash impact — below the token for atmosphere.
         .effect()
         .file(closest('jb2a.claws.200px.dark_red'))
         .atLocation(token)
@@ -333,4 +307,4 @@ export const shapechange = {
     default_config: DEFAULT_CONFIG,
 };
 
-adapter.autorec.register("shapechange", 'effect', 'eskie.effect.shapechange', DEFAULT_CONFIG, '0.1.1', "Shapechange");
+adapter.autorec.register("shapechange", 'effect', 'eskie.effect.shapechange', DEFAULT_CONFIG, '0.1.2', "Shapechange");

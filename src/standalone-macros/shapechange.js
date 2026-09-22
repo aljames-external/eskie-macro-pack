@@ -1,7 +1,7 @@
 // Standalone Macro: Shapechange
 // Original Author: EskieMoh#2969
 // Update Author: bakanabaka
-// Modular Standalone Conversion: bakanabaka
+// Modular Standalone Conversion & Sequencer 4.3.0+ .motion() Update: bakanabaka
 
 if (!game.modules.get("sequencer")?.active) {
     return ui.notifications.error("The 'Shapechange' macro requires the 'Sequencer' module to be installed and active!");
@@ -68,7 +68,6 @@ async function playShapechange(token, targetForm) {
     const sequence = new Sequence();
     const tokenWidth = token.document?.width ?? 1;
     const scaleX = token.document?.texture?.scaleX ?? 1;
-    const tokenRotation = token.document?.rotation ?? token.rotation ?? 0;
 
     // 1. Dark outflow vortex beneath token — builds atmosphere
     sequence
@@ -115,38 +114,11 @@ async function playShapechange(token, targetForm) {
         .filter("ColorMatrix", { saturate: 0, brightness: 0 })
         .belowTokens();
 
-    // 3. Ghost of current token sprite — stretches and squashes as it warps
+    // 3. Shapechange transformation warp and shudder via Sequencer 4.3.0+ sequence.motion(token).scaleTo(1.25).noise()
     sequence
-        .effect()
-        .copySprite(token)
-        .spriteRotation(-tokenRotation)
-        .attachTo(token)
-        .fadeIn(500)
-        .fadeOut(500)
-        .scaleToObject(1, { considerTokenScale: true })
-        .animateProperty("sprite", "width", {
-            from: tokenWidth * 1.1 * scaleX,
-            to: tokenWidth * 1.25 * scaleX,
-            duration: 500,
-            gridUnits: true,
-            ease: "easeInOutBack",
-        })
-        .animateProperty("sprite", "height", {
-            from: tokenWidth * scaleX,
-            to: tokenWidth * 1.25 * scaleX,
-            duration: 750,
-            gridUnits: true,
-            ease: "easeOutBack",
-        })
-        .loopProperty("spriteContainer", "position.x", {
-            from: -0.005,
-            to: 0.005,
-            duration: 100,
-            pingPong: true,
-            gridUnits: true,
-        })
-        .opacity(0.65)
-        .repeats(3, 800, 800);
+        .motion(token)
+        .scaleTo(1.25)
+        .noise();
 
     // 4. First target form ghost — very faint, brightened
     sequence
@@ -289,47 +261,10 @@ async function playShapechange(token, targetForm) {
             gridUnits: true,
         })
         .opacity(0.75)
-        .filter("ColorMatrix", { brightness: 0.2 });
-
-    // 9. Current token sprite climax blur & darken
-    sequence
-        .effect()
-        .copySprite(token)
-        .spriteRotation(-tokenRotation)
-        .delay(2400)
-        .attachTo(token)
-        .duration(2000)
-        .fadeIn(750)
-        .fadeOut(500)
-        .scaleToObject(1, { considerTokenScale: true })
-        .animateProperty("sprite", "width", {
-            from: tokenWidth * 1.1 * scaleX,
-            to: tokenWidth * 1.25 * scaleX,
-            duration: 500,
-            gridUnits: true,
-            ease: "easeInOutBack",
-        })
-        .animateProperty("sprite", "height", {
-            from: tokenWidth * scaleX,
-            to: tokenWidth * 1.25 * scaleX,
-            duration: 750,
-            gridUnits: true,
-            ease: "easeOutBack",
-        })
-        .loopProperty("spriteContainer", "position.x", {
-            from: -0.005,
-            to: 0.005,
-            duration: 100,
-            pingPong: true,
-            gridUnits: true,
-        })
-        .opacity(1)
-        .filter("ColorMatrix", { brightness: 0 })
-        .filter("Blur", { blurX: 5, blurY: 5 })
-        .zIndex(0)
+        .filter("ColorMatrix", { brightness: 0.2 })
         .waitUntilFinished(-500);
 
-    // 10. Token image swap — change texture to selected form
+    // 9. Token image swap — change texture to selected form
     sequence.thenDo(function () {
         token.document?.update({ "texture.src": targetForm });
     });

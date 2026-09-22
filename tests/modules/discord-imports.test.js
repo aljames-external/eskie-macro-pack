@@ -1326,6 +1326,26 @@ test('beguilingArrow uses Sequencer 4.3.0+ sequence.motion(target).noise() for t
     assert.match(jsContent, /\.noise\(\)/, 'beguiling-arrow.js must use .noise()');
 });
 
+test('rageV2 and rage macro use Sequencer 4.3.0+ sequence.motion(token).scaleTo(1.05).noise() for rage pulse and shudder instead of copySprite', () => {
+    const tsModulePath = path.join(rootDir, 'src/animation/effects/active-effect/rage/rage_v2.ts');
+    const jsMacroPath = path.join(rootDir, 'src/standalone-macros/rage.js');
+
+    const tsContent = fs.readFileSync(tsModulePath, 'utf8');
+    const jsContent = fs.readFileSync(jsMacroPath, 'utf8');
+
+    assert.doesNotMatch(tsContent, /copySprite/, 'rage_v2.ts must not use copySprite');
+    assert.match(tsContent, /\.motion\(/, 'rage_v2.ts must use .motion()');
+    assert.match(tsContent, /\.motion\(token\)/, 'rage_v2.ts must use .motion(token)');
+    assert.match(tsContent, /\.scaleTo\(1\.05\)/, 'rage_v2.ts must use .scaleTo(1.05)');
+    assert.match(tsContent, /\.noise\(\)/, 'rage_v2.ts must use .noise()');
+
+    assert.doesNotMatch(jsContent, /copySprite/, 'rage.js must not use copySprite');
+    assert.match(jsContent, /\.motion\(/, 'rage.js must use .motion()');
+    assert.match(jsContent, /\.motion\(token\)/, 'rage.js must use .motion(token)');
+    assert.match(jsContent, /\.scaleTo\(1\.05\)/, 'rage.js must use .scaleTo(1.05)');
+    assert.match(jsContent, /\.noise\(\)/, 'rage.js must use .noise()');
+});
+
 
 
 
