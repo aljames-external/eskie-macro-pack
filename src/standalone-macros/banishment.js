@@ -239,8 +239,8 @@ if (anyActive) {
 
         // Banishing target scaling/rotation via Sequencer 4.3.0+ .motion() API
         sequence.motion(target)
-            .scaleTo(0)
-            .rotateBy(360);
+            .scaleTo(0, { duration: 500 })
+            .rotateBy(360, { duration: 500 });
 
         sequence.effect()
             .file(closest(`jb2a.explosion.02.${color}`))

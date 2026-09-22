@@ -133,7 +133,7 @@ if (introParticle) {
 // 1. Flying token hover motion via Sequencer 4.3.0+ .motion() API
 sequence.motion(token)
     .name(label)
-    .moveTo({ y: -0.5 }, { gridUnits: true })
+    .moveTo({ y: -0.5 }, { duration: 1000, gridUnits: true })
     .oscillate()
     .persist();
 

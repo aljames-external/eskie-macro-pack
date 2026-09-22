@@ -73,7 +73,7 @@ const sequence = new Sequence()
         .fadeOut(500)
 
     .motion(token)
-        .moveTo(position, { offset: { x: -1, y: -1 } })
+        .moveTo(position, { duration: 500, offset: { x: -1, y: -1 } })
         .snapToGrid()
         .waitUntilFinished()
 

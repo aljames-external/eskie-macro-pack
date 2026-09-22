@@ -100,7 +100,7 @@ sequence.effect()
 // Dive prone tilt and movement using Sequencer 4.3.0+ sequence.motion(token).rotateTo(90, { duration: 300 }).moveBy()
 sequence.motion(token)
     .rotateTo(90, { duration: 300 })
-    .moveBy(position, { delay: 100, ease: 'easeOutQuint' });
+    .moveBy(position, { duration: 800, delay: 100, ease: 'easeOutQuint' });
 
 // Persistent tracking effect for staying low evasive cover state & macro toggle support
 sequence.effect()

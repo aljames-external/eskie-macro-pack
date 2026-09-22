@@ -35,8 +35,8 @@ sequence
         .waitUntilFinished(-1250)
 
     .motion(target)
-        .scaleTo(0)
-        .rotateBy(360)
+        .scaleTo(0, { duration: 500 })
+        .rotateBy(360, { duration: 500 })
 
     .effect()
         .file(closest("eskie.attack.ranged.arrow.01.physical.medium.purple.slow"))

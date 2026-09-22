@@ -57,7 +57,7 @@ sequence = sequence.effect()
     .waitUntilFinished(-500);
 
 sequence = sequence.motion(target)
-    .moveTo(position);
+    .moveTo(position, { duration: 500 });
 
 // Vortex in
 sequence = sequence.effect()

@@ -56,8 +56,7 @@ sequence.effect()
 
 if (canPull) {
     sequence.motion(target)
-        .moveTo(location, { rotate: false, ease: 'easeInCubic', delay: Math.max(0, 101 + timingAdjust) })
-        .duration(500);
+        .moveTo(location, { duration: 500, rotate: false, ease: 'easeInCubic', delay: Math.max(0, 101 + timingAdjust) });
 }
 
 await sequence.play();

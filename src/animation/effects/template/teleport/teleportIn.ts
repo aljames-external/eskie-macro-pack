@@ -47,7 +47,7 @@ function create(token: Token, targets: any[] = [], config: any = {}) {
         .waitUntilFinished(-1500);
 
     sequence = sequence.motion(token)
-        .moveTo(position, { offset: { x: -1, y: -1 } })
+        .moveTo(position, { duration: 500, offset: { x: -1, y: -1 } })
         .snapToGrid();
 
     targets.forEach(target => {
@@ -55,7 +55,7 @@ function create(token: Token, targets: any[] = [], config: any = {}) {
         let targetX = position.x + (targetCenter.x - tokenCenter.x);
         let targetY = position.y + (targetCenter.y - tokenCenter.y);
         sequence = sequence.motion(target)
-            .moveTo({ x: targetX, y: targetY }, { offset: { x: -1, y: -1 } })
+            .moveTo({ x: targetX, y: targetY }, { duration: 500, offset: { x: -1, y: -1 } })
             .snapToGrid();
     });
     

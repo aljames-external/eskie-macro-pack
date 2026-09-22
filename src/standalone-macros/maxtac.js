@@ -237,7 +237,7 @@ for (const offset of thrusterPositions) {
 // Sequencer 4.3.0+ Vehicle tile flying hover motion
 seq.motion(target)
     .name(effectNameFly)
-    .moveTo({ y: -0.5 }, { gridUnits: true })
+    .moveTo({ y: -0.5 }, { duration: 1000, gridUnits: true })
     .oscillate()
     .persist();
 

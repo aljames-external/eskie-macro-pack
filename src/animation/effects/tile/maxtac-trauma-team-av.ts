@@ -205,7 +205,7 @@ async function create(tile: Tile, config: any = {}) {
         // Sequencer 4.3.0+ Vehicle tile flying hover motion
         .motion(tile)
             .name(effectNameFly)
-            .moveTo({ y: -0.5 }, { gridUnits: true })
+            .moveTo({ y: -0.5 }, { duration: 1000, gridUnits: true })
             .oscillate()
             .persist()
 

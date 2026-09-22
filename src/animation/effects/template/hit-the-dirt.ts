@@ -67,7 +67,7 @@ async function create(token: Token, config: AnimationEffectConfig = {}, options:
     // Dive prone tilt and movement using Sequencer 4.3.0+ sequence.motion(token).rotateTo(90, { duration: 300 }).moveBy()
     sequence.motion(token)
         .rotateTo(90, { duration: 300 })
-        .moveBy(position, { delay: 100, ease: 'easeOutQuint' });
+        .moveBy(position, { duration: 800, delay: 100, ease: 'easeOutQuint' });
 
     return sequence;
 }

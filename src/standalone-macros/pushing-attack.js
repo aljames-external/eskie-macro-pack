@@ -140,7 +140,7 @@ sequence.wait(250);
 
 // Target knockback push using Sequencer 4.3.0+ sequence.motion(target).moveBy() API
 sequence.motion(target)
-    .moveBy(position, { ease: 'easeOutCirc' });
+    .moveBy(position, { duration: 500, ease: 'easeOutCirc' });
 
 await sequence.play();
 

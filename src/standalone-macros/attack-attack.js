@@ -62,13 +62,13 @@ const seq = new Sequence();
 // Initial clash charges via Sequencer 4.3.0+ sequence.motion(token)
 seq.motion(blue)
     .delay(400)
-    .moveTo(b1, { relativeToCenter: true })
-    .moveTo(b2, { delay: 1000, ease: "easeOutQuint", rotate: false });
+    .moveTo(b1, { duration: 300, relativeToCenter: true })
+    .moveTo(b2, { duration: 500, delay: 1000, ease: "easeOutQuint", rotate: false });
 
 seq.motion(red)
     .delay(400)
-    .moveTo(r1, { relativeToCenter: true })
-    .moveTo(r2, { delay: 1000, ease: "easeOutQuint", rotate: false });
+    .moveTo(r1, { duration: 300, relativeToCenter: true })
+    .moveTo(r2, { duration: 500, delay: 1000, ease: "easeOutQuint", rotate: false });
 
 seq.wait(750);
 
@@ -151,7 +151,7 @@ seq.thenDo(() => {
     Sequencer.EffectManager.endEffects({ name: "gob" });
 });
 
-seq.motion(blue).moveTo(b3, { relativeToCenter: true });
-seq.motion(red).moveTo(r3, { relativeToCenter: true });
+seq.motion(blue).moveTo(b3, { duration: 300, relativeToCenter: true });
+seq.motion(red).moveTo(r3, { duration: 300, relativeToCenter: true });
 
 await seq.play({ preload: true });

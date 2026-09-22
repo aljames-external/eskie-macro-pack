@@ -243,8 +243,8 @@ async function createBanish(target: Token, config: any = {}) {
         .fadeOut(750);
 
     sequence.motion(target)
-        .scaleTo(0)
-        .rotateBy(360);
+        .scaleTo(0, { duration: 500 })
+        .rotateBy(360, { duration: 500 });
 
     sequence.effect()
         .file(closest(`jb2a.explosion.02.${portal.color}`))

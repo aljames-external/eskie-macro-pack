@@ -722,15 +722,15 @@ test('banishment uses Sequencer 4.3.0+ sequence.motion(target).scaleTo(0).rotate
     assert.doesNotMatch(tsContent, /\.animation\(\)/, 'banishment.ts must not hide token with animation()');
     assert.match(tsContent, /\.motion\(/, 'banishment.ts must use .motion()');
     assert.match(tsContent, /sequence\.motion\(target\)/, 'banishment.ts must use sequence.motion(target)');
-    assert.match(tsContent, /\.scaleTo\(0\)/, 'banishment.ts must use .scaleTo(0)');
-    assert.match(tsContent, /\.rotateBy\(360\)/, 'banishment.ts must use .rotateBy(360)');
+    assert.match(tsContent, /\.scaleTo\(0/, 'banishment.ts must use .scaleTo(0)');
+    assert.match(tsContent, /\.rotateBy\(360/, 'banishment.ts must use .rotateBy(360)');
 
     assert.doesNotMatch(jsContent, /copySprite/, 'banishment.js must not use copySprite');
     assert.doesNotMatch(jsContent, /\.animation\(\)/, 'banishment.js must not hide token with animation()');
     assert.match(jsContent, /\.motion\(/, 'banishment.js must use .motion()');
     assert.match(jsContent, /sequence\.motion\(target\)/, 'banishment.js must use sequence.motion(target)');
-    assert.match(jsContent, /\.scaleTo\(0\)/, 'banishment.js must use .scaleTo(0)');
-    assert.match(jsContent, /\.rotateBy\(360\)/, 'banishment.js must use .rotateBy(360)');
+    assert.match(jsContent, /\.scaleTo\(0/, 'banishment.js must use .scaleTo(0)');
+    assert.match(jsContent, /\.rotateBy\(360/, 'banishment.js must use .rotateBy(360)');
 });
 
 test('banishingArrow uses Sequencer 4.3.0+ sequence.motion(target).scaleTo(0).rotateBy(360) for target scaling/rotation instead of copySprite and opacity(0) hiding', () => {
@@ -744,15 +744,15 @@ test('banishingArrow uses Sequencer 4.3.0+ sequence.motion(target).scaleTo(0).ro
     assert.doesNotMatch(tsContent, /\.animation\(\)/, 'banishing-arrow.ts must not hide token with animation()');
     assert.match(tsContent, /\.motion\(/, 'banishing-arrow.ts must use .motion()');
     assert.match(tsContent, /\.motion\(target\)/, 'banishing-arrow.ts must use .motion(target)');
-    assert.match(tsContent, /\.scaleTo\(0\)/, 'banishing-arrow.ts must use .scaleTo(0)');
-    assert.match(tsContent, /\.rotateBy\(360\)/, 'banishing-arrow.ts must use .rotateBy(360)');
+    assert.match(tsContent, /\.scaleTo\(0/, 'banishing-arrow.ts must use .scaleTo(0)');
+    assert.match(tsContent, /\.rotateBy\(360/, 'banishing-arrow.ts must use .rotateBy(360)');
 
     assert.doesNotMatch(jsContent, /copySprite/, 'banishing-arrow.js must not use copySprite');
     assert.doesNotMatch(jsContent, /\.animation\(\)/, 'banishing-arrow.js must not hide token with animation()');
     assert.match(jsContent, /\.motion\(/, 'banishing-arrow.js must use .motion()');
     assert.match(jsContent, /\.motion\(target\)/, 'banishing-arrow.js must use .motion(target)');
-    assert.match(jsContent, /\.scaleTo\(0\)/, 'banishing-arrow.js must use .scaleTo(0)');
-    assert.match(jsContent, /\.rotateBy\(360\)/, 'banishing-arrow.js must use .rotateBy(360)');
+    assert.match(jsContent, /\.scaleTo\(0/, 'banishing-arrow.js must use .scaleTo(0)');
+    assert.match(jsContent, /\.rotateBy\(360/, 'banishing-arrow.js must use .rotateBy(360)');
 });
 
 test('graspingArrow uses Sequencer 4.3.0+ sequence.motion(target).noise() for target vine grapple shudder instead of copySprite and opacity(0) hiding', () => {

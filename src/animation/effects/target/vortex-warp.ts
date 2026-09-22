@@ -30,7 +30,7 @@ async function create(target: Token, config: Record<string, any> = {}) {
         .waitUntilFinished(-500);
 
     sequence = sequence.motion(target)
-        .moveTo(mConfig.position);
+        .moveTo(mConfig.position, { duration: 500 });
 
     // Vortex in
     sequence = sequence.effect()

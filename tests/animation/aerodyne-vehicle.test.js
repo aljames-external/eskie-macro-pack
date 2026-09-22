@@ -98,7 +98,7 @@ test('aerodyneVehicle.create builds sequence with sequence.motion(token).moveTo(
         assert.equal(capturedMotionTarget, mockToken, 'Motion target must be the token');
         assert.equal(moveToCalled, true, 'moveTo must be called');
         assert.deepEqual(moveToArgs[0], { y: -0.2 }, 'moveTo target position must be { y: -0.2 }');
-        assert.deepEqual(moveToArgs[1], { gridUnits: true }, 'moveTo options must specify { gridUnits: true }');
+        assert.deepEqual(moveToArgs[1], { duration: 1000, gridUnits: true }, 'moveTo options must specify { duration: 1000, gridUnits: true }');
         assert.equal(oscillateCalled, true, 'oscillate must be called');
         assert.equal(opacitySetZero, false, 'Token opacity must NOT be set to 0');
     } finally {

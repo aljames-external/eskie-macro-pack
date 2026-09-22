@@ -35,7 +35,7 @@ async function create(token: Token, config: any = {}) {
 
         .motion(token)
         .name(EFFECT_NAME)
-        .moveTo({ y: -0.2 }, { gridUnits: true })
+        .moveTo({ y: -0.2 }, { duration: 1000, gridUnits: true })
         .oscillate()
         .persist()
 

@@ -25,7 +25,7 @@ async function create(token: Token, config: any = {}) {
 
     seq.motion(token)
         .name(label)
-        .moveTo({ y: -0.5 }, { gridUnits: true })
+        .moveTo({ y: -0.5 }, { duration: 1000, gridUnits: true })
         .oscillate()
         .persist();
 

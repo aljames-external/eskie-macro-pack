@@ -74,8 +74,7 @@ async function create(token: Token, target: Token, config: Record<string, any> =
     if (canPull) {
         // Pull target token towards caster using Sequencer 4.3.0+ sequence.motion(target).moveTo()
         seq.motion(target)
-            .moveTo(location, { rotate: false, ease: 'easeInCubic', delay: Math.max(0, 101 + timingAdjust) })
-            .duration(500);
+            .moveTo(location, { duration: 500, rotate: false, ease: 'easeInCubic', delay: Math.max(0, 101 + timingAdjust) });
     }
 
     return seq;

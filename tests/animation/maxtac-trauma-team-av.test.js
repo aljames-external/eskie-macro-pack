@@ -91,7 +91,7 @@ test('maxtacTraumaTeamAV.create builds sequence with sequence.motion(tile).moveT
         assert.equal(capturedMotionTarget, mockTile, 'Motion target must be the tile');
         assert.equal(moveToCalled, true, 'moveTo must be called');
         assert.deepEqual(moveToArgs[0], { y: -0.5 }, 'moveTo target position must be { y: -0.5 }');
-        assert.deepEqual(moveToArgs[1], { gridUnits: true }, 'moveTo options must specify { gridUnits: true }');
+        assert.deepEqual(moveToArgs[1], { duration: 1000, gridUnits: true }, 'moveTo options must specify { duration: 1000, gridUnits: true }');
         assert.equal(oscillateCalled, true, 'oscillate must be called');
     } finally {
         globalThis.Sequence = origSequence;

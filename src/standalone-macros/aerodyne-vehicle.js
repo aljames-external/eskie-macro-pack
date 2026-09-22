@@ -53,7 +53,7 @@ const seq = new Sequence()
 
     .motion(token)
     .name(effectName)
-    .moveTo({ y: -0.2 }, { gridUnits: true })
+    .moveTo({ y: -0.2 }, { duration: 1000, gridUnits: true })
     .oscillate()
     .persist()
 
