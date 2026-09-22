@@ -1,5 +1,7 @@
 // Standalone Macro: Thorn Whip
 // Author: .eskie
+// Modular Conversion & Sequencer 4.3.0+ .motion() Update: bakanabaka
+
 const closest = (path) => game.modules.get('eskie-macros')?.api?.util?.closest?.(path) ?? path;
 
 const token = canvas.tokens.controlled[0];
@@ -25,55 +27,37 @@ const rawLocation = {
 };
 
 const location = canvas.grid.getCenterPoint ? canvas.grid.getCenterPoint(rawLocation) : rawLocation;
-const offsetX = (location.x - target.center.x) / canvas.grid.size;
-const offsetY = (location.y - target.center.y) / canvas.grid.size;
 
-new Sequence()
-    .effect()
+const canPull = (target.document?.width ?? 1) <= 2;
+
+const sequence = new Sequence();
+
+sequence.effect()
     .file(closest('eskie.casting.nature.01.side.one_shot.green'))
     .attachTo(token)
     .rotateTowards(target)
     .playbackRate(1.25)
     .scaleToObject(1, { considerTokenScale: true })
-    .spriteOffset({ x: 0 }, { gridUnits: true })
-    .effect()
+    .spriteOffset({ x: 0 }, { gridUnits: true });
+
+sequence.effect()
     .file(closest('eskie.nature.vine.thorny.ranged.01.physical.normal.green'))
     .attachTo(token)
     .stretchTo(target)
     .zIndex(2)
-    .waitUntilFinished(-1000)
-    .effect()
+    .waitUntilFinished(-1000);
+
+sequence.effect()
     .file(closest('eskie.damage.piercing.01.yellow'))
     .atLocation(target)
     .scaleToObject(1, { considerTokenScale: true })
     .zIndex(1)
-    .randomRotation()
-    .effect()
-    .copySprite(target)
-    .spriteRotation(-target.document.rotation)
-    .attachTo(target)
-    .scaleToObject(1, { considerTokenScale: true })
-    .loopProperty('sprite', 'position.x', { from: -0.05, to: 0.05, duration: 50, pingPong: true, gridUnits: true })
-    .opacity(0.5)
-    .duration(1000)
-    .fadeOut(250)
-    .animation()
-    .delay(100)
-    .on(target)
-    .opacity(0)
-    .playIf(target.document.width <= 2)
-    .effect()
-    .copySprite(target)
-    .spriteRotation(-target.document.rotation)
-    .zIndex(0)
-    .animateProperty('spriteContainer', 'position.x', { from: 0, to: offsetX, duration: 500, delay: 101 + timingAdjust, gridUnits: true, ease: 'easeInCubic' })
-    .animateProperty('spriteContainer', 'position.y', { from: 0, to: offsetY, duration: 500, delay: 101 + timingAdjust, gridUnits: true, ease: 'easeInCubic' })
-    .duration(700 + timingAdjust)
-    .waitUntilFinished(-100)
-    .playIf(target.document.width <= 2)
-    .animation()
-    .on(target)
-    .teleportTo(location, { relativeToCenter: true })
-    .opacity(1)
-    .playIf(target.document.width <= 2)
-    .play();
+    .randomRotation();
+
+if (canPull) {
+    sequence.motion(target)
+        .moveTo(location, { rotate: false, ease: 'easeInCubic', delay: Math.max(0, 101 + timingAdjust) })
+        .duration(500);
+}
+
+await sequence.play();

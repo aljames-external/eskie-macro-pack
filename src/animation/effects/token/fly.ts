@@ -1,5 +1,5 @@
 // Original Author: EskieMoh#2969
-// Modular Conversion: bakanabaka
+// Modular Conversion & Sequencer 4.3.0+ .motion() Update: bakanabaka
 
 import { closest } from "../../../lib/filemanager.js";
 
@@ -13,46 +13,34 @@ const DEFAULT_CONFIG = {
 async function create(token: Token, config: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id, sound } = mConfig;
+    const label = `${id} - ${token.id}`;
 
-    let seq = new Sequence();
+    const seq = new Sequence();
     applySound(seq, sound);
-    seq = seq.effect()
+    seq.effect()
         .file(closest("jb2a.misty_step.01.blue"))
         .atLocation(token)
         .scaleToObject(1.75)
         .belowTokens();
 
-    seq = seq.animation()
-        .on(token)
-        .opacity(0);
-
-    seq = seq.effect()
-        .copySprite(token)
-        .spriteRotation(-token.document.rotation)
-        .name(`${id} - ${token.id}`)
-        .atLocation(token)
-        .scaleToObject(1, { considerTokenScale: true })
-        .opacity(1)
-        .duration(800)
-        .anchor({ x: 0.55, y: 0.9 })
-        .animateProperty('spriteContainer', 'position.y', { from: 50, to: 0, duration: 500 })
-        .loopProperty('spriteContainer', 'position.y', { from: 0, to: -50, duration: 2500, pingPong: true, delay: 500 })
-        .attachTo(token, { bindAlpha: false })
-        .zIndex(2)
+    seq.motion(token)
+        .name(label)
+        .moveTo({ y: -0.5 }, { gridUnits: true })
+        .oscillate()
         .persist();
 
-    seq = seq.effect()
+    seq.effect()
         .copySprite(token)
         .spriteRotation(-token.document.rotation)
-        .name(`${id} - ${token.id}`)
-        .atLocation(token)
+        .name(label)
+        .atLocation(token, { ignoreMotion: true })
         .scaleToObject(0.9, { considerTokenScale: true })
         .duration(1000)
         .opacity(0.5)
         .belowTokens()
         .filter("ColorMatrix", { brightness: -1 })
         .filter("Blur", { blurX: 5, blurY: 10 })
-        .attachTo(token, { bindAlpha: false })
+        .attachTo(token, { bindAlpha: false, ignoreMotion: true })
         .zIndex(1)
         .persist();
 
@@ -66,12 +54,10 @@ async function play(token: Token, config: any = {}) {
 
 async function stop(token: Token, config: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
-    const { id, sound } = mConfig;
+    const { id } = mConfig;
+    const label = `${id} - ${token.id}`;
 
-    return Promise.all([
-        Sequencer.EffectManager.endEffects({ name: `${id} - ${token.id}`, object: token }),
-        new Sequence().animation().on(token).opacity(1).play()
-    ])
+    return Sequencer.EffectManager.endEffects({ name: label, object: token });
 }
 
 export const fly = {
@@ -80,3 +66,4 @@ export const fly = {
     stop,
     default_config: DEFAULT_CONFIG,
 };
+

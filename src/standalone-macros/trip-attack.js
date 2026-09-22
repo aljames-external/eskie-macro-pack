@@ -1,6 +1,6 @@
 // Standalone Macro: Trip Attack
 // Original Author: .eskie
-// Modular Conversion: bakanabaka
+// Modular Conversion & Sequencer 4.3.0+ .motion() Update: bakanabaka
 
 if (!game.modules.get("sequencer")?.active) {
     return ui.notifications.error("The 'Trip Attack' macro requires the 'Sequencer' module to be installed and active!");
@@ -48,7 +48,6 @@ const effectOffset = -0.75 - (0.25 * weightIndex);
 
 const targetSquare = getNearestSquareCenter(token, target);
 const tokenWidth = token.document.width;
-const targetRotation = target.document.rotation;
 
 const sequence = new Sequence();
 
@@ -60,11 +59,6 @@ sequence
         .scaleToObject(effectSize, { considerTokenScale: true })
         .spriteOffset({ x: effectOffset * tokenWidth }, { gridUnits: true })
         .zIndex(1)
-
-    .animation()
-        .delay(100)
-        .on(target)
-        .opacity(0)
 
     .effect()
         .copySprite(target)
@@ -87,28 +81,15 @@ sequence
         .belowTokens()
         .animateProperty("spriteContainer", "position.y", { from: 0, to: -0.5, duration: 500, ease: "easeOutCubic", gridUnits: true })
 
-    .effect()
-        .copySprite(target)
-        .attachTo(target, { bindAlpha: false, bindRotation: false, local: false })
-        .scaleToObject(1, { considerTokenScale: true })
-        .animateProperty("spriteContainer", "position.y", { from: 0, to: -0.5, duration: 500, ease: "easeOutCubic", delay: 100, gridUnits: true })
-        .animateProperty("spriteContainer", "position.y", { from: 0, to: 0.5, duration: 250, ease: "easeOutCubic", delay: 600, gridUnits: true })
-        .animateProperty("sprite", "rotation", { from: 0, to: 90, duration: 250, ease: "easeOutCubic", delay: 100 })
-        .zIndex(2)
-        .duration(1200)
-        .waitUntilFinished(-500)
+    .motion(target)
+        .rotateTo(90)
 
     .effect()
         .file(closest("eskie.smoke.03.white"))
         .attachTo(target, { bindAlpha: false, bindRotation: false })
         .scaleToObject(2, { considerTokenScale: true })
         .opacity(0.8)
-        .belowTokens()
-
-    .animation()
-        .delay(300)
-        .on(target)
-        .opacity(1)
-        .rotate(targetRotation + 90);
+        .belowTokens();
 
 await sequence.play();
+

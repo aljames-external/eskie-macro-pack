@@ -242,60 +242,9 @@ async function createBanish(target: Token, config: any = {}) {
         .fadeIn(250)
         .fadeOut(750);
 
-    sequence.animation()
-        .on(target)
-        .opacity(0)
-        .show(false);
-
-    sequence.effect()
-        .copySprite(target)
-        .spriteRotation(-target.document.rotation)
-        .atLocation(target)
-        .scaleToObject(1, { considerTokenScale: true })
-        .animateProperty('spriteContainer', 'position.y', { from: 0, to: -15, duration: 250, ease: "easeInOutBack" })
-        .waitUntilFinished(-100);
-
-    sequence.effect()
-        .copySprite(target)
-        .spriteRotation(-target.document.rotation)
-        .atLocation(target)
-        .scaleToObject(1, { considerTokenScale: true })
-        .animateProperty('spriteContainer', 'position.y', { from: -15, to: 0, duration: 2000, ease: "easeInOutBack" })
-        .animateProperty('sprite', 'rotation', { from: 0, to: 8, duration: 500, ease: "easeOutCubic" })
-        .animateProperty('sprite', 'rotation', { from: 0, to: -16, duration: 500, delay: 500, ease: "easeOutCubic" })
-        .animateProperty('sprite', 'rotation', { from: 0, to: 16, duration: 500, delay: 1000, ease: "easeOutCubic" })
-        .animateProperty('sprite', 'rotation', { from: 0, to: -16, duration: 500, delay: 1500, ease: "easeInCubic" })
-        .waitUntilFinished(-100);
-
-    sequence.effect()
-        .copySprite(target)
-        .spriteRotation(-target.document.rotation)
-        .atLocation(target)
-        .scaleToObject(1, { considerTokenScale: true })
-        .animateProperty('spriteContainer', 'position.y', { from: 0, to: -40, duration: 500, ease: "easeInOutBack" })
-        .waitUntilFinished(-100);
-
-    sequence.effect()
-        .copySprite(target)
-        .spriteRotation(-target.document.rotation)
-        .atLocation(target)
-        .scaleToObject(1, { considerTokenScale: true })
-        .animateProperty('spriteContainer', 'position.y', { from: -40, to: -15, duration: 2000, ease: "easeInOutBack" })
-        .animateProperty('sprite', 'rotation', { from: 0, to: 8, duration: 500, ease: "easeOutCubic" })
-        .animateProperty('sprite', 'rotation', { from: 0, to: -16, duration: 500, delay: 500, ease: "easeOutCubic" })
-        .animateProperty('sprite', 'rotation', { from: 0, to: 16, duration: 500, delay: 1000, ease: "easeOutCubic" })
-        .animateProperty('sprite', 'rotation', { from: 0, to: -16, duration: 500, delay: 1500, ease: "easeInCubic" })
-        .waitUntilFinished(-100);
-
-    sequence.effect()
-        .copySprite(target)
-        .spriteRotation(-target.document.rotation)
-        .atLocation(target)
-        .scaleToObject(1, { considerTokenScale: true })
-        .animateProperty('spriteContainer', 'position.y', { from: -15, to: -200, duration: 750, ease: "easeInOutBack" })
-        .scaleOut(0, 750)
-        .duration(375)
-        .waitUntilFinished(-150);
+    sequence.motion(target)
+        .scaleTo(0)
+        .rotateBy(360);
 
     sequence.effect()
         .file(closest(`jb2a.explosion.02.${portal.color}`))
@@ -362,20 +311,8 @@ async function createReturn(target: Token, config: any = {}) {
         .belowTokens()
         .delay(1500)
         .waitUntilFinished(-4000);
-    sequence.effect()
-        .copySprite(target)
-        .spriteRotation(-target.document.rotation)
-        .atLocation(target)
-        .scaleToObject(1, { considerTokenScale: true })
-        .animateProperty('spriteContainer', 'position.y', { from: -75, to: 0, duration: 500, ease: "easeOutBounce" })
-        .scaleIn(0.25, 500)
-        .fadeIn(250)
-        .delay(1500)
-        .waitUntilFinished(-150);
-    sequence.animation()
-        .on(target)
-        .show(true)
-        .opacity(1);
+    sequence.motion(target)
+        .scaleTo(1);
     return sequence;
 }
 
@@ -386,10 +323,8 @@ async function playReturn(target: Token, config: any = {}) {
 
 async function clean(target: Token, config: any = {}) {
     new Sequence()
-        .animation()
-        .on(target)
-        .opacity(1)
-        .show(true)
+        .motion(target)
+        .scaleTo(1)
         .play();
 }
 

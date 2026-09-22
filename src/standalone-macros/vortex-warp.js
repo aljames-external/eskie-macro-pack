@@ -1,6 +1,6 @@
 // Standalone Macro: Vortex Warp
 // Original Author: EskieMoh#2969
-// Modular Conversion: bakanabaka
+// Modular Conversion & Sequencer 4.3.0+ .motion() Update: bakanabaka
 
 if (!game.modules.get("sequencer")?.active) {
     return ui.notifications.error("The 'Vortex Warp' macro requires the 'Sequencer' module to be installed and active!");
@@ -14,9 +14,8 @@ if (!target) return ui.notifications.warn("Please target a token to warp!");
 
 const label = "Vortex Warp";
 const activeEffects = Sequencer.EffectManager.getEffects({ name: label, object: target });
-if (activeEffects.length > 0 || (target.document?.opacity ?? 1) === 0) {
+if (activeEffects.length > 0) {
     Sequencer.EffectManager.endEffects({ name: label, object: target });
-    new Sequence().animation().on(target).opacity(1).play();
     return;
 }
 
@@ -57,23 +56,8 @@ sequence = sequence.effect()
     .belowTokens()
     .waitUntilFinished(-500);
 
-sequence = sequence.effect()
-    .name(label)
-    .copySprite(target)
-    .spriteRotation(-(target.document?.rotation ?? 0))
-    .scaleToObject(1, { considerTokenScale: true })
-    .duration(500)
-    .scaleOut(0, 500, { ease: "easeInOutElastic" })
-    .rotateOut(180, 300, { ease: "easeOutCubic" });
-
-sequence = sequence.animation()
-    .on(target)
-    .opacity(0);
-
-sequence = sequence.animation()
-    .on(target)
-    .teleportTo(position, { offset: { x: -1, y: -1 } })
-    .snapToGrid();
+sequence = sequence.motion(target)
+    .moveTo(position);
 
 // Vortex in
 sequence = sequence.effect()
@@ -89,18 +73,5 @@ sequence = sequence.effect()
     .duration(2000)
     .waitUntilFinished(-500);
 
-sequence = sequence.effect()
-    .name(label)
-    .copySprite(target)
-    .spriteRotation(-(target.document?.rotation ?? 0))
-    .scaleToObject(1, { considerTokenScale: true })
-    .scaleIn(0, 500, { ease: "easeInOutElastic" })
-    .rotateIn(180, 300, { ease: "easeOutCubic" })
-    .duration(500)
-    .waitUntilFinished(-250);
-
-sequence = sequence.animation()
-    .on(target)
-    .opacity(1);
-
 await sequence.play();
+

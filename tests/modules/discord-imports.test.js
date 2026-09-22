@@ -560,4 +560,197 @@ test('stormingDashStrikes uses Sequencer 4.3.0+ sequence.motion(token).moveTo() 
     assert.match(jsContent, /\.moveTo\(endPos/, 'storming-dash-strikes.js must use .moveTo(endPos)');
 });
 
+test('psychicTeleportation uses Sequencer 4.3.0+ sequence.motion(token).moveTo() API', () => {
+    const tsModulePath = path.join(rootDir, 'src/animation/effects/template/psychic-teleportation.ts');
+    const jsMacroPath = path.join(rootDir, 'src/standalone-macros/psychic-teleportation.js');
+
+    const tsContent = fs.readFileSync(tsModulePath, 'utf8');
+    const jsContent = fs.readFileSync(jsMacroPath, 'utf8');
+
+    assert.doesNotMatch(tsContent, /copySprite/, 'psychic-teleportation.ts must not use copySprite');
+    assert.doesNotMatch(tsContent, /\.opacity\(0\)/, 'psychic-teleportation.ts must not hide token with opacity(0)');
+    assert.match(tsContent, /\.motion\(token\)/, 'psychic-teleportation.ts must use .motion(token)');
+    assert.match(tsContent, /\.moveTo\(position/, 'psychic-teleportation.ts must use .moveTo(position)');
+
+    assert.doesNotMatch(jsContent, /copySprite/, 'psychic-teleportation.js must not use copySprite');
+    assert.doesNotMatch(jsContent, /\.opacity\(0\)/, 'psychic-teleportation.js must not hide token with opacity(0)');
+    assert.match(jsContent, /\.motion\(token\)/, 'psychic-teleportation.js must use .motion(token)');
+    assert.match(jsContent, /\.moveTo\(position/, 'psychic-teleportation.js must use .moveTo(position)');
+});
+
+
+test('vortexWarp uses Sequencer 4.3.0+ sequence.motion(target).moveTo() API for teleport movement', () => {
+    const tsModulePath = path.join(rootDir, 'src/animation/effects/target/vortex-warp.ts');
+    const jsMacroPath = path.join(rootDir, 'src/standalone-macros/vortex-warp.js');
+
+    const tsContent = fs.readFileSync(tsModulePath, 'utf8');
+    const jsContent = fs.readFileSync(jsMacroPath, 'utf8');
+
+    assert.doesNotMatch(tsContent, /copySprite/, 'vortex-warp.ts must not use copySprite');
+    assert.doesNotMatch(tsContent, /\.opacity\(0\)/, 'vortex-warp.ts must not hide token with opacity(0)');
+    assert.match(tsContent, /\.motion\(/, 'vortex-warp.ts must use .motion()');
+    assert.match(tsContent, /sequence\.motion\(target\)/, 'vortex-warp.ts must use sequence.motion(target)');
+    assert.match(tsContent, /\.moveTo\(/, 'vortex-warp.ts must use .moveTo()');
+
+    assert.doesNotMatch(jsContent, /copySprite/, 'vortex-warp.js must not use copySprite');
+    assert.doesNotMatch(jsContent, /\.opacity\(0\)/, 'vortex-warp.js must not hide token with opacity(0)');
+    assert.match(jsContent, /\.motion\(/, 'vortex-warp.js must use .motion()');
+    assert.match(jsContent, /sequence\.motion\(target\)/, 'vortex-warp.js must use sequence.motion(target)');
+    assert.match(jsContent, /\.moveTo\(/, 'vortex-warp.js must use .moveTo()');
+});
+
+test('baitAndSwitch uses Sequencer 4.3.0+ sequence.motion(token).moveTo() and sequence.motion(target).moveTo() API for position swap', () => {
+    const tsModulePath = path.join(rootDir, 'src/animation/effects/battlemaster/bait-and-switch.ts');
+    const jsMacroPath = path.join(rootDir, 'src/standalone-macros/bait-and-switch.js');
+
+    const tsContent = fs.readFileSync(tsModulePath, 'utf8');
+    const jsContent = fs.readFileSync(jsMacroPath, 'utf8');
+
+    assert.doesNotMatch(tsContent, /\.opacity\(0\)/, 'bait-and-switch.ts must not hide token with opacity(0)');
+    assert.match(tsContent, /sequence\.motion\(token\)/, 'bait-and-switch.ts must use sequence.motion(token)');
+    assert.match(tsContent, /sequence\.motion\(target\)/, 'bait-and-switch.ts must use sequence.motion(target)');
+    assert.match(tsContent, /\.moveTo\(/, 'bait-and-switch.ts must use .moveTo()');
+
+    assert.doesNotMatch(jsContent, /\.opacity\(0\)/, 'bait-and-switch.js must not hide token with opacity(0)');
+    assert.match(jsContent, /sequence\.motion\(token\)/, 'bait-and-switch.js must use sequence.motion(token)');
+    assert.match(jsContent, /sequence\.motion\(target\)/, 'bait-and-switch.js must use sequence.motion(target)');
+    assert.match(jsContent, /\.moveTo\(/, 'bait-and-switch.js must use .moveTo()');
+});
+
+test('stepOfTheWindJump uses Sequencer 4.3.0+ sequence.motion(token).moveTo() with arc: 0.8 for jump trajectory', () => {
+    const tsModulePath = path.join(rootDir, 'src/animation/effects/template/step-of-the-wind-jump.ts');
+    const jsMacroPath = path.join(rootDir, 'src/standalone-macros/step-of-the-wind-jump.js');
+
+    const tsContent = fs.readFileSync(tsModulePath, 'utf8');
+    const jsContent = fs.readFileSync(jsMacroPath, 'utf8');
+
+    assert.doesNotMatch(tsContent, /\.opacity\(0\)/, 'step-of-the-wind-jump.ts must not hide token with opacity(0)');
+    assert.match(tsContent, /\.motion\(token\)/, 'step-of-the-wind-jump.ts must use .motion(token)');
+    assert.match(tsContent, /\.moveTo\(position,\s*\{[\s\S]*arc:\s*0\.8/, 'step-of-the-wind-jump.ts must use .moveTo() with arc: 0.8');
+
+    assert.doesNotMatch(jsContent, /\.opacity\(0\)/, 'step-of-the-wind-jump.js must not hide token with opacity(0)');
+    assert.match(jsContent, /\.motion\(token\)/, 'step-of-the-wind-jump.js must use .motion(token)');
+    assert.match(jsContent, /\.moveTo\(position,\s*\{[\s\S]*arc:\s*0\.8/, 'step-of-the-wind-jump.js must use .moveTo() with arc: 0.8');
+});
+
+test('enlargeReduce uses Sequencer 4.3.0+ sequence.motion(token).scaleTo() API for scale animation', () => {
+    const tsModulePath = path.join(rootDir, 'src/animation/effects/active-effect/enlarge-reduce.ts');
+    const jsMacroPath = path.join(rootDir, 'src/standalone-macros/enlarge-reduce.js');
+
+    const tsContent = fs.readFileSync(tsModulePath, 'utf8');
+    const jsContent = fs.readFileSync(jsMacroPath, 'utf8');
+
+    assert.doesNotMatch(tsContent, /copySprite/, 'enlarge-reduce.ts must not use copySprite');
+    assert.doesNotMatch(tsContent, /\.opacity\(0\)/, 'enlarge-reduce.ts must not hide token with opacity(0)');
+    assert.doesNotMatch(tsContent, /teleportTo/, 'enlarge-reduce.ts must not use teleportTo');
+    assert.match(tsContent, /\.motion\(token\)/, 'enlarge-reduce.ts must use .motion(token)');
+    assert.match(tsContent, /\.scaleTo\(/, 'enlarge-reduce.ts must use .scaleTo()');
+
+    assert.doesNotMatch(jsContent, /copySprite/, 'enlarge-reduce.js must not use copySprite');
+    assert.doesNotMatch(jsContent, /\.opacity\(0\)/, 'enlarge-reduce.js must not hide token with opacity(0)');
+    assert.doesNotMatch(jsContent, /teleportTo/, 'enlarge-reduce.js must not use teleportTo');
+    assert.match(jsContent, /\.motion\(token\)/, 'enlarge-reduce.js must use .motion(token)');
+    assert.match(jsContent, /\.scaleTo\(/, 'enlarge-reduce.js must use .scaleTo()');
+});
+
+test('iaijutsuStrike uses Sequencer 4.3.0+ sequence.motion().moveTo() API for slash dash movement', () => {
+    const tsModulePath = path.join(rootDir, 'src/animation/effects/token/iaijutsu-strike.ts');
+    const jsMacroPath = path.join(rootDir, 'src/standalone-macros/iaijutsu-strike.js');
+
+    const tsContent = fs.readFileSync(tsModulePath, 'utf8');
+    const jsContent = fs.readFileSync(jsMacroPath, 'utf8');
+
+    assert.doesNotMatch(tsContent, /\.opacity\(0\)/, 'iaijutsu-strike.ts must not hide token with opacity(0)');
+    assert.doesNotMatch(tsContent, /teleportTo/, 'iaijutsu-strike.ts must not use teleportTo');
+    assert.match(tsContent, /sequence\.motion\(source\)/, 'iaijutsu-strike.ts must use sequence.motion(source)');
+    assert.match(tsContent, /\.moveTo\(dashDestination/, 'iaijutsu-strike.ts must use .moveTo(dashDestination)');
+
+    assert.doesNotMatch(jsContent, /\.opacity\(0\)/, 'iaijutsu-strike.js must not hide token with opacity(0)');
+    assert.doesNotMatch(jsContent, /teleportTo/, 'iaijutsu-strike.js must not use teleportTo');
+    assert.match(jsContent, /sequence\.motion\(token\)/, 'iaijutsu-strike.js must use sequence.motion(token)');
+    assert.match(jsContent, /\.moveTo\(dashDestination/, 'iaijutsu-strike.js must use .moveTo(dashDestination)');
+});
+
+
+test('levitation uses Sequencer 4.3.0+ sequence.motion(token).oscillate() / .moveTo() hover motion', () => {
+    const tsModulePath = path.join(rootDir, 'src/animation/effects/active-effect/levitation.ts');
+    const jsMacroPath = path.join(rootDir, 'src/standalone-macros/levitation.js');
+
+    const tsContent = fs.readFileSync(tsModulePath, 'utf8');
+    const jsContent = fs.readFileSync(jsMacroPath, 'utf8');
+
+    assert.doesNotMatch(tsContent, /copySprite/, 'levitation.ts must not use copySprite');
+    assert.doesNotMatch(tsContent, /\.opacity\(0\)/, 'levitation.ts must not hide token with opacity(0)');
+    assert.match(tsContent, /\.motion\(token\)/, 'levitation.ts must use .motion(token)');
+    assert.match(tsContent, /\.moveTo\(/, 'levitation.ts must use .moveTo()');
+    assert.match(tsContent, /\.oscillate\(/, 'levitation.ts must use .oscillate()');
+
+    assert.doesNotMatch(jsContent, /\.opacity\(0\)/, 'levitation.js must not hide token with opacity(0)');
+    assert.match(jsContent, /\.motion\(token\)/, 'levitation.js must use .motion(token)');
+    assert.match(jsContent, /\.moveTo\(/, 'levitation.js must use .moveTo()');
+    assert.match(jsContent, /\.oscillate\(/, 'levitation.js must use .oscillate()');
+});
+
+test('fly uses Sequencer 4.3.0+ sequence.motion(token).moveTo({ y: -0.5 }, { gridUnits: true }).oscillate().persist() hover motion', () => {
+    const tsModulePath = path.join(rootDir, 'src/animation/effects/token/fly.ts');
+    const jsMacroPath = path.join(rootDir, 'src/standalone-macros/fly.js');
+
+    const tsContent = fs.readFileSync(tsModulePath, 'utf8');
+    const jsContent = fs.readFileSync(jsMacroPath, 'utf8');
+
+    assert.doesNotMatch(tsContent, /\.opacity\(0\)/, 'fly.ts must not hide token with opacity(0)');
+    assert.match(tsContent, /\.motion\(token\)/, 'fly.ts must use .motion(token)');
+    assert.match(tsContent, /\.moveTo\(/, 'fly.ts must use .moveTo()');
+    assert.match(tsContent, /\.oscillate\(/, 'fly.ts must use .oscillate()');
+
+    assert.doesNotMatch(jsContent, /\.opacity\(0\)/, 'fly.js must not hide token with opacity(0)');
+    assert.match(jsContent, /\.motion\(token\)/, 'fly.js must use .motion(token)');
+    assert.match(jsContent, /\.moveTo\(/, 'fly.js must use .moveTo()');
+    assert.match(jsContent, /\.oscillate\(/, 'fly.js must use .oscillate()');
+});
+
+test('banishment uses Sequencer 4.3.0+ sequence.motion(target).scaleTo(0).rotateBy(360) for target scaling/rotation instead of copySprite and opacity(0) hiding', () => {
+    const tsModulePath = path.join(rootDir, 'src/animation/effects/active-effect/banishment.ts');
+    const jsMacroPath = path.join(rootDir, 'src/standalone-macros/banishment.js');
+
+    const tsContent = fs.readFileSync(tsModulePath, 'utf8');
+    const jsContent = fs.readFileSync(jsMacroPath, 'utf8');
+
+    assert.doesNotMatch(tsContent, /copySprite/, 'banishment.ts must not use copySprite');
+    assert.doesNotMatch(tsContent, /\.animation\(\)/, 'banishment.ts must not hide token with animation()');
+    assert.match(tsContent, /\.motion\(/, 'banishment.ts must use .motion()');
+    assert.match(tsContent, /sequence\.motion\(target\)/, 'banishment.ts must use sequence.motion(target)');
+    assert.match(tsContent, /\.scaleTo\(0\)/, 'banishment.ts must use .scaleTo(0)');
+    assert.match(tsContent, /\.rotateBy\(360\)/, 'banishment.ts must use .rotateBy(360)');
+
+    assert.doesNotMatch(jsContent, /copySprite/, 'banishment.js must not use copySprite');
+    assert.doesNotMatch(jsContent, /\.animation\(\)/, 'banishment.js must not hide token with animation()');
+    assert.match(jsContent, /\.motion\(/, 'banishment.js must use .motion()');
+    assert.match(jsContent, /sequence\.motion\(target\)/, 'banishment.js must use sequence.motion(target)');
+    assert.match(jsContent, /\.scaleTo\(0\)/, 'banishment.js must use .scaleTo(0)');
+    assert.match(jsContent, /\.rotateBy\(360\)/, 'banishment.js must use .rotateBy(360)');
+});
+
+test('thornWhip uses Sequencer 4.3.0+ sequence.motion(target).moveTo() for pulling target token instead of copySprite and opacity(0) hiding', () => {
+    const tsModulePath = path.join(rootDir, 'src/animation/effects/target/thorn-whip.ts');
+    const jsMacroPath = path.join(rootDir, 'src/standalone-macros/thorn-whip.js');
+
+    const tsContent = fs.readFileSync(tsModulePath, 'utf8');
+    const jsContent = fs.readFileSync(jsMacroPath, 'utf8');
+
+    assert.doesNotMatch(tsContent, /copySprite/, 'thorn-whip.ts must not use copySprite');
+    assert.doesNotMatch(tsContent, /\.opacity\(0\)/, 'thorn-whip.ts must not hide token with opacity(0)');
+    assert.match(tsContent, /\.motion\(/, 'thorn-whip.ts must use .motion()');
+    assert.match(tsContent, /seq\.motion\(target\)/, 'thorn-whip.ts must use seq.motion(target)');
+    assert.match(tsContent, /\.moveTo\(/, 'thorn-whip.ts must use .moveTo()');
+
+    assert.doesNotMatch(jsContent, /copySprite/, 'thorn-whip.js must not use copySprite');
+    assert.doesNotMatch(jsContent, /\.opacity\(0\)/, 'thorn-whip.js must not hide token with opacity(0)');
+    assert.match(jsContent, /\.motion\(/, 'thorn-whip.js must use .motion()');
+    assert.match(jsContent, /sequence\.motion\(target\)/, 'thorn-whip.js must use sequence.motion(target)');
+    assert.match(jsContent, /\.moveTo\(/, 'thorn-whip.js must use .moveTo()');
+});
+
+
+
 

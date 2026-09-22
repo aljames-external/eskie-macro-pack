@@ -16,34 +16,37 @@ function create(token: Token, config: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id, tint, sound } = mConfig;
     const label = `${id} - ${token.id}`;
-    const gridSize = adapter.getSceneDimensions().size;
-    const floatOffset = gridSize / 9;
 
     const sequence = new Sequence();
     applySound(sequence, sound);
+
+    // Levitating token hover motion via Sequencer 4.3.0+ .motion() API
     sequence
-    .animation()
-        .delay(75)
-        .on(token)
-        .opacity(0)
+        .motion(token)
+        .name(label)
+        .moveTo({ y: -0.6 }, { gridUnits: true, duration: 2000, ease: "easeOutCubic" })
+        .oscillate()
+        .persist();
 
     // Bless loop effect
-    .effect()
+    sequence
+        .effect()
         .name(label)
         .atLocation(token)
-        .attachTo(token, {bindAlpha: false})
+        .attachTo(token, { bindAlpha: false })
         .file(closest("jb2a.bless.200px.loop.blue"))
         .fadeIn(500)
         .fadeOut(500)
         .scaleToObject(2)
         .tint(tint)
-        .persist()
+        .persist();
 
     // Wind stream effect
-    .effect()
+    sequence
+        .effect()
         .name(label)
         .atLocation(token)
-        .attachTo(token, {bindAlpha: false})
+        .attachTo(token, { bindAlpha: false })
         .file(closest("jb2a.wind_stream.200.white"))
         .fadeIn(500)
         .fadeOut(500)
@@ -51,40 +54,21 @@ function create(token: Token, config: any = {}) {
         .tint(tint)
         .scaleToObject(1)
         .belowTokens()
-        .persist()
-    
-    // Levitating token sprite
-    .effect()
-        .name(label)
-        .copySprite(token)
-        .spriteRotation(-token.document.rotation)
-        .attachTo(token, {bindAlpha: false})
-        .scaleToObject(1, { considerTokenScale: true })
-        .fadeIn(500)
-        .fadeOut(500)
-        .animateProperty('spriteContainer', 'position.y', { from: 0, to: -0.6, duration: 2000, gridUnits: true, ease: "easeOutCubic" })
-        .loopProperty('sprite', "rotation", {from: -10, to: 10, duration: 1100, pingPong: true, ease: "easeInOutSine" })
-        .loopProperty('spriteContainer', 'position.x', {from: -floatOffset, to: floatOffset, duration: 2000, pingPong: true, ease: "easeInOutSine" })
-        .loopProperty('spriteContainer', 'position.y', {from: -floatOffset, to: floatOffset, duration: 3000, pingPong: true, ease: "easeInOutSine" })
-        .zIndex(2)
-        .persist()
+        .persist();
 
     // Levitating token border
-    .effect()
+    sequence
+        .effect()
         .name(label)
-        .attachTo(token, {bindAlpha: false})
+        .attachTo(token, { bindAlpha: false })
         .file(closest("jb2a.token_border.circle.static.blue.012"))
         .fadeIn(500)
         .fadeOut(500)
         .scaleToObject(2)
         .belowTokens()
-        .animateProperty('spriteContainer', 'position.y', { from: 0, to: -0.6, duration: 2000, gridUnits: true, ease: "easeOutCubic" })
-        .loopProperty('sprite', "rotation", {from: -10, to: 10, duration: 1100, pingPong: true, ease: "easeInOutSine" })
-        .loopProperty('spriteContainer', 'position.x', {from: -floatOffset, to: floatOffset, duration: 2000, pingPong: true, ease: "easeInOutSine" })
-        .loopProperty('spriteContainer', 'position.y', {from: -floatOffset, to: floatOffset, duration: 3000, pingPong: true, ease: "easeInOutSine" })
         .zIndex(1)
         .persist();
-    
+
     return sequence;
 }
 
@@ -95,17 +79,8 @@ async function play(token: Token, config: any = {}) {
 
 async function stop(token: Token, config: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
-    const { id, sound } = mConfig;
+    const { id } = mConfig;
     const label = `${id} - ${token.id}`;
-
-    new Sequence()
-        .animation()
-        .delay(75)
-        .fadeIn(500)
-        .fadeOut(500)
-        .on(token)
-        .opacity(1)
-        .play();
 
     return Sequencer.EffectManager.endEffects({ name: label, object: token });
 }
@@ -117,4 +92,5 @@ export const levitation = {
     default_config: DEFAULT_CONFIG,
 };
 
-adapter.autorec.register("levitating", "effect", "eskie.effect.levitation", DEFAULT_CONFIG, "0.0.1", "Levitating");
+adapter.autorec.register("levitating", "effect", "eskie.effect.levitation", DEFAULT_CONFIG, "0.0.2", "Levitating");
+

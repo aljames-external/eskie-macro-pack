@@ -1,6 +1,6 @@
 // Standalone Macro: Bait and Switch
 // Original Author: .eskie
-// Modular Conversion: bakanabaka
+// Modular Conversion & Sequencer 4.3.0+ .motion() Update: bakanabaka
 
 if (!game.modules.get("sequencer")?.active) {
     return ui.notifications.error("The 'Bait and Switch' macro requires the 'Sequencer' module to be installed and active!");
@@ -24,68 +24,40 @@ if (token.y === target.y) blurDirectionX = 20;
 
 const sequence = new Sequence();
 
-sequence
-    .animation()
-        .on(target)
-        .opacity(0)
-        .delay(150)
+// Target position swap motion via Sequencer 4.3.0+ sequence.motion(target)
+sequence.motion(target)
+    .moveTo(tokenCenter, { rotate: false, ease: "easeInBack", delay: 250 })
+    .moveSpeed(500)
+    .duration(1000);
 
-    .animation()
-        .on(token)
-        .opacity(0)
-        .delay(250)
+// Token position swap motion via Sequencer 4.3.0+ sequence.motion(token)
+sequence.motion(token)
+    .moveTo(targetCenter, { rotate: false, ease: "easeOutCubic", delay: 500 })
+    .moveSpeed(300)
+    .duration(1250);
 
-    .effect()
-        .copySprite(target)
-        .scaleToObject(1, { considerTokenScale: true })
-        .moveTowards(token, { rotate: false, ease: "easeInBack", delay: 250 })
-        .moveSpeed(500)
-        .duration(1000)
-        .zIndex(0.2)
+sequence.effect()
+    .copySprite(token)
+    .scaleToObject(1, { considerTokenScale: true })
+    .moveTowards(targetCenter, { rotate: false, ease: "easeOutCubic", delay: 500 })
+    .moveSpeed(300)
+    .duration(1250)
+    .opacity(0.85)
+    .fadeIn(50, { delay: 500 })
+    .fadeOut(500, { ease: "easeOutQuint" })
+    .filter("Blur", { blurX: blurDirectionX, blurY: blurDirectionY })
+    .zIndex(0.1);
 
-    .effect()
-        .copySprite(token)
-        .scaleToObject(1, { considerTokenScale: true })
-        .moveTowards(target, { rotate: false, ease: "easeOutCubic", delay: 500 })
-        .moveSpeed(300)
-        .duration(1250)
-
-    .effect()
-        .copySprite(token)
-        .scaleToObject(1, { considerTokenScale: true })
-        .moveTowards(target, { rotate: false, ease: "easeOutCubic", delay: 500 })
-        .moveSpeed(300)
-        .duration(1250)
-        .opacity(0.85)
-        .fadeIn(50, { delay: 500 })
-        .fadeOut(500, { ease: "easeOutQuint" })
-        .filter("Blur", { blurX: blurDirectionX, blurY: blurDirectionY })
-        .zIndex(0.1)
-
-    .effect()
-        .file(closest("eskie.smoke.01.white"))
-        .atLocation(targetCenter)
-        .rotateTowards(tokenCenter)
-        .scaleToObject(1.5, { considerTokenScale: true })
-        .belowTokens()
-        .delay(750)
-        .opacity(0.4)
-        .spriteOffset({ x: -0.5 }, { gridUnits: true })
-        .mirrorX()
-        .spriteRotation(180)
-
-    .animation()
-        .delay(1000)
-        .on(token)
-        .teleportTo(targetCenter, { relativeToCenter: false })
-        .snapToGrid()
-        .opacity(1)
-
-    .animation()
-        .delay(750)
-        .on(target)
-        .teleportTo(tokenCenter, { relativeToCenter: false })
-        .snapToGrid()
-        .opacity(1);
+sequence.effect()
+    .file(closest("eskie.smoke.01.white"))
+    .atLocation(targetCenter)
+    .rotateTowards(tokenCenter)
+    .scaleToObject(1.5, { considerTokenScale: true })
+    .belowTokens()
+    .delay(750)
+    .opacity(0.4)
+    .spriteOffset({ x: -0.5 }, { gridUnits: true })
+    .mirrorX()
+    .spriteRotation(180);
 
 await sequence.play();

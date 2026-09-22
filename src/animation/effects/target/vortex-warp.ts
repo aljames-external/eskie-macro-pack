@@ -1,5 +1,5 @@
 // Original Author: EskieMoh#2969
-// Modular Conversion: bakanabaka
+// Modular Conversion & Sequencer 4.3.0+ .motion() Update: bakanabaka
 
 import { closest } from "../../../lib/filemanager.js";
 
@@ -10,7 +10,7 @@ const DEFAULT_CONFIG = {
     sound: { ...DEFAULT_SOUND_CONFIG },
 };
 
-async function create(target: Token, config: any = {}) {
+async function create(target: Token, config: Record<string, any> = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     let sequence = new Sequence();
     applySound(sequence, mConfig.sound);
@@ -29,21 +29,8 @@ async function create(target: Token, config: any = {}) {
         .belowTokens()
         .waitUntilFinished(-500);
 
-    sequence = sequence.effect()
-        .copySprite(target)
-        .spriteRotation(-adapter.getTokenRotation(target))
-        .scaleToObject(1, { considerTokenScale: true })
-        .duration(500)
-        .scaleOut(0, 500, { ease: "easeInOutElastic" })
-        .rotateOut(180, 300, { ease: "easeOutCubic" });
-    sequence = sequence.animation()
-        .on(target)
-        .opacity(0);
-
-    sequence = sequence.animation()
-        .on(target)
-        .teleportTo(mConfig.position, { offset: { x: -1, y: -1 } })
-        .snapToGrid();
+    sequence = sequence.motion(target)
+        .moveTo(mConfig.position);
 
     // Vortex in
     sequence = sequence.effect()
@@ -56,25 +43,12 @@ async function create(target: Token, config: any = {}) {
         .scaleOut(0, 600, { ease: "easeOutCubic" })
         .opacity(1)
         .duration(2000)
-        .waitUntilFinished(-500)
-    
-    sequence = sequence.effect()
-        .copySprite(target)
-        .spriteRotation(-adapter.getTokenRotation(target))
-        .scaleToObject(1, { considerTokenScale: true })
-        .scaleIn(0, 500, { ease: "easeInOutElastic" })
-        .rotateIn(180, 300, { ease: "easeOutCubic" })
-        .duration(500)
-        .waitUntilFinished(-250);
-
-    sequence = sequence.animation()
-        .on(target)
-        .opacity(1);
+        .waitUntilFinished(-500);
 
     return sequence;
 }
 
-async function play(target: Token, config: any = {}) {
+async function play(target: Token, config: Record<string, any> = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { position } = mConfig;
     const { widthUnits: targetWidth } = adapter.getTokenDimensions(target);
@@ -90,15 +64,21 @@ async function play(target: Token, config: any = {}) {
 
     if (!position) {
         mConfig.position = await Sequencer.Crosshair.show(crosshairConfig);
-        if (!mConfig.position.x) return;
+        if (!mConfig.position?.x) return;
     }
 
     const sequence = await create(target, mConfig);
     if (sequence) { return sequence.play(); }
 }
 
+function stop() {
+    // Transient animation
+}
+
 export const vortexWarp = {
     create,
     play,
+    stop,
     default_config: DEFAULT_CONFIG,
 };
+

@@ -1,10 +1,11 @@
 // Original Author: .eskie
-// Modular Conversion: bakanabaka
+// Modular Conversion & Sequencer 4.3.0+ .motion() Update: bakanabaka
 
 import { closest } from '../../../lib/filemanager.js';
+import { settingsOverride } from '../../../lib/settings.js';
 import { applySound, DEFAULT_SOUND_CONFIG } from '../../utils/sound.js';
+import { adapter } from '../../../adapters/index.js';
 
-import { adapter } from "../../../adapters/index.js";
 const DEFAULT_CONFIG = {
     id: 'thornWhip',
     color: 'green',
@@ -13,11 +14,12 @@ const DEFAULT_CONFIG = {
     sound: { ...DEFAULT_SOUND_CONFIG }
 };
 
-async function create(token: Token, target: Token, config: any = {}) {
+async function create(token: Token, target: Token, config: Record<string, any> = {}) {
+    config = settingsOverride(config);
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id, color, timingAdjust, pull, sound } = mConfig;
 
-    if (!token || !target) return;
+    if (!token || !target) return null;
 
     const tokenCenter = adapter.getCenter(token);
     const targetCenter = adapter.getCenter(target);
@@ -36,9 +38,7 @@ async function create(token: Token, target: Token, config: any = {}) {
         y: targetCenter.y + (distance > 0 ? (dy / distance) * moveDistance : 0)
     };
 
-    const location = (canvas as any)?.grid?.getCenterPoint ? (canvas as any).grid.getCenterPoint(rawLocation) : rawLocation;
-    const offsetX = (location.x - targetCenter.x) / gridSize;
-    const offsetY = (location.y - targetCenter.y) / gridSize;
+    const location = adapter.getCenterPoint(rawLocation);
     const { widthUnits: targetWidth } = adapter.getTokenDimensions(target);
     const canPull = pull && (targetWidth <= 2);
 
@@ -71,49 +71,23 @@ async function create(token: Token, target: Token, config: any = {}) {
         .zIndex(1)
         .randomRotation();
 
-    seq.effect()
-        .copySprite(target)
-        .spriteRotation(-target.document.rotation)
-        .attachTo(target)
-        .scaleToObject(1, { considerTokenScale: true })
-        .loopProperty('sprite', 'position.x', { from: -0.05, to: 0.05, duration: 50, pingPong: true, gridUnits: true })
-        .opacity(0.5)
-        .duration(1000)
-        .fadeOut(250);
-
     if (canPull) {
-        // Turn token invisible during slide
-        seq.animation()
-            .delay(100)
-            .on(target)
-            .opacity(0);
-
-        // Copy sprite slides towards destination
-        seq.effect()
-            .copySprite(target)
-            .spriteRotation(-target.document.rotation)
-            .zIndex(0)
-            .animateProperty('spriteContainer', 'position.x', { from: 0, to: offsetX, duration: 500, delay: 101 + timingAdjust, gridUnits: true, ease: 'easeInCubic' })
-            .animateProperty('spriteContainer', 'position.y', { from: 0, to: offsetY, duration: 500, delay: 101 + timingAdjust, gridUnits: true, ease: 'easeInCubic' })
-            .duration(700 + timingAdjust)
-            .waitUntilFinished(-100);
-
-        // Teleport target token to final snapped location and restore visibility
-        seq.animation()
-            .on(target)
-            .teleportTo(location, { relativeToCenter: true })
-            .opacity(1);
+        // Pull target token towards caster using Sequencer 4.3.0+ sequence.motion(target).moveTo()
+        seq.motion(target)
+            .moveTo(location, { rotate: false, ease: 'easeInCubic', delay: Math.max(0, 101 + timingAdjust) })
+            .duration(500);
     }
 
     return seq;
 }
 
-async function play(token: Token, target: Token, config: any = {}) {
+async function play(token: Token, target: Token, config: Record<string, any> = {}) {
     const seq = await create(token, target, config);
     if (seq) return seq.play();
+    return null;
 }
 
-async function stop(token: Token, target?: Token, config: any = {}) {
+async function stop(token: Token, target?: Token, config: Record<string, any> = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id } = mConfig;
     Sequencer.EffectManager.endEffects({ name: `${id} - ${token.id}` });
@@ -126,5 +100,6 @@ export const thornWhip = {
     default_config: DEFAULT_CONFIG
 };
 
-adapter.autorec.register('thornWhip', 'ranged-target', 'eskie.effect.thornWhip', DEFAULT_CONFIG, '0.0.1', 'Thorn Whip');
+adapter.autorec.register('thornWhip', 'ranged-target', 'eskie.effect.thornWhip', DEFAULT_CONFIG, '0.0.2', 'Thorn Whip');
+
 

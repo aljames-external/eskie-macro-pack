@@ -283,6 +283,11 @@ class Adapter {
         return this.foundry.getCenter(target);
     }
 
+    getCenterPoint(point: { x: number, y: number }): { x: number, y: number } {
+        return this.foundry.getCenterPoint(point);
+    }
+
+
     getTokenDimensions(token: Token) {
         return this.foundry.getTokenDimensions(token);
     }

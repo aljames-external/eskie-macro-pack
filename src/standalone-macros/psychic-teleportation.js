@@ -1,6 +1,6 @@
 // Standalone Macro: Psychic Teleportation
 // Original Author: EskieMoh#2969
-// Modular Conversion: bakanabaka
+// Modular Conversion & .motion() Update: bakanabaka
 
 if (!game.modules.get("sequencer")?.active) {
     return ui.notifications.error("The 'Psychic Teleportation' macro requires the 'Sequencer' module to be installed and active!");
@@ -13,7 +13,6 @@ const label = "Psychic Teleportation";
 const activeEffects = Sequencer.EffectManager.getEffects({ name: label, object: token });
 if (activeEffects.length > 0) {
     Sequencer.EffectManager.endEffects({ name: label, object: token });
-    new Sequence().animation().on(token).opacity(1).play();
     return;
 }
 
@@ -31,10 +30,6 @@ const position = await Sequencer.Crosshair.show({
 if (!position || position.cancelled) return;
 
 const sequence = new Sequence()
-    .animation()
-        .on(token)
-        .opacity(0)
-
     .effect()
         .name(label)
         .file(closest("jb2a.dagger.throw.01.white"))
@@ -77,20 +72,8 @@ const sequence = new Sequence()
         .opacity(0.25)
         .fadeOut(500)
 
-    .effect()
-        .copySprite(token)
-        .spriteRotation(-token.document.rotation)
-        .atLocation(token)
-        .scaleToObject(1, { considerTokenScale: true })
-        .filter("ColorMatrix", { saturate: -1, brightness: 10 })
-        .filter("Blur", { blurX: 5, blurY: 10 })
-        .duration(500)
-        .scaleOut(0, 500, { ease: "easeOutCubic" })
-        .fadeOut(500)
-
-    .animation()
-        .on(token)
-        .teleportTo(position, { offset: { x: -1, y: -1 } })
+    .motion(token)
+        .moveTo(position, { offset: { x: -1, y: -1 } })
         .snapToGrid()
         .waitUntilFinished()
 
@@ -132,21 +115,6 @@ const sequence = new Sequence()
         .opacity(0.25)
         .fadeOut(500)
 
-    .effect()
-        .copySprite(token)
-        .spriteRotation(-token.document.rotation)
-        .atLocation(token)
-        .scaleToObject(1, { considerTokenScale: true })
-        .filter("ColorMatrix", { saturate: -1, brightness: 10 })
-        .filter("Blur", { blurX: 5, blurY: 10 })
-        .duration(500)
-        .scaleIn(0, 500, { ease: "easeOutCubic" })
-        .fadeOut(500)
-
-    .waitUntilFinished(-400)
-
-    .animation()
-        .on(token)
-        .opacity(1);
+    .waitUntilFinished(-400);
 
 await sequence.play();

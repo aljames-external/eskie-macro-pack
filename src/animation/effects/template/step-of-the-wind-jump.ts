@@ -1,5 +1,5 @@
 // Author: .eskie
-// Modular Conversion: bakanabaka
+// Modular Conversion & .motion() Update: bakanabaka
 
 import { closest, absolutePath } from "../../../lib/filemanager.js";
 import { template as templatelib } from '../../../lib/templates.js';
@@ -70,11 +70,6 @@ async function create(token: Token, config: any = {}, options: any = {}) {
     
     seq.wait(100)
 
-        .animation()
-            .delay(200)
-            .on(token)
-            .opacity(0)
-
         .effect()
             .file(closest("eskie.smoke.03.white"))
             .atLocation(token)
@@ -116,21 +111,13 @@ async function create(token: Token, config: any = {}, options: any = {}) {
             .duration(jumpTime + 200)
             .zIndex(2)
 
-        .effect()
-            .name(`${tokenName} Step of the Wind (Jump)`)
-            .copySprite(token)
-            .spriteRotation(-tokenRotation)
-            .atLocation(token)
-            .scaleToObject(1, { considerTokenScale: true })
-            .opacity(1)
-            .animateProperty('spriteContainer', 'position.y', { from: 0, to: -1.5, duration: upTime, gridUnits: true, ease: "easeOutCubic", delay: 200 })
-            .animateProperty('spriteContainer', 'position.y', { from: 0, to: 1.5, duration: downTime, gridUnits: true, fromEnd: false, ease: "easeInSine", delay: upTime + 200 })
-            .moveTowards(position, { ease: "linear", rotate: false, delay: 200 })
-            .persist()
-            .extraEndDuration(800)
-            .duration(jumpTime + 200)
-            .animateProperty('sprite', 'rotation', { from: 0, to: 360, duration: upTime + downTime, ease: "easeInSine", delay: 200 })
-            .zIndex(5)
+        .motion(token)
+            .moveTo(position, {
+                arc: 0.8,
+                duration: jumpTime,
+                delay: 200,
+                rotate: false
+            })
 
         .effect()
             .name(`${tokenName} Step of the Wind (Jump)`)
@@ -153,21 +140,9 @@ async function create(token: Token, config: any = {}, options: any = {}) {
 
         .wait(jumpTime)
 
-        .animation()
-            .on(token)
-            .teleportTo(position)
-            .snapToGrid()
-            .waitUntilFinished()
-
         .thenDo(function(){
             Sequencer.EffectManager.endEffects({ name: `${tokenName} Step of the Wind (Jump)` });
         })
-
-        .animation()
-            .delay(200)
-            .on(token)
-            .opacity(1)
-            .snapToGrid()
 
         .effect()
             .file(closest("eskie.smoke.03.white"))

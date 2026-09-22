@@ -1,12 +1,15 @@
 // Original Author: EskieMoh#2969
 // Modular Conversion: bakanabaka
+// Sequencer 4.3.0+ .motion() Update
 
 import { closest } from '../../../lib/filemanager.js';
 import { text as textUtil } from '../../utils/text.js';
 import { cinemaBars } from '../../scene-overlays/cinema-bars.js';
+import { settingsOverride } from '../../../lib/settings.js';
 
 import { adapter } from "../../../adapters/index.js";
 import { applySound, DEFAULT_SOUND_CONFIG } from "../../utils/sound.js";
+
 const DEFAULT_CONFIG = {
     id: 'IaijutsuStrike',
     targetDeath: true,
@@ -33,12 +36,14 @@ const DEFAULT_CONFIG = {
 };
 
 function dashEffect(source: Token, target: Token, sound: any) {
-    const deltaX = target.x - source.x;
-    const deltaY = source.y - target.y;
+    const srcCenter = adapter.getCenter(source);
+    const tgtCenter = adapter.getCenter(target);
+    const deltaX = tgtCenter.x - srcCenter.x;
+    const deltaY = srcCenter.y - tgtCenter.y;
     const angleRad = Math.atan2(deltaY, deltaX);
-    const angleDeg = angleRad * 180 / Math.PI;
+    const angleDeg = (angleRad * 180) / Math.PI;
 
-    let sequence = new Sequence();
+    const sequence = new Sequence();
     if (sound) applySound(sequence, sound);
     sequence.effect()
         .file(closest("eskie.attack.ranged.arrow.01.physical.heavy.redblack"))
@@ -47,24 +52,24 @@ function dashEffect(source: Token, target: Token, sound: any) {
         .filter("ColorMatrix", { saturate: -1, brightness: 1 })
         .size({ width: 8, height: 1 }, { gridUnits: true })
         .scaleOut(0, 600, { ease: "easeOutCubic" })
-        .aboveLighting()
+        .aboveLighting();
     return sequence;
 }
 
 function deathAnimation(target: Token, sound: any) {
-    let sequence = new Sequence();
+    const sequence = new Sequence();
     if (sound) applySound(sequence, sound);
-    sequence.animation()
-        .on(target)
-        .opacity(0)
 
     const { widthUnits: targetWidth } = adapter.getTokenDimensions(target);
     const gridSize = adapter.getGridSize();
+    const targetPos = adapter.getCenter(target);
+    const targetName = target.name;
+    const targetRot = adapter.getTokenRotation(target);
 
     sequence.effect()
-        .name(`IaijutsuStrike ${target.name} Top`)
+        .name(`IaijutsuStrike ${targetName} Top`)
         .copySprite(target)
-        .spriteRotation(-adapter.getTokenRotation(target))
+        .spriteRotation(-targetRot)
         .atLocation(target)
         .scaleToObject(1, { considerTokenScale: true })
         .shape("polygon", {
@@ -77,16 +82,16 @@ function deathAnimation(target: Token, sound: any) {
             isMask: true,
             name: "test"
         })
-        .moveTowards({ x: target.x + gridSize * targetWidth + 0.1, y: target.y + gridSize * targetWidth + 0.1 }, { rotate: false })
+        .moveTowards({ x: targetPos.x + gridSize * targetWidth + 0.1, y: targetPos.y + gridSize * targetWidth + 0.1 }, { rotate: false })
         .moveSpeed(100)
         .persist()
         .extraEndDuration(1000)
-        .fadeOut(1000)
+        .fadeOut(1000);
 
     sequence.effect()
-        .name(`IaijutsuStrike ${target.name} Bottom`)
+        .name(`IaijutsuStrike ${targetName} Bottom`)
         .copySprite(target)
-        .spriteRotation(-adapter.getTokenRotation(target))
+        .spriteRotation(-targetRot)
         .atLocation(target)
         .scaleToObject(1, { considerTokenScale: true })
         .shape("polygon", {
@@ -101,7 +106,7 @@ function deathAnimation(target: Token, sound: any) {
         })
         .zIndex(0.1)
         .persist()
-        .fadeOut(500)
+        .fadeOut(500);
 
     sequence.effect()
         .file(closest("jb2a.water_splash.cone.01.red"))
@@ -111,20 +116,21 @@ function deathAnimation(target: Token, sound: any) {
         .scaleToObject()
         .zIndex(0)
         .fadeOut(500)
-        .rotate(45)
+        .rotate(45);
 
-    sequence.wait(5500)
+    sequence.wait(5500);
     return sequence;
 }
 
-async function create(source: Token, target: Token, config: any = {}) {
+async function create(source: Token, target: Token, config: AnimationEffectConfig = {}) {
+    config = settingsOverride(config);
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { targetDeath, teleport, cameraFocus, text } = mConfig;
 
-    let position;
+    let position = mConfig.position;
 
-    if (teleport) {
-        let crosshairsConfig = {
+    if (teleport && !position) {
+        const crosshairsConfig = {
             size: 1,
             icon: 'icons/skills/melee/blade-tip-orange.webp',
             label: 'Iaijutsu Strike',
@@ -134,17 +140,18 @@ async function create(source: Token, target: Token, config: any = {}) {
             drawOutline: true,
             interval: -1,
             rememberControlled: true,
-        }
+        };
         position = await Sequencer.Crosshair.show(crosshairsConfig);
+        if (!position || position.cancelled) return;
     }
 
-    let sequence = new Sequence();
+    const sequence = new Sequence();
     applySound(sequence, mConfig.sound);
 
-    if (cameraFocus.enable) {
+    if (cameraFocus?.enable) {
         const targetCenter = adapter.getCenter(target);
         sequence.addSequence(cinemaBars.create({ dim: true }));
-        sequence.canvasPan({ duration: 250, x: targetCenter.x, y: targetCenter.y, scale: cameraFocus.scale })
+        sequence.canvasPan({ duration: 250, x: targetCenter.x, y: targetCenter.y, scale: cameraFocus.scale });
     }
 
     sequence.effect()
@@ -155,20 +162,21 @@ async function create(source: Token, target: Token, config: any = {}) {
         .rotateIn(-180, 500, { ease: "easeOutCubic" })
         .filter("ColorMatrix", { saturate: -1, brightness: 1.2 })
         .aboveLighting()
-        .waitUntilFinished()
+        .waitUntilFinished();
 
-    sequence.wait(500)
+    sequence.wait(500);
 
     sequence.addSequence(dashEffect(source, target, mConfig.sound));
 
-    if (teleport) {
-        sequence.animation()
-            .on(source)
-            .teleportTo(position, { offset: { x: -1, y: -1 } })
-            .snapToGrid()
-    }
+    const dashDestination = position ?? adapter.getCenter(target);
 
-    sequence.wait(500)
+    // Slash dash token movement via Sequencer 4.3.0+ sequence.motion() API
+    sequence.motion(source)
+        .moveTo(dashDestination, { rotate: false, ease: 'easeOutCubic' })
+        .moveSpeed(1500)
+        .duration(400);
+
+    sequence.wait(500);
 
     sequence.addSequence(await textUtil.create(target, "居合術", text));
 
@@ -176,38 +184,35 @@ async function create(source: Token, target: Token, config: any = {}) {
         sequence.addSequence(deathAnimation(target, mConfig.sound));
     }
 
-    sequence.wait(500)
+    sequence.wait(500);
 
-    if (cameraFocus.enable) {
-        sequence.thenDo(() => cinemaBars.stop())
+    if (cameraFocus?.enable) {
+        sequence.thenDo(() => cinemaBars.stop());
     }
 
     return sequence;
 }
 
-async function play(source: Token, target: Token, config: any = {}) {
+async function play(source: Token, target: Token, config: AnimationEffectConfig = {}) {
+    config = settingsOverride(config);
     const seq = await create(source, target, config);
     if (seq) { await seq.play(); }
 }
 
-async function clean(target: Token, config: any = {}) {
+async function clean(target: Token, _config: AnimationEffectConfig = {}) {
     return Promise.all([
         Sequencer.EffectManager.endEffects({ name: `IaijutsuStrike` }),
         Sequencer.EffectManager.endEffects({ name: `IaijutsuText` }),
         cinemaBars.stop(),
-        Sequencer.EffectManager.endEffects({ name: `IaijutsuStrike ${target.name} *` }),
-        new Sequence()
-            .animation()
-            .on(target)
-            .opacity(1)
-            .show(true)
-            .play()
+        Sequencer.EffectManager.endEffects({ name: `IaijutsuStrike ${target.name} *` })
     ]);
 }
 
 export const iaijutsuStrike = {
     create,
     play,
+    stop: clean,
     clean,
     default_config: DEFAULT_CONFIG,
 };
+

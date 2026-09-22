@@ -1,6 +1,6 @@
 // Standalone Macro: Iaijutsu Strike
 // Original Author: EskieMoh#2969
-// Modular Conversion: standalone-macro
+// Modular Conversion & Sequencer 4.3.0+ .motion() Update: bakanabaka
 
 if (!game.modules.get("sequencer")?.active) {
     return ui.notifications.error("The 'Iaijutsu Strike' macro requires the 'Sequencer' module to be installed and active!");
@@ -130,9 +130,6 @@ function createDeathAnimation(targetToken) {
     const tName = targetToken.name ?? "Target";
 
     let seq = new Sequence();
-    seq.animation()
-        .on(targetToken)
-        .opacity(0);
 
     seq.effect()
         .name(`IaijutsuStrike ${tName} Top`)
@@ -207,6 +204,7 @@ if (teleport === true) {
         rememberControlled: true,
     };
     position = await Sequencer.Crosshair.show(crosshairsConfig);
+    if (!position || position.cancelled) return;
 }
 
 let sequence = new Sequence();
@@ -238,12 +236,13 @@ sequence.wait(500);
 // Linear dash slice wave through target token
 sequence.addSequence(createDashEffect(token, target));
 
-if (teleport === true && position) {
-    sequence.animation()
-        .on(token)
-        .teleportTo(position, { offset: { x: -1, y: -1 } })
-        .snapToGrid();
-}
+const dashDestination = position ?? target.center;
+
+// Slash dash token movement via Sequencer 4.3.0+ sequence.motion() API
+sequence.motion(token)
+    .moveTo(dashDestination, { rotate: false, ease: "easeOutCubic" })
+    .moveSpeed(1500)
+    .duration(400);
 
 sequence.wait(500);
 
@@ -264,3 +263,4 @@ if (cameraFocus?.enable ?? true) {
 }
 
 await sequence.play();
+

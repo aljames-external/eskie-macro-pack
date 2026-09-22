@@ -1,6 +1,6 @@
 // Standalone Macro: Fly
 // Original Author: EskieMoh#2969
-// Modular Conversion: bakanabaka
+// Modular Conversion & Sequencer 4.3.0+ .motion() Update: bakanabaka
 
 if (!game.modules.get("sequencer")?.active) {
     return ui.notifications.error("The 'Fly' macro requires the 'Sequencer' module to be installed and active!");
@@ -19,13 +19,10 @@ const label = `${id} - ${tokenId}`;
 const activeEffects = Sequencer.EffectManager.getEffects({ name: label, object: token });
 if ((activeEffects?.length ?? 0) > 0) {
     Sequencer.EffectManager.endEffects({ name: label, object: token });
-    await new Sequence()
-        .animation()
-            .on(token)
-            .opacity(1)
-        .play();
     return;
 }
+
+const rotation = -(token.document?.rotation ?? token.rotation ?? 0);
 
 const sequence = new Sequence();
 
@@ -36,41 +33,28 @@ sequence.effect()
     .scaleToObject(1.75)
     .belowTokens();
 
-// Hide original token sprite while elevated flight sprite is active
-sequence.animation()
-    .on(token)
-    .opacity(0);
-
-// Elevated floating token sprite (wind/feather float loop animation)
-sequence.effect()
-    .copySprite(token)
-    .spriteRotation(-(token.document?.rotation ?? token.rotation ?? 0))
+// Flying token hover motion via Sequencer 4.3.0+ .motion() API
+sequence.motion(token)
     .name(label)
-    .atLocation(token)
-    .scaleToObject(1, { considerTokenScale: true })
-    .opacity(1)
-    .duration(800)
-    .anchor({ x: 0.55, y: 0.9 })
-    .animateProperty('spriteContainer', 'position.y', { from: 50, to: 0, duration: 500 })
-    .loopProperty('spriteContainer', 'position.y', { from: 0, to: -50, duration: 2500, pingPong: true, delay: 500 })
-    .attachTo(token, { bindAlpha: false })
-    .zIndex(2)
+    .moveTo({ y: -0.5 }, { gridUnits: true })
+    .oscillate()
     .persist();
 
 // Ground shadow sprite (altitude elevation scale and blur shadow animation)
 sequence.effect()
     .copySprite(token)
-    .spriteRotation(-(token.document?.rotation ?? token.rotation ?? 0))
+    .spriteRotation(rotation)
     .name(label)
-    .atLocation(token)
+    .atLocation(token, { ignoreMotion: true })
     .scaleToObject(0.9, { considerTokenScale: true })
     .duration(1000)
     .opacity(0.5)
     .belowTokens()
     .filter("ColorMatrix", { brightness: -1 })
     .filter("Blur", { blurX: 5, blurY: 10 })
-    .attachTo(token, { bindAlpha: false })
+    .attachTo(token, { bindAlpha: false, ignoreMotion: true })
     .zIndex(1)
     .persist();
 
 await sequence.play();
+

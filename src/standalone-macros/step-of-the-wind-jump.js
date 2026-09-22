@@ -1,6 +1,6 @@
 // Standalone Macro: Step of the Wind (Jump)
 // Original Author: .eskie
-// Modular Conversion: bakanabaka
+// Modular Conversion & .motion() Update: bakanabaka
 
 if (!game.modules.get("sequencer")?.active) {
     return ui.notifications.error("The 'Step of the Wind (Jump)' macro requires the 'Sequencer' module to be installed and active!");
@@ -13,7 +13,6 @@ const label = `${token.document?.name ?? token.name ?? "Token"} Step of the Wind
 const activeEffects = Sequencer.EffectManager.getEffects({ name: label, object: token }) ?? [];
 if (activeEffects.length > 0) {
     Sequencer.EffectManager.endEffects({ name: label, object: token });
-    new Sequence().animation().on(token).opacity(1).play();
     return;
 }
 
@@ -82,11 +81,6 @@ const seq = new Sequence();
 
 seq.wait(100)
 
-    .animation()
-        .delay(200)
-        .on(token)
-        .opacity(0)
-
     // Launch Dust Burst
     .effect()
         .file(closest("eskie.smoke.03.white"))
@@ -131,22 +125,14 @@ seq.wait(100)
         .duration(jumpTime + 200)
         .zIndex(2)
 
-    // Monk Athletic Wind-Boosted Leap Trajectory (Leaping Token Sprite)
-    .effect()
-        .name(label)
-        .copySprite(token)
-        .spriteRotation(-tokenRotation)
-        .atLocation(token)
-        .scaleToObject(1, { considerTokenScale: true })
-        .opacity(1)
-        .animateProperty('spriteContainer', 'position.y', { from: 0, to: -1.5, duration: upTime, gridUnits: true, ease: "easeOutCubic", delay: 200 })
-        .animateProperty('spriteContainer', 'position.y', { from: 0, to: 1.5, duration: downTime, gridUnits: true, fromEnd: false, ease: "easeInSine", delay: upTime + 200 })
-        .moveTowards(position, { ease: "linear", rotate: false, delay: 200 })
-        .persist()
-        .extraEndDuration(800)
-        .duration(jumpTime + 200)
-        .animateProperty('sprite', 'rotation', { from: 0, to: 360, duration: upTime + downTime, ease: "easeInSine", delay: 200 })
-        .zIndex(5)
+    // Monk Athletic Wind-Boosted Leap Trajectory via Sequencer 4.3.0+ .motion()
+    .motion(token)
+        .moveTo(position, {
+            arc: 0.8,
+            duration: jumpTime,
+            delay: 200,
+            rotate: false
+        })
 
     // Air Motion Trail
     .effect()
@@ -170,21 +156,9 @@ seq.wait(100)
 
     .wait(jumpTime)
 
-    .animation()
-        .on(token)
-        .teleportTo(position)
-        .snapToGrid()
-        .waitUntilFinished()
-
     .thenDo(function() {
         Sequencer.EffectManager.endEffects({ name: label, object: token });
     })
-
-    .animation()
-        .delay(200)
-        .on(token)
-        .opacity(1)
-        .snapToGrid()
 
     // Landing Impact Shockwave Burst
     .effect()

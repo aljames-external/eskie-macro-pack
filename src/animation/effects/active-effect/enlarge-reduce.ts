@@ -30,6 +30,10 @@ async function createEnlarge(token: Token, config: any = {}) {
     const sequence = new Sequence();
     applySound(sequence, sound.enlarge);
 
+    const targetWidth = token.document.width > 0.5 ? token.document.width + scaleFactor : 1;
+    const targetHeight = token.document.height > 0.5 ? token.document.height + scaleFactor : 1;
+    const targetScale = targetWidth / token.document.width;
+
     sequence
         .effect()
         .file(closest("jb2a.static_electricity.03.orange"))
@@ -38,58 +42,20 @@ async function createEnlarge(token: Token, config: any = {}) {
         .scaleToObject(1)
         .fadeIn(250)
         .fadeOut(250)
-        .zIndex(2)
+        .zIndex(2);
 
-        .effect()
-        .copySprite(token)
-        .spriteRotation(-token.document.rotation)
-        .atLocation(token)
-        .scaleToObject(1, { considerTokenScale: true })
-        .scaleToObject(2)
-        .duration(500)
-        .scaleIn(0.25, 500)
-        .fadeIn(250)
-        .fadeOut(250)
-        .repeats(3, 500, 500)
-        .opacity(0.2)
-        .zIndex(1)
+    sequence
+        .motion(token)
+        .scaleTo(targetScale, { duration: 1000, ease: "easeOutBounce" });
 
-        .animation()
-        .on(token)
-        .opacity(0)
-
-        .effect()
-        .copySprite(token)
-        .spriteRotation(-token.document.rotation)
-        .atLocation(token)
-        .scaleToObject(1, { considerTokenScale: true })
-        .loopProperty('sprite', "rotation", { from: -10, to: 10, duration: 75, pingPong: true, delay: 200 })
-        .duration(2000)
-        .waitUntilFinished(-200)
-        .zIndex(0)
-
+    sequence
         .thenDo(function () {
             return (token.document as any).update({
-                height: (token.document.height > 0.5) ? token.document.height + scaleFactor : 1,
-                width: (token.document.width > 0.5) ? token.document.width + scaleFactor : 1,
+                height: targetHeight,
+                width: targetWidth,
                 scale: 1,
             }, { animate: false });
         })
-
-        .animation()
-        .on(token)
-        .teleportTo({ x: token.x, y: token.y })
-        .snapToGrid()
-
-        .wait(200)
-
-        .effect()
-        .copySprite(token)
-        .spriteRotation(-token.document.rotation)
-        .atLocation(token)
-        .scaleToObject(1, { considerTokenScale: true })
-        .duration(3000)
-        .scaleIn(0.25, 700, { ease: "easeOutBounce" })
 
         .effect()
         .file(closest("jb2a.extras.tmfx.outpulse.circle.01.fast"))
@@ -124,12 +90,7 @@ async function createEnlarge(token: Token, config: any = {}) {
         .scaleToObject(1)
         .fadeIn(250)
         .fadeOut(250)
-        .waitUntilFinished(-3000)
-
-        .animation()
-        .on(token)
-        .opacity(1)
-    ;
+        .waitUntilFinished(-3000);
 
     return sequence;
 }
@@ -160,6 +121,10 @@ async function createReduce(token: Token, config: any = {}) {
     const sequence = new Sequence();
     applySound(sequence, sound.reduce);
 
+    const targetWidth = (token.document.width - scaleFactor) > 0 ? token.document.width - scaleFactor : 0.5;
+    const targetHeight = (token.document.height - scaleFactor) > 0 ? token.document.height - scaleFactor : 0.5;
+    const targetScale = targetWidth / token.document.width;
+
     sequence
         .effect()
         .file(closest("jb2a.static_electricity.03.orange"))
@@ -168,57 +133,20 @@ async function createReduce(token: Token, config: any = {}) {
         .scaleToObject(1)
         .fadeIn(250)
         .fadeOut(250)
-        .zIndex(2)
+        .zIndex(2);
 
-        .effect()
-        .copySprite(token)
-        .spriteRotation(-token.document.rotation)
-        .atLocation(token)
-        .scaleToObject(2, { considerTokenScale: true })
-        .duration(500)
-        .scaleIn(0.25, 500)
-        .fadeIn(250)
-        .fadeOut(250)
-        .repeats(3, 500, 500)
-        .opacity(0.2)
-        .zIndex(1)
+    sequence
+        .motion(token)
+        .scaleTo(targetScale, { duration: 1000, ease: "easeOutBounce" });
 
-        .animation()
-        .on(token)
-        .opacity(0)
-
-        .effect()
-        .copySprite(token)
-        .spriteRotation(-token.document.rotation)
-        .atLocation(token)
-        .scaleToObject(1, { considerTokenScale: true })
-        .loopProperty('sprite', "rotation", { from: -10, to: 10, duration: 75, pingPong: true, delay: 200 })
-        .duration(2000)
-        .waitUntilFinished(-200)
-        .zIndex(0)
-
+    sequence
         .thenDo(function () {
             return (token.document as any).update({
-                height: (token.document.height - scaleFactor) > 0 ? token.document.height - scaleFactor : 0.5,
-                width: (token.document.width - scaleFactor) > 0 ? token.document.width - scaleFactor : 0.5,
+                height: targetHeight,
+                width: targetWidth,
                 scale: 1,
             }, { animate: false });
         })
-
-        .animation()
-        .on(token)
-        .teleportTo({ x: token.x, y: token.y })
-        .snapToGrid()
-
-        .wait(200)
-
-        .effect()
-        .copySprite(token)
-        .spriteRotation(-token.document.rotation)
-        .atLocation(token)
-        .scaleToObject(1, { considerTokenScale: true })
-        .duration(3000)
-        .scaleIn(0.25, 700, { ease: "easeOutBounce" })
 
         .effect()
         .file(closest("jb2a.extras.tmfx.outpulse.circle.01.fast"))
@@ -252,12 +180,7 @@ async function createReduce(token: Token, config: any = {}) {
         .scaleToObject(1)
         .fadeIn(250)
         .fadeOut(250)
-        .waitUntilFinished(-3000)
-
-        .animation()
-        .on(token)
-        .opacity(1)
-    ;
+        .waitUntilFinished(-3000);
 
     return sequence;
 }
@@ -290,5 +213,5 @@ export const enlargeReduce = {
     default_config: DEFAULT_CONFIG,
 };
 
-adapter.autorec.register("enlarged", "effect", "eskie.effect.enlargeReduce.enlarge", DEFAULT_CONFIG, "0.0.1", "Enlarged");
-adapter.autorec.register("reduced", "effect", "eskie.effect.enlargeReduce.reduce", DEFAULT_CONFIG, "0.0.1", "Reduced");
+adapter.autorec.register("enlarged", "effect", "eskie.effect.enlargeReduce.enlarge", DEFAULT_CONFIG, "0.0.2", "Enlarged");
+adapter.autorec.register("reduced", "effect", "eskie.effect.enlargeReduce.reduce", DEFAULT_CONFIG, "0.0.2", "Reduced");

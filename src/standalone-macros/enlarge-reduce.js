@@ -70,7 +70,12 @@ if (choice === "enlarge") {
  */
 async function playEnlarge(token, options = {}) {
     const sequence = new Sequence();
-    const tokenRotation = token.document?.rotation ?? token.rotation ?? 0;
+
+    const currentHeight = token.document?.height ?? token.height ?? 1;
+    const currentWidth = token.document?.width ?? token.width ?? 1;
+    const targetHeight = (currentHeight > 0.5) ? currentHeight + scaleFactor : 1;
+    const targetWidth = (currentWidth > 0.5) ? currentWidth + scaleFactor : 1;
+    const targetScale = targetWidth / currentWidth;
 
     sequence
         .effect()
@@ -80,60 +85,20 @@ async function playEnlarge(token, options = {}) {
             .scaleToObject(1)
             .fadeIn(250)
             .fadeOut(250)
-            .zIndex(2)
+            .zIndex(2);
 
-        .effect()
-            .copySprite(token)
-            .spriteRotation(-tokenRotation)
-            .atLocation(token)
-            .scaleToObject(1, { considerTokenScale: true })
-            .scaleToObject(2)
-            .duration(500)
-            .scaleIn(0.25, 500)
-            .fadeIn(250)
-            .fadeOut(250)
-            .repeats(3, 500, 500)
-            .opacity(0.2)
-            .zIndex(1)
+    sequence
+        .motion(token)
+        .scaleTo(targetScale, { duration: 1000, ease: "easeOutBounce" });
 
-        .animation()
-            .on(token)
-            .opacity(0)
-
-        .effect()
-            .copySprite(token)
-            .spriteRotation(-tokenRotation)
-            .atLocation(token)
-            .scaleToObject(1, { considerTokenScale: true })
-            .loopProperty('sprite', "rotation", { from: -10, to: 10, duration: 75, pingPong: true, delay: 200 })
-            .duration(2000)
-            .waitUntilFinished(-200)
-            .zIndex(0)
-
+    sequence
         .thenDo(function () {
-            const currentHeight = token.document?.height ?? 1;
-            const currentWidth = token.document?.width ?? 1;
             return token.document.update({
-                height: (currentHeight > 0.5) ? currentHeight + scaleFactor : 1,
-                width: (currentWidth > 0.5) ? currentWidth + scaleFactor : 1,
+                height: targetHeight,
+                width: targetWidth,
                 scale: 1,
             }, { animate: false });
         })
-
-        .animation()
-            .on(token)
-            .teleportTo({ x: token.x, y: token.y })
-            .snapToGrid()
-
-        .wait(200)
-
-        .effect()
-            .copySprite(token)
-            .spriteRotation(-tokenRotation)
-            .atLocation(token)
-            .scaleToObject(1, { considerTokenScale: true })
-            .duration(3000)
-            .scaleIn(0.25, 700, { ease: "easeOutBounce" })
 
         .effect()
             .file(closest("jb2a.extras.tmfx.outpulse.circle.01.fast"))
@@ -168,11 +133,7 @@ async function playEnlarge(token, options = {}) {
             .scaleToObject(1)
             .fadeIn(250)
             .fadeOut(250)
-            .waitUntilFinished(-3000)
-
-        .animation()
-            .on(token)
-            .opacity(1);
+            .waitUntilFinished(-3000);
 
     if (!options.isToggleOff) {
         sequence.effect()
@@ -193,7 +154,12 @@ async function playEnlarge(token, options = {}) {
  */
 async function playReduce(token, options = {}) {
     const sequence = new Sequence();
-    const tokenRotation = token.document?.rotation ?? token.rotation ?? 0;
+
+    const currentHeight = token.document?.height ?? token.height ?? 1;
+    const currentWidth = token.document?.width ?? token.width ?? 1;
+    const targetHeight = (currentHeight - scaleFactor) > 0 ? currentHeight - scaleFactor : 0.5;
+    const targetWidth = (currentWidth - scaleFactor) > 0 ? currentWidth - scaleFactor : 0.5;
+    const targetScale = targetWidth / currentWidth;
 
     sequence
         .effect()
@@ -203,59 +169,20 @@ async function playReduce(token, options = {}) {
             .scaleToObject(1)
             .fadeIn(250)
             .fadeOut(250)
-            .zIndex(2)
+            .zIndex(2);
 
-        .effect()
-            .copySprite(token)
-            .spriteRotation(-tokenRotation)
-            .atLocation(token)
-            .scaleToObject(2, { considerTokenScale: true })
-            .duration(500)
-            .scaleIn(0.25, 500)
-            .fadeIn(250)
-            .fadeOut(250)
-            .repeats(3, 500, 500)
-            .opacity(0.2)
-            .zIndex(1)
+    sequence
+        .motion(token)
+        .scaleTo(targetScale, { duration: 1000, ease: "easeOutBounce" });
 
-        .animation()
-            .on(token)
-            .opacity(0)
-
-        .effect()
-            .copySprite(token)
-            .spriteRotation(-tokenRotation)
-            .atLocation(token)
-            .scaleToObject(1, { considerTokenScale: true })
-            .loopProperty('sprite', "rotation", { from: -10, to: 10, duration: 75, pingPong: true, delay: 200 })
-            .duration(2000)
-            .waitUntilFinished(-200)
-            .zIndex(0)
-
+    sequence
         .thenDo(function () {
-            const currentHeight = token.document?.height ?? 1;
-            const currentWidth = token.document?.width ?? 1;
             return token.document.update({
-                height: (currentHeight - scaleFactor) > 0 ? currentHeight - scaleFactor : 0.5,
-                width: (currentWidth - scaleFactor) > 0 ? currentWidth - scaleFactor : 0.5,
+                height: targetHeight,
+                width: targetWidth,
                 scale: 1,
             }, { animate: false });
         })
-
-        .animation()
-            .on(token)
-            .teleportTo({ x: token.x, y: token.y })
-            .snapToGrid()
-
-        .wait(200)
-
-        .effect()
-            .copySprite(token)
-            .spriteRotation(-tokenRotation)
-            .atLocation(token)
-            .scaleToObject(1, { considerTokenScale: true })
-            .duration(3000)
-            .scaleIn(0.25, 700, { ease: "easeOutBounce" })
 
         .effect()
             .file(closest("jb2a.extras.tmfx.outpulse.circle.01.fast"))
@@ -289,11 +216,7 @@ async function playReduce(token, options = {}) {
             .scaleToObject(1)
             .fadeIn(250)
             .fadeOut(250)
-            .waitUntilFinished(-3000)
-
-        .animation()
-            .on(token)
-            .opacity(1);
+            .waitUntilFinished(-3000);
 
     if (!options.isToggleOff) {
         sequence.effect()

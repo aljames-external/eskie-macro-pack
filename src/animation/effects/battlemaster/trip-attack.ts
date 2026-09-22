@@ -1,12 +1,12 @@
 // Original Author: .eskie
-// Modular Conversion: bakanabaka
+// Modular Conversion & Sequencer 4.3.0+ .motion() Update: bakanabaka
 
 import { closest } from '../../../lib/filemanager.js';
 import { settingsOverride } from '../../../lib/settings.js';
 import { adapter } from '../../../adapters/index.js';
 import { applySound, DEFAULT_SOUND_CONFIG } from '../../utils/sound.js';
 
-const DEFAULT_CONFIG = {
+const DEFAULT_CONFIG: AnimationEffectConfig = {
     id: 'tripAttack',
     type: 'bludgeoning', // 'slashing', 'piercing', 'bludgeoning'
     weight: 'heavy', // 'light', 'medium', 'heavy'
@@ -14,21 +14,20 @@ const DEFAULT_CONFIG = {
     sound: { ...DEFAULT_SOUND_CONFIG },
 };
 
-async function create(token: Token, target: Token, config: any = {}) {
+async function create(token: Token, target: Token, config: Record<string, any> = {}) {
     config = settingsOverride(config);
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { type, weight, color, sound } = mConfig;
 
-    if (!token || !target) return;
+    if (!token || !target) return null;
 
     const weightIndex = ({ light: 0, medium: 1, heavy: 2 } as Record<string, number>)[weight] ?? 2;
     const effectSize = 2 + (0.25 * weightIndex);
     const effectOffset = -0.75 - (0.25 * weightIndex);
 
     const targetSquare = adapter.getNearestSquareCenter(token, target);
-    if (!targetSquare) return;
+    if (!targetSquare) return null;
     const tokenWidth = adapter.getTokenDimensions(token).widthUnits;
-    const targetRotation = adapter.getTokenRotation(target);
 
     const sequence = new Sequence();
     applySound(sequence, sound);
@@ -41,11 +40,6 @@ async function create(token: Token, target: Token, config: any = {}) {
             .scaleToObject(effectSize, { considerTokenScale: true })
             .spriteOffset({ x: effectOffset * tokenWidth }, { gridUnits: true })
             .zIndex(1)
-
-        .animation()
-            .delay(100)
-            .on(target)
-            .opacity(0)
 
         .effect()
             .copySprite(target)
@@ -68,36 +62,23 @@ async function create(token: Token, target: Token, config: any = {}) {
             .belowTokens()
             .animateProperty('spriteContainer', 'position.y', { from: 0, to: -0.5, duration: 500, ease: 'easeOutCubic', gridUnits: true })
 
-        .effect()
-            .copySprite(target)
-            .attachTo(target, { bindAlpha: false, bindRotation: false, local: false })
-            .scaleToObject(1, { considerTokenScale: true })
-            .animateProperty('spriteContainer', 'position.y', { from: 0, to: -0.5, duration: 500, ease: 'easeOutCubic', delay: 100, gridUnits: true })
-            .animateProperty('spriteContainer', 'position.y', { from: 0, to: 0.5, duration: 250, ease: 'easeOutCubic', delay: 600, gridUnits: true })
-            .animateProperty('sprite', 'rotation', { from: 0, to: 90, duration: 250, ease: 'easeOutCubic', delay: 100 })
-            .zIndex(2)
-            .duration(1200)
-            .waitUntilFinished(-500)
+        .motion(target)
+            .rotateTo(90)
 
         .effect()
             .file(closest('eskie.smoke.03.white'))
             .attachTo(target, { bindAlpha: false, bindRotation: false })
             .scaleToObject(2, { considerTokenScale: true })
             .opacity(0.8)
-            .belowTokens()
-
-        .animation()
-            .delay(300)
-            .on(target)
-            .opacity(1)
-            .rotate(targetRotation + 90);
+            .belowTokens();
 
     return sequence;
 }
 
-async function play(token: Token, target: Token, config: any = {}) {
+async function play(token: Token, target: Token, config: Record<string, any> = {}) {
     const sequence = await create(token, target, config);
     if (sequence) return sequence.play();
+    return null;
 }
 
 function stop() {
@@ -111,4 +92,5 @@ export const tripAttack = {
     default_config: DEFAULT_CONFIG,
 };
 
-adapter.autorec.register('tripAttack', 'melee-target', 'eskie.effect.battlemaster.tripAttack', DEFAULT_CONFIG, '0.0.1', 'Trip Attack');
+adapter.autorec.register('tripAttack', 'melee-target', 'eskie.effect.battlemaster.tripAttack', DEFAULT_CONFIG, '0.0.2', 'Trip Attack');
+

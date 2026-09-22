@@ -2,34 +2,35 @@ import { closest, absolutePath } from '../../../lib/filemanager.js';
 import { template as templatelib } from '../../../lib/templates.js';
 import { adapter } from '../../../adapters/index.js';
 import { applySound, DEFAULT_SOUND_CONFIG } from '../../utils/sound.js';
+import { settingsOverride } from '../../../lib/settings.js';
 
 const DEFAULT_CONFIG = {
     id: 'Psychic Teleportation',
+    position: undefined,
     sound: { ...DEFAULT_SOUND_CONFIG }
 };
 
 async function create(token: Token, config: any = {}) {
-    const { id, template, sound } = adapter.mergeObject(DEFAULT_CONFIG, config);
+    config = settingsOverride(config);
+    const { id, template, sound, position: configPos } = adapter.mergeObject(DEFAULT_CONFIG, config);
 
-    const cfg = { 
-        radius: 1,
-        max: 500,
-        icon: absolutePath("jb2a.portals.vertical.vortex.purple"), 
-        label: id
-    };
-    let [position, _] = await templatelib.getPosition(template, cfg);
-    if (!position || position.cancelled) { return; }
-
-    const tokenRotation = adapter.getTokenRotation(token);
+    let position = configPos;
+    if (!position) {
+        const cfg = { 
+            radius: 1,
+            max: 500,
+            icon: absolutePath("jb2a.portals.vertical.vortex.purple"), 
+            label: id
+        };
+        let [pos, _] = await templatelib.getPosition(template, cfg);
+        if (!pos || pos.cancelled) { return; }
+        position = pos;
+    }
 
     let seq = new Sequence();
     applySound(seq, sound);
 
-    seq.animation()
-        .on(token)
-        .opacity(0)
-
-        .effect()
+    seq.effect()
             .name(id)
             .file(closest("jb2a.dagger.throw.01.white"))
             .atLocation(token)
@@ -71,27 +72,15 @@ async function create(token: Token, config: any = {}) {
             .opacity(0.25)
             .fadeOut(500)
 
-        .effect()
-            .copySprite(token)
-            .spriteRotation(-tokenRotation)
-            .atLocation(token)
-            .scaleToObject(1, { considerTokenScale: true })
-            .filter("ColorMatrix", { saturate: -1, brightness: 10 })
-            .filter("Blur", { blurX: 5, blurY: 10 })
-            .duration(500)
-            .scaleOut(0, 500, { ease: "easeOutCubic" })
-            .fadeOut(500)
-
-        .animation()
-            .on(token)
-            .teleportTo(position, { offset: { x: -1, y: -1 } })
+        .motion(token)
+            .moveTo(position, { offset: { x: -1, y: -1 } })
             .snapToGrid()
             .waitUntilFinished()
 
         .wait(1000)
 
         .thenDo(function(){
-                Sequencer.EffectManager.endEffects({ name: id })  
+                Sequencer.EffectManager.endEffects({ name: id, object: token });
             })
 
         .effect()
@@ -126,22 +115,7 @@ async function create(token: Token, config: any = {}) {
             .opacity(0.25)
             .fadeOut(500)
 
-        .effect()
-            .copySprite(token)
-            .spriteRotation(-tokenRotation)
-            .atLocation(token)
-            .scaleToObject(1, { considerTokenScale: true })
-            .filter("ColorMatrix", { saturate: -1, brightness: 10 })
-            .filter("Blur", { blurX: 5, blurY: 10 })
-            .duration(500)
-            .scaleIn(0, 500, { ease: "easeOutCubic" })
-            .fadeOut(500)
-
-        .waitUntilFinished(-400)
-
-        .animation()
-            .on(token)
-            .opacity(1)
+        .waitUntilFinished(-400);
 
     return seq;
 }
@@ -152,11 +126,8 @@ async function play(token: Token, config: any = {}) {
 }
 
 async function stop(token: Token, config: any = {}) {
-    await new Sequence()
-        .animation()
-            .on(token)
-            .opacity(1)
-            .play();
+    const { id } = adapter.mergeObject(DEFAULT_CONFIG, config);
+    Sequencer.EffectManager.endEffects({ name: id, object: token });
 }
 
 export const psychicTeleportation = {
@@ -166,4 +137,4 @@ export const psychicTeleportation = {
     default_config: DEFAULT_CONFIG,
 };
 
-adapter.autorec.register("psychicTeleportation", "template", "eskie.effect.psychicTeleportation", DEFAULT_CONFIG, "0.0.1", "Psychic Teleportation");
+adapter.autorec.register("psychicTeleportation", "template", "eskie.effect.psychicTeleportation", DEFAULT_CONFIG, "0.0.2", "Psychic Teleportation");

@@ -1,5 +1,5 @@
 // Original Author: .eskie
-// Modular Conversion: bakanabaka
+// Modular Conversion & Sequencer 4.3.0+ .motion() Update: bakanabaka
 
 import { closest } from '../../../lib/filemanager.js';
 import { settingsOverride } from '../../../lib/settings.js';
@@ -11,7 +11,7 @@ const DEFAULT_CONFIG = {
     sound: { ...DEFAULT_SOUND_CONFIG },
 };
 
-async function create(token: Token, target: Token, config: any = {}) {
+async function create(token: Token, target: Token, config: Record<string, any> = {}) {
     config = settingsOverride(config);
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { sound } = mConfig;
@@ -29,74 +29,46 @@ async function create(token: Token, target: Token, config: any = {}) {
     const sequence = new Sequence();
     applySound(sequence, sound);
 
-    sequence
-        .animation()
-            .on(target)
-            .opacity(0)
-            .delay(150)
+    // Target position swap motion via Sequencer 4.3.0+ sequence.motion(target)
+    sequence.motion(target)
+        .moveTo(tokenCenter, { rotate: false, ease: 'easeInBack', delay: 250 })
+        .moveSpeed(500)
+        .duration(1000);
 
-        .animation()
-            .on(token)
-            .opacity(0)
-            .delay(250)
+    // Token position swap motion via Sequencer 4.3.0+ sequence.motion(token)
+    sequence.motion(token)
+        .moveTo(targetCenter, { rotate: false, ease: 'easeOutCubic', delay: 500 })
+        .moveSpeed(300)
+        .duration(1250);
 
-        .effect()
-            .copySprite(target)
-            .scaleToObject(1, { considerTokenScale: true })
-            .moveTowards(token, { rotate: false, ease: 'easeInBack', delay: 250 })
-            .moveSpeed(500)
-            .duration(1000)
-            .zIndex(0.2)
+    sequence.effect()
+        .copySprite(token)
+        .scaleToObject(1, { considerTokenScale: true })
+        .moveTowards(targetCenter, { rotate: false, ease: 'easeOutCubic', delay: 500 })
+        .moveSpeed(300)
+        .duration(1250)
+        .opacity(0.85)
+        .fadeIn(50, { delay: 500 })
+        .fadeOut(500, { ease: 'easeOutQuint' })
+        .filter('Blur', { blurX: blurDirectionX, blurY: blurDirectionY })
+        .zIndex(0.1);
 
-        .effect()
-            .copySprite(token)
-            .scaleToObject(1, { considerTokenScale: true })
-            .moveTowards(target, { rotate: false, ease: 'easeOutCubic', delay: 500 })
-            .moveSpeed(300)
-            .duration(1250)
-
-        .effect()
-            .copySprite(token)
-            .scaleToObject(1, { considerTokenScale: true })
-            .moveTowards(target, { rotate: false, ease: 'easeOutCubic', delay: 500 })
-            .moveSpeed(300)
-            .duration(1250)
-            .opacity(0.85)
-            .fadeIn(50, { delay: 500 })
-            .fadeOut(500, { ease: 'easeOutQuint' })
-            .filter('Blur', { blurX: blurDirectionX, blurY: blurDirectionY })
-            .zIndex(0.1)
-
-        .effect()
-            .file(closest('eskie.smoke.01.white'))
-            .atLocation(targetCenter)
-            .rotateTowards(tokenCenter)
-            .scaleToObject(1.5, { considerTokenScale: true })
-            .belowTokens()
-            .delay(750)
-            .opacity(0.4)
-            .spriteOffset({ x: -0.5 }, { gridUnits: true })
-            .mirrorX()
-            .spriteRotation(180)
-
-        .animation()
-            .delay(1000)
-            .on(token)
-            .teleportTo(targetCenter, { relativeToCenter: false })
-            .snapToGrid()
-            .opacity(1)
-
-        .animation()
-            .delay(750)
-            .on(target)
-            .teleportTo(tokenCenter, { relativeToCenter: false })
-            .snapToGrid()
-            .opacity(1);
+    sequence.effect()
+        .file(closest('eskie.smoke.01.white'))
+        .atLocation(targetCenter)
+        .rotateTowards(tokenCenter)
+        .scaleToObject(1.5, { considerTokenScale: true })
+        .belowTokens()
+        .delay(750)
+        .opacity(0.4)
+        .spriteOffset({ x: -0.5 }, { gridUnits: true })
+        .mirrorX()
+        .spriteRotation(180);
 
     return sequence;
 }
 
-async function play(token: Token, target: Token, config: any = {}) {
+async function play(token: Token, target: Token, config: Record<string, any> = {}) {
     const sequence = await create(token, target, config);
     if (sequence) return sequence.play();
 }
@@ -112,4 +84,4 @@ export const baitAndSwitch = {
     default_config: DEFAULT_CONFIG,
 };
 
-adapter.autorec.register('baitAndSwitch', 'melee-target', 'eskie.effect.battlemaster.baitAndSwitch', DEFAULT_CONFIG, '0.0.1', 'Bait and Switch');
+adapter.autorec.register('baitAndSwitch', 'melee-target', 'eskie.effect.battlemaster.baitAndSwitch', DEFAULT_CONFIG, '0.0.2', 'Bait and Switch');

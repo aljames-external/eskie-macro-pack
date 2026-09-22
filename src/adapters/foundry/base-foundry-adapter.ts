@@ -977,6 +977,21 @@ export class BaseFoundryAdapter {
     }
 
     /**
+     * Retrieve the snapped center point for a given location on the canvas grid.
+     * @param {{ x: number, y: number }} point Target coordinates
+     * @returns {{ x: number, y: number }} Snapped center point
+     */
+    getCenterPoint(point: { x: number, y: number }): { x: number, y: number } {
+        if (!point) return { x: 0, y: 0 };
+        const canvasGrid = (canvas as any)?.grid;
+        if (typeof canvasGrid?.getCenterPoint === 'function') {
+            return canvasGrid.getCenterPoint(point);
+        }
+        return point;
+    }
+
+
+    /**
      * Extracts normalized pixel dimensions, grid unit spans, and pixel radius for a token placeable.
      * @param {Token} token Target token placeable
      * @returns {{ widthPx: number, heightPx: number, widthUnits: number, heightUnits: number, radiusPx: number }}

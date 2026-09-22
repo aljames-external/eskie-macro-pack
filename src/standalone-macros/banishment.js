@@ -87,21 +87,8 @@ if (anyActive) {
             .delay(1500)
             .waitUntilFinished(-4000);
 
-        sequence.effect()
-            .copySprite(target)
-            .spriteRotation(targetRot)
-            .atLocation(target)
-            .scaleToObject(1, { considerTokenScale: true })
-            .animateProperty("spriteContainer", "position.y", { from: -75, to: 0, duration: 500, ease: "easeOutBounce" })
-            .scaleIn(0.25, 500)
-            .fadeIn(250)
-            .delay(1500)
-            .waitUntilFinished(-150);
-
-        sequence.animation()
-            .on(target)
-            .show(true)
-            .opacity(1);
+        sequence.motion(target)
+            .scaleTo(1);
     }
 } else {
     // --- BANISHMENT SEQUENCE (TOGGLE ON) ---
@@ -121,7 +108,6 @@ if (anyActive) {
     for (const target of targets) {
         const targetId = target.id ?? target.document?.id ?? "";
         const effectName = `${id}-${targetId}`;
-        const targetRot = -(target.document?.rotation ?? target.rotation ?? 0);
 
         if (sound.enabled) {
             sequence.sound()
@@ -251,77 +237,10 @@ if (anyActive) {
             .fadeIn(250)
             .fadeOut(750);
 
-        // Hide actual token sprite on map
-        sequence.animation()
-            .on(target)
-            .opacity(0)
-            .show(false);
-
-        // Ground shadow dissipation animation as target floats into portal
-        sequence.effect()
-            .copySprite(target)
-            .spriteRotation(targetRot)
-            .atLocation(target)
-            .scaleToObject(0.9, { considerTokenScale: true })
-            .belowTokens()
-            .filter("ColorMatrix", { brightness: -1 })
-            .filter("Blur", { blurX: 5, blurY: 10 })
-            .opacity(0.5)
-            .duration(4500)
-            .fadeOut(1000)
-            .scaleOut(0, 4500);
-
-        // Dimensional banishment hover & pop-out wobbling animation
-        sequence.effect()
-            .copySprite(target)
-            .spriteRotation(targetRot)
-            .atLocation(target)
-            .scaleToObject(1, { considerTokenScale: true })
-            .animateProperty("spriteContainer", "position.y", { from: 0, to: -15, duration: 250, ease: "easeInOutBack" })
-            .waitUntilFinished(-100);
-
-        sequence.effect()
-            .copySprite(target)
-            .spriteRotation(targetRot)
-            .atLocation(target)
-            .scaleToObject(1, { considerTokenScale: true })
-            .animateProperty("spriteContainer", "position.y", { from: -15, to: 0, duration: 2000, ease: "easeInOutBack" })
-            .animateProperty("sprite", "rotation", { from: 0, to: 8, duration: 500, ease: "easeOutCubic" })
-            .animateProperty("sprite", "rotation", { from: 0, to: -16, duration: 500, delay: 500, ease: "easeOutCubic" })
-            .animateProperty("sprite", "rotation", { from: 0, to: 16, duration: 500, delay: 1000, ease: "easeOutCubic" })
-            .animateProperty("sprite", "rotation", { from: 0, to: -16, duration: 500, delay: 1500, ease: "easeInCubic" })
-            .waitUntilFinished(-100);
-
-        sequence.effect()
-            .copySprite(target)
-            .spriteRotation(targetRot)
-            .atLocation(target)
-            .scaleToObject(1, { considerTokenScale: true })
-            .animateProperty("spriteContainer", "position.y", { from: 0, to: -40, duration: 500, ease: "easeInOutBack" })
-            .waitUntilFinished(-100);
-
-        sequence.effect()
-            .copySprite(target)
-            .spriteRotation(targetRot)
-            .atLocation(target)
-            .scaleToObject(1, { considerTokenScale: true })
-            .animateProperty("spriteContainer", "position.y", { from: -40, to: -15, duration: 2000, ease: "easeInOutBack" })
-            .animateProperty("sprite", "rotation", { from: 0, to: 8, duration: 500, ease: "easeOutCubic" })
-            .animateProperty("sprite", "rotation", { from: 0, to: -16, duration: 500, delay: 500, ease: "easeOutCubic" })
-            .animateProperty("sprite", "rotation", { from: 0, to: 16, duration: 500, delay: 1000, ease: "easeOutCubic" })
-            .animateProperty("sprite", "rotation", { from: 0, to: -16, duration: 500, delay: 1500, ease: "easeInCubic" })
-            .waitUntilFinished(-100);
-
-        // Dimensional pop-out burst into portal vortex
-        sequence.effect()
-            .copySprite(target)
-            .spriteRotation(targetRot)
-            .atLocation(target)
-            .scaleToObject(1, { considerTokenScale: true })
-            .animateProperty("spriteContainer", "position.y", { from: -15, to: -200, duration: 750, ease: "easeInOutBack" })
-            .scaleOut(0, 750)
-            .duration(375)
-            .waitUntilFinished(-150);
+        // Banishing target scaling/rotation via Sequencer 4.3.0+ .motion() API
+        sequence.motion(target)
+            .scaleTo(0)
+            .rotateBy(360);
 
         sequence.effect()
             .file(closest(`jb2a.explosion.02.${color}`))
@@ -361,7 +280,6 @@ if (anyActive) {
             .atLocation(target)
             .file(closest(`jb2a.magic_signs.circle.02.conjuration.loop.${color}`))
             .scaleToObject(0.1)
-            .opacity(0)
             .persist();
     }
 }
