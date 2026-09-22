@@ -4,15 +4,15 @@ declare global {
   var eskie: Record<string, any>;
   var Sequencer: {
     EffectManager: {
-      endEffects(options: { name?: string; object?: any; sceneId?: string }): Promise<void>;
-      getEffects(options: { name?: string; object?: any; sceneId?: string }): any[];
+      endEffects(options?: any): Promise<void>;
+      getEffects(options?: any): any[];
     };
     Crosshair: {
-      show(config: any): Promise<any>;
+      show(config?: any, callbacks?: any): Promise<any>;
     };
     [key: string]: any;
   };
-  var Sequence: import('./sequencer.js').SequenceConstructor;
+  var Sequence: any;
   type Sequence = import('./sequencer.js').SequenceBuilder;
   var Tagger: any;
   var socketlib: any;
