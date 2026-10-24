@@ -258,3 +258,238 @@ test('rollTracker.processMessageAndPlay only executes on rolling user machine an
         globalThis.Sequence = originalSequence;
     }
 });
+
+test('rollTracker ignores attack rolls and multi-target spells only animate targets and not the caster', async () => {
+    const gm = { id: 'gm-user', isGM: true };
+    const p1 = { id: 'player-1', isGM: false };
+    const p2 = { id: 'player-2', isGM: false };
+
+    globalThis.game = {
+        ...globalThis.game,
+        user: p1,
+        users: [gm, p1, p2],
+        modules: new Map([
+            ['eskie-effects', { id: 'eskie-effects', active: true }],
+            ['midi-qol', { id: 'midi-qol', active: true }]
+        ])
+    };
+
+    const sequenceCalls = [];
+    const effectCalls = [];
+    const atLocationTokens = [];
+
+    const mockEffectProxy = new Proxy({}, {
+        get(_t, prop) {
+            if (prop === 'atLocation') {
+                return (target, ...args) => {
+                    atLocationTokens.push(target);
+                    effectCalls.push({ method: 'atLocation', args: [target, ...args] });
+                    return mockEffectProxy;
+                };
+            }
+            return (...args) => {
+                effectCalls.push({ method: prop, args });
+                return mockEffectProxy;
+            };
+        }
+    });
+
+    const mockSequenceProxy = new Proxy({}, {
+        get(_t, prop) {
+            if (prop === 'effect') {
+                return (...args) => {
+                    sequenceCalls.push({ method: 'effect', args });
+                    return mockEffectProxy;
+                };
+            }
+            if (prop === 'play') {
+                return (...args) => {
+                    sequenceCalls.push({ method: 'play', args });
+                    return Promise.resolve();
+                };
+            }
+            return (...args) => {
+                sequenceCalls.push({ method: prop, args });
+                return mockSequenceProxy;
+            };
+        }
+    });
+
+    const originalSequence = globalThis.Sequence;
+    globalThis.Sequence = function() {
+        return mockSequenceProxy;
+    };
+
+    try {
+        const casterToken = { id: 'tok-caster', name: 'Mage', h: 100, document: { id: 'tok-caster', name: 'Mage' } };
+        const targetToken1 = { id: 'tok-target-1', name: 'Goblin 1', h: 100, document: { id: 'tok-target-1', name: 'Goblin 1' } };
+        const targetToken2 = { id: 'tok-target-2', name: 'Goblin 2', h: 100, document: { id: 'tok-target-2', name: 'Goblin 2' } };
+        const zannaToken = { id: 'tok-zanna', name: 'Zanna', h: 100, document: { id: 'tok-zanna', name: 'Zanna' } };
+
+        const tokenMap = new Map([
+            ['tok-caster', casterToken],
+            ['tok-target-1', targetToken1],
+            ['tok-target-2', targetToken2],
+            ['tok-zanna', zannaToken]
+        ]);
+
+        globalThis.canvas = {
+            ready: true,
+            tokens: {
+                get: (id) => tokenMap.get(id) ?? null,
+                controlled: [casterToken]
+            }
+        };
+
+        // 1. Attack roll: Mage casts Fire Bolt / attack roll
+        const attackFlags = {};
+        const attackMsg = {
+            id: 'msg-attack-firebolt',
+            whisper: [],
+            author: { id: 'player-1' },
+            flavor: 'Fire Bolt - Attack Roll',
+            content: '<p>Make a ranged spell attack against the target.</p>',
+            rolls: [{ total: 19, options: { type: 'attack' } }],
+            flags: {
+                world: attackFlags,
+                dnd5e: { roll: { type: 'attack' } }
+            },
+            speaker: { token: 'tok-caster' },
+            setFlag: async (_scope, key, value) => { attackFlags[key] = value; }
+        };
+
+        await rollTracker.processMessageAndPlay(attackMsg, 'player-1');
+        assert.equal(sequenceCalls.length, 0, 'Attack rolls must not trigger sequence animations');
+        assert.equal(attackFlags.rollAnimatedTokens, undefined, 'No tokens should be recorded as animated for attack roll');
+
+        // 1b. Midi-QOL Attack Roll containing empty saves-display template: Must NOT animate attacking token
+        const midiAttackFlags = {};
+        const midiAttackMsg = {
+            id: 'msg-midi-attack-card',
+            whisper: [],
+            author: { id: 'player-1' },
+            flavor: 'Attack Roll',
+            content: `
+                <div class="midi-qol">
+                    <p>Attack Roll: 22 vs AC</p>
+                    <div class="midi-qol-saves-display"></div>
+                </div>
+            `,
+            rolls: [{ total: 22, options: { type: 'attack' } }],
+            flags: {
+                world: midiAttackFlags,
+                'midi-qol': { messageType: 'attack' }
+            },
+            speaker: { token: 'tok-caster' },
+            setFlag: async (_scope, key, value) => { midiAttackFlags[key] = value; }
+        };
+        await rollTracker.processMessageAndPlay(midiAttackMsg, 'player-1');
+        assert.equal(sequenceCalls.length, 0, 'Midi-QOL attack rolls must never trigger sequence animations');
+        assert.equal(midiAttackFlags.rollAnimatedTokens, undefined, 'Attacker must never be recorded as animated');
+
+        // 2. Early Multi-target spell: Mage casts Cone of Cold BEFORE targets resolve saves
+        // Chat card has damage roll and saves display, but no resolved targets yet
+        const earlyConeFlags = {};
+        const earlyConeMsg = {
+            id: 'msg-cone-of-cold',
+            whisper: [],
+            author: { id: 'player-1' },
+            speaker: { token: 'tok-caster', alias: 'Mage' },
+            rolls: [{ total: 36, options: { type: 'damage' } }],
+            content: `
+                <div class="midi-qol">
+                    <p>8d8 Cold Damage</p>
+                    <div class="midi-qol-saves-display">
+                        DC 16 Constitution Saving Throw
+                    </div>
+                </div>
+            `,
+            flags: {
+                world: earlyConeFlags,
+                'midi-qol': { messageType: 'item' }
+            },
+            setFlag: async (_scope, key, value) => { earlyConeFlags[key] = value; }
+        };
+        await rollTracker.processMessageAndPlay(earlyConeMsg, 'player-1');
+        assert.equal(sequenceCalls.length, 0, 'Early spell cards before saves resolve must not trigger animations');
+        assert.equal(earlyConeFlags.rollAnimatedTokens, undefined, 'Caster must NOT be recorded as animated');
+
+        // 3. Multi-target spell resolution: Targets roll Con saves (updateChatMessage)
+        sequenceCalls.length = 0;
+        atLocationTokens.length = 0;
+        const coneFlags = {};
+        const coneMsg = {
+            id: 'msg-cone-of-cold',
+            whisper: [],
+            author: { id: 'player-1' },
+            speaker: { token: 'tok-caster', alias: 'Mage' },
+            rolls: [{ total: 36, options: { type: 'damage' } }],
+            content: `
+                <div class="midi-qol-saves-display">
+                    DC 16 Constitution Saving Throw
+                    <ul>
+                        <li class="midi-qol-target-select success" data-id="tok-target-1">Goblin 1 <i class="fa-check"></i></li>
+                        <li class="midi-qol-target-select failure" data-id="tok-target-2">Goblin 2 <i class="fa-times"></i></li>
+                    </ul>
+                </div>
+            `,
+            flags: {
+                world: coneFlags
+            },
+            setFlag: async (_scope, key, value) => { coneFlags[key] = value; }
+        };
+
+        await rollTracker.processMessageAndPlay(coneMsg, 'player-1');
+
+        // Verify animations triggered for target tokens only
+        assert.ok(sequenceCalls.length > 0, 'Sequence animations must trigger for target saving throws');
+        assert.deepEqual(coneFlags.rollAnimatedTokens?.sort(), ['tok-target-1', 'tok-target-2'].sort(), 'Only target tokens must be recorded as animated');
+
+        // Verify sequence effect atLocation targets only target tokens, NOT the caster
+        const targetIdsAnimated = atLocationTokens.map(t => t.id);
+        assert.ok(targetIdsAnimated.includes('tok-target-1'), 'Target 1 must receive die animation');
+        assert.ok(targetIdsAnimated.includes('tok-target-2'), 'Target 2 must receive die animation');
+        assert.equal(targetIdsAnimated.includes('tok-caster'), false, 'Caster must NOT receive die animation on target saves');
+
+        // 4. Midi-QOL workflow card with messageType 'attack' updated with type: 2 (MESSAGE_TYPES.SAVES) and fa-xmark failure
+        sequenceCalls.length = 0;
+        atLocationTokens.length = 0;
+        const zannaFlags = {};
+        const zannaMsg = {
+            id: 'msg-zanna-save-workflow',
+            whisper: [],
+            author: { id: 'player-1' },
+            speaker: { token: 'tok-caster', alias: 'Mage' },
+            content: `
+                <div class="midi-qol">
+                    <div class="midi-qol-saves-display">
+                        DC 17 Constitution Saving Throw
+                        <ul>
+                            <li class="midi-qol midi-qol-save-class target midi-qol-target-select midi-qol-player-target failure" data-id="tok-zanna">
+                                <i class="fas fa-xmark"></i>
+                                Zanna
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            `,
+            flags: {
+                world: zannaFlags,
+                'midi-qol': { messageType: 'attack', type: 2 }
+            },
+            setFlag: async (_scope, key, value) => { zannaFlags[key] = value; }
+        };
+
+        await rollTracker.processMessageAndPlay(zannaMsg, 'player-1');
+
+        assert.ok(sequenceCalls.length > 0, 'Sequence must animate for Zanna save failure');
+        assert.deepEqual(zannaFlags.rollAnimatedTokens, ['tok-zanna'], 'Only Zanna must be recorded as animated');
+        assert.ok(atLocationTokens.some(t => t.id === 'tok-zanna'), 'Zanna must receive die animation');
+        assert.equal(atLocationTokens.some(t => t.id === 'tok-caster'), false, 'Caster must NOT receive die animation');
+    } finally {
+        globalThis.game.modules.delete('eskie-effects');
+        globalThis.game.modules.delete('midi-qol');
+        globalThis.Sequence = originalSequence;
+    }
+});
+

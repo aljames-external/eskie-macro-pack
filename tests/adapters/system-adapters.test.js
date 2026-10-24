@@ -215,3 +215,170 @@ test('GenericSystemAdapter qualifies messages based on keyword text analysis', (
     };
     assert.equal(adapter.qualifyMessage(chatTextOnly), 'text');
 });
+
+test('parseAndNormalizeAbility enforces strict word boundaries and does not match substrings in common words', () => {
+    const adapter = new Dnd5eSystemAdapter();
+
+    // Plain English words that contain 3-letter substrings should NOT match
+    assert.equal(adapter.normalizeAbility(null, "this strike into the cone"), null);
+    assert.equal(adapter.normalizeAbility(null, "a person walked along the path"), null);
+    assert.equal(adapter.normalizeAbility(null, "decrease the interval"), null);
+
+    // Actual bounded abilities and skills should match
+    assert.equal(adapter.normalizeAbility(null, "Make a Constitution saving throw"), "constitution");
+    assert.equal(adapter.normalizeAbility(null, "Roll a Str check"), "strength");
+    assert.equal(adapter.normalizeAbility(null, "Wis saving throw"), "wisdom");
+    assert.equal(adapter.normalizeAbility("dex"), "dexterity");
+});
+
+test('Dnd5eSystemAdapter strictly classifies attack and damage messages and extracts zero save/check rolls', () => {
+    const adapter = new Dnd5eSystemAdapter();
+
+    // Core D&D 5e attack flag
+    const atkMsg = { id: 'msg-atk-flag', flags: { dnd5e: { roll: { type: 'attack' } } } };
+    assert.equal(adapter.qualifyMessage(atkMsg), 'attack');
+    assert.deepEqual(adapter.extractRolls(atkMsg), []);
+
+    // Core D&D 5e damage flag
+    const dmgMsg = { id: 'msg-dmg-flag', flags: { dnd5e: { roll: { type: 'damage' } } } };
+    assert.equal(adapter.qualifyMessage(dmgMsg), 'damage');
+    assert.deepEqual(adapter.extractRolls(dmgMsg), []);
+
+    // D&D 5e v4 Activity attack
+    const actAtkMsg = { id: 'msg-act-atk', flags: { dnd5e: { activity: { type: 'attack' } } } };
+    assert.equal(adapter.qualifyMessage(actAtkMsg), 'attack');
+    assert.deepEqual(adapter.extractRolls(actAtkMsg), []);
+
+    // D&D 5e v4 actionType (melee spell attack)
+    const mwakMsg = { id: 'msg-mwak', flags: { dnd5e: { actionType: 'msak' } } };
+    assert.equal(adapter.qualifyMessage(mwakMsg), 'attack');
+    assert.deepEqual(adapter.extractRolls(mwakMsg), []);
+
+    // Roll options type = attack
+    const optAtkMsg = { id: 'msg-opt-atk', rolls: [{ options: { type: 'attack' } }] };
+    assert.equal(adapter.qualifyMessage(optAtkMsg), 'attack');
+    assert.deepEqual(adapter.extractRolls(optAtkMsg), []);
+
+    // Flavor text attack
+    const flavorAtkMsg = {
+        id: 'msg-flavor-atk',
+        flavor: 'Fire Bolt - Attack Roll',
+        content: '<p>Make a ranged spell attack against the target.</p>',
+        rolls: [{ total: 19, options: {} }]
+    };
+    assert.equal(adapter.qualifyMessage(flavorAtkMsg), 'attack');
+    assert.deepEqual(adapter.extractRolls(flavorAtkMsg), []);
+});
+
+test('Dnd5eSystemAdapter extracts only target saving throws and excludes caster on multi-target spell cards', () => {
+    const adapter = new Dnd5eSystemAdapter();
+
+    // Enable Midi-QOL module for test
+    globalThis.game = {
+        ...globalThis.game,
+        modules: new Map([['midi-qol', { id: 'midi-qol', active: true }]])
+    };
+
+    try {
+        // Cone of Cold cast by Mage: includes damage roll and Midi-QOL target saves display
+        const coneOfColdMsg = {
+            id: 'msg-cone-of-cold',
+            speaker: { token: 'tok-mage', alias: 'Mage' },
+            rolls: [{ total: 36, options: { type: 'damage' } }],
+            content: `
+                <div class="midi-qol-saves-display">
+                    DC 16 Constitution Saving Throw
+                    <ul>
+                        <li class="midi-qol-target-select success" data-id="tok-target-1">Target 1 <i class="fa-check"></i></li>
+                        <li class="midi-qol-target-select failure" data-id="tok-target-2">Target 2 <i class="fa-times"></i></li>
+                    </ul>
+                </div>
+            `
+        };
+
+        assert.equal(adapter.qualifyMessage(coneOfColdMsg), 'saving throw');
+        const extractedRolls = adapter.extractRolls(coneOfColdMsg);
+
+        // Must extract exactly the two target tokens
+        assert.equal(extractedRolls.length, 2);
+        assert.equal(extractedRolls[0].tokenId, 'tok-target-1');
+        assert.equal(extractedRolls[0].outcome, 'success');
+        assert.equal(extractedRolls[0].rawAbility, 'constitution');
+
+        assert.equal(extractedRolls[1].tokenId, 'tok-target-2');
+        assert.equal(extractedRolls[1].outcome, 'failure');
+        assert.equal(extractedRolls[1].rawAbility, 'constitution');
+
+        // Must NOT extract any roll for the caster (tok-mage or tokenId: null)
+        assert.equal(extractedRolls.some(r => r.tokenId === 'tok-mage' || r.tokenId === null), false);
+
+        // 2. Midi-QOL Attack Roll with saves-display template: Must classify as attack, not saving throw
+        const midiAtkMsg = {
+            id: 'msg-midi-attack',
+            speaker: { token: 'tok-mage', alias: 'Mage' },
+            rolls: [{ total: 21, options: { type: 'attack' } }],
+            content: `
+                <div class="midi-qol">
+                    <p>Attack Roll: 21 vs AC</p>
+                    <div class="midi-qol-saves-display"></div>
+                </div>
+            `,
+            flags: {
+                'midi-qol': { messageType: 'attack' }
+            }
+        };
+        assert.equal(adapter.qualifyMessage(midiAtkMsg), 'attack');
+        assert.deepEqual(adapter.extractRolls(midiAtkMsg), []);
+
+        // 3. Early spell card before targets resolve saves: Must NOT qualify as save or fall back to caster
+        const earlyConeMsg = {
+            id: 'msg-early-cone',
+            speaker: { token: 'tok-mage', alias: 'Mage' },
+            rolls: [{ total: 36, options: { type: 'damage' } }],
+            content: `
+                <div class="midi-qol">
+                    <p>8d8 Cold Damage</p>
+                    <div class="midi-qol-saves-display">
+                        DC 16 Constitution Saving Throw
+                    </div>
+                </div>
+            `,
+            flags: {
+                'midi-qol': { messageType: 'item' }
+            }
+        };
+        assert.notEqual(adapter.qualifyMessage(earlyConeMsg), 'saving throw');
+        assert.deepEqual(adapter.extractRolls(earlyConeMsg), []);
+
+        // 4. Midi-QOL workflow card with messageType 'attack' updated with type: 2 (MESSAGE_TYPES.SAVES) and fa-xmark
+        const zannaSaveMsg = {
+            id: 'msg-zanna-save',
+            speaker: { token: 'tok-mage', alias: 'Mage' },
+            content: `
+                <div class="midi-qol">
+                    <div class="midi-qol-saves-display">
+                        DC 17 Constitution Saving Throw
+                        <ul>
+                            <li class="midi-qol midi-qol-save-class target midi-qol-target-select midi-qol-player-target failure" data-id="tok-zanna">
+                                <i class="fas fa-xmark"></i>
+                                Zanna
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            `,
+            flags: {
+                'midi-qol': { messageType: 'attack', type: 2 }
+            }
+        };
+        assert.equal(adapter.qualifyMessage(zannaSaveMsg), 'saving throw');
+        const zannaRolls = adapter.extractRolls(zannaSaveMsg);
+        assert.equal(zannaRolls.length, 1);
+        assert.equal(zannaRolls[0].tokenId, 'tok-zanna');
+        assert.equal(zannaRolls[0].outcome, 'failure');
+        assert.equal(zannaRolls[0].rawAbility, 'constitution');
+    } finally {
+        globalThis.game.modules.delete('midi-qol');
+    }
+});
+

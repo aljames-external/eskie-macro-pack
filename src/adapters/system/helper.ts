@@ -21,8 +21,8 @@ export function parseAndNormalizeAbility(rawAbility: any, combinedText = "", cus
     if (!raw) {
         // Strip HTML tags to prevent tags like <strong> from matching "str"
         const cleanText = (combinedText ?? "").replace(/<[^>]*>/g, "").toLowerCase();
-        // Shared regex matching common ability and skill names/abbreviations
-        const abilityRegex = /(strength|dexterity|constitution|intelligence|wisdom|charisma|acrobatics|athletics|arcana|history|investigation|nature|religion|animal\s+handling|insight|medicine|perception|survival|deception|intimidation|performance|persuasion|stealth|sleight\s+of\s+hand|str|dex|con|int|wis|cha|prc|acr|ath|ste|sle|arc|his|inv|nat|rel|ani|ins|med|per|pers|sur|dec|itm|prf)/i;
+        // Shared regex matching common ability and skill names/abbreviations with word boundaries
+        const abilityRegex = /\b(strength|dexterity|constitution|intelligence|wisdom|charisma|acrobatics|athletics|arcana|history|investigation|nature|religion|animal\s+handling|insight|medicine|perception|survival|deception|intimidation|performance|persuasion|stealth|sleight\s+of\s+hand|str|dex|con|int|wis|cha|prc|acr|ath|ste|sle|arc|his|inv|nat|rel|ani|ins|med|per|pers|sur|dec|itm|prf)\b/i;
         const match = cleanText.match(abilityRegex);
         if (match) raw = match[1]?.replace(/\s+/g, " ");
     }

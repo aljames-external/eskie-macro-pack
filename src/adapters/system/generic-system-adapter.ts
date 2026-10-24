@@ -24,13 +24,19 @@ export class GenericSystemAdapter extends BaseSystemAdapter {
         const contentLower = contentText.toLowerCase();
         const combinedText = `${flavorText} ${contentLower}`;
 
-        const hasKeywords = /save|saving\s+throw|check|skill/.test(combinedText);
-        const isAttackOrDamage = /attack|strike|damage|damage\s+roll/.test(combinedText);
+        const isAttack = /\b(attack|strike|to\s+hit|attack\s+roll)\b/.test(combinedText);
+        const isDamage = /\b(damage|damage\s+roll)\b/.test(combinedText);
+        const hasKeywords = /\b(save|saving\s+throw|check|skill)\b/.test(combinedText);
         const hasRolls = Boolean((message?.rolls && message.rolls.length > 0) || message?.roll);
 
-        if (hasRolls && !isAttackOrDamage && hasKeywords) {
-            if (/save|saving\s+throw/.test(combinedText)) return "saving throw";
-            if (/check|skill/.test(combinedText)) return "ability check";
+        if (hasRolls && (isAttack || isDamage) && !combinedText.includes("saving throw") && !combinedText.includes("save")) {
+            if (isAttack) return "attack";
+            if (isDamage) return "damage";
+        }
+
+        if (hasRolls && !isAttack && !isDamage && hasKeywords) {
+            if (/\b(save|saving\s+throw)\b/.test(combinedText)) return "saving throw";
+            if (/\b(check|skill)\b/.test(combinedText)) return "ability check";
         }
 
         return super.qualifyMessage(message);
@@ -38,10 +44,15 @@ export class GenericSystemAdapter extends BaseSystemAdapter {
 
     /**
      * Extracts generic roll results from a qualified chat message.
-     * @param {ChatMessage} _message
+     * @param {ChatMessage} message
      * @returns {Array<{ source: string, rawAbility: string|null, outcome: string, tokenId: string|null }>}
      */
-    override extractRolls(_message: any): any[] {
+    override extractRolls(message: any): any[] {
+        const qualified = this.qualifyMessage(message);
+        if (qualified !== "saving throw" && qualified !== "ability check") {
+            return [];
+        }
+
         return [{
             source: "generic-keywords",
             rawAbility: null,

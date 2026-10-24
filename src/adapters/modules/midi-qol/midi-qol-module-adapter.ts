@@ -30,10 +30,16 @@ export class MidiQolModuleAdapter extends BaseModuleAdapter {
         });
 
         // Ignore attack, damage, and item usage cards (unless they dynamically contain a target saves display)
-        const messageType = midiFlags?.messageType ?? midiFlags?.type;
+        const midiMessageType = midiFlags?.messageType;
+        const midiType = typeof midiFlags?.type === "string" ? midiFlags.type : null;
+        const actionType = midiFlags?.actionType;
+        const isAttackAction = ["mwak", "rwak", "msak", "rsak"].includes(actionType);
         const hasSavesDisplay = contentText.includes("midi-qol-saves-display");
-        if (messageType && ["attack", "damage", "item"].includes(messageType) && !hasSavesDisplay) {
-            log.debug(`Midi-QOL: Ignoring attack/damage/item messageType: "${messageType}"`);
+        const hasAttackType = ["attack", "damage", "item"].includes(midiMessageType) || (midiType !== null && ["attack", "damage", "item"].includes(midiType));
+        const isAttackOrDamage = isAttackAction || hasAttackType || Boolean(midiFlags?.hitTargets?.length) || Boolean(midiFlags?.isHit);
+
+        if (isAttackOrDamage && !hasSavesDisplay) {
+            log.debug(`Midi-QOL: Ignoring attack/damage/item card for message="${message?.id}"`);
             return { rolls: [], outcome: "indeterminant" };
         }
 
@@ -54,9 +60,9 @@ export class MidiQolModuleAdapter extends BaseModuleAdapter {
                 // Parse the short ability code from the save display block text
                 let saveAbility: string | null = null;
                 const textContext = (saveDisplay.textContent ?? "").toLowerCase();
-                const abilityRegex = /(strength|dexterity|constitution|intelligence|wisdom|charisma|str|dex|con|int|wis|cha|acr|ath|per|ste)/;
+                const abilityRegex = /\b(strength|dexterity|constitution|intelligence|wisdom|charisma|str|dex|con|int|wis|cha|acr|ath|per|ste)\b/i;
                 const match = textContext.match(abilityRegex);
-                if (match) saveAbility = match[1] ?? null;
+                if (match) saveAbility = match[1]?.toLowerCase() ?? null;
 
                 targetLis.forEach((el: any) => {
                     const tokenId = el.dataset?.id ?? el.getAttribute?.('data-id');
@@ -64,12 +70,12 @@ export class MidiQolModuleAdapter extends BaseModuleAdapter {
                     let isResolved = false;
 
                     const hasCheck = el.querySelector(".fa-check") !== null;
-                    const hasTimes = el.querySelector(".fa-times") !== null;
+                    const hasFail = el.querySelector(".fa-times") !== null || el.querySelector(".fa-xmark") !== null;
 
                     if (el.classList.contains("success") || hasCheck) {
                         targetOutcome = "success";
                         isResolved = true;
-                    } else if (el.classList.contains("failure") || hasTimes) {
+                    } else if (el.classList.contains("failure") || hasFail) {
                         targetOutcome = "failure";
                         isResolved = true;
                     }
@@ -86,8 +92,10 @@ export class MidiQolModuleAdapter extends BaseModuleAdapter {
             }
         }
 
-        // If flag outcomes exist but no HTML saves (e.g., single-target roll card updates)
-        if (rolls.length === 0 && outcome !== "indeterminant") {
+        // If flag outcomes exist but no HTML saves (e.g. single-target save card updates)
+        // Strictly ensure we only push if the card is explicitly a saving throw or ability check
+        const isSaveOrCheck = midiMessageType === "save" || midiMessageType === "check" || midiType === "save" || midiType === "check" || Boolean(midiFlags?.save);
+        if (rolls.length === 0 && outcome !== "indeterminant" && isSaveOrCheck) {
             rolls.push({
                 source: "midi-qol-flags",
                 rawAbility: null,

@@ -107,6 +107,51 @@ if (typeof String.prototype.slugify !== 'function') {
     };
 }
 
+if (typeof globalThis.DOMParser === 'undefined') {
+    globalThis.DOMParser = class DOMParser {
+        parseFromString(htmlString) {
+            return {
+                querySelector: (sel) => {
+                    if (sel === '.midi-qol-saves-display' && htmlString.includes('midi-qol-saves-display')) {
+                        const textContent = htmlString.replace(/<[^>]*>/g, ' ');
+                        return {
+                            textContent,
+                            querySelectorAll: (itemSel) => {
+                                if (itemSel.includes('midi-qol-target-select')) {
+                                    const regex = /<li[^>]*class="([^"]*midi-qol-target-select[^"]*)"[^>]*data-id="([^"]+)"[^>]*>([\s\S]*?)<\/li>/gi;
+                                    const items = [];
+                                    let m;
+                                    while ((m = regex.exec(htmlString)) !== null) {
+                                        const classListStr = m[1];
+                                        const tokenId = m[2];
+                                        const inner = m[3];
+                                        items.push({
+                                            dataset: { id: tokenId },
+                                            getAttribute: (attr) => attr === 'data-id' ? tokenId : null,
+                                            classList: {
+                                                contains: (c) => classListStr.split(/\s+/).includes(c)
+                                            },
+                                            querySelector: (childSel) => {
+                                                if (childSel === '.fa-check' && (inner.includes('fa-check') || inner.includes('fa-check-circle'))) return {};
+                                                if (childSel === '.fa-times' && (inner.includes('fa-times') || inner.includes('fa-times-circle'))) return {};
+                                                if (childSel === '.fa-xmark' && (inner.includes('fa-xmark') || inner.includes('fa-times'))) return {};
+                                                return null;
+                                            }
+                                        });
+                                    }
+                                    return items;
+                                }
+                                return [];
+                            }
+                        };
+                    }
+                    return null;
+                }
+            };
+        }
+    };
+}
+
 globalThis.CONST = {
     USER_ROLES: {
         NONE: 0,

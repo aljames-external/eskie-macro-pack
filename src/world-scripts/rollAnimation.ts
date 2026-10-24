@@ -299,9 +299,30 @@ export class RollTracker {
         const newFiredTokens = [...firedTokens];
         let updatedFlags = false;
 
+        // If the card is an item/spell usage card or contains target-specific rolls (e.g. multi-target saves display),
+        // only animate those explicit targets; filter out any ambient speaker rolls (tokenId: null)
+        // so the caster or attacker never animates during spells prompting target saving throws or attack cards.
+        const midiFlags = message?.flags?.["midi-qol"];
+        const isDirectMidiSaveOrCheck = midiFlags?.messageType === "save" ||
+            midiFlags?.messageType === "check" ||
+            midiFlags?.type === "save" ||
+            midiFlags?.type === "check";
+
+        const isItemOrWorkflowCard = Boolean(
+            message?.flags?.dnd5e?.messageType === "usage" ||
+            message?.flags?.dnd5e?.item ||
+            message?.flags?.dnd5e?.activity ||
+            (Boolean(midiFlags) && !isDirectMidiSaveOrCheck) ||
+            message?.content?.includes("midi-qol-saves-display")
+        );
+
+        const hasTargetSpecificRolls = rolls.some(r => Boolean(r.tokenId));
+        const actionableRolls = (isItemOrWorkflowCard || hasTargetSpecificRolls)
+            ? rolls.filter(r => Boolean(r.tokenId))
+            : rolls;
         const visibleUsers = this.getMessageVisibilityUsers(message);
 
-        for (const roll of rolls) {
+        for (const roll of actionableRolls) {
             const token = this.getSpeakerToken(message, roll.tokenId);
             if (!token || !token.id) {
                 log.debug(`RollTracker.processMessageAndPlay: roll skipped (no token found on canvas)`, {
